@@ -6,6 +6,7 @@ import { useStore, KEYS, ChatMessage } from '@/lib/store'
 import Markdown from './Markdown'
 import { PROPERTIES } from '@/data/properties'
 import { formatKES } from '@/lib/format'
+import { asset } from '@/config'
 
 const uid = () => Math.random().toString(36).slice(2, 10)
 
@@ -134,7 +135,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
       {/* header */}
       <div className="flex items-center justify-between gap-3 border-b border-gold-100 bg-gradient-to-r from-gold-50 to-white px-5 py-4">
         <div className="flex items-center gap-3">
-          <img src="/brand/keja-mascot.jpg" alt="Keja" className="h-10 w-10 rounded-full object-cover ring-2 ring-gold-300" />
+          <img src={asset('/brand/keja-mascot.jpg')} alt="Keja" className="h-10 w-10 rounded-full object-cover ring-2 ring-gold-300" />
           <div>
             <p className="font-display text-base font-bold text-ink">Keja AI</p>
             <p className="flex items-center gap-1 text-[11px] text-ink-muted">
@@ -165,7 +166,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
           <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[88%] sm:max-w-[78%] ${m.role === 'user' ? 'order-1' : ''}`}>
               {m.role === 'keja' && (
-                <img src="/brand/keja-mascot.jpg" alt="Keja" className="mb-1.5 h-7 w-7 rounded-full object-cover ring-1 ring-gold-200" />
+                <img src={asset('/brand/keja-mascot.jpg')} alt="Keja" className="mb-1.5 h-7 w-7 rounded-full object-cover ring-1 ring-gold-200" />
               )}
               <div
                 className={

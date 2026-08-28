@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Target, Eye, HeartHandshake, ShieldCheck, Bot, Building2, ChevronRight, Globe2 } from 'lucide-react'
+import { asset } from '@/config'
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
@@ -103,7 +104,7 @@ export default function About() {
       {/* parent company */}
       <section className="bg-ink">
         <div className="container-luxe flex flex-col items-center gap-8 py-16 lg:flex-row">
-          <img src="/brand/chacadom-logo.jpg" alt="Chacadom Investments" className="h-36 w-36 rounded-2xl object-cover shadow-gold-lg" />
+          <img src={asset('/brand/chacadom-logo.jpg')} alt="Chacadom Investments" className="h-36 w-36 rounded-2xl object-cover shadow-gold-lg" />
           <div className="max-w-2xl text-center lg:text-left">
             <p className="eyebrow !text-gold-400">A Chacadom Investments venture</p>
             <h2 className="mt-2 font-display text-3xl font-bold text-white">Building wealth through real estate excellence</h2>

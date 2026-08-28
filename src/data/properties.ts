@@ -1,3 +1,4 @@
+import { asset } from '@/config'
 export type PropertyType = 'apartment' | 'villa' | 'townhouse' | 'bungalow' | 'land' | 'commercial'
 export type Purpose = 'buy' | 'rent' | 'invest'
 export type Availability = 'available' | 'reserved' | 'sold'
@@ -50,7 +51,7 @@ export interface Property {
   highlights: string[]
 }
 
-const IMG = (n: string) => `/images/props/${n}.jpg`
+const IMG = (n: string) => asset(`/images/props/${n}.jpg`)
 
 export const AGENCIES = [
   { name: 'Chacadom Premier Properties', listings: 6, rating: 4.9, verifiedSince: '2024' },

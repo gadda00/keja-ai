@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Mail, Phone, MapPin, Send, CheckCircle2, Bot, MessageCircle } from 'lucide-react'
 import { SITE, whatsappLink } from '@/config'
 import { useStore, KEYS, Lead } from '@/lib/store'
+import { asset } from '@/config'
 
 export default function Contact() {
   const [leads, setLeads] = useStore<Lead[]>(KEYS.leads, [])
@@ -146,7 +147,7 @@ export default function Contact() {
             </div>
 
             <div className="overflow-hidden rounded-2xl">
-              <img src="/brand/keja-banner.jpg" alt="Keja by Chacadom" className="w-full object-cover" />
+              <img src={asset('/brand/keja-banner.jpg')} alt="Keja by Chacadom" className="w-full object-cover" />
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import {
   KeyRound, Wrench, Sparkles, CalendarClock, FileBarChart, Building2, MessageCircle, Bot, ArrowRight, CheckCircle2,
 } from 'lucide-react'
+import { asset } from '@/config'
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
@@ -104,7 +105,7 @@ export default function Manage() {
           </motion.div>
 
           <motion.div {...fadeUp} className="card-luxe overflow-hidden">
-            <img src="/images/props/interior_0.jpg" alt="Managed apartment interior" className="h-64 w-full object-cover" />
+            <img src={asset('/images/props/interior_0.jpg')} alt="Managed apartment interior" className="h-64 w-full object-cover" />
             <div className="p-6">
               <h3 className="font-display text-xl font-bold text-ink">What owners see, monthly</h3>
               <div className="mt-4 space-y-2.5 text-sm">
