@@ -1,0 +1,112 @@
+import { Link } from 'react-router-dom'
+import { MapPin, BedDouble, Bath, Ruler, Heart, TrendingUp, Eye, Building2 } from 'lucide-react'
+import type { Property } from '@/data/properties'
+import { formatKES } from '@/lib/format'
+import TrustBadge from './TrustBadge'
+import { useStore, KEYS } from '@/lib/store'
+
+export default function PropertyCard({ property }: { property: Property }) {
+  const [favorites, setFavorites] = useStore<string[]>(KEYS.favorites, [])
+  const isFav = favorites.includes(property.id)
+  const isRent = property.price < 500000
+  const toggleFav = () => {
+    setFavorites(isFav ? favorites.filter((f) => f !== property.id) : [...favorites, property.id])
+  }
+
+  return (
+    <div className="card-luxe card-luxe-hover group relative flex flex-col overflow-hidden">
+      <div className="relative h-56 overflow-hidden">
+        <Link to={`/properties/${property.id}`}>
+          <img
+            src={property.images[0]}
+            alt={property.title}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        </Link>
+        <div className="absolute left-3 top-3 flex flex-col gap-1.5">
+          <TrustBadge score={property.trustScore} size="sm" />
+          {property.offPlan && (
+            <span className="rounded-full bg-ink/85 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gold-300">
+              Off-Plan
+            </span>
+          )}
+          {property.availability === 'reserved' && (
+            <span className="rounded-full bg-ink/85 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+              Reserved
+            </span>
+          )}
+        </div>
+        <button
+          onClick={toggleFav}
+          aria-label="Toggle favourite"
+          className={`absolute right-3 top-3 rounded-full p-2 shadow-sm transition ${
+            isFav ? 'bg-gold-500 text-white' : 'bg-white/90 text-ink-muted hover:text-gold-600'
+          }`}
+        >
+          <Heart className="h-4 w-4" fill={isFav ? 'currentColor' : 'none'} />
+        </button>
+        <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-medium text-ink-muted">
+          <Eye className="h-3 w-3" /> {property.views}
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col p-5">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-gold-600">
+              {property.area} · {property.county}
+            </p>
+            <Link to={`/properties/${property.id}`}>
+              <h3 className="mt-1 truncate font-display text-lg font-semibold text-ink transition-colors hover:text-gold-700">
+                {property.title}
+              </h3>
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-ink-muted">
+          {property.bedrooms ? (
+            <span className="inline-flex items-center gap-1.5">
+              <BedDouble className="h-4 w-4 text-gold-500" /> {property.bedrooms} bed
+            </span>
+          ) : null}
+          {property.bathrooms ? (
+            <span className="inline-flex items-center gap-1.5">
+              <Bath className="h-4 w-4 text-gold-500" /> {property.bathrooms} bath
+            </span>
+          ) : null}
+          <span className="inline-flex items-center gap-1.5">
+            <Ruler className="h-4 w-4 text-gold-500" /> {property.sizeSqm.toLocaleString()} sqm
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <Building2 className="h-4 w-4 text-gold-500" /> {property.agency.split(' ')[0]}
+          </span>
+        </div>
+
+        {property.grossYieldEstimate && (
+          <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
+            <TrendingUp className="h-4 w-4" /> Est. gross yield ~{property.grossYieldEstimate}% p.a.
+          </p>
+        )}
+
+        <div className="mt-auto flex items-end justify-between border-t border-gold-100 pt-4">
+          <div>
+            <p className="font-display text-xl font-bold text-ink">
+              {formatKES(property.price, { monthly: isRent })}
+            </p>
+            {property.rentEstimate && !isRent && (
+              <p className="text-xs text-ink-faint">Est. rent {formatKES(property.rentEstimate, { monthly: true })}</p>
+            )}
+          </div>
+          <Link
+            to={`/properties/${property.id}`}
+            className="text-sm font-semibold text-gold-700 transition hover:text-gold-600"
+          >
+            View →
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}

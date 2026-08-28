@@ -1,0 +1,44 @@
+import { useEffect, useState } from 'react'
+import { MessageCircle, X } from 'lucide-react'
+import { whatsappLink } from '@/config'
+
+export default function WhatsAppFloat() {
+  const [showLabel, setShowLabel] = useState(false)
+  const [dismissed, setDismissed] = useState(false)
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowLabel(true), 4000)
+    return () => clearTimeout(t)
+  }, [])
+
+  if (dismissed) return null
+
+  return (
+    <div className="fixed bottom-5 right-5 z-40 flex items-end gap-3">
+      {showLabel && !dismissed && (
+        <div className="relative mb-1 max-w-[220px] animate-fadeUp rounded-2xl rounded-br-none bg-white p-4 shadow-card-hover ring-1 ring-gold-100">
+          <button
+            onClick={() => setDismissed(true)}
+            className="absolute -right-2 -top-2 rounded-full bg-ink p-1 text-white"
+            aria-label="Dismiss"
+          >
+            <X className="h-3 w-3" />
+          </button>
+          <p className="text-xs font-semibold text-ink">Karibu! 👋</p>
+          <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+            Keja is also on WhatsApp — instant property answers, viewings & alerts.
+          </p>
+        </div>
+      )}
+      <a
+        href={whatsappLink('Hello Keja! Help me find verified property in Kenya.')}
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Chat with Keja on WhatsApp"
+        className="group flex h-14 w-14 items-center justify-center rounded-full bg-emerald-600 shadow-lg transition-all hover:scale-105 hover:bg-emerald-500"
+      >
+        <MessageCircle className="h-7 w-7 text-white" fill="currentColor" />
+      </a>
+    </div>
+  )
+}

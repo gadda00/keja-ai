@@ -1,0 +1,412 @@
+import { Link, useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import {
+  Search, ShieldCheck, TrendingUp, Bot, MapPin, ChevronRight, Sparkles,
+  Building2, BadgeCheck, AlertTriangle, Calculator, LayoutDashboard, FileSearch, Zap,
+} from 'lucide-react'
+import PropertyCard from '@/components/property/PropertyCard'
+import { featuredProperties, PROPERTIES } from '@/data/properties'
+import { formatKES } from '@/lib/format'
+import { whatsappLink } from '@/config'
+
+const fadeUp = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: '-60px' },
+  transition: { duration: 0.6 },
+}
+
+export default function Home() {
+  const navigate = useNavigate()
+  const avgTrust = Math.round(PROPERTIES.reduce((s, p) => s + p.trustScore, 0) / PROPERTIES.length)
+  const verifiedCount = PROPERTIES.filter((p) => p.trustScore >= 75).length
+  const flaggedCount = PROPERTIES.filter((p) => p.trustScore < 60).length
+
+  return (
+    <div>
+      {/* ============================== HERO ============================== */}
+      <section className="relative overflow-hidden bg-ink">
+        <div className="absolute inset-0">
+          <img src="/images/props/skyline_hero.jpg" alt="Nairobi skyline" className="h-full w-full object-cover opacity-40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-ink/80 via-ink/60 to-ink" />
+        </div>
+
+        <div className="container-luxe relative flex flex-col items-center py-24 text-center sm:py-32">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+            <span className="inline-flex items-center gap-2 rounded-full border border-gold-400/40 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide2 text-gold-300 backdrop-blur">
+              <Sparkles className="h-3.5 w-3.5" />
+              AI Real Estate · by Chacadom Investments
+            </span>
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.12 }}
+            className="mt-6 max-w-4xl font-display text-4xl font-bold leading-[1.1] text-white sm:text-6xl"
+          >
+            Find home. <span className="gold-text">Verified.</span>
+            <span className="mt-3 block text-xl font-medium text-white/70 sm:text-2xl">
+              Intelligent Real Estate. Smarter Investments.
+            </span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.24 }}
+            className="mt-6 max-w-2xl text-base leading-relaxed text-white/70 sm:text-lg"
+          >
+            Keja.ai is Kenya’s AI property advisor and cross-agency trust layer. We don’t just list property —
+            we tell you which listings you can trust, with verified titles, transparent yields and honest investment math.
+          </motion.p>
+
+          {/* Search bar */}
+          <motion.form
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.36 }}
+            className="mt-10 w-full max-w-3xl"
+            onSubmit={(e) => {
+              e.preventDefault()
+              const q = new FormData(e.currentTarget).get('q') as string
+              navigate(`/properties?q=${encodeURIComponent(q || '')}`)
+            }}
+          >
+            <div className="flex items-center gap-2 rounded-2xl bg-white p-2 shadow-gold-lg">
+              <div className="flex flex-1 items-center gap-2.5 pl-3">
+                <MapPin className="h-5 w-5 shrink-0 text-gold-600" />
+                <input
+                  name="q"
+                  placeholder="Search area — Kilimani, Westlands, Kitengela, Nyali..."
+                  className="w-full bg-transparent py-2.5 text-sm text-ink placeholder-ink-faint focus:outline-none"
+                />
+              </div>
+              <button type="submit" className="btn-gold !rounded-xl !px-6">
+                <Search className="h-4 w-4" /> Search
+              </button>
+            </div>
+          </motion.form>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs text-white/60"
+          >
+            <span>Popular:</span>
+            {['Kilimani', 'Westlands', 'Karen', 'Kitengela land', 'Nyali'].map((a) => (
+              <Link
+                key={a}
+                to={`/properties?q=${encodeURIComponent(a)}`}
+                className="rounded-full border border-white/20 px-3 py-1 transition hover:border-gold-400 hover:text-gold-300"
+              >
+                {a}
+              </Link>
+            ))}
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="mt-12 flex flex-wrap items-center justify-center gap-3"
+          >
+            <Link to="/ask" className="btn-gold">
+              <Bot className="h-4 w-4" /> Ask Keja AI
+            </Link>
+            <Link
+              to="/trust"
+              className="inline-flex items-center gap-2 border border-gold-400/50 px-6 py-3 text-sm font-semibold tracking-wide text-gold-300 transition hover:bg-gold-400/10"
+            >
+              <ShieldCheck className="h-4 w-4" /> How we verify
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ============================== STATS ============================== */}
+      <section className="border-b border-gold-100 bg-white">
+        <div className="container-luxe grid grid-cols-2 gap-6 py-10 sm:grid-cols-4">
+          {[
+            { icon: Building2, value: `${PROPERTIES.length}`, label: 'Verified listings' },
+            { icon: BadgeCheck, value: `${verifiedCount}`, label: 'Trust-scored properties' },
+            { icon: AlertTriangle, value: `${flaggedCount}`, label: 'Fraud flags caught' },
+            { icon: ShieldCheck, value: `${avgTrust}/100`, label: 'Avg. trust score' },
+          ].map((s) => (
+            <motion.div key={s.label} {...fadeUp} className="flex flex-col items-center text-center">
+              <s.icon className="h-5 w-5 text-gold-600" />
+              <p className="mt-2 font-display text-3xl font-bold text-ink">{s.value}</p>
+              <p className="mt-1 text-xs font-medium uppercase tracking-wider text-ink-muted">{s.label}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ============================== KEJA AI SECTION ============================== */}
+      <section className="section-pad bg-cream">
+        <div className="container-luxe grid items-center gap-12 lg:grid-cols-2">
+          <motion.div {...fadeUp}>
+            <p className="eyebrow">Meet Keja — your AI advisor</p>
+            <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
+              Conversational property search, <span className="gold-text">done right</span>
+            </h2>
+            <p className="mt-5 leading-relaxed text-ink-soft">
+              Chat with Keja in English, Kiswahili or French. Ask anything — &ldquo;2BR in Kilimani under 15M&rdquo;,
+              &ldquo;is Kitengela a good investment?&rdquo;, &ldquo;how do you verify titles?&rdquo; — and get answers
+              grounded in verified inventory, with every number labelled as fact, estimate or assumption.
+            </p>
+            <ul className="mt-6 space-y-3.5">
+              {[
+                { icon: Search, text: 'Conversational search across multiple agencies — neutral, not one developer’s stock' },
+                { icon: Calculator, text: 'Live investment math: yields, ROI, payback, 5 & 10-year projections' },
+                { icon: ShieldCheck, text: 'Trust answers you can check — Ardhisasa title logic, fraud red flags' },
+                { icon: Zap, text: 'Lead qualification that routes you to the right agent — only when you’re ready' },
+              ].map((f) => (
+                <li key={f.text} className="flex gap-3">
+                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gold-100">
+                    <f.icon className="h-4 w-4 text-gold-700" />
+                  </span>
+                  <span className="text-sm leading-relaxed text-ink-soft">{f.text}</span>
+                </li>
+              ))}
+            </ul>
+            <Link to="/ask" className="btn-gold mt-8">
+              Start chatting <ChevronRight className="h-4 w-4" />
+            </Link>
+          </motion.div>
+
+          <motion.div {...fadeUp} className="relative">
+            <div className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-gold-100/40 blur-2xl" />
+            <div className="overflow-hidden rounded-3xl shadow-card-hover ring-1 ring-gold-200">
+              <img src="/brand/keja-banner.jpg" alt="Keja AI assistant" className="w-full object-cover" />
+            </div>
+            <div className="absolute -bottom-5 -left-3 rounded-2xl bg-white p-4 shadow-card-hover ring-1 ring-gold-100 sm:-left-8">
+              <div className="flex items-center gap-3">
+                <img src="/brand/keja-mascot.jpg" alt="Keja mascot" className="h-12 w-12 rounded-xl object-cover ring-2 ring-gold-200" />
+                <div>
+                  <p className="text-sm font-bold text-ink">&ldquo;Hi, I’m Keja.&rdquo;</p>
+                  <p className="text-xs text-ink-muted">Here to help you discover, analyse and invest smarter.</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ============================== TRUST LAYER ============================== */}
+      <section className="section-pad bg-ink">
+        <div className="container-luxe">
+          <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center">
+            <p className="eyebrow !text-gold-400">The Keja Trust Layer</p>
+            <h2 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl">
+              We don’t just list property.
+              <span className="gold-text block">We tell you which listings you can trust.</span>
+            </h2>
+            <p className="mt-5 leading-relaxed text-white/60">
+              A tool owned by one agency can never tell you a listing looks suspicious. Keja sits above multiple
+              agencies — so trust-scoring is structurally possible, and structurally defensible.
+            </p>
+          </motion.div>
+
+          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                icon: FileSearch,
+                title: 'Ardhisasa title cross-check',
+                text: 'Every listing’s title is checked against official land records — encumbrances, caveats and ownership history.',
+              },
+              {
+                icon: BadgeCheck,
+                title: 'Photo & duplicate scan',
+                text: 'Reverse-image matching catches recycled photos and the same unit listed five times — classic scam patterns.',
+              },
+              {
+                icon: TrendingUp,
+                title: 'Pricing anomaly detection',
+                text: 'A 34%-below-market &ldquo;urgent sale&rdquo; isn’t a bargain — it’s a bait. Our models flag price anomalies instantly.',
+              },
+              {
+                icon: ShieldCheck,
+                title: 'Agent reputation scoring',
+                text: 'Phone-number history, complaint patterns and prior listing behaviour build a reputation score for every agent.',
+              },
+            ].map((c, i) => (
+              <motion.div
+                key={c.title}
+                {...fadeUp}
+                transition={{ ...fadeUp.transition, delay: i * 0.08 }}
+                className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur transition hover:border-gold-400/40 hover:bg-white/[0.08]"
+              >
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gold-gradient shadow-gold-sm">
+                  <c.icon className="h-5 w-5 text-white" />
+                </span>
+                <h3 className="mt-4 font-display text-lg font-semibold text-white">{c.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/55">{c.text}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div {...fadeUp} className="mt-10 text-center">
+            <Link to="/trust" className="inline-flex items-center gap-2 text-sm font-semibold text-gold-300 hover:text-gold-200">
+              Explore the Trust Center <ChevronRight className="h-4 w-4" />
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ============================== FEATURED ============================== */}
+      <section className="section-pad bg-white">
+        <div className="container-luxe">
+          <motion.div {...fadeUp} className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow">Featured — trust score 90+</p>
+              <h2 className="heading-display mt-3 text-3xl sm:text-4xl">Top-verified properties this week</h2>
+            </div>
+            <Link to="/properties" className="btn-outline">
+              Browse all {PROPERTIES.length} listings <ChevronRight className="h-4 w-4" />
+            </Link>
+          </motion.div>
+
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredProperties.slice(0, 6).map((p, i) => (
+              <motion.div key={p.id} {...fadeUp} transition={{ ...fadeUp.transition, delay: i * 0.06 }}>
+                <PropertyCard property={p} />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================== HOW IT WORKS ============================== */}
+      <section className="section-pad bg-cream">
+        <div className="container-luxe">
+          <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center">
+            <p className="eyebrow">The full flow</p>
+            <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
+              From discovery to management — <span className="gold-text">one intelligent flow</span>
+            </h2>
+          </motion.div>
+
+          <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            {[
+              { step: '01', title: 'Discover', text: 'Search verified inventory across agencies — or just ask Keja.' },
+              { step: '02', title: 'Verify', text: 'Trust scores, title checks and fraud signals on every listing.' },
+              { step: '03', title: 'Analyse', text: 'Yields, ROI, projections and investor reports — the honest math.' },
+              { step: '04', title: 'Transact', text: 'Escorted viewings, M-Pesa escrow deposits, advocate-led closing.' },
+              { step: '05', title: 'Manage', text: 'Tenants, rent collection, maintenance and owner statements.' },
+            ].map((s, i) => (
+              <motion.div
+                key={s.step}
+                {...fadeUp}
+                transition={{ ...fadeUp.transition, delay: i * 0.07 }}
+                className="relative rounded-2xl bg-white p-6 shadow-card ring-1 ring-gold-100"
+              >
+                <p className="font-display text-3xl font-bold text-gold-300">{s.step}</p>
+                <h3 className="mt-2 font-display text-lg font-semibold text-ink">{s.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink-muted">{s.text}</p>
+                {i < 4 && <ChevronRight className="absolute -right-3 top-1/2 hidden h-5 w-5 -translate-y-1/2 text-gold-400 lg:block" />}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================== TOOLS CTA ============================== */}
+      <section className="section-pad bg-white">
+        <div className="container-luxe grid gap-6 md:grid-cols-3">
+          {[
+            {
+              icon: Calculator,
+              title: 'Investment Calculator',
+              text: 'Purchase price, rent, occupancy → gross & net yield, payback, 5/10-year projections. Built for diaspora and investor buyers.',
+              to: '/invest',
+              cta: 'Run the numbers',
+            },
+            {
+              icon: LayoutDashboard,
+              title: 'Agent Dashboard',
+              text: 'Multi-agency lead pipeline (HOT/WARM/COLD), inventory, verification queue, rental performance and AI activity.',
+              to: '/dashboard',
+              cta: 'Open dashboard',
+            },
+            {
+              icon: Bot,
+              title: 'WhatsApp-first',
+              text: 'Keja lives where Kenya already is. Instant property answers, viewing requests and escrow prompts on WhatsApp.',
+              href: whatsappLink('Hello Keja! I’d like help finding property.'),
+              cta: 'Chat now',
+            },
+          ].map((t) => (
+            <motion.div key={t.title} {...fadeUp} className="card-luxe card-luxe-hover flex flex-col p-7">
+              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold-gradient shadow-gold-sm">
+                <t.icon className="h-6 w-6 text-white" />
+              </span>
+              <h3 className="mt-5 font-display text-xl font-semibold text-ink">{t.title}</h3>
+              <p className="mt-2.5 flex-1 text-sm leading-relaxed text-ink-muted">{t.text}</p>
+              {t.to ? (
+                <Link to={t.to} className="mt-5 text-sm font-semibold text-gold-700 hover:text-gold-600">
+                  {t.cta} →
+                </Link>
+              ) : (
+                <a href={t.href} target="_blank" rel="noreferrer" className="mt-5 text-sm font-semibold text-emerald-700 hover:text-emerald-600">
+                  {t.cta} →
+                </a>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ============================== FLAGGED EXAMPLE ============================== */}
+      <section className="border-y border-gold-100 bg-gold-50/50">
+        <div className="container-luxe flex flex-col items-center gap-6 py-12 text-center lg:flex-row lg:text-left">
+          <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-red-100">
+            <AlertTriangle className="h-8 w-8 text-red-600" />
+          </span>
+          <div className="flex-1">
+            <h3 className="font-display text-2xl font-bold text-ink">
+              This week, our trust layer caught a listing priced 34% below market
+            </h3>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-ink-muted">
+              Re-posted three times under different agent names, with photos lifted from another building. It’s still
+              on our site — openly flagged — because transparency is how markets get safer. That’s the difference
+              between a listings board and a trust layer. {formatKES(4200000)} looked like a deal. It wasn’t.
+            </p>
+          </div>
+          <Link to="/properties/KJA-020" className="btn-dark shrink-0">
+            See the flagged listing
+          </Link>
+        </div>
+      </section>
+
+      {/* ============================== FINAL CTA ============================== */}
+      <section className="relative overflow-hidden bg-ink">
+        <div className="absolute inset-0 bg-gold-shimmer opacity-[0.06]" />
+        <div className="container-luxe relative py-20 text-center sm:py-24">
+          <motion.div {...fadeUp}>
+            <p className="eyebrow !text-gold-400">For you. For your family. For your future.</p>
+            <h2 className="mt-4 font-display text-3xl font-bold text-white sm:text-5xl">
+              We don’t just find you a home.
+              <span className="gold-text block">We help you build a legacy.</span>
+            </h2>
+            <p className="mx-auto mt-5 max-w-xl text-white/60">
+              Join the buyers, renters and investors getting honest answers from Kenya’s AI real-estate advisor.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Link to="/ask" className="btn-gold">
+                <Bot className="h-4 w-4" /> Ask Keja anything
+              </Link>
+              <Link
+                to="/properties"
+                className="inline-flex items-center gap-2 border border-gold-400/50 px-6 py-3 text-sm font-semibold tracking-wide text-gold-300 transition hover:bg-gold-400/10"
+              >
+                Browse listings
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </div>
+  )
+}
