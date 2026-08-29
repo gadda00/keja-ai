@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import WhatsAppFloat from '@/components/layout/WhatsAppFloat'
+import AuthModal from '@/components/auth/AuthModal'
 import Home from '@/pages/Home'
 import Properties from '@/pages/Properties'
 import PropertyDetail from '@/pages/PropertyDetail'
@@ -13,10 +14,14 @@ import Contact from '@/pages/Contact'
 import Insights from '@/pages/Insights'
 import ListProperty from '@/pages/ListProperty'
 import Manage from '@/pages/Manage'
+import Account from '@/pages/Account'
+import Ecosystem from '@/pages/Ecosystem'
 
 const InvestmentCalculator = lazy(() => import('@/pages/InvestmentCalculator'))
 const Dashboard = lazy(() => import('@/pages/Dashboard'))
 const Tokenize = lazy(() => import('@/pages/Tokenize'))
+const Admin = lazy(() => import('@/pages/Admin'))
+const Partners = lazy(() => import('@/pages/Partners'))
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -58,12 +63,17 @@ export default function App() {
             <Route path="/insights" element={<Insights />} />
             <Route path="/sell" element={<ListProperty />} />
             <Route path="/manage" element={<Manage />} />
+            <Route path="/account" element={<Account />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/ecosystem" element={<Ecosystem />} />
+            <Route path="/partners" element={<Partners />} />
             <Route path="*" element={<Home />} />
           </Routes>
         </Suspense>
       </main>
       <Footer />
       <WhatsAppFloat />
+      <AuthModal />
     </div>
   )
 }

@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
-import { MapPin, BedDouble, Bath, Ruler, Heart, TrendingUp, Eye, Building2 } from 'lucide-react'
+import { MapPin, BedDouble, Bath, Ruler, Heart, TrendingUp, Eye, Building2, Gauge } from 'lucide-react'
 import type { Property } from '@/data/properties'
 import { formatKES } from '@/lib/format'
+import { investmentScore, scoreTone } from '@/lib/investmentScore'
 import TrustBadge from './TrustBadge'
 import { useStore, KEYS } from '@/lib/store'
 
@@ -9,6 +10,7 @@ export default function PropertyCard({ property }: { property: Property }) {
   const [favorites, setFavorites] = useStore<string[]>(KEYS.favorites, [])
   const isFav = favorites.includes(property.id)
   const isRent = property.price < 500000
+  const score = investmentScore(property)
   const toggleFav = () => {
     setFavorites(isFav ? favorites.filter((f) => f !== property.id) : [...favorites, property.id])
   }
@@ -89,6 +91,19 @@ export default function PropertyCard({ property }: { property: Property }) {
             <TrendingUp className="h-4 w-4" /> Est. gross yield ~{property.grossYieldEstimate}% p.a.
           </p>
         )}
+
+        {/* KEJA Investment Score™ */}
+        <div className="mt-3 flex items-center justify-between rounded-xl bg-ink px-3.5 py-2.5">
+          <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-gold-300">
+            <Gauge className="h-3.5 w-3.5" /> Investment Score™
+          </span>
+          <span className="flex items-baseline gap-1.5">
+            <span className={`rounded-md px-2 py-0.5 font-display text-sm font-bold ${scoreTone(score.overall).chip}`}>
+              {score.overall.toFixed(1)}
+            </span>
+            <span className="text-[10px] text-white/60">/ 10 · {score.band}</span>
+          </span>
+        </div>
 
         <div className="mt-auto flex items-end justify-between border-t border-gold-100 pt-4">
           <div>

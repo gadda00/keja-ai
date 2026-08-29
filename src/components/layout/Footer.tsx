@@ -34,6 +34,8 @@ export default function Footer() {
             <li><Link to="/invest" className="hover:text-gold-300">Investment Calculator</Link></li>
             <li><Link to="/ask" className="hover:text-gold-300">Ask Keja AI</Link></li>
             <li><Link to="/dashboard" className="hover:text-gold-300">Agent Dashboard</Link></li>
+            <li><Link to="/partners" className="hover:text-gold-300">Partner Network</Link></li>
+            <li><Link to="/ecosystem" className="hover:text-gold-300">The Ecosystem</Link></li>
           </ul>
         </div>
 
@@ -45,6 +47,8 @@ export default function Footer() {
             <li><Link to="/about" className="hover:text-gold-300">About Keja.ai</Link></li>
             <li><Link to="/insights" className="hover:text-gold-300">Market Insights</Link></li>
             <li><Link to="/manage" className="hover:text-gold-300">List & Manage</Link></li>
+            <li><Link to="/account" className="hover:text-gold-300">My Account</Link></li>
+            <li><Link to="/admin" className="hover:text-gold-300">Admin Console</Link></li>
           </ul>
         </div>
 

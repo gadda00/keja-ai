@@ -188,6 +188,66 @@ export class KejaAI {
       return this.tokenizeAnswer()
     }
 
+    // KJAI / KPT — the two-token architecture
+    if (/(kjai|kpt|utility token|property token|token economics|tokenomics|two.?token)/.test(t)) {
+      return {
+        text: 'Great question — this is the **two-token architecture** from the KEJA blueprint:\n\n**KJAI (utility token)** — the ecosystem utility layer, planning supply of 1,000,000,000. It powers premium AI access, fee benefits, developer services and ecosystem rewards. *Never* a speculative product — utility must be measurable and tied to real activity.\n\n**KPT (property investment tokens)** — project-specific digital representations of legally defined investor interests in property SPVs, funds or REITs. Example: a KSh 500M Nairobi property → 500,000 units at KSh 1,000 reference. Rights come from enforceable legal documents, not the token itself.\n\nThe core separation principle: company equity, platform utility and property interests stay **legally distinct**.',
+        meta: [
+          { label: 'FACT', text: 'Two-token model (KJAI utility + KPT property) is the documented blueprint architecture' },
+          { label: 'ASSUMPTION', text: '1B KJAI supply is a planning figure pending legal & economic validation' },
+        ],
+        quickReplies: ['Open Keja Tokenize', 'How does the tokenization lifecycle work?', 'Is this regulated in Kenya?'],
+      }
+    }
+
+    // Ecosystem / products
+    if (/(ecosystem|keja home|keja invest|keja pro|keja manage|keja data|keja search|products?|platform family|what products)/.test(t)) {
+      return {
+        text: 'KEJA is a family of products built around **one intelligence layer**:\n\n🏠 **KEJA HOME** — discovery, search & guided decisions for buyers and renters\n📈 **KEJA INVEST** — investment analysis, scores & reports\n💼 **KEJA PRO** — agent CRM, lead qualification & analytics\n🏢 **KEJA MANAGE** — landlord tools, tenants & rental analytics\n📊 **KEJA DATA** — market intelligence & APIs for institutions\n🔎 **KEJA SEARCH** — natural-language property discovery\n✨ **KEJA AI ADVISOR** — that\u2019s me, across every product\n🪙 **KEJA TOKEN** — regulated tokenization infrastructure (demo)\n\nData feeds intelligence → intelligence improves discovery → discovery feeds transactions → transactions generate more data. The flywheel compounds.',
+        meta: [{ label: 'FACT', text: 'Product family per the KEJA ecosystem architecture' }],
+        quickReplies: ['Explore the ecosystem', 'Show me investment deals', 'How do I list property?'],
+      }
+    }
+
+    // Investment Score
+    if (/(investment score|score|rating|how do you rank|trust score|scoring)/.test(t)) {
+      return {
+        text: 'Two different scores — both transparent:\n\n**KEJA Investment Score™** (0–10): seven weighted factors — Rental Potential (22%), Capital Appreciation (18%), Location (16%), Price/Value (14%), Demand (12%), Risk (10%), Liquidity (8%). Every factor declares whether it\u2019s based on **FACT**, **ESTIMATE** or **ASSUMPTION**. You\u2019ll find it on every property page.\n\n**Trust Score** (0–100): verification-driven — title check, Ardhisasa match, photo authenticity, duplicate scan, pricing analysis and agent history.\n\nScores are decision-support tools, never guarantees. That\u2019s the discipline.',
+        meta: [
+          { label: 'FACT', text: 'Score weights and factors are published on every property detail page' },
+          { label: 'ASSUMPTION', text: 'Location demand bands and type norms are illustrative baselines' },
+        ],
+        quickReplies: ['Show me top-scored properties', 'How does verification work?', 'Open the investment calculator'],
+      }
+    }
+
+    // Account / sign in
+    if (/(sign in|sign up|log ?in|register|account|google|session|create account)/.test(t)) {
+      return {
+        text: 'You can create a Keja account in seconds — **Continue with Google** or email. Your account unlocks:\n\n• Saved properties & searches\n• Your investment portfolio & Keja Tokenize holdings\n• Keja AI conversations that remember you\n• Viewing requests & WhatsApp updates\n• KEJA PRO tools if you\u2019re an agent\n\nSessions are role-based (user / agent / admin) and expire automatically. Privacy by design: your data stays on your device in this demo build.',
+        meta: [{ label: 'FACT', text: 'RBAC + auto-expiring sessions per the KEJA security architecture' }],
+        quickReplies: ['Sign in now', 'Tell me about the admin console', 'Find property first'],
+      }
+    }
+
+    // Partners / global listings
+    if (/(partner|agency partner|become a partner|list globally|global listings|international|diaspora|syndicat|feed)/.test(t)) {
+      return {
+        text: 'Keja acquires inventory **globally through five channels**:\n\n1️⃣ **Agent & agency partnerships** — free KEJA PRO tools in exchange for verified inventory\n2️⃣ **Developer direct deals** — off-plan & new builds with payment plans\n3️⃣ **Owner/landlord self-service** — free guided wizard, 24h review SLA\n4️⃣ **Cross-portal syndication** — XML/JSON feeds from diaspora corridors (UK, US, UAE)\n5️⃣ **API & data partnerships** — institutional and MLS-equivalent integrations\n\nEvery channel runs through duplicate detection, price-anomaly screening and completeness checks — trust by design, on every listing.',
+        meta: [{ label: 'FACT', text: 'Five-channel supply strategy per the marketplace architecture' }],
+        quickReplies: ['Become a partner', 'List my property', 'How does verification work?'],
+      }
+    }
+
+    // Admin console
+    if (/(admin|console|back ?office|moderation|review queue|who reviews)/.test(t)) {
+      return {
+        text: 'The **Admin Console** is the operating layer of the platform — restricted to administrator accounts:\n\n• **Overview** — KPIs, funnel, supply health\n• **Users** — role-based access management (admin / agent / user)\n• **Listings** — verification queue with anomaly flags & completeness scores\n• **Leads** — HOT/WARM/COLD CRM pipeline\n• **Partners & Feeds** — applications, feed connections, sync operations\n• **Audit Trail** — every critical action, recorded\n• **Settings** — review SLA, auto-approve thresholds, maintenance mode\n\nTry it: sign in as `admin@keja.ai` / `admin123` (demo credentials).',
+        meta: [{ label: 'FACT', text: 'RBAC-gated console; audit trail per security architecture' }],
+        quickReplies: ['Sign in as admin', 'How do listings get verified?', 'Tell me about partners'],
+      }
+    }
+
     // Investment analysis for a specific area
     if (/(invest|roi|yield|return|appreciation|worth it|good deal|rental income|cash ?flow|mapato|uwekezaji)/.test(t)) {
       return this.investmentAnswer(input)

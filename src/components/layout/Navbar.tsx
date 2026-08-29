@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
-import { Menu, X, ShieldCheck, Home } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { Menu, X, ShieldCheck, Home, LayoutDashboard, LogOut, Settings2, UserCircle2, Building2 } from 'lucide-react'
 import { SITE } from '@/config'
+import { useAuth, initials } from '@/lib/auth'
 
 const NAV = [
   { to: '/properties', label: 'Buy & Rent' },
   { to: '/invest', label: 'Invest' },
   { to: '/tokenize', label: 'Tokenize', highlight: true },
+  { to: '/partners', label: 'Partners' },
   { to: '/ask', label: 'Ask Keja AI' },
   { to: '/trust', label: 'Trust Center' },
   { to: '/dashboard', label: 'Dashboard' },
@@ -16,7 +18,11 @@ const NAV = [
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
+  const { user, isAdmin, logout, setAuthModalOpen } = useAuth()
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
@@ -25,6 +31,22 @@ export default function Navbar() {
   }, [])
 
   useEffect(() => setOpen(false), [location.pathname])
+
+  // close avatar menu on outside click
+  useEffect(() => {
+    if (!menuOpen) return
+    const onClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false)
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
+  }, [menuOpen])
+
+  const handleLogout = () => {
+    setMenuOpen(false)
+    logout()
+    navigate('/')
+  }
 
   return (
     <header
@@ -41,11 +63,13 @@ export default function Navbar() {
             <span className="font-display text-xl font-bold tracking-tight text-ink">
               Keja<span className="gold-text">.ai</span>
             </span>
-            <span className="text-[9px] font-semibold uppercase tracking-wide2 text-ink-muted">by Chacadom</span>
+            <span className="text-[9px] font-semibold uppercase tracking-wide2 text-ink-muted">
+              by Chacadom
+            </span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main navigation">
+        <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Main navigation">
           {NAV.map((item) => (
             <NavLink
               key={item.to}
@@ -82,6 +106,84 @@ export default function Navbar() {
             <ShieldCheck className="h-4 w-4 text-gold-600" />
             Verified inventory only
           </Link>
+          {user ? (
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="flex items-center gap-2 rounded-full border border-gold-200 bg-gold-50/60 py-1 pl-1 pr-3 transition hover:border-gold-400 hover:bg-gold-50"
+                aria-label="Account menu"
+                aria-expanded={menuOpen}
+              >
+                <span
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-gold-gradient text-xs font-bold text-white"
+                  aria-hidden="true"
+                >
+                  {initials(user.name)}
+                </span>
+                <span className="hidden text-left leading-tight sm:block">
+                  <span className="block max-w-[110px] truncate text-xs font-semibold text-ink">
+                    {user.name.split(' ')[0]}
+                  </span>
+                  <span className="block text-[10px] font-semibold uppercase tracking-wide text-gold-700">
+                    {user.role}
+                  </span>
+                </span>
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 mt-2 w-60 overflow-hidden rounded-xl bg-white shadow-card-hover ring-1 ring-gold-200">
+                  <div className="border-b border-gold-100 bg-gold-50/50 px-4 py-3">
+                    <p className="truncate text-sm font-semibold text-ink">{user.name}</p>
+                    <p className="truncate text-xs text-ink-muted">{user.email}</p>
+                  </div>
+                  <div className="flex flex-col p-1.5">
+                    <Link
+                      to="/account"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-ink-soft transition hover:bg-gold-50 hover:text-gold-700"
+                    >
+                      <UserCircle2 className="h-4 w-4 text-gold-600" /> My Account
+                    </Link>
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-gold-700 transition hover:bg-gold-50"
+                      >
+                        <Settings2 className="h-4 w-4" /> Admin Console
+                      </Link>
+                    )}
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-ink-soft transition hover:bg-gold-50 hover:text-gold-700"
+                    >
+                      <LayoutDashboard className="h-4 w-4 text-gold-600" /> Sales Dashboard
+                    </Link>
+                    <Link
+                      to="/partners"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-ink-soft transition hover:bg-gold-50 hover:text-gold-700"
+                    >
+                      <Building2 className="h-4 w-4 text-gold-600" /> List with Keja
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-red-600 transition hover:bg-red-50"
+                    >
+                      <LogOut className="h-4 w-4" /> Sign out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => setAuthModalOpen(true)}
+              className="btn-dark !px-4 !py-2 !text-xs"
+            >
+              Sign in
+            </button>
+          )}
           <Link to="/ask" className="btn-gold !px-4 !py-2">
             Ask Keja
           </Link>
@@ -121,6 +223,33 @@ export default function Navbar() {
                 )}
               </NavLink>
             ))}
+            <div className="mt-2 flex gap-2">
+              {user ? (
+                <>
+                  <Link to="/account" className="btn-outline flex-1 !py-2.5 !text-xs">
+                    Account ({user.name.split(' ')[0]})
+                  </Link>
+                  {isAdmin && (
+                    <Link to="/admin" className="btn-dark flex-1 !py-2.5 !text-xs">
+                      Admin
+                    </Link>
+                  )}
+                  <button onClick={handleLogout} className="btn-outline !px-4 !py-2.5 !text-xs !text-red-600">
+                    <LogOut className="h-4 w-4" />
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    setOpen(false)
+                    setAuthModalOpen(true)
+                  }}
+                  className="btn-dark flex-1 !py-2.5 !text-xs"
+                >
+                  Sign in
+                </button>
+              )}
+            </div>
             <Link to="/ask" className="btn-gold mt-2 w-full">
               Ask Keja AI
             </Link>

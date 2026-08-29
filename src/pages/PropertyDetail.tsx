@@ -4,11 +4,12 @@ import { motion } from 'framer-motion'
 import {
   MapPin, BedDouble, Bath, Ruler, Heart, Share2, ShieldCheck, ShieldAlert, CheckCircle2,
   AlertTriangle, Phone, Building2, TrendingUp, Calendar, Eye, Bot, FileText, ChevronLeft,
-  ArrowRight, Clock, Award,
+  ArrowRight, Clock, Award, Gauge,
 } from 'lucide-react'
 import { getProperty, PROPERTIES, areaInsights } from '@/data/properties'
 import { formatKES, timeAgo } from '@/lib/format'
 import { analyzeInvestment, estimateMonthlyExpenses, calculateMortgage } from '@/lib/finance'
+import { investmentScore, scoreTone } from '@/lib/investmentScore'
 import TrustBadge from '@/components/property/TrustBadge'
 import PropertyCard from '@/components/property/PropertyCard'
 import { useStore, KEYS } from '@/lib/store'
@@ -17,6 +18,7 @@ import { whatsappLink } from '@/config'
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>()
   const property = getProperty(id ?? '')
+  const score = useMemo(() => (property ? investmentScore(property) : null), [property])
   const [activeImg, setActiveImg] = useState(0)
   const [showAllSignals, setShowAllSignals] = useState(false)
   const [viewingOpen, setViewingOpen] = useState(false)
@@ -266,6 +268,62 @@ export default function PropertyDetail() {
                 <Link to="/trust" className="ml-1 font-semibold text-gold-700">How scoring works →</Link>
               </p>
             </section>
+
+            {/* KEJA Investment Score™ */}
+            {score && (
+            <section className="mt-10">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="flex items-center gap-2 font-display text-xl font-bold text-ink">
+                  <Gauge className="h-5 w-5 text-gold-600" />
+                  KEJA Investment Score™
+                </h2>
+                <span className={`rounded-full px-3 py-1 text-xs font-bold ${scoreTone(score.overall).chip}`}>
+                  {score.overall.toFixed(1)} / 10 · {score.band}
+                </span>
+              </div>
+              <p className="mt-2 max-w-3xl text-xs leading-relaxed text-ink-muted">
+                A transparent multi-factor framework — rental potential, capital appreciation,
+                location, demand, price/value, liquidity and risk. Scores are decision-support
+                tools, not guarantees; each factor declares whether it rests on verified facts,
+                estimates or assumptions.
+              </p>
+              <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {score.factors.map((f) => {
+                  const tone = scoreTone(f.score)
+                  return (
+                    <div key={f.key} className="card-luxe p-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-ink">{f.label}</p>
+                        <span className={`rounded-md px-2 py-0.5 font-display text-sm font-bold ${tone.chip}`}>
+                          {f.score.toFixed(1)}
+                        </span>
+                      </div>
+                      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-gold-50">
+                        <div
+                          className={`h-full rounded-full ${tone.bar}`}
+                          style={{ width: `${f.score * 10}%` }}
+                        />
+                      </div>
+                      <p className="mt-2 flex items-start gap-1.5 text-[11px] leading-relaxed text-ink-muted">
+                        <span
+                          className={`mt-px shrink-0 rounded px-1 py-px text-[9px] font-bold uppercase tracking-wide ${
+                            f.basis === 'FACT'
+                              ? 'bg-green-100 text-green-700'
+                              : f.basis === 'ESTIMATE'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-ink/10 text-ink-muted'
+                          }`}
+                        >
+                          {f.basis}
+                        </span>
+                        {f.note}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
+            )}
 
             {/* investment snapshot */}
             {investment && (

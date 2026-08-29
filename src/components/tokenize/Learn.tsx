@@ -254,6 +254,137 @@ export function Learn() {
           ))}
         </div>
 
+        {/* KJAI & KPT — blueprint token architecture */}
+        <div className="mt-16">
+          <SectionTitle
+            center
+            eyebrow="The two-token architecture"
+            title="KJAI for ecosystem utility · KPT for property interests"
+            sub="Company equity, platform utility and property investment interests remain conceptually and legally distinct — the core separation principle of the KEJA blueprint."
+          />
+          <div className="mt-8 grid gap-5 lg:grid-cols-2">
+            {/* KJAI */}
+            <div className="rounded-2xl bg-ink p-6 text-white">
+              <div className="flex items-center justify-between">
+                <h3 className="font-display text-xl font-bold text-gold-300">KJAI — Utility Token</h3>
+                <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white/70">
+                  1,000,000,000 planning supply
+                </span>
+              </div>
+              <p className="mt-3 text-[13px] leading-relaxed text-white/70">
+                The ecosystem utility layer — never a speculative product. Premium AI access, fee
+                benefits, developer services, ecosystem rewards and membership tiers where legally
+                permitted. No promise of appreciation; utility tied to real customer activity.
+              </p>
+              <div className="mt-5 space-y-2.5">
+                {[
+                  ['Ecosystem & rewards', '25%', '250M'],
+                  ['Treasury', '20%', '200M'],
+                  ['Community', '15%', '150M'],
+                  ['Strategic investors', '15%', '150M'],
+                  ['Team & founders', '10%', '100M'],
+                  ['Technology', '10%', '100M'],
+                  ['Liquidity', '5%', '50M'],
+                ].map(([label, pct, tokens]) => (
+                  <div key={label} className="flex items-center gap-3">
+                    <span className="w-36 shrink-0 text-[11px] text-white/70">{label}</span>
+                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
+                      <div className="h-full rounded-full bg-gold-gradient" style={{ width: `${(Number(pct.replace('%', '')) / 25) * 100}%` }} />
+                    </div>
+                    <span className="w-10 text-right text-[11px] font-bold text-gold-300">{pct}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-4 text-[10px] leading-relaxed text-white/40">
+                Planning allocation — a design assumption that must be validated through legal,
+                economic and market modelling before any issuance.
+              </p>
+            </div>
+
+            {/* KPT */}
+            <div className="rounded-2xl border-2 border-gold-300 bg-white p-6">
+              <div className="flex items-center justify-between">
+                <h3 className="font-display text-xl font-bold text-ink">
+                  KPT — Property Investment Tokens
+                </h3>
+                <span className="rounded-full bg-gold-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-gold-800">
+                  Project-specific
+                </span>
+              </div>
+              <p className="mt-3 text-[13px] leading-relaxed text-ink-muted">
+                KPTs represent legally defined interests in specific property SPVs, funds, REITs or
+                approved structures. The rights attached come from enforceable legal documents —
+                never from the token itself.
+              </p>
+              <div className="mt-5 rounded-xl bg-gold-50 p-4 ring-1 ring-gold-100">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-gold-700">
+                  Illustrative example — KPT-NBO-001
+                </p>
+                <div className="mt-3 space-y-2 text-[12.5px]">
+                  {[
+                    ['Underlying asset', 'Income-generating Nairobi residential property'],
+                    ['Illustrative value', 'KSh 500,000,000'],
+                    ['Units', '500,000'],
+                    ['Unit reference', 'KSh 1,000'],
+                    ['Rights', 'Defined by the legal vehicle & offering documents'],
+                  ].map(([k, v]) => (
+                    <div key={k} className="flex justify-between gap-4">
+                      <span className="text-ink-muted">{k}</span>
+                      <span className="text-right font-semibold text-ink">{v}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                {['Investor ownership records', 'Distributions', 'Transfers', 'Property performance', 'Valuations', 'Corporate actions'].map(
+                  (r) => (
+                    <span key={r} className="rounded-lg bg-cream px-2.5 py-1.5 text-[11px] font-medium text-ink-soft ring-1 ring-gold-100">
+                      {r}
+                    </span>
+                  ),
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* tokenization lifecycle */}
+          <div className="mt-10">
+            <SectionTitle
+              center
+              eyebrow="The lifecycle"
+              title="From property selection to servicing — ten controlled steps"
+            />
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
+              {[
+                'Identify property',
+                'Due diligence',
+                'Legal structure (SPV)',
+                'Classification & approvals',
+                'Define investor rights',
+                'Tokenize',
+                'Onboard investors (KYC/AML)',
+                'Operate & distribute',
+                'Report',
+                'Secondary transfers',
+              ].map((s, i) => (
+                <div
+                  key={s}
+                  className="rounded-xl border border-gold-100 bg-white p-3.5 text-center"
+                >
+                  <p className="font-display text-lg font-bold text-gold-400">
+                    {String(i + 1).padStart(2, '0')}
+                  </p>
+                  <p className="mt-1 text-[11px] font-semibold leading-snug text-ink-soft">{s}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-4 text-center text-[11px] leading-relaxed text-ink-faint">
+              Classification first. Licensing second. Issuance third — the regulatory-first
+              operating sequence.
+            </p>
+          </div>
+        </div>
+
         {/* glossary */}
         <div className="mt-12">
           <SectionTitle center eyebrow="Glossary" title="Six terms you will hear constantly" />

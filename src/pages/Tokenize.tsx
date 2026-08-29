@@ -8,7 +8,7 @@
 import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Coins, Store, GraduationCap, Briefcase, LayoutDashboard } from 'lucide-react'
-import { TokenizeProvider, useTokenize } from '@/lib/tokenizeStore'
+import { useTokenize } from '@/lib/tokenizeStore'
 import type { TokenizeView } from '@/lib/tokenizeStore'
 import { ToastProvider } from '@/components/tokenize/shared'
 import { Marketplace } from '@/components/tokenize/Marketplace'
@@ -102,11 +102,9 @@ export default function Tokenize() {
         </div>
       }
     >
-      <TokenizeProvider>
-        <ToastProvider>
-          <TokenizeInner />
-        </ToastProvider>
-      </TokenizeProvider>
+      <ToastProvider>
+        <TokenizeInner />
+      </ToastProvider>
     </Suspense>
   )
 }

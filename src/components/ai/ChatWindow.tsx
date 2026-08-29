@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Send, Sparkles, ShieldCheck, Languages } from 'lucide-react'
 import { kejaAI, AIResponse } from '@/lib/ai/engine'
 import { useStore, KEYS, ChatMessage } from '@/lib/store'
+import { useAuth } from '@/lib/auth'
 import Markdown from './Markdown'
 import { PROPERTIES } from '@/data/properties'
 import { formatKES } from '@/lib/format'
@@ -18,6 +19,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
   const bottomRef = useRef<HTMLDivElement>(null)
   const started = useRef(false)
   const navigate = useNavigate()
+  const { setAuthModalOpen } = useAuth()
 
   useEffect(() => {
     if (!started.current && messages.length === 0) {
@@ -40,16 +42,35 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
     setMessages([...messages, userMsg])
     setInput('')
 
-    // navigation shortcut from quick replies
-    if (/^open keja tokenize$/i.test(clean)) {
+    // navigation shortcuts from quick replies
+    const navShortcut: Record<string, { to: string; msg: string }> = {
+      'open keja tokenize': { to: '/tokenize', msg: 'Taking you to **Keja Tokenize** — our tokenized real-estate marketplace. 🪙' },
+      'explore the ecosystem': { to: '/ecosystem', msg: 'Opening the **KEJA ecosystem** — all eight products, one intelligence layer. ✨' },
+      'become a partner': { to: '/partners', msg: 'Heading to the **Partner Network** — five channels to get your inventory on Keja. 🤝' },
+      'sign in now': { to: '', msg: '' }, // handled via auth modal below
+      'sign in as admin': { to: '', msg: '' },
+    }
+    const shortcut = navShortcut[clean.toLowerCase()]
+    if (shortcut) {
+      if (clean.toLowerCase() === 'sign in now' || clean.toLowerCase() === 'sign in as admin') {
+        const kejaMsg: ChatMessage = {
+          id: uid(),
+          role: 'keja',
+          text: 'Opening the **sign-in panel** for you now. Pick *Continue with Google* or use a demo account. 🔐',
+          ts: new Date().toISOString(),
+        }
+        setMessages([...messages, userMsg, kejaMsg])
+        setTimeout(() => setAuthModalOpen(true), 500)
+        return
+      }
       const kejaMsg: ChatMessage = {
         id: uid(),
         role: 'keja',
-        text: 'Taking you to **Keja Tokenize** — our tokenized real-estate marketplace. 🪙',
+        text: shortcut.msg,
         ts: new Date().toISOString(),
       }
       setMessages([...messages, userMsg, kejaMsg])
-      setTimeout(() => navigate('/tokenize'), 600)
+      setTimeout(() => navigate(shortcut.to), 600)
       return
     }
 

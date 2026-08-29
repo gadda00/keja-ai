@@ -465,6 +465,54 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ============================== ECOSYSTEM / BLUEPRINT ============================== */}
+      <section className="bg-white">
+        <div className="container-luxe py-16">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="eyebrow">The KEJA Ecosystem</p>
+            <h2 className="heading-display mt-2 text-3xl sm:text-4xl">
+              Discover. Analyse. Invest. <span className="gold-text">Transact. Manage.</span>
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-ink-muted">
+              Eight products, one intelligence layer — from first search to tokenized ownership.
+              Data feeds intelligence; intelligence improves decisions; decisions create
+              transactions; transactions create more data. The flywheel compounds.
+            </p>
+          </div>
+          <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {[
+              { name: 'KEJA HOME', desc: 'Guided discovery', to: '/properties' },
+              { name: 'KEJA INVEST', desc: 'Scores & reports', to: '/invest' },
+              { name: 'KEJA PRO', desc: 'Agent CRM & leads', to: '/dashboard' },
+              { name: 'KEJA MANAGE', desc: 'Landlord tools', to: '/manage' },
+              { name: 'KEJA DATA', desc: 'Market intelligence', to: '/contact' },
+              { name: 'KEJA SEARCH', desc: 'Natural-language search', to: '/ask' },
+              { name: 'KEJA AI', desc: 'Your advisor', to: '/ask' },
+              { name: 'KEJA TOKEN', desc: 'Fractional ownership', to: '/tokenize' },
+            ].map((p) => (
+              <Link
+                key={p.name}
+                to={p.to}
+                className="card-luxe card-luxe-hover group p-4 text-center"
+              >
+                <p className="font-display text-sm font-bold text-ink group-hover:text-gold-700">
+                  {p.name}
+                </p>
+                <p className="mt-1 text-[11px] text-ink-muted">{p.desc}</p>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
+            <Link to="/ecosystem" className="btn-outline !py-2.5 !text-xs">
+              Explore the full ecosystem →
+            </Link>
+            <Link to="/partners" className="btn-outline !py-2.5 !text-xs">
+              Get your listings on Keja 🌍
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ============================== FINAL CTA ============================== */}
       <section className="relative overflow-hidden bg-ink">
         <div className="absolute inset-0 bg-gold-shimmer opacity-[0.06]" />
