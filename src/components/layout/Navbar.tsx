@@ -6,6 +6,7 @@ import { SITE } from '@/config'
 const NAV = [
   { to: '/properties', label: 'Buy & Rent' },
   { to: '/invest', label: 'Invest' },
+  { to: '/tokenize', label: 'Tokenize', highlight: true },
   { to: '/ask', label: 'Ask Keja AI' },
   { to: '/trust', label: 'Trust Center' },
   { to: '/dashboard', label: 'Dashboard' },
@@ -44,18 +45,31 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main navigation">
           {NAV.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
-                  isActive ? 'bg-gold-50 text-gold-700' : 'text-ink-soft hover:bg-gold-50/60 hover:text-gold-700'
+                `rounded-lg px-2.5 py-2 text-[13px] font-medium transition-colors ${
+                  isActive
+                    ? 'bg-gold-50 text-gold-700'
+                    : item.highlight
+                      ? 'text-gold-700 hover:bg-gold-50/60'
+                      : 'text-ink-soft hover:bg-gold-50/60 hover:text-gold-700'
                 }`
               }
             >
-              {item.label}
+              {item.highlight ? (
+                <span className="inline-flex items-center gap-1.5">
+                  {item.label}
+                  <span className="rounded-full bg-gold-gradient px-1.5 py-px text-[9px] font-bold uppercase tracking-wide text-white">
+                    New
+                  </span>
+                </span>
+              ) : (
+                item.label
+              )}
             </NavLink>
           ))}
         </nav>
@@ -84,7 +98,7 @@ export default function Navbar() {
 
       {open && (
         <div className="border-t border-gold-100 bg-white px-4 pb-4 pt-2 lg:hidden">
-          <nav className="flex flex-col gap-1">
+          <nav className="flex flex-col gap-1" aria-label="Mobile navigation">
             {NAV.map((item) => (
               <NavLink
                 key={item.to}
@@ -95,7 +109,16 @@ export default function Navbar() {
                   }`
                 }
               >
-                {item.label}
+                {item.highlight ? (
+                  <span className="inline-flex items-center gap-1.5">
+                    {item.label}
+                    <span className="rounded-full bg-gold-gradient px-1.5 py-px text-[9px] font-bold uppercase tracking-wide text-white">
+                      New
+                    </span>
+                  </span>
+                ) : (
+                  item.label
+                )}
               </NavLink>
             ))}
             <Link to="/ask" className="btn-gold mt-2 w-full">

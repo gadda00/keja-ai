@@ -28,7 +28,7 @@ export default function About() {
       </section>
 
       <section className="section-pad bg-white">
-        <div className="container-luxe grid gap-6 md:grid-cols-3">
+        <div className="container-luxe grid gap-6 grid-cols-1 md:grid-cols-3">
           {[
             {
               icon: Target,
@@ -84,7 +84,7 @@ export default function About() {
             </div>
           </motion.div>
 
-          <motion.div {...fadeUp} className="grid gap-4 sm:grid-cols-2">
+          <motion.div {...fadeUp} className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             {[
               { icon: Bot, title: 'AI-native', text: 'Conversational discovery, investment intelligence and verification — not a listings board with a chat bolted on.' },
               { icon: ShieldCheck, title: 'Trust as product', text: 'The Verified by Keja badge is earned through checks, not paid placements. Fraud we catch is published.' },

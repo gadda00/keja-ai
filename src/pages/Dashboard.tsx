@@ -99,7 +99,7 @@ export default function Dashboard() {
             <h2 className="font-display text-xl font-bold text-ink">Lead pipeline</h2>
             <p className="text-xs text-ink-faint">HOT leads route to agency sales teams immediately</p>
           </div>
-          <div className="mt-4 grid gap-4 lg:grid-cols-3">
+          <div className="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-3">
             {TEMPS.map((t) => {
               const colLeads = leads.filter((l) => l.temperature === t.key)
               return (
@@ -187,7 +187,7 @@ export default function Dashboard() {
         </section>
 
         {/* charts row */}
-        <div className="mt-10 grid gap-6 lg:grid-cols-2">
+        <div className="mt-10 grid gap-6 grid-cols-1 lg:grid-cols-2">
           {/* inventory by type */}
           <div className="card-luxe p-6">
             <h3 className="font-display text-lg font-bold text-ink">Inventory by type</h3>
@@ -275,7 +275,7 @@ export default function Dashboard() {
         {/* agency network */}
         <section className="mt-10">
           <h2 className="font-display text-xl font-bold text-ink">Agency network</h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
             {AGENCIES.map((a) => (
               <div key={a.name} className="card-luxe p-5 text-center">
                 <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-gold-100 font-display text-sm font-bold text-gold-700">

@@ -68,7 +68,7 @@ export default function TrustCenter() {
 
       {/* the five pillars */}
       <section className="section-pad bg-white">
-        <div className="container-luxe grid gap-6 lg:grid-cols-2">
+        <div className="container-luxe grid gap-6 grid-cols-1 lg:grid-cols-2">
           {PILLARS.map((p, i) => (
             <motion.div
               key={p.title}
@@ -94,7 +94,7 @@ export default function TrustCenter() {
               <Scale className="h-6 w-6 text-gold-400" />
               <h3 className="font-display text-xl font-semibold text-white">Score bands — what the badge means</h3>
             </div>
-            <div className="mt-5 grid gap-4 sm:grid-cols-4">
+            <div className="mt-5 grid gap-4 grid-cols-1 sm:grid-cols-4">
               {[
                 { band: '90–100', label: 'Highly Verified', desc: 'All checks passed. Clean title, unique photos, in-band pricing, reputable agency.', tone: 'gold' },
                 { band: '75–89', label: 'Verified', desc: 'Passed all critical checks; one minor note (e.g. off-plan renders or similar unit elsewhere).', tone: 'gold' },

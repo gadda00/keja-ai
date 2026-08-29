@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   Search, ShieldCheck, TrendingUp, Bot, MapPin, ChevronRight, Sparkles,
-  Building2, BadgeCheck, AlertTriangle, Calculator, LayoutDashboard, FileSearch, Zap,
+  Building2, BadgeCheck, AlertTriangle, Calculator, LayoutDashboard, FileSearch, Zap, Coins, Link2, CalendarClock,
 } from 'lucide-react'
 import PropertyCard from '@/components/property/PropertyCard'
 import { featuredProperties, PROPERTIES } from '@/data/properties'
@@ -117,6 +117,12 @@ export default function Home() {
               <Bot className="h-4 w-4" /> Ask Keja AI
             </Link>
             <Link
+              to="/tokenize"
+              className="inline-flex items-center gap-2 border border-gold-400/50 px-6 py-3 text-sm font-semibold tracking-wide text-gold-300 transition hover:bg-gold-400/10"
+            >
+              <Coins className="h-4 w-4" /> Tokenize — invest from $100
+            </Link>
+            <Link
               to="/trust"
               className="inline-flex items-center gap-2 border border-gold-400/50 px-6 py-3 text-sm font-semibold tracking-wide text-gold-300 transition hover:bg-gold-400/10"
             >
@@ -178,7 +184,7 @@ export default function Home() {
           </motion.div>
 
           <motion.div {...fadeUp} className="relative">
-            <div className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-gold-100/40 blur-2xl" />
+            <div className="absolute -inset-4 sm:-inset-6 -z-10 rounded-[2.5rem] bg-gold-100/40 blur-2xl" />
             <div className="overflow-hidden rounded-3xl shadow-card-hover ring-1 ring-gold-200">
               <img src={asset('/brand/keja-banner.jpg')} alt="Keja AI assistant" className="w-full object-cover" />
             </div>
@@ -210,7 +216,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-14 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {[
               {
                 icon: FileSearch,
@@ -269,13 +275,91 @@ export default function Home() {
             </Link>
           </motion.div>
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {featuredProperties.slice(0, 6).map((p, i) => (
               <motion.div key={p.id} {...fadeUp} transition={{ ...fadeUp.transition, delay: i * 0.06 }}>
                 <PropertyCard property={p} />
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ============================== TOKENIZE SECTION ============================== */}
+      <section className="section-pad bg-cream">
+        <div className="container-luxe grid items-center gap-12 lg:grid-cols-2">
+          <motion.div {...fadeUp}>
+            <span className="inline-flex items-center gap-2 rounded-full border border-gold-300 bg-white px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wide2 text-gold-700">
+              <Sparkles className="h-3.5 w-3.5" /> New — Keja Tokenize
+            </span>
+            <h2 className="heading-display mt-4 text-3xl sm:text-4xl">
+              Own a fraction of Nairobi’s <span className="gold-text">finest</span> real estate
+            </h2>
+            <p className="mt-5 leading-relaxed text-ink-soft">
+              Keja Tokenize converts institutional-grade property into digital tokens — a $10M tower
+              becomes 1,000,000 tokens at $10 each. From $100, KYC-verified investors buy fractions and
+              earn monthly or quarterly rental income, recorded on-chain. Compliance-first: every asset
+              sits in its own SPV, is Ardhisasa title-verified and is informed by Kenya’s CMA sandbox.
+            </p>
+            <ul className="mt-6 space-y-3.5">
+              {[
+                { icon: Coins, text: 'Fractional ownership from $100 — no $100K minimums' },
+                { icon: CalendarClock, text: 'Rental income distributed monthly or quarterly, pro-rata' },
+                { icon: Link2, text: 'Blockchain-verified ownership record — the Keja Ledger' },
+                { icon: ShieldCheck, text: 'KYC/AML-gated, SPV-wrapped, independently valued assets' },
+              ].map((f) => (
+                <li key={f.text} className="flex gap-3">
+                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gold-100">
+                    <f.icon className="h-4 w-4 text-gold-700" />
+                  </span>
+                  <span className="text-sm leading-relaxed text-ink-soft">{f.text}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Link to="/tokenize" className="btn-gold">
+                Explore tokenized offerings <ChevronRight className="h-4 w-4" />
+              </Link>
+              <Link to="/tokenize?view=learn" className="btn-outline">
+                How tokenization works
+              </Link>
+            </div>
+          </motion.div>
+
+          <motion.div {...fadeUp} className="relative">
+            <div className="absolute -inset-4 sm:-inset-6 -z-10 rounded-[2.5rem] bg-gold-100/50 blur-2xl" />
+            <div className="relative overflow-hidden rounded-3xl shadow-card-hover ring-1 ring-gold-200">
+              <img
+                src={asset('/images/props/office_0.jpg')}
+                alt="Westlands Tower One — tokenized Grade-A office property"
+                loading="lazy"
+                className="h-[380px] w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/10 to-transparent" />
+              <div className="absolute inset-x-6 bottom-6 flex flex-wrap items-end justify-between gap-4 text-white">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wide2 text-gold-300">Live offering · KJ-WST1</p>
+                  <p className="font-display text-2xl font-bold">Westlands Tower One</p>
+                  <p className="mt-0.5 text-[13px] text-white/70">$12M Grade-A offices · from $100</p>
+                </div>
+                <div className="rounded-2xl bg-white/95 px-4 py-3 text-ink shadow-gold-md">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-gold-700">Net yield</p>
+                  <p className="text-xl font-bold text-emerald-700">7.0%</p>
+                </div>
+              </div>
+            </div>
+            <div className="absolute -top-5 -right-2 rounded-2xl bg-white p-4 shadow-card-hover ring-1 ring-gold-100 sm:-right-5">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold-gradient">
+                  <Link2 className="h-5 w-5 text-white" />
+                </span>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-ink-muted">Tokenized value</p>
+                  <p className="text-lg font-bold leading-none text-ink">$45.5M+</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -289,7 +373,7 @@ export default function Home() {
             </h2>
           </motion.div>
 
-          <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-14 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
             {[
               { step: '01', title: 'Discover', text: 'Search verified inventory across agencies — or just ask Keja.' },
               { step: '02', title: 'Verify', text: 'Trust scores, title checks and fraud signals on every listing.' },
@@ -315,7 +399,7 @@ export default function Home() {
 
       {/* ============================== TOOLS CTA ============================== */}
       <section className="section-pad bg-white">
-        <div className="container-luxe grid gap-6 md:grid-cols-3">
+        <div className="container-luxe grid gap-6 grid-cols-1 md:grid-cols-3">
           {[
             {
               icon: Calculator,

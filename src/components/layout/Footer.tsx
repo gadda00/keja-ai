@@ -30,6 +30,7 @@ export default function Footer() {
           <ul className="mt-4 space-y-2.5 text-sm">
             <li><Link to="/properties" className="hover:text-gold-300">Buy Property</Link></li>
             <li><Link to="/properties?purpose=rent" className="hover:text-gold-300">Rent Property</Link></li>
+            <li><Link to="/tokenize" className="inline-flex items-center gap-1.5 font-semibold text-gold-300 hover:text-gold-200">Keja Tokenize<span className="rounded-full bg-gold-gradient px-1.5 py-px text-[9px] font-bold uppercase tracking-wide text-white">New</span></Link></li>
             <li><Link to="/invest" className="hover:text-gold-300">Investment Calculator</Link></li>
             <li><Link to="/ask" className="hover:text-gold-300">Ask Keja AI</Link></li>
             <li><Link to="/dashboard" className="hover:text-gold-300">Agent Dashboard</Link></li>

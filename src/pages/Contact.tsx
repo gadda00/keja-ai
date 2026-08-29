@@ -41,7 +41,7 @@ export default function Contact() {
           </p>
         </div>
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-[1.2fr_1fr]">
+        <div className="mt-10 grid gap-8 grid-cols-1 lg:grid-cols-[1.2fr_1fr]">
           {/* form */}
           <div className="card-luxe p-6 sm:p-8">
             {sent ? (
@@ -59,7 +59,7 @@ export default function Contact() {
               </div>
             ) : (
               <form onSubmit={submit} className="space-y-5">
-                <div className="grid gap-5 sm:grid-cols-2">
+                <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
                   <div>
                     <label className="label-luxe">Full name *</label>
                     <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="input-luxe" placeholder="Jane Wanjiku" />
@@ -69,7 +69,7 @@ export default function Contact() {
                     <input required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="input-luxe" placeholder="+254 7XX XXX XXX" />
                   </div>
                 </div>
-                <div className="grid gap-5 sm:grid-cols-2">
+                <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
                   <div>
                     <label className="label-luxe">Email</label>
                     <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="input-luxe" placeholder="you@example.com" />

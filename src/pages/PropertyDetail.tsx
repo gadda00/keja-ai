@@ -121,7 +121,7 @@ export default function PropertyDetail() {
         </div>
 
         {/* gallery */}
-        <div className="mt-6 grid gap-3 lg:grid-cols-[2fr_1fr]">
+        <div className="mt-6 grid gap-3 grid-cols-1 lg:grid-cols-[2fr_1fr]">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative overflow-hidden rounded-2xl">
             <img src={property.images[activeImg]} alt={property.title} className="h-[300px] w-full object-cover sm:h-[460px]" />
             <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-ink">
@@ -158,7 +158,7 @@ export default function PropertyDetail() {
         </div>
 
         {/* main grid */}
-        <div className="mt-10 grid gap-10 lg:grid-cols-[1.7fr_1fr]">
+        <div className="mt-10 grid gap-10 grid-cols-1 lg:grid-cols-[1.7fr_1fr]">
           {/* left column */}
           <div>
             {/* specs */}
@@ -300,7 +300,7 @@ export default function PropertyDetail() {
             {mortgage && (
               <section className="mt-10 rounded-2xl bg-cream p-6">
                 <h2 className="font-display text-xl font-bold text-ink">Mortgage estimate</h2>
-                <div className="mt-4 grid gap-4 sm:grid-cols-[200px_1fr] sm:items-center">
+                <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-[200px_1fr] sm:items-center">
                   <div>
                     <label className="label-luxe">Deposit: {mortgageDeposit}% ({formatKES(mortgage.deposit)})</label>
                     <input
@@ -429,7 +429,7 @@ export default function PropertyDetail() {
               View all <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {similar.map((p) => (
               <PropertyCard key={p.id} property={p} />
             ))}

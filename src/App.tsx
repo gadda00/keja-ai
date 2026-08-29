@@ -16,6 +16,7 @@ import Manage from '@/pages/Manage'
 
 const InvestmentCalculator = lazy(() => import('@/pages/InvestmentCalculator'))
 const Dashboard = lazy(() => import('@/pages/Dashboard'))
+const Tokenize = lazy(() => import('@/pages/Tokenize'))
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -49,6 +50,7 @@ export default function App() {
             <Route path="/properties/:id" element={<PropertyDetail />} />
             <Route path="/ask" element={<AskKeja />} />
             <Route path="/invest" element={<InvestmentCalculator />} />
+            <Route path="/tokenize" element={<Tokenize />} />
             <Route path="/trust" element={<TrustCenter />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/about" element={<About />} />

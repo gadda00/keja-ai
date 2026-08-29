@@ -8,7 +8,11 @@ export default function WhatsAppFloat() {
 
   useEffect(() => {
     const t = setTimeout(() => setShowLabel(true), 4000)
-    return () => clearTimeout(t)
+    const t2 = setTimeout(() => setShowLabel(false), 16000)
+    return () => {
+      clearTimeout(t)
+      clearTimeout(t2)
+    }
   }, [])
 
   if (dismissed) return null
@@ -16,7 +20,7 @@ export default function WhatsAppFloat() {
   return (
     <div className="fixed bottom-5 right-5 z-40 flex items-end gap-3">
       {showLabel && !dismissed && (
-        <div className="relative mb-1 max-w-[220px] animate-fadeUp rounded-2xl rounded-br-none bg-white p-4 shadow-card-hover ring-1 ring-gold-100">
+        <div className="relative mb-1 hidden max-w-[220px] animate-fadeUp rounded-2xl rounded-br-none bg-white p-4 shadow-card-hover ring-1 ring-gold-100 sm:block">
           <button
             onClick={() => setDismissed(true)}
             className="absolute -right-2 -top-2 rounded-full bg-ink p-1 text-white"

@@ -55,7 +55,7 @@ export default function ListProperty() {
 
       {/* steps */}
       <section className="section-pad bg-white">
-        <div className="container-luxe grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="container-luxe grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((s, i) => (
             <motion.div key={s.title} {...fadeUp} transition={{ ...fadeUp.transition, delay: i * 0.07 }} className="card-luxe p-6">
               <div className="flex items-center justify-between">
@@ -73,7 +73,7 @@ export default function ListProperty() {
 
       {/* pricing & form */}
       <section className="section-pad bg-cream">
-        <div className="container-luxe grid gap-10 lg:grid-cols-2">
+        <div className="container-luxe grid gap-10 grid-cols-1 lg:grid-cols-2">
           <motion.div {...fadeUp}>
             <p className="eyebrow">Transparent pricing</p>
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">No sale, no fee. Ever.</h2>
@@ -124,7 +124,7 @@ export default function ListProperty() {
                     setSent(true)
                   }}
                 >
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                     <div>
                       <label className="label-luxe">Your name *</label>
                       <input required className="input-luxe" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Jane Wanjiku" />
@@ -138,7 +138,7 @@ export default function ListProperty() {
                     <label className="label-luxe">Property title / short description *</label>
                     <input required className="input-luxe" value={form.property} onChange={(e) => setForm({ ...form, property: e.target.value })} placeholder="e.g. 3BR apartment, fitted kitchen, 4th floor" />
                   </div>
-                  <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
                     <div>
                       <label className="label-luxe">Type</label>
                       <select className="input-luxe" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>

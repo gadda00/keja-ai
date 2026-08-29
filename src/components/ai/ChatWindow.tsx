@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Send, Sparkles, ShieldCheck, Languages } from 'lucide-react'
 import { kejaAI, AIResponse } from '@/lib/ai/engine'
 import { useStore, KEYS, ChatMessage } from '@/lib/store'
@@ -17,6 +17,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
   const [lang, setLang] = useState(kejaAI.language)
   const bottomRef = useRef<HTMLDivElement>(null)
   const started = useRef(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!started.current && messages.length === 0) {
@@ -38,6 +39,20 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
     const userMsg: ChatMessage = { id: uid(), role: 'user', text: clean, ts: new Date().toISOString() }
     setMessages([...messages, userMsg])
     setInput('')
+
+    // navigation shortcut from quick replies
+    if (/^open keja tokenize$/i.test(clean)) {
+      const kejaMsg: ChatMessage = {
+        id: uid(),
+        role: 'keja',
+        text: 'Taking you to **Keja Tokenize** — our tokenized real-estate marketplace. 🪙',
+        ts: new Date().toISOString(),
+      }
+      setMessages([...messages, userMsg, kejaMsg])
+      setTimeout(() => navigate('/tokenize'), 600)
+      return
+    }
+
     setTyping(true)
 
     const lastKeja = [...messages].reverse().find((m) => m.role === 'keja')
@@ -66,6 +81,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
     if (!lastKeja) return defaultQ
     if (/What are you looking for|Natafuta|recherchez/.test(lastKeja.text)) return ['Find me a home', 'Show investment deals', 'Land under 4M', 'I want to rent']
     if (/Trust Score|trust is literally|Great question/.test(lastKeja.text)) return ['What is Ardhisasa?', 'Show me only verified listings', 'Show a flagged example']
+    if (/Keja Tokenize/.test(lastKeja.text)) return ['Open Keja Tokenize', 'What are the risks?', 'Show investment deals']
     if (/question 1 of 4|Question 1 of 4/i.test(lastKeja.text)) return []
     if (/Habari|Bonjour/.test(lastKeja.text)) return defaultQ
     return []

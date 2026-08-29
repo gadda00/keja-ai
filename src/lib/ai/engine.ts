@@ -183,6 +183,11 @@ export class KejaAI {
       return this.trustAnswer(t)
     }
 
+    // Tokenization questions
+    if (/(tokeni[sz]|fractional|fraction of|tokeni[sz]ation|buy tokens|digital tokens|blockchain|ledger|kmy|kujua kuhusu tokens?)/.test(t)) {
+      return this.tokenizeAnswer()
+    }
+
     // Investment analysis for a specific area
     if (/(invest|roi|yield|return|appreciation|worth it|good deal|rental income|cash ?flow|mapato|uwekezaji)/.test(t)) {
       return this.investmentAnswer(input)
@@ -287,6 +292,17 @@ export class KejaAI {
       text: `**${p.title}** (${p.id})\n${p.area}, ${p.county} · ${formatKES(p.price)}${p.sizeSqm ? ` · ${p.sizeSqm} sqm` : ''}\nListed by ${p.agency}\n\n${trust}${yieldLine}\n\nShall I arrange a viewing or prepare a full investor report?`,
       propertyIds: [p.id],
       quickReplies: [`Book a viewing for ${p.id}`, 'Prepare investor report', 'Show me similar properties'],
+    }
+  }
+
+  private tokenizeAnswer(): AIResponse {
+    return {
+      text: "**Keja Tokenize** is our real-estate tokenization platform. 🪙\n\nWe convert institutional-grade Kenyan property into digital tokens — a **$10M building becomes 1,000,000 tokens at $10 each** — so you can own a fraction from **$100** and earn your share of rental income, paid monthly or quarterly.\n\nHow we keep it safe:\n\n• Every property sits in its own **SPV** (legal ring-fence)\n• Titles verified on **Ardhisasa** — zero encumbrances\n• **KYC/AML-gated** investors only\n• Ownership recorded on-chain (the Keja Ledger)\n• Structured with Kenya's **CMA regulatory sandbox** in mind\n\nLive offerings right now include Westlands Tower One (7.0% net yield), Kilimani Sky Residences (8.0%) and Karen Village Retail Court (funding).\n\nIt's currently a **demonstration environment** — tokens, valuations and distributions are simulated.",
+      meta: [
+        { label: 'FACT', text: 'Live demo offerings: 5 Nairobi assets, 6.0–8.0% net yields, $10 tokens.' },
+        { label: 'ASSUMPTION', text: 'Yields are projections — not guaranteed — and tokens are illiquid early on.' },
+      ],
+      quickReplies: ['Open Keja Tokenize', 'How does KYC work?', 'What are the risks?'],
     }
   }
 
