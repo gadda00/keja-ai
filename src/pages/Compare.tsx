@@ -15,6 +15,10 @@ export default function Compare() {
   const [params, setParams] = useSearchParams()
   const all = useAllProperties()
   const [compare, setCompare] = useStore<string[]>(KEYS.compare, [])
+
+  const ids = params.get('ids')?.split(',').filter(Boolean) ?? compare
+  const items = ids.map((id) => all.find((p) => p.id === id)).filter((p): p is NonNullable<typeof p> => Boolean(p)).slice(0, 4)
+
   const [copied, setCopied] = useState(false)
   const shareUrl = items.length ? `${window.location.origin}/keja-ai/compare?ids=${items.map((p) => p.id).join(',')}` : ''
   const shareCompare = () => {
@@ -26,9 +30,6 @@ export default function Compare() {
       })
       .catch(() => undefined)
   }
-
-  const ids = params.get('ids')?.split(',').filter(Boolean) ?? compare
-  const items = ids.map((id) => all.find((p) => p.id === id)).filter((p): p is NonNullable<typeof p> => Boolean(p)).slice(0, 4)
 
   const removeOne = (id: string) => {
     const next = compare.filter((c) => c !== id)

@@ -109,14 +109,6 @@ export default function ListProperty() {
   const [submissions, setSubmissions] = useSubmissions()
   const [step, setStep] = useState(0)
 
-  // Draft auto-save: a refresh mid-wizard no longer loses everything.
-  useEffect(() => {
-    try {
-      localStorage.setItem('keja:sell-draft', JSON.stringify(form))
-    } catch {
-      /* storage unavailable */
-    }
-  }, [form])
   const [form, setForm] = useState<WizardForm>(() => {
     try {
       const draft = localStorage.getItem('keja:sell-draft')
@@ -125,6 +117,15 @@ export default function ListProperty() {
       return EMPTY
     }
   })
+
+  // Draft auto-save: a refresh mid-wizard no longer loses everything.
+  useEffect(() => {
+    try {
+      localStorage.setItem('keja:sell-draft', JSON.stringify(form))
+    } catch {
+      /* storage unavailable */
+    }
+  }, [form])
   const [checksRun, setChecksRun] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submissionId, setSubmissionId] = useState('')
