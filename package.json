@@ -57,7 +57,7 @@
     "vite": "^8.2.2",
     "vitest": "^4.1.11"
   },
-  "description": "Keja.ai — Intelligent Real Estate. Verified Trust. Kenya's AI real-estate advisor and cross-agency trust layer. A Chacadom Investments venture.",
+  "description": "Keja.ai \u2014 Intelligent Real Estate. Verified Trust. Kenya's AI real-estate advisor and cross-agency trust layer. A Chacadom Investments venture.",
   "author": "Chacadom Investments",
   "license": "UNLICENSED",
   "lint-staged": {
@@ -68,5 +68,8 @@
     "*.{json,css,md}": [
       "prettier --write"
     ]
+  },
+  "engines": {
+    "node": ">=22.0.0"
   }
 }

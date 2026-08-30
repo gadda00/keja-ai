@@ -4,7 +4,7 @@ Thanks for helping build Kenya's AI real-estate trust layer. This document is th
 
 ## Prerequisites
 
-- Node.js **20.19+** (CI pins Node 20; Vite 8 requires ≥20.19)
+- Node.js **22+** (CI runs Node 22; jsdom 30 / undici 8 in the test stack require ≥22)
 - npm 10+
 
 ## Setup
