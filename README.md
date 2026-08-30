@@ -1,79 +1,53 @@
 # Keja.ai — Intelligent Real Estate. Verified Trust.
 
-> Kenya's AI real-estate advisor and cross-agency trust layer — a **Chacadom Investments** venture.
+Kenya's AI real-estate advisor and cross-agency trust layer — a product of **Chacadom Investments**.
+Live at **https://gadda00.github.io/keja-ai/**
 
-**"Keja" is Swahili for home.** Keja.ai helps people discover, evaluate, buy, sell, rent and manage property across multiple agencies and developers — not just one. We don't just list property; we tell you which listings you can trust.
+## What's inside
 
-## ✨ Features
+| Area | Highlights |
+|---|---|
+| **Marketplace** | 20+ verified listings, trust scores, Investment Score™ (7 weighted factors, FACT/ESTIMATE/ASSUMPTION labels), SVG Kenya map view, saved searches + alert matching, 4-property comparison |
+| **AI advisor** | Conversational engine (EN/SW/FR) covering search, yields, mortgages, buying costs, process timelines, affordability, area guides, qualification |
+| **Calculators** | Rental ROI + 5/10-yr projections, mortgage (extra-payment savings, amortization schedule), affordability (CBK 33% DTI), Kenyan buying-cost stack |
+| **Keja Tokenize** | Fractional ownership demo (SPV framing, KYC/AML gating, simulated ledger, secondary market with order books, distributions calendar) — clearly labelled simulation |
+| **Accounts** | Google Sign-In (demo picker until `GOOGLE_CLIENT_ID` is set) + email/password, 12h/30d sliding sessions, RBAC (user/agent/admin), brute-force throttle |
+| **Admin console** | Users, verification queue with trust-by-design anomaly flags, bulk approve/reject, CSV exports, partner applications + global feed connections, audit trail, settings |
+| **Supply** | 4-step listing wizard with live anomaly detection, 5-channel global listing acquisition strategy |
+| **Content** | Six long-form market guides (`/insights`), Trust Center methodology, ecosystem map (8 products) |
+| **Platform** | PWA (installable, offline shell), per-route SEO meta + sitemap, WCAG-AA focus management, error boundary + real 404 |
 
-| Area | What's included |
-|------|-----------------|
-| **AI Assistant (Keja)** | Conversational property search, investment math, trust answers, lead qualification — in **English, Kiswahili & Français**, with facts / estimates / assumptions explicitly labelled |
-| **Marketplace** | 20 verified listings across 5 partner agencies; filters (type, area, budget, bedrooms, purpose, verified-only), sorting, search |
-| **Trust Layer** | Trust scores (0–100) with 5-pillar verification: Ardhisasa title checks, photo authenticity, duplicate detection, pricing anomaly detection, agent reputation. Flagged listings shown transparently with fraud signals |
-| **Investment Calculator** | Gross & net yield, payback, 5/10-year projections with charts; real-listing presets; KES/USD diaspora mode |
-| **Property Pages** | Gallery, verification report, investment snapshot, mortgage estimator (deposit slider), area insights, viewing requests with M-Pesa escrow notes |
-| **Dashboard** | HOT/WARM/COLD lead pipeline, inventory stats, verification queue, rental performance charts, agency network |
-| **Services** | Sell with Keja (verification-first listing flow), Property Management (tenants, M-Pesa rent collection, owner statements) |
-| **Extras** | Favorites (localStorage), WhatsApp touchpoints, market insights, responsive white & gold luxury design |
+## Stack
 
-## 🧱 Tech Stack
+React 19 · Vite 8 · TypeScript (strict, zero `any`) · Tailwind 3.4 · React Router 7 · Zustand-free local stores (localStorage, backend-upgradeable) · recharts (lazy) · vitest.
 
-- **React 18 + TypeScript + Vite** — fast, static, deploys anywhere
-- **Tailwind CSS 3** — white & gold design system (`gold` palette, Playfair Display + Inter)
-- **React Router 6** — SPA routing with Netlify redirects
-- **Recharts** — investment projections & dashboard charts (lazy-loaded)
-- **Framer Motion + Lucide** — animations & icons
-- **Keja AI engine** (`src/lib/ai/engine.ts`) — intent detection, property matching, finance math, multilingual responses. Client-side by design (Phase 1 MVP); upgrade path to a server LLM is a drop-in swap of the `respond()` call.
-
-## 🚀 Run locally
+## Develop
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173
-npm run build      # production build → dist/
-npm run preview    # serve the production build
+npm run dev        # local dev server
+npm test           # unit tests (finance, scoring, search engines)
+npm run build      # production build (base /keja-ai/ baked into vite.config)
 ```
 
-## 🌍 Deploy to Netlify
+`base` is set in `vite.config.ts`, so local builds match CI; CI additionally passes `--base` explicitly.
 
-This repo is Netlify-ready (`netlify.toml` + `_redirects` included):
+## Architecture notes
 
-1. Push this repo to GitHub.
-2. In Netlify: **Add new site → Import an existing project → GitHub → select this repo**.
-3. Build command `npm run build`, publish directory `dist` (auto-detected from `netlify.toml`).
-4. Add your custom domain `keja.ai` in **Site settings → Domain management**.
+- `src/lib/` — engines: `finance.ts` (investment/mortgage/affordability math), `investmentScore.ts`, `ai/engine.ts` (intent parser), `auth.tsx`, `adminStore.ts` (verification queue), `tokenizeStore.tsx` (holdings/FIFO ledger), `searchStore.ts` (saved searches/notifications), `inventory.ts` (merged marketplace), `seo.ts` (per-route meta), `useFocusTrap.ts`
+- `src/data/` — properties (20 listings + area insights), tokenize assets, long-form articles
+- `src/components/tokenize/` — the tokenization module (marketplace, trade, portfolio, issuer, learn)
+- `public/sw.js` — versioned service worker (cache-first assets, network-first pages, offline fallback)
 
-No environment variables are required for the MVP.
+## Demo accounts
 
-## 📁 Project structure
+`admin@keja.ai / admin123` · `agent@keja.ai / agent123` · `investor@keja.ai / investor123` · Google demo picker (Amina / Victor / Clive).
+All data is client-side demo data — no production backend, no real securities.
 
-```
-src/
-├── config/          # site settings (WhatsApp number, contact info)
-├── data/
-│   └── properties.ts   # 20-listing database + agencies + area insights
-├── lib/
-│   ├── ai/engine.ts    # Keja AI conversational engine
-│   ├── finance.ts      # investment & mortgage mathematics
-│   ├── store.ts        # localStorage state (favorites, leads, chat)
-│   └── format.ts       # KES formatting, trust tiers
-├── components/       # layout, property cards, chat window, markdown
-└── pages/            # Home, Properties, PropertyDetail, AskKeja,
-                      # InvestmentCalculator, TrustCenter, Dashboard,
-                      # About, Contact, Insights, ListProperty, Manage
-```
+## Deployment
 
-## 🔧 Configuration
+`git push origin main` → GitHub Actions builds with `--base=/keja-ai/`, copies `index.html → 404.html` (SPA fallback), deploys to GitHub Pages.
 
-- **WhatsApp number & contact details** → `src/config/index.ts`
-- **Listings & agencies** → `src/data/properties.ts`
-- **AI knowledge & responses** → `src/lib/ai/engine.ts`
+## Roadmap
 
-## 🗺️ Roadmap alignment
-
-This implements the **Phase 1 MVP** from the Keja.ai roadmap: AI assistant, property database, conversational search, ROI calculator, client qualification, lead capture, viewing-request flow. Phase 2 (cross-agency trust data pipelines, Ardhisasa API integration) and Phase 3 (M-Pesa escrow, property management operations, WhatsApp Business API) build on this foundation.
-
----
-
-© Chacadom Investments. *We don't just list property. We tell you which listings you can trust.*
+Real backend (accounts, listings, payments via M-Pesa/bank), licensed KYC provider, ERC-3643 tokenization with CMA sandbox approval, agent portal (KEJA PRO), multilingual full-site i18n.
