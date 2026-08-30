@@ -3,7 +3,7 @@
  * Design): anomaly flags, completeness scores, approve/reject workflow and
  * promotion of approved submissions into the live marketplace.
  */
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Check,
   X,
@@ -20,6 +20,7 @@ import {
   Download,
 } from 'lucide-react'
 import { exportCSV } from '@/lib/csv'
+import { useFocusTrap } from '@/lib/useFocusTrap'
 import { useAuth } from '@/lib/auth'
 import {
   useSubmissions,
@@ -54,6 +55,8 @@ export default function AdminListings() {
   const [selected, setSelected] = useState<ListingSubmission | null>(null)
   const [note, setNote] = useState('')
   const [checked, setChecked] = useState<string[]>([])
+  const reviewRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(reviewRef, !!selected, () => setSelected(null))
 
   const counts = useMemo(
     () => ({
@@ -82,7 +85,10 @@ export default function AdminListings() {
     )
     setSubmissions(next)
     if (status === 'approved') {
-      setUserListings([...targets.map(submissionToListing), ...userListings])
+      const fresh = targets
+        .map(submissionToListing)
+        .filter((l) => !userListings.some((u) => u.id === l.id || u.title === l.title))
+      setUserListings([...fresh, ...userListings])
     }
     logAudit({
       actor: user?.name ?? 'admin',
@@ -117,8 +123,13 @@ export default function AdminListings() {
     )
     setSubmissions(next)
     if (status === 'approved') {
-      const listing = submissionToListing(s)
-      setUserListings([listing, ...userListings])
+      // idempotent publish: never duplicate a listing already in the marketplace
+      if (!userListings.some((u) => u.id === s.id || u.title === s.title)) {
+        setUserListings([submissionToListing(s), ...userListings])
+      }
+    } else if (status === 'rejected' || status === 'flagged') {
+      // pull the listing out of the marketplace when review turns negative
+      setUserListings(userListings.filter((u) => u.id !== s.id && u.title !== s.title))
     }
     logAudit({
       actor: user?.name ?? 'admin',
@@ -374,8 +385,15 @@ export default function AdminListings() {
           <div
             className="absolute inset-0 bg-ink/60 backdrop-blur-sm"
             onClick={() => setSelected(null)}
+            aria-hidden="true"
           />
-          <div className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl ring-1 ring-gold-200">
+          <div
+            ref={reviewRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Review ${selected.title}`}
+            className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl ring-1 ring-gold-200"
+          >
             <div className="sticky top-0 flex items-start justify-between gap-4 border-b border-gold-100 bg-white/95 px-6 py-4 backdrop-blur">
               <div>
                 <p className="eyebrow">Listing review · {selected.id}</p>

@@ -271,6 +271,7 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
         let remaining = tokenAmount
         const investments = s.investments
           .filter((i) => i.propertyId === propertyId)
+          .sort((a, b) => a.createdAt.localeCompare(b.createdAt)) // FIFO: oldest lots sell first
           .map((i) => {
             if (remaining <= 0) return i
             const take = Math.min(i.tokenAmount, remaining)

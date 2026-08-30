@@ -1,4 +1,4 @@
-import { useEffect, type RefObject } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
@@ -6,9 +6,15 @@ const FOCUSABLE =
 /**
  * Traps Tab focus inside `ref` while `active`, restores focus to the
  * previously focused element on deactivate, and closes on Escape.
- * WCAG 2.4.3 / 2.1.2 for modal dialogs.
+ * Only the dialog that actually contains focus responds to Escape, so
+ * stacked modals (KYC above Invest) close one at a time.
+ * Scroll-locking is owned by the modal components (modalOpenCount), not here.
  */
 export function useFocusTrap(ref: RefObject<HTMLElement | null>, active: boolean, onEscape?: () => void) {
+  // keep the latest callback without re-running the trap effect on every render
+  const escRef = useRef(onEscape)
+  escRef.current = onEscape
+
   useEffect(() => {
     if (!active) return
     const node = ref.current
@@ -21,12 +27,16 @@ export function useFocusTrap(ref: RefObject<HTMLElement | null>, active: boolean
     const t = window.setTimeout(focusFirst, 30)
 
     const onKeyDown = (e: KeyboardEvent) => {
+      if (!node) return
       if (e.key === 'Escape') {
-        e.stopPropagation()
-        onEscape?.()
+        // only the dialog that owns focus closes — allows stacked modals
+        if (node.contains(document.activeElement)) {
+          e.stopPropagation()
+          escRef.current?.()
+        }
         return
       }
-      if (e.key !== 'Tab' || !node) return
+      if (e.key !== 'Tab') return
       const els = Array.from(node.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
         (el) => el.offsetParent !== null,
       )
@@ -43,14 +53,10 @@ export function useFocusTrap(ref: RefObject<HTMLElement | null>, active: boolean
     }
 
     document.addEventListener('keydown', onKeyDown, true)
-    const prevOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
     return () => {
       window.clearTimeout(t)
       document.removeEventListener('keydown', onKeyDown, true)
-      document.body.style.overflow = prevOverflow
       previouslyFocused?.focus?.()
     }
-  }, [active, ref, onEscape])
+  }, [active, ref])
 }

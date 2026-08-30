@@ -98,10 +98,17 @@ export default function MapView({ properties, onSelectArea }: Props) {
               onMouseLeave={() => setHover(null)}
               onClick={() => onSelectArea?.(c.area)}
               role="button"
-              aria-label={`${c.area}: ${c.props.length} listings, median ${formatKES(c.median)}`}
+              tabIndex={0}
+              aria-label={`${c.area}: ${c.props.length} listings, median ${formatKES(c.median)}. Press Enter to filter this area.`}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  onSelectArea?.(c.area)
+                }
+              }}
             >
               <circle r={size + (isHover ? 5 : 0)} fill={t.fill} opacity={isHover ? 0.42 : 0.22} />
-              <circle r={size * 0.45} fill={t.fill} stroke="white" strokeWidth="1.5" />
+              <circle r={size * 0.45} fill={t.fill} stroke="white" strokeWidth="1.5" className="focusable-pin" />
               <text y={-size - 8} textAnchor="middle" className="fill-ink" fontSize="13" fontWeight="700">
                 {c.area}
               </text>
@@ -126,6 +133,7 @@ export default function MapView({ properties, onSelectArea }: Props) {
           )
         })}
       </svg>
+      <style>{`g[role="button"]:focus { outline: none; } g[role="button"]:focus circle { stroke: #8A6B26; stroke-width: 3; }`}</style>
 
       {hover && null /* tooltip handled inside SVG for perf */}
 

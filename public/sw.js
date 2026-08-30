@@ -1,18 +1,22 @@
-/* Keja.ai service worker — app shell + asset caching for GitHub Pages hosting.
+/* Service worker — app shell + asset caching for GitHub Pages hosting.
    Strategy:
-   - /assets/* (hashed): cache-first (immutable)
-   - images: cache-first with 30-day TTL
-   - navigations: network-first, fall back to cached index, then offline page
+   - /assets/* (hashed): cache-first (immutable), only 200s
+   - images: cache-first (only 200s), versioned cache
+   - navigations: network-first -> cached page -> cached shell -> offline page
 */
-const VERSION = 'keja-v3'
+const VERSION = 'v3'
 const ASSET_CACHE = `${VERSION}-assets`
 const IMG_CACHE = `${VERSION}-images`
 const PAGE_CACHE = `${VERSION}-pages`
-const BASE = self.registration.scope // includes trailing /keja-ai/
+const BASE = self.registration.scope
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(PAGE_CACHE).then((c) => c.addAll([BASE, `${BASE}index.html`, `${BASE}offline.html`]).catch(() => {})),
+    Promise.allSettled([
+      caches.open(PAGE_CACHE).then((c) => c.add(BASE)),
+      caches.open(PAGE_CACHE).then((c) => c.add(`${BASE}index.html`)),
+      caches.open(PAGE_CACHE).then((c) => c.add(`${BASE}offline.html`)),
+    ]),
   )
   self.skipWaiting()
 })
@@ -26,6 +30,8 @@ self.addEventListener('activate', (event) => {
   self.clients.claim()
 })
 
+const ok = (res) => res && res.status === 200
+
 self.addEventListener('fetch', (event) => {
   const { request } = event
   if (request.method !== 'GET') return
@@ -38,8 +44,10 @@ self.addEventListener('fetch', (event) => {
         (hit) =>
           hit ||
           fetch(request).then((res) => {
-            const copy = res.clone()
-            caches.open(ASSET_CACHE).then((c) => c.put(request, copy))
+            if (ok(res)) {
+              const copy = res.clone()
+              caches.open(ASSET_CACHE).then((c) => c.put(request, copy))
+            }
             return res
           }),
       ),
@@ -47,13 +55,15 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  if (/\.(?:png|jpg|jpeg|webp|svg|woff2?)$/i.test(url.pathname)) {
+  if (/\.(?:png|jpg|jpeg|webp|svg|ico|woff2?)$/i.test(url.pathname)) {
     event.respondWith(
       caches.match(request).then((hit) => {
         if (hit) return hit
         return fetch(request).then((res) => {
-          const copy = res.clone()
-          caches.open(IMG_CACHE).then((c) => c.put(request, copy))
+          if (ok(res)) {
+            const copy = res.clone()
+            caches.open(IMG_CACHE).then((c) => c.put(request, copy))
+          }
           return res
         })
       }),
@@ -65,19 +75,22 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((res) => {
-          const copy = res.clone()
-          caches.open(PAGE_CACHE).then((c) => c.put(request, copy))
+          if (ok(res)) {
+            const copy = res.clone()
+            caches.open(PAGE_CACHE).then((c) => c.put(request, copy))
+          }
           return res
         })
         .catch(async () => {
-          const cached = await caches.match(request)
+          const cached = (await caches.match(request)) || (await caches.match(`${BASE}index.html`))
           if (cached) return cached
-          const shell = await caches.match(`${BASE}index.html`)
-          if (shell) return shell
-          return new Response('<h1>Offline</h1><p>Keja.ai needs a connection to load this page.</p>', {
-            status: 200,
-            headers: { 'Content-Type': 'text/html' },
-          })
+          return (
+            (await caches.match(`${BASE}offline.html`)) ||
+            new Response('<h1>Offline</h1><p>Please reconnect to load this page.</p>', {
+              status: 200,
+              headers: { 'Content-Type': 'text/html' },
+            })
+          )
         }),
     )
   }

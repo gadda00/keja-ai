@@ -252,7 +252,7 @@ export default function SecondaryMarket() {
         {Object.keys(holdings).length === 0 ? (
           <p className="mt-4 rounded-xl bg-gold-50 p-4 text-sm leading-relaxed text-ink-soft">
             Your projected distribution schedule appears here once you hold tokens. Monthly properties pay every
-            month; quarterly properties pay in March, June, September and December.
+            month; quarterly properties pay every third month from the cycle start.
           </p>
         ) : (
           <>

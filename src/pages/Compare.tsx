@@ -1,4 +1,5 @@
 import { Link, useSearchParams } from 'react-router-dom'
+import { useEffect } from 'react'
 import { GitCompareArrows, X, TrendingUp, ShieldCheck, BedDouble, Bath, Ruler, Building2, Gauge, MapPin } from 'lucide-react'
 import { useAllProperties } from '@/lib/inventory'
 import { formatKES } from '@/lib/format'
@@ -10,14 +11,18 @@ import { usePageMeta } from '@/lib/seo'
 
 export default function Compare() {
   usePageMeta('Compare Properties', 'Side-by-side comparison of Keja-verified properties: price, yields, Investment Score, trust and mortgage estimates.')
-  const [params] = useSearchParams()
+  const [params, setParams] = useSearchParams()
   const all = useAllProperties()
   const [compare, setCompare] = useStore<string[]>(KEYS.compare, [])
 
   const ids = params.get('ids')?.split(',').filter(Boolean) ?? compare
   const items = ids.map((id) => all.find((p) => p.id === id)).filter((p): p is NonNullable<typeof p> => Boolean(p)).slice(0, 4)
 
-  const removeOne = (id: string) => setCompare(compare.filter((c) => c !== id))
+  const removeOne = (id: string) => {
+    const next = compare.filter((c) => c !== id)
+    setCompare(next)
+    if (params.get('ids')) setParams(next.length ? { ids: next.join(',') } : {}, { replace: true })
+  }
 
   const rows: { label: string; render: (p: (typeof items)[number]) => React.ReactNode }[] = [
     { label: 'Price', render: (p) => <b className="font-display text-lg text-ink">{formatKES(p.price, { monthly: p.price < 500_000 })}</b> },
