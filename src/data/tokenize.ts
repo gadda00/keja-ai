@@ -82,7 +82,7 @@ export interface LedgerTx {
   tokens: number
   totalCostUsd: number
   timestamp: string
-  type: 'PURCHASE' | 'ISSUANCE'
+  type: 'PURCHASE' | 'ISSUANCE' | 'SALE'
 }
 
 export interface ReceivedDistribution {

@@ -115,8 +115,10 @@ export interface MortgageResult {
   schedule: { year: number; balance: number; paid: number }[]
 }
 
-export function calculateMortgage(input: MortgageInput): MortgageResult {
-  const { propertyPrice, depositPct, annualRatePct, termYears } = input
+export function calculateMortgage(input: MortgageInput & { extraMonthly?: number }): MortgageResult & {
+  extra?: { monthsSaved: number; interestSaved: number; payoffMonths: number }
+} {
+  const { propertyPrice, depositPct, annualRatePct, termYears, extraMonthly = 0 } = input
   const deposit = (propertyPrice * depositPct) / 100
   const principal = propertyPrice - deposit
   const r = annualRatePct / 100 / 12
@@ -136,8 +138,82 @@ export function calculateMortgage(input: MortgageInput): MortgageResult {
     schedule.push({ year: y, balance: Math.round(balance), paid: Math.round(monthly * 12 * y) })
   }
 
-  return { deposit, principal, monthlyRepayment: monthly, totalInterest, totalRepayment, schedule }
+  // with extra monthly payments
+  let extra: { monthsSaved: number; interestSaved: number; payoffMonths: number } | undefined
+  if (extraMonthly > 0) {
+    let bal = principal
+    let months = 0
+    const payment = monthly + extraMonthly
+    while (bal > 0 && months < n) {
+      bal = bal + bal * r - payment
+      months++
+    }
+    const payoffMonths = Math.min(months, n)
+    const interestWithExtra = payment * payoffMonths - principal
+    extra = {
+      payoffMonths,
+      monthsSaved: Math.max(0, n - payoffMonths),
+      interestSaved: Math.max(0, totalInterest - interestWithExtra),
+    }
+  }
+
+  return { deposit, principal, monthlyRepayment: monthly, totalInterest, totalRepayment, schedule, extra }
 }
+
+export interface AffordabilityInput {
+  netMonthlyIncome: number
+  otherMonthlyObligations: number
+  annualRatePct: number
+  termYears: number
+  depositPct: number
+  /** Bank stress ratio: max share of income for the instalment (CBK guidance ≈ 33%) */
+  maxDtiPct?: number
+}
+
+export interface AffordabilityResult {
+  maxInstalment: number
+  maxPrincipal: number
+  maxPropertyPrice: number
+  requiredDeposit: number
+  totalCashNeeded: number
+  dtiPct: number
+}
+
+/** Reverse mortgage math: income → maximum supportable property price. */
+export function calculateAffordability(input: AffordabilityInput): AffordabilityResult {
+  const { netMonthlyIncome, otherMonthlyObligations, annualRatePct, termYears, depositPct, maxDtiPct = 33 } = input
+  const maxInstalment = Math.max(0, (netMonthlyIncome * maxDtiPct) / 100 - otherMonthlyObligations)
+  const r = annualRatePct / 100 / 12
+  const n = termYears * 12
+  // P = M * (1 - (1+r)^-n) / r
+  const maxPrincipal = r === 0 ? maxInstalment * n : (maxInstalment * (1 - Math.pow(1 + r, -n))) / r
+  const maxPropertyPrice = depositPct < 100 ? maxPrincipal / (1 - depositPct / 100) : maxPrincipal
+  const requiredDeposit = (maxPropertyPrice * depositPct) / 100
+  return {
+    maxInstalment,
+    maxPrincipal,
+    maxPropertyPrice,
+    requiredDeposit,
+    totalCashNeeded: requiredDeposit, // + stamp duty & legal shown at UI level
+    dtiPct: maxDtiPct,
+  }
+}
+
+/** Indicative KES→USD rate used across the app (single source of truth). */
+export const FX_KES_PER_USD = 129
+
+/** Rentals in this marketplace are priced below the 500k sale floor. */
+export function isRentalPrice(price: number): boolean {
+  return price < 500_000
+}
+
+/** Kenyan buyer cost stack (statutory + typical professional fees, % of price). */
+export const BUYING_COSTS = [
+  { label: 'Stamp duty (4% urban)', pct: 4, statutory: true },
+  { label: 'Legal fees (~1.5%)', pct: 1.5, statutory: false },
+  { label: 'Valuation (~0.25%)', pct: 0.25, statutory: false },
+  { label: 'Registration & misc.', pct: 0.15, statutory: false },
+]
 
 /** Kenyan mortgage market context (typical 2026 levels, for guidance only) */
 export const MORTGAGE_MARKET = {

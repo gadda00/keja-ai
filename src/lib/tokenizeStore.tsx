@@ -15,7 +15,7 @@ import type {
 
 const STORAGE_KEY = 'keja-tokenize-v1'
 
-export type TokenizeView = 'marketplace' | 'property' | 'portfolio' | 'issuer' | 'learn'
+export type TokenizeView = 'marketplace' | 'property' | 'portfolio' | 'issuer' | 'learn' | 'market'
 
 interface PersistedState {
   investor: Investor | null
@@ -71,6 +71,7 @@ export interface TokenizeStore {
 
   completeKyc: (form: KycForm) => Investor
   buyTokens: (propertyId: string, tokenAmount: number) => BuyResult
+  sellTokens: (propertyId: string, tokenAmount: number, pricePerTokenUsd: number) => { proceedsUsd: number; txHash: string; tokens: number }
   issueProperty: (draft: IssuerDraft) => IssueResult
   loadDemoPortfolio: () => void
   signOut: () => void
@@ -245,6 +246,50 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
     [properties]
   )
 
+  const sellTokens = useCallback(
+    (propertyId: string, tokenAmount: number, pricePerTokenUsd: number) => {
+      const p = properties.find((x) => x.id === propertyId)
+      if (!p) throw new Error('Property not found')
+      const held = state.investments
+        .filter((i) => i.propertyId === propertyId)
+        .reduce((acc, i) => acc + i.tokenAmount, 0)
+      if (tokenAmount <= 0 || tokenAmount > held) throw new Error('Insufficient tokens')
+      const proceeds = tokenAmount * pricePerTokenUsd
+      const txHash = randomHex(64)
+      const now = new Date().toISOString()
+      const ledgerTx: LedgerTx = {
+        txHash,
+        blockNumber: nextBlockNumber(),
+        symbol: p.tokenSymbol,
+        title: p.title,
+        tokens: -tokenAmount,
+        totalCostUsd: proceeds,
+        timestamp: now,
+        type: 'SALE',
+      }
+      setState((s) => {
+        let remaining = tokenAmount
+        const investments = s.investments
+          .filter((i) => i.propertyId === propertyId)
+          .map((i) => {
+            if (remaining <= 0) return i
+            const take = Math.min(i.tokenAmount, remaining)
+            remaining -= take
+            return { ...i, tokenAmount: i.tokenAmount - take }
+          })
+          .filter((i) => i.tokenAmount > 0)
+        return {
+          ...s,
+          investments,
+          ledger: [ledgerTx, ...s.ledger],
+          soldDelta: { ...s.soldDelta, [propertyId]: Math.max(0, (s.soldDelta[propertyId] ?? 0) - tokenAmount) },
+        }
+      })
+      return { proceedsUsd: proceeds, txHash, tokens: tokenAmount }
+    },
+    [properties, state.investments],
+  )
+
   const issueProperty = useCallback((draft: IssuerDraft): IssueResult => {
     const existing = [...TOKENIZED_PROPERTIES, ...state.customProperties]
     const totalTokens = draft.tokenPriceUsd > 0 ? Math.round(draft.totalValueUsd / draft.tokenPriceUsd) : 0
@@ -356,6 +401,7 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
     closeKyc,
     completeKyc,
     buyTokens,
+    sellTokens,
     issueProperty,
     loadDemoPortfolio,
     signOut,

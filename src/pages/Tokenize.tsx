@@ -8,11 +8,12 @@
 import { usePageMeta } from '@/lib/seo'
 import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Coins, Store, GraduationCap, Briefcase, LayoutDashboard } from 'lucide-react'
+import { Coins, Store, GraduationCap, Briefcase, LayoutDashboard, CandlestickChart } from 'lucide-react'
 import { useTokenize } from '@/lib/tokenizeStore'
 import type { TokenizeView } from '@/lib/tokenizeStore'
 import { ToastProvider } from '@/components/tokenize/shared'
 import { Marketplace } from '@/components/tokenize/Marketplace'
+import SecondaryMarket from '@/components/tokenize/Market'
 import { PropertyDetail } from '@/components/tokenize/PropertyDetail'
 import { PortfolioView } from '@/components/tokenize/PortfolioView'
 import { IssuerConsole } from '@/components/tokenize/IssuerConsole'
@@ -22,12 +23,13 @@ import { InvestModal } from '@/components/tokenize/InvestModal'
 
 const VIEW_TABS: { v: TokenizeView; label: string; icon: typeof Store }[] = [
   { v: 'marketplace', label: 'Marketplace', icon: Store },
+  { v: 'market', label: 'Trade', icon: CandlestickChart },
   { v: 'portfolio', label: 'My Portfolio', icon: LayoutDashboard },
   { v: 'issuer', label: 'Issuer Console', icon: Briefcase },
   { v: 'learn', label: 'Learn', icon: GraduationCap },
 ]
 
-const VALID_VIEWS: TokenizeView[] = ['marketplace', 'portfolio', 'issuer', 'learn']
+const VALID_VIEWS: TokenizeView[] = ['marketplace', 'market', 'portfolio', 'issuer', 'learn']
 
 function TabBar() {
   const { view, setView } = useTokenize()
@@ -80,6 +82,7 @@ function TokenizeInner() {
     <div>
       <TabBar />
       {view === 'marketplace' && <Marketplace />}
+      {view === 'market' && <SecondaryMarket />}
       {view === 'property' && selected && <PropertyDetail property={selected} />}
       {view === 'portfolio' && <PortfolioView />}
       {view === 'issuer' && <IssuerConsole />}
