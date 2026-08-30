@@ -7,9 +7,17 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
+    "lint:eslint": "eslint src --ext .ts,.tsx --max-warnings 0",
+    "lint:prettier": "prettier --check src",
+    "lint:all": "npm run lint:eslint && npm run lint:prettier",
+    "lint:fix": "npm run lint:eslint -- --fix && npm run lint:prettier -- --write",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\"",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc -b --noEmit",
+    "prepare": "husky install"
   },
   "dependencies": {
     "framer-motion": "^13.1.1",
@@ -17,16 +25,31 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",
-    "recharts": "^3.10.1"
+    "recharts": "^3.10.1",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
+    "@typescript-eslint/eslint-plugin": "^8.13.0",
+    "@typescript-eslint/parser": "^8.13.0",
     "@vitejs/plugin-react": "^6.1.0",
     "autoprefixer": "^10.5.4",
+    "eslint": "^9.14.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
     "oxlint": "^1.79.0",
     "postcss": "^8.5.26",
+    "prettier": "^3.3.3",
+    "prettier-plugin-import-sort": "^0.0.7",
     "tailwindcss": "^3.4.17",
     "typescript": "~6.0.2",
     "vite": "^8.2.2",
@@ -34,5 +57,14 @@
   },
   "description": "Keja.ai \u2014 Intelligent Real Estate. Verified Trust. Kenya's AI real-estate advisor and cross-agency trust layer. A Chacadom Investments venture.",
   "author": "Chacadom Investments",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
+  }
 }
