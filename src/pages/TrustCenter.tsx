@@ -1,4 +1,4 @@
-import { usePageMeta } from '@/lib/seo'
+import { usePageMeta, faqJsonLd } from '@/lib/seo'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -46,11 +46,33 @@ const PILLARS = [
   },
 ]
 
+const TRUST_FAQS = [
+              {
+                q: 'What is Ardhisasa and why does it matter?',
+                a: 'Ardhisasa is Kenya’s official digital land information platform run by the Ministry of Lands. It records ownership, tenure, acreage and encumbrances for registered land. We cross-check every listing’s title against it where access permits — and we tell you when we couldn’t, rather than pretending.',
+              },
+              {
+                q: 'Does a high trust score guarantee the deal is safe?',
+                a: 'No — and be suspicious of anyone who promises that. A trust score means our checks passed as of the date shown. You should still run your own advocate-led due diligence: official land search, rates clearance, encumbrances, and a physical beacon walkthrough for land. We make that easier, not optional.',
+              },
+              {
+                q: 'Why do you show flagged listings instead of hiding them?',
+                a: 'Three reasons: (1) buyers deserve to see what fraud looks like, with labels; (2) hiding listings would push bad actors to less transparent channels; (3) a marketplace that only shows perfect inventory isn’t telling the truth about the Kenyan market. We show reality, clearly marked.',
+              },
+              {
+                q: 'How do agents get onto the verified network?',
+                a: 'Agencies apply or are invited, submit company registration and operator IDs, and their first listings go through enhanced verification. Their ongoing behaviour — complaint patterns, listing accuracy, closing honesty — feeds their reputation score. Bad actors are removed; their history stays on record.',
+              },
+              {
+                q: 'Can I get scammed anyway?',
+                a: 'Fraud evolves, so stay alert even on verified platforms. Our golden rules: never pay "holding fees" to personal wallets, insist on escrow, never skip the official land search, walk the beacons, and treat urgency ("someone else is paying today") as a red flag in itself.',
+              },
+]
+
 export default function TrustCenter() {
   usePageMeta(
     'Trust Center — How Keja Verifies Every Listing',
-    'Ardhisasa title cross-checks, photo and duplicate scans, pricing anomaly detection and agent reputation scoring.',
-  )
+    'Ardhisasa title cross-checks, photo and duplicate scans, pricing anomaly detection and agent reputation scoring.', { jsonLd: faqJsonLd(TRUST_FAQS) })
   return (
     <div>
       {/* hero */}
@@ -140,44 +162,11 @@ export default function TrustCenter() {
               seller’s data flows through the same verification layer. That’s why agencies onboard to Keja
               first, and why the trust layer compounds as the network grows.
             </p>
-            <Link to="/properties" className="btn-gold mt-8">
-              Browse verified inventory <ChevronRight className="h-4 w-4" />
-            </Link>
-          </motion.div>
-
-          <motion.div {...fadeUp} className="space-y-4">
-            {[
-              {
-                icon: Lock,
-                title: 'M-Pesa escrow for deposits & viewing fees',
-                text: 'Funds are released only on confirmed viewings or completion milestones — never to an agent’s personal wallet "for holding".',
-              },
-              {
-                icon: Activity,
-                title: 'Listing-velocity monitoring',
-                text: 'A listing re-posted three times in six weeks under different names is flagged automatically — the pattern that precedes most deposit fraud.',
-              },
-              {
-                icon: AlertTriangle,
-                title: 'We publish the fraud we catch',
-                text: 'Flagged listings stay visible, clearly marked, so buyers learn the red flags. Transparency is how markets get safer.',
-              },
-            ].map((c) => (
-              <div key={c.title} className="card-luxe flex gap-4 p-6">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gold-100">
-                  <c.icon className="h-5 w-5 text-gold-700" />
-                </span>
-                <div>
-                  <h3 className="font-display text-lg font-semibold text-ink">{c.title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{c.text}</p>
-                </div>
-              </div>
-            ))}
+            <Link to="/properties" className="btn-outline">Browse verified listings</Link>
           </motion.div>
         </div>
       </section>
 
-      {/* FAQ */}
       <section className="section-pad bg-white">
         <div className="container-luxe mx-auto max-w-3xl">
           <motion.div {...fadeUp} className="text-center">
@@ -185,28 +174,7 @@ export default function TrustCenter() {
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">Straight answers</h2>
           </motion.div>
           <div className="mt-10 space-y-4">
-            {[
-              {
-                q: 'What is Ardhisasa and why does it matter?',
-                a: 'Ardhisasa is Kenya’s official digital land information platform run by the Ministry of Lands. It records ownership, tenure, acreage and encumbrances for registered land. We cross-check every listing’s title against it where access permits — and we tell you when we couldn’t, rather than pretending.',
-              },
-              {
-                q: 'Does a high trust score guarantee the deal is safe?',
-                a: 'No — and be suspicious of anyone who promises that. A trust score means our checks passed as of the date shown. You should still run your own advocate-led due diligence: official land search, rates clearance, encumbrances, and a physical beacon walkthrough for land. We make that easier, not optional.',
-              },
-              {
-                q: 'Why do you show flagged listings instead of hiding them?',
-                a: 'Three reasons: (1) buyers deserve to see what fraud looks like, with labels; (2) hiding listings would push bad actors to less transparent channels; (3) a marketplace that only shows perfect inventory isn’t telling the truth about the Kenyan market. We show reality, clearly marked.',
-              },
-              {
-                q: 'How do agents get onto the verified network?',
-                a: 'Agencies apply or are invited, submit company registration and operator IDs, and their first listings go through enhanced verification. Their ongoing behaviour — complaint patterns, listing accuracy, closing honesty — feeds their reputation score. Bad actors are removed; their history stays on record.',
-              },
-              {
-                q: 'Can I get scammed anyway?',
-                a: 'Fraud evolves, so stay alert even on verified platforms. Our golden rules: never pay "holding fees" to personal wallets, insist on escrow, never skip the official land search, walk the beacons, and treat urgency ("someone else is paying today") as a red flag in itself.',
-              },
-            ].map((f) => (
+            {TRUST_FAQS.map((f) => (
               <motion.details key={f.q} {...fadeUp} className="group card-luxe overflow-hidden">
                 <summary className="flex cursor-pointer items-center justify-between gap-4 p-5 font-display text-base font-semibold text-ink marker:content-none">
                   {f.q}

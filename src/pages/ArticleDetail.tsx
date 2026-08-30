@@ -1,15 +1,29 @@
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Clock, CalendarDays, User } from 'lucide-react'
 import { ARTICLES } from '@/data/articles'
-import { usePageMeta } from '@/lib/seo'
+import { usePageMeta, articleJsonLd, breadcrumbJsonLd } from '@/lib/seo'
 
 export default function ArticleDetail() {
   const { slug } = useParams<{ slug: string }>()
   const article = ARTICLES.find((a) => a.slug === slug)
-  usePageMeta(
-    article ? `${article.title}` : 'Article not found',
-    article?.excerpt,
-  )
+  usePageMeta(article ? `${article.title}` : 'Article not found', article?.excerpt, {
+    jsonLd: article
+      ? [
+          articleJsonLd({
+            title: article.title,
+            description: article.excerpt,
+            slug: article.slug,
+            publishedAt: article.date,
+            author: 'Keja.ai Insights Desk',
+          }),
+          breadcrumbJsonLd([
+            { name: 'Home', path: '/keja-ai/' },
+            { name: 'Insights', path: '/keja-ai/insights' },
+            { name: article.title, path: `/keja-ai/insights/${article.slug}` },
+          ]),
+        ]
+      : null,
+  })
 
   if (!article) {
     return (

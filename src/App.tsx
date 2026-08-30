@@ -89,6 +89,7 @@ export default function App() {
               <Route path="/ecosystem" element={<Ecosystem />} />
               <Route path="/partners" element={<Partners />} />
               <Route path="/compare" element={<Compare />} />
+              <Route path="/legal" element={<TermsPrivacy />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

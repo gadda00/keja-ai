@@ -8,6 +8,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { X, Lock, Mail, User as UserIcon, ShieldCheck, Sparkles, ChevronLeft } from 'lucide-react'
 import { useAuth, DEMO_GOOGLE_ACCOUNTS, initials } from '@/lib/auth'
 import { useFocusTrap } from '@/lib/useFocusTrap'
+import { Link } from 'react-router-dom'
 
 type Mode = 'choose' | 'login' | 'register'
 
@@ -206,7 +207,8 @@ export default function AuthModal() {
               <p className="flex items-start gap-2 text-[11px] leading-relaxed text-ink-faint">
                 <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold-600" />
                 Protected by KEJA Trust infrastructure. Sessions expire automatically; role-based
-                access controls apply. By continuing you accept the Terms & Privacy Policy.
+                access controls apply. By continuing you accept the{' '}
+                <Link to="/legal" className="font-semibold text-gold-700 underline decoration-gold-400 underline-offset-2">Terms &amp; Privacy Policy</Link>.
               </p>
             </div>
           )}

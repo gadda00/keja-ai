@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+# Client-only app pages that waste crawl budget
+Disallow: /admin
+Disallow: /account
+Disallow: /dashboard
 
 Sitemap: https://gadda00.github.io/keja-ai/sitemap.xml

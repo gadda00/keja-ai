@@ -43,6 +43,7 @@ export default function Footer() {
           <h4 className="text-xs font-bold uppercase tracking-wide2 text-gold-400">Trust & Company</h4>
           <ul className="mt-4 space-y-2.5 text-sm">
             <li><Link to="/trust" className="hover:text-gold-300">Trust Center</Link></li>
+            <li><Link to="/legal" className="hover:text-gold-300">Terms &amp; Privacy</Link></li>
             <li><Link to="/trust#score" className="hover:text-gold-300">How Trust Scores Work</Link></li>
             <li><Link to="/about" className="hover:text-gold-300">About Keja.ai</Link></li>
             <li><Link to="/insights" className="hover:text-gold-300">Market Insights</Link></li>

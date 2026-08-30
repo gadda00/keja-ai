@@ -1,4 +1,4 @@
-import { usePageMeta } from '@/lib/seo'
+import { usePageMeta, realEstateListingJsonLd, breadcrumbJsonLd } from '@/lib/seo'
 import SmartImg from '@/components/ui/SmartImg'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
@@ -24,7 +24,35 @@ export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>()
   const allProperties = useAllProperties()
   const property = findProperty(allProperties, id ?? '')
-  usePageMeta(property ? `${property.title} — ${property.area}` : 'Property', property ? `${property.title} in ${property.area}, ${property.county}. Trust score ${property.trustScore}/100, verified by Keja.` : undefined)
+  const jsonLd = property
+    ? [
+        realEstateListingJsonLd({
+          id: property.id,
+          title: property.title,
+          description: property.description,
+          price: property.price,
+          images: property.images,
+          area: property.area,
+          county: property.county,
+          bedrooms: property.bedrooms,
+          bathrooms: property.bathrooms,
+          sizeSqm: property.sizeSqm,
+          agency: property.agency,
+          listedAt: property.listedAt,
+          monthly: isRentalPrice(property.price),
+        }),
+        breadcrumbJsonLd([
+          { name: 'Home', path: '/keja-ai/' },
+          { name: 'Properties', path: '/keja-ai/properties' },
+          { name: property.title, path: `/keja-ai/properties/${property.id}` },
+        ]),
+      ]
+    : null
+  usePageMeta(
+    property ? `${property.title} — ${property.area}` : 'Property',
+    property ? `${property.title} in ${property.area}, ${property.county}. Trust score ${property.trustScore}/100, verified by Keja.` : undefined,
+    { jsonLd, image: '/og/og-home.png' },
+  )
   const score = useMemo(() => (property ? investmentScore(property) : null), [property])
   const [activeImg, setActiveImg] = useState(0)
   const [showAllSignals, setShowAllSignals] = useState(false)

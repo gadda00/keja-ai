@@ -34,8 +34,11 @@ jobs:
       - name: Unit tests (finance, scoring, search engines)
         run: npm test
 
-      - name: Lint
-        run: npx oxlint src --quiet || true
+      - name: Lint (blocking quality gate)
+        run: npx oxlint src
+
+      - name: Generate sitemap (properties + articles + routes)
+        run: node scripts/generate-sitemap.mjs
 
       - name: Build (with GitHub Pages base path)
         run: npm run build -- --base=/keja-ai/
