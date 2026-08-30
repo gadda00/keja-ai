@@ -105,7 +105,7 @@ describe('isRentalPrice', () => {
 describe('format utils', () => {
   it('formats KES with M/B suffixes and monthly marker', () => {
     expect(formatKES(14_500_000)).toBe('KES 14.5M')
-    expect(formatKES(2_400_000_000)).toBe('KES 2.40B')
+    expect(formatKES(2_400_000_000)).toBe('KES 2.4B')
     expect(formatKES(850_000, { monthly: true })).toBe('KES 850,000/mo')
   })
 
