@@ -6,10 +6,11 @@ import {
   AlertTriangle, Phone, Building2, TrendingUp, Calendar, Eye, Bot, FileText, ChevronLeft,
   ArrowRight, Clock, Award, Gauge,
 } from 'lucide-react'
-import { getProperty, PROPERTIES, areaInsights } from '@/data/properties'
+import { areaInsights } from '@/data/properties'
 import { formatKES, timeAgo } from '@/lib/format'
 import { analyzeInvestment, estimateMonthlyExpenses, calculateMortgage } from '@/lib/finance'
 import { investmentScore, scoreTone } from '@/lib/investmentScore'
+import { useAllProperties, findProperty } from '@/lib/inventory'
 import TrustBadge from '@/components/property/TrustBadge'
 import PropertyCard from '@/components/property/PropertyCard'
 import { useStore, KEYS } from '@/lib/store'
@@ -17,7 +18,8 @@ import { whatsappLink } from '@/config'
 
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>()
-  const property = getProperty(id ?? '')
+  const allProperties = useAllProperties()
+  const property = findProperty(allProperties, id ?? '')
   const score = useMemo(() => (property ? investmentScore(property) : null), [property])
   const [activeImg, setActiveImg] = useState(0)
   const [showAllSignals, setShowAllSignals] = useState(false)
@@ -28,6 +30,7 @@ export default function PropertyDetail() {
   const [phone, setPhone] = useState('')
   const [date, setDate] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [reference, setReference] = useState('')
   const [mortgageDeposit, setMortgageDeposit] = useState(20)
 
   useEffect(() => {
@@ -75,7 +78,7 @@ export default function PropertyDetail() {
   }
 
   const isFav = favorites.includes(property.id)
-  const similar = PROPERTIES.filter(
+  const similar = allProperties.filter(
     (p) => p.id !== property.id && (p.type === property.type || p.area === property.area) && p.trustScore >= 75,
   ).slice(0, 3)
   const flagged = property.trustScore < 60
@@ -435,7 +438,7 @@ export default function PropertyDetail() {
                       <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-600" />
                       <p className="mt-3 font-semibold text-ink">Viewing request received ✓</p>
                       <p className="mt-1.5 text-xs leading-relaxed text-ink-muted">
-                        {property.agent.name} will confirm your slot. Reference: VD-{property.id}-{Math.floor(Math.random() * 900 + 100)}.
+                        {property.agent.name} will confirm your slot. Reference: {reference}.
                         Any viewing fee is held in M-Pesa escrow until the viewing is confirmed.
                       </p>
                     </div>
@@ -443,14 +446,24 @@ export default function PropertyDetail() {
                     <form
                       onSubmit={(e) => {
                         e.preventDefault()
+                        setReference(`VD-${property.id}-${Math.floor(Math.random() * 900 + 100)}`)
                         setSubmitted(true)
                       }}
                     >
                       <p className="text-sm font-bold text-ink">Book an escorted viewing</p>
                       <div className="mt-3 space-y-3">
-                        <input value={name} onChange={(e) => setName(e.target.value)} required placeholder="Your name" className="input-luxe" />
-                        <input value={phone} onChange={(e) => setPhone(e.target.value)} required placeholder="Phone (e.g. +254 7XX XXX XXX)" className="input-luxe" />
-                        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required className="input-luxe" />
+                        <div>
+                          <label htmlFor={`vd-name-${property.id}`} className="sr-only">Your name</label>
+                          <input id={`vd-name-${property.id}`} value={name} onChange={(e) => setName(e.target.value)} required placeholder="Your name" autoComplete="name" className="input-luxe" />
+                        </div>
+                        <div>
+                          <label htmlFor={`vd-phone-${property.id}`} className="sr-only">Phone number</label>
+                          <input id={`vd-phone-${property.id}`} value={phone} onChange={(e) => setPhone(e.target.value)} required type="tel" placeholder="Phone (e.g. +254 7XX XXX XXX)" autoComplete="tel" className="input-luxe" />
+                        </div>
+                        <div>
+                          <label htmlFor={`vd-date-${property.id}`} className="sr-only">Preferred date</label>
+                          <input id={`vd-date-${property.id}`} type="date" value={date} min={new Date().toISOString().slice(0, 10)} onChange={(e) => setDate(e.target.value)} required className="input-luxe" />
+                        </div>
                         <button type="submit" className="btn-gold w-full !py-2.5">Confirm request</button>
                       </div>
                     </form>

@@ -32,6 +32,18 @@ export default function Navbar() {
 
   useEffect(() => setOpen(false), [location.pathname])
 
+  // close menus on Escape
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false)
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [])
+
   // close avatar menu on outside click
   useEffect(() => {
     if (!menuOpen) return
@@ -190,16 +202,18 @@ export default function Navbar() {
         </div>
 
         <button
-          className="rounded-lg p-2 text-ink hover:bg-gold-50 lg:hidden"
+          className="rounded-lg p-2 text-ink hover:bg-gold-50 xl:hidden"
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
+          aria-expanded={open}
+          aria-controls="mobile-nav"
         >
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
       {open && (
-        <div className="border-t border-gold-100 bg-white px-4 pb-4 pt-2 lg:hidden">
+        <div id="mobile-nav" className="border-t border-gold-100 bg-white px-4 pb-4 pt-2 xl:hidden">
           <nav className="flex flex-col gap-1" aria-label="Mobile navigation">
             {NAV.map((item) => (
               <NavLink

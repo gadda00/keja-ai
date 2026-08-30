@@ -22,7 +22,7 @@ export function trustTier(score: number): { label: string; tone: 'high' | 'good'
 
 export function timeAgo(dateStr: string): string {
   const d = new Date(dateStr)
-  const now = new Date('2026-08-28')
+  const now = new Date()
   const days = Math.floor((now.getTime() - d.getTime()) / 86400000)
   if (days < 1) return 'today'
   if (days === 1) return 'yesterday'

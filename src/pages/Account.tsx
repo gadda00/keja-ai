@@ -19,14 +19,15 @@ import {
 } from 'lucide-react'
 import { useAuth, initials } from '@/lib/auth'
 import { useStore, KEYS } from '@/lib/store'
-import { PROPERTIES } from '@/data/properties'
+import { useAllProperties } from '@/lib/inventory'
 import PropertyCard from '@/components/property/PropertyCard'
 
 export default function Account() {
   const { user, session, logout, isAdmin, setAuthModalOpen } = useAuth()
   const [favorites] = useStore<string[]>(KEYS.favorites, [])
-  const [viewed] = useStore<{ id: string; ts: string }[]>(KEYS.viewed, [])
+  const [viewed] = useStore<string[]>(KEYS.viewed, [])
   const [chat] = useStore<{ id: string; role: string; text: string; ts: string }[]>(KEYS.chat, [])
+  const allProperties = useAllProperties()
 
   if (!user) {
     return (
@@ -46,7 +47,7 @@ export default function Account() {
     )
   }
 
-  const favProperties = PROPERTIES.filter((p) => favorites.includes(p.id)).slice(0, 3)
+  const favProperties = allProperties.filter((p) => favorites.includes(p.id)).slice(0, 3)
   const sessionExpires = session
     ? new Date(session.expiresAt).toLocaleString('en-GB', {
         day: 'numeric',
@@ -187,15 +188,15 @@ export default function Account() {
             <section className="card-luxe p-6">
               <h2 className="heading-display mb-4 text-lg">Recently viewed</h2>
               <div className="flex flex-wrap gap-2">
-                {viewed.slice(0, 8).map((v) => {
-                  const prop = PROPERTIES.find((p) => p.id === v.id)
+                {[...viewed].reverse().slice(0, 8).map((vid) => {
+                  const prop = allProperties.find((p) => p.id === vid)
                   return (
                     <Link
-                      key={v.id + v.ts}
-                      to={`/properties/${v.id}`}
+                      key={vid}
+                      to={`/properties/${vid}`}
                       className="rounded-lg bg-gold-50 px-3 py-1.5 text-xs font-medium text-ink-soft ring-1 ring-gold-100 transition hover:bg-gold-100"
                     >
-                      {prop ? prop.title.slice(0, 34) + (prop.title.length > 34 ? '…' : '') : v.id}
+                      {prop ? prop.title.slice(0, 34) + (prop.title.length > 34 ? '…' : '') : vid}
                     </Link>
                   )
                 })}
