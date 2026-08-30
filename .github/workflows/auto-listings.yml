@@ -1,0 +1,74 @@
+# Keja Auto-Pilot — AI automatic listing ingestion.
+#
+# Runs the code-automated pipeline (market scanner + partner feed adapters →
+# AI enrichment → dedupe → quality gate → publish) on a schedule. When new
+# listings are published, the updated data file is committed, which triggers
+# the main deploy workflow — the marketplace grows itself, end to end.
+#
+#   schedule : every 6 hours (04:10, 10:10, 16:10, 22:10 UTC)
+#   dispatch : manual, with an optional volume override
+name: Auto-Pilot listings
+
+on:
+  schedule:
+    - cron: '10 4,10,16,22 * * *'
+  workflow_dispatch:
+    inputs:
+      count:
+        description: 'Scanner volume for this run (1-12)'
+        default: '4'
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: autopilot
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Auto-Pilot pipeline
+        id: pipeline
+        run: |
+          COUNT="${{ github.event.inputs.count || '4' }}"
+          echo "Running Auto-Pilot (scanner volume: $COUNT)"
+          # Exit code 3 = nothing new (still a success for CI)
+          node scripts/auto-listings/run.mjs --count "$COUNT" && echo "changed=true" >> "$GITHUB_OUTPUT" || {
+            code=$?
+            if [ "$code" -eq 3 ]; then echo "changed=false" >> "$GITHUB_OUTPUT";
+            else exit $code; fi
+          }
+
+      - name: Commit new listings
+        if: steps.pipeline.outputs.changed == 'true'
+        run: |
+          git config user.name "keja-autopilot[bot]"
+          git config user.email "autopilot@keja.ai"
+          git add src/data/auto-listings.json
+          git commit -m "chore(autopilot): ingest new listings $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
+          echo "Committed — the deploy workflow will publish the marketplace update."
+
+      - name: Run summary
+        run: |
+          echo "### Auto-Pilot run complete" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          node -e "
+            const d = require('./src/data/auto-listings.json');
+            const r = d.runs[0];
+            console.log('run        :', r.id);
+            console.log('ingested   :', r.ingested, '(scanner', r.sources.scanner, '+ feeds', r.sources.feeds + ')');
+            console.log('published  :', r.published, '| queued:', r.queued, '| rejected:', r.rejected, '| deduped:', r.deduped);
+            console.log('inventory  :', d.listings.length, 'live auto-listings /', d.pending.length, 'pending review');
+            console.log('feed health:', JSON.stringify(r.feedStatus));
+          " >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"

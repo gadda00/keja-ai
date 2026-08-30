@@ -4,7 +4,8 @@
  * with explicit FACT / ESTIMATE / ASSUMPTION labelling (the trust differentiator).
  * Languages: English, Kiswahili, French (roadmap Step 15).
  */
-import { PROPERTIES, Property, areaInsights, getProperty } from '@/data/properties'
+import { Property, areaInsights } from '@/data/properties'
+import { MARKET_INVENTORY } from '@/lib/inventory'
 import { analyzeInvestment, calculateMortgage, estimateMonthlyExpenses, isRentalPrice } from '@/lib/finance'
 import { formatKES } from '@/lib/format'
 import type { LanguageCode } from '@/config'
@@ -101,7 +102,7 @@ function parseQuery(t: string): ParsedQuery {
 }
 
 function matchProperties(q: ParsedQuery): Property[] {
-  let list = [...PROPERTIES]
+  let list = [...MARKET_INVENTORY]
   if (q.areas.length) {
     const countyHit = q.areas.some((a) => a === 'Nairobi')
     list = list.filter((p) => q.areas.includes(p.area) || q.areas.includes(p.county) || (countyHit && p.county === 'Nairobi'))
@@ -189,7 +190,7 @@ export class KejaAI {
     if (/(show me (my )?matches|my matches|based on my profile|my budget)/.test(t) && this.lastQualification) {
       const q = parseQuery(`${this.lastQualification.interest ?? ''} ${this.lastQualification.budget ?? ''} ${this.lastQualification.timeline ?? ''}`)
       const matches = matchProperties({ ...q, purpose: /rent|kodi/i.test(this.lastQualification.budget ?? '') ? 'rent' : q.purpose })
-      return this.searchAnswer(q, matches.length ? matches : PROPERTIES.slice(0, 4))
+      return this.searchAnswer(q, matches.length ? matches : MARKET_INVENTORY.slice(0, 4))
     }
 
     // Fresh inventory — newest listings first
@@ -304,10 +305,11 @@ export class KejaAI {
       }
     }
 
-    // Ask about specific property by ID
-    const byId = input.match(/KJA-\d{3}/i)
+    // Ask about specific property by ID (supports seed KJA-0xx and auto KJA-Axxxx)
+    const byId = input.match(/KJA-(?:A?\d{3,4})/i)
     if (byId) {
-      const p = getProperty(byId[0].toUpperCase())
+      const wanted = byId[0].toUpperCase()
+      const p = MARKET_INVENTORY.find((x) => x.id.toUpperCase() === wanted)
       if (p) return this.propertyAnswer(p)
     }
 
@@ -377,7 +379,7 @@ export class KejaAI {
 
   /** Newest verified inventory — the "fresh listings" surface. */
   private newListingsAnswer(): AIResponse {
-    const fresh = [...PROPERTIES]
+    const fresh = [...MARKET_INVENTORY]
       .filter((p) => p.trustScore >= 75)
       .sort((a, b) => b.listedAt.localeCompare(a.listedAt))
       .slice(0, 4)
@@ -405,7 +407,7 @@ export class KejaAI {
     const area = q.areas[0]
     if (area && areaInsights[area]) {
       const ins = areaInsights[area]
-      const areaProps = PROPERTIES.filter((p) => p.area === area && !isRentalPrice(p.price)).slice(0, 2)
+      const areaProps = MARKET_INVENTORY.filter((p) => p.area === area && !isRentalPrice(p.price)).slice(0, 2)
       const sample = areaProps[0]
       let calc = ''
       if (sample?.rentEstimate) {
@@ -430,7 +432,7 @@ export class KejaAI {
       }
     }
     // General investment education
-    const topYield = [...PROPERTIES].filter((p) => p.grossYieldEstimate && p.trustScore >= 85).sort((a, b) => (b.grossYieldEstimate ?? 0) - (a.grossYieldEstimate ?? 0)).slice(0, 3)
+    const topYield = [...MARKET_INVENTORY].filter((p) => p.grossYieldEstimate && p.trustScore >= 85).sort((a, b) => (b.grossYieldEstimate ?? 0) - (a.grossYieldEstimate ?? 0)).slice(0, 3)
     return {
       text: `Here\u2019s how I think about investment property in Kenya (and anywhere, really):\n\n1️⃣ **Yield** — rental income vs total cost. Nairobi apartments: 8–9.5% gross is strong; land yields nothing but appreciates fastest (10–12%/yr in growth corridors).\n2️⃣ **Appreciation** — infrastructure drives value faster than hype: expressways, bypasses, SGR, SEZs, universities.\n3️⃣ **Liquidity** — can you exit? 2BR Kilimani/Westlands sells in weeks; unique luxury can take a year.\n4️⃣ **Trust** — a 12% \u201cyield\u201d on a flagged listing is worth nothing. I only vouch for verified stock.\n\nTop verified yield picks right now:\n${topYield.map((p) => `• ${propLine(p)} · ~${p.grossYieldEstimate}% gross`).join('\n')}\n\nWant a full 5/10-year projection on any of these?`,
       propertyIds: topYield.map((p) => p.id),

@@ -1,0 +1,43 @@
+{
+  "agency": "Skyline Agents Kenya",
+  "feedVersion": "1.2",
+  "listings": [
+    {
+      "id": "SKY-2026-081",
+      "title": "Skyline Agents Kenya — Kilimani 3-Bed with City Views",
+      "type": "apartment",
+      "area": "Kilimani",
+      "price": 13500000,
+      "sqm": 138,
+      "beds": 3,
+      "baths": 2,
+      "agent": "Mercy Wanjiru",
+      "phone": "+254 712 400 118",
+      "offPlan": "no"
+    },
+    {
+      "id": "SKY-2026-082",
+      "title": "Skyline Agents Kenya — Ruaka Family Townhouse",
+      "type": "townhouse",
+      "area": "Ruaka",
+      "price": 15500000,
+      "sqm": 190,
+      "beds": 4,
+      "baths": 3,
+      "agent": "Peter Kariuki",
+      "phone": "+254 720 811 340",
+      "offPlan": "no"
+    },
+    {
+      "id": "SKY-2026-083",
+      "title": "Skyline Agents Kenya — Kitengela 0.5 Acre Commercial Plot",
+      "type": "land",
+      "area": "Kitengela",
+      "price": 6500000,
+      "sqm": 2023,
+      "agent": "Mercy Wanjiru",
+      "phone": "+254 712 400 118",
+      "offPlan": "no"
+    }
+  ]
+}

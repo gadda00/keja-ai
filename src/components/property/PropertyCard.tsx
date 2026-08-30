@@ -8,6 +8,12 @@ import TrustBadge from './TrustBadge'
 import { useStore, KEYS } from '@/lib/store'
 import { isRentalPrice } from '@/lib/finance'
 
+/** Auto-Pilot listings carry the KJA-A id prefix — labelled, never hidden. */
+const isAutoPilot = (id: string) => /^KJA-A/.test(id)
+
+/** Listed within the last 7 days. */
+const isNewArrival = (listedAt: string) => Date.now() - +new Date(listedAt) < 7 * 24 * 3600 * 1000
+
 export default function PropertyCard({ property }: { property: Property }) {
   const [favorites, setFavorites] = useStore<string[]>(KEYS.favorites, [])
   const [compare, setCompare] = useStore<string[]>(KEYS.compare, [])
@@ -35,6 +41,16 @@ export default function PropertyCard({ property }: { property: Property }) {
         </Link>
         <div className="absolute left-3 top-3 flex flex-col gap-1.5">
           <TrustBadge score={property.trustScore} size="sm" />
+          {isNewArrival(property.listedAt) && (
+            <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+              Fresh
+            </span>
+          )}
+          {isAutoPilot(property.id) && (
+            <span className="rounded-full bg-sky-600/90 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+              Auto-Pilot
+            </span>
+          )}
           {property.offPlan && (
             <span className="rounded-full bg-ink/85 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gold-300">
               Off-Plan

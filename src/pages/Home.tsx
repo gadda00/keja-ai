@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import PropertyCard from '@/components/property/PropertyCard'
 import { featuredProperties, PROPERTIES } from '@/data/properties'
+import { AUTO_PROPERTIES, autoPilotStats } from '@/lib/autoListings'
 import { formatKES } from '@/lib/format'
 import { whatsappLink } from '@/config'
 import { asset } from '@/config'
@@ -24,9 +25,14 @@ export default function Home() {
     "Kenya's AI real-estate advisor: verified listings, trust scores, investment intelligence and tokenized fractional ownership.",
   )
   const navigate = useNavigate()
-  const avgTrust = Math.round(PROPERTIES.reduce((s, p) => s + p.trustScore, 0) / PROPERTIES.length)
-  const verifiedCount = PROPERTIES.filter((p) => p.trustScore >= 75).length
-  const flaggedCount = PROPERTIES.filter((p) => p.trustScore < 60).length
+  const MARKET = [...AUTO_PROPERTIES, ...PROPERTIES]
+  const avgTrust = Math.round(MARKET.reduce((s, p) => s + p.trustScore, 0) / MARKET.length)
+  const verifiedCount = MARKET.filter((p) => p.trustScore >= 75).length
+  const flaggedCount = MARKET.filter((p) => p.trustScore < 60).length
+  const freshThisWeek = [...MARKET]
+    .sort((a, b) => b.listedAt.localeCompare(a.listedAt))
+    .filter((p) => Date.now() - +new Date(p.listedAt) < 7 * 24 * 3600 * 1000)
+    .slice(0, 3)
 
   return (
     <div>
@@ -144,7 +150,7 @@ export default function Home() {
       <section className="border-b border-gold-100 bg-white">
         <div className="container-luxe grid grid-cols-2 gap-6 py-10 sm:grid-cols-4">
           {[
-            { icon: Building2, value: `${PROPERTIES.length}`, label: 'Verified listings' },
+            { icon: Building2, value: `${verifiedCount}`, label: 'Verified listings' },
             { icon: BadgeCheck, value: `${verifiedCount}`, label: 'Trust-scored properties' },
             { icon: AlertTriangle, value: `${flaggedCount}`, label: 'Fraud flags caught' },
             { icon: ShieldCheck, value: `${avgTrust}/100`, label: 'Avg. trust score' },
@@ -273,6 +279,42 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ============================== NEW THIS WEEK (AUTO-PILOT) ============================== */}
+      {freshThisWeek.length > 0 && (
+        <section className="section-pad !pt-12 !pb-4 bg-white">
+          <div className="container-luxe">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="eyebrow flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                  New this week — ingested by Keja Auto-Pilot
+                </p>
+                <h2 className="heading-display mt-3 text-3xl sm:text-4xl">Fresh on the market</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-muted">
+                  Our AI pipeline scans the market and our partner feeds (JSON · CSV · XML) every few
+                  hours — new postings are enriched, screened for duplicates and price anomalies, and
+                  published here automatically. Auto-ingested listings are always labelled and
+                  trust-capped until human verification.
+                </p>
+              </div>
+              <Link to="/properties?sort=recent" className="btn-outline">
+                See all fresh listings <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="mt-8 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {freshThisWeek.map((p) => (
+                <PropertyCard key={p.id} property={p} />
+              ))}
+            </div>
+            <p className="mt-4 text-[11px] text-ink-faint">
+              Pipeline stats: {autoPilotStats().liveListings} auto-listings live ·{' '}
+              {autoPilotStats().totalRuns} runs logged · {autoPilotStats().feedHealth} · quality avg{' '}
+              {autoPilotStats().avgQuality}/100
+            </p>
+          </div>
+        </section>
+      )}
+
       {/* ============================== FEATURED ============================== */}
       <section className="section-pad bg-white">
         <div className="container-luxe">
@@ -282,7 +324,7 @@ export default function Home() {
               <h2 className="heading-display mt-3 text-3xl sm:text-4xl">Top-verified properties this week</h2>
             </div>
             <Link to="/properties" className="btn-outline">
-              Browse all {PROPERTIES.length} listings <ChevronRight className="h-4 w-4" />
+              Browse all {MARKET.length} listings <ChevronRight className="h-4 w-4" />
             </Link>
           </motion.div>
 

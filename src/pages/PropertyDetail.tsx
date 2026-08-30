@@ -112,6 +112,11 @@ export default function PropertyDetail() {
           <div>
             <div className="flex flex-wrap items-center gap-2.5">
               <TrustBadge score={property.trustScore} />
+              {/^KJA-A/.test(property.id) && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-sky-600 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white" title="Ingested and machine-screened by the Keja Auto-Pilot pipeline">
+                  Auto-Pilot listing
+                </span>
+              )}
               {property.offPlan && <span className="chip">Off-Plan · {property.completionDate}</span>}
               {property.furnished && <span className="chip">Furnished</span>}
               {property.availability === 'reserved' && (

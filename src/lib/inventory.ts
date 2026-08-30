@@ -11,6 +11,7 @@ import { useMemo } from 'react'
 import type { Property } from '@/data/properties'
 import { PROPERTIES } from '@/data/properties'
 import { useUserListings, type UserListing } from '@/lib/adminStore'
+import { AUTO_PROPERTIES } from '@/lib/autoListings'
 import { asset } from '@/config'
 
 /**
@@ -65,14 +66,19 @@ export function userListingToProperty(u: UserListing): Property {
   }
 }
 
-/** Merged inventory hook — approved partner submissions first, then seed stock. */
+/** Merged inventory hook — auto-published Auto-Pilot listings, approved
+ * partner submissions, then seed stock. (Auto listings are machine-screened
+ * and trust-capped — see lib/autoListings.) */
 export function useAllProperties(): Property[] {
   const [userListings] = useUserListings()
   return useMemo(
-    () => [...userListings.map(userListingToProperty), ...PROPERTIES],
+    () => [...userListings.map(userListingToProperty), ...AUTO_PROPERTIES, ...PROPERTIES],
     [userListings],
   )
 }
+
+/** Static merged inventory (no hooks) — for the AI engine and non-React code. */
+export const MARKET_INVENTORY: Property[] = [...AUTO_PROPERTIES, ...PROPERTIES]
 
 /** Resolve one property from the merged inventory by id. */
 export function findProperty(all: Property[], id: string): Property | undefined {

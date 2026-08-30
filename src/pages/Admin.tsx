@@ -5,7 +5,7 @@
  */
 import { usePageMeta } from '@/lib/seo'
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import {
   LayoutGrid,
   Users,
@@ -18,6 +18,7 @@ import {
   TrendingUp,
   Lock,
   RefreshCw,
+  Bot,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import AdminOverview from '@/components/admin/AdminOverview'
@@ -27,8 +28,22 @@ import AdminLeads from '@/components/admin/AdminLeads'
 import AdminPartners from '@/components/admin/AdminPartners'
 import AdminAudit from '@/components/admin/AdminAudit'
 import AdminSettings from '@/components/admin/AdminSettings'
+import AdminAutoPilot from '@/components/admin/AdminAutoPilot'
+import { autoPilotStats } from '@/lib/autoListings'
 
-type Tab = 'overview' | 'users' | 'listings' | 'leads' | 'partners' | 'audit' | 'settings'
+const timeAgoSafe = (iso: string) => {
+  try {
+    const diff = Date.now() - +new Date(iso)
+    const hrs = Math.floor(diff / 3_600_000)
+    if (hrs < 1) return 'just now'
+    if (hrs < 24) return `${hrs}h ago`
+    return `${Math.floor(hrs / 24)}d ago`
+  } catch {
+    return ''
+  }
+}
+
+type Tab = 'overview' | 'users' | 'listings' | 'leads' | 'partners' | 'autopilot' | 'audit' | 'settings'
 
 const TABS: { id: Tab; label: string; icon: typeof LayoutGrid }[] = [
   { id: 'overview', label: 'Overview', icon: LayoutGrid },
@@ -36,6 +51,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid }[] = [
   { id: 'listings', label: 'Listings', icon: Building2 },
   { id: 'leads', label: 'Leads', icon: Flame },
   { id: 'partners', label: 'Partners & Feeds', icon: Handshake },
+  { id: 'autopilot', label: 'Auto-Pilot', icon: Bot },
   { id: 'audit', label: 'Audit Trail', icon: FileClock },
   { id: 'settings', label: 'Settings', icon: Settings2 },
 ]
@@ -46,7 +62,16 @@ export default function Admin() {
     'Users, verification queue, leads, partners, audit trail and settings.',
   )
   const { isAdmin, isLoggedIn, setAuthModalOpen } = useAuth()
-  const [tab, setTab] = useState<Tab>('overview')
+  const [params, setParams] = useSearchParams()
+  const initialTab = (params.get('tab') as Tab) || 'overview'
+  const [tab, setTab] = useState<Tab>(
+    TABS.some((t) => t.id === initialTab) ? initialTab : 'overview',
+  )
+  const selectTab = (t: string) => {
+    setTab(t as Tab)
+    setParams(t === 'overview' ? {} : { tab: t }, { replace: true })
+  }
+  const stats = autoPilotStats()
 
   const guard = useMemo(() => {
     if (!isLoggedIn) return 'auth'
@@ -108,9 +133,22 @@ export default function Admin() {
             global supply partnerships, auditability and platform settings in one command centre.
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-xl bg-green-50 px-4 py-2.5 ring-1 ring-green-200">
-          <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-green-500" />
-          <span className="text-xs font-semibold text-green-800">All systems operational</span>
+        <div
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 ring-1 ${
+            stats.feedsDegraded ? 'bg-amber-50 ring-amber-200' : 'bg-green-50 ring-green-200'
+          }`}
+        >
+          <span
+            className={`h-2.5 w-2.5 animate-pulse rounded-full ${
+              stats.feedsDegraded ? 'bg-amber-500' : 'bg-green-500'
+            }`}
+          />
+          <span className={`text-xs font-semibold ${stats.feedsDegraded ? 'text-amber-800' : 'text-green-800'}`}>
+            {stats.feedsDegraded ? 'Feed attention required' : 'All systems operational'}
+          </span>
+          <span className="text-[10px] text-ink-faint">
+            · Auto-Pilot: {stats.feedHealth} · last run {stats.lastRunAt ? timeAgoSafe(stats.lastRunAt) : 'pending'}
+          </span>
           <RefreshCw className="ml-1 h-3.5 w-3.5 text-green-600" />
         </div>
       </div>
@@ -122,7 +160,7 @@ export default function Admin() {
             key={t.id}
             role="tab"
             aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
+            onClick={() => selectTab(t.id)}
             className={`flex shrink-0 items-center gap-2 rounded-t-lg border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
               tab === t.id
                 ? 'border-gold-600 bg-gold-50/60 text-gold-700'
@@ -137,11 +175,12 @@ export default function Admin() {
 
       {/* content */}
       <div className="py-8">
-        {tab === 'overview' && <AdminOverview onNavigate={(t) => setTab(t as Tab)} />}
+        {tab === 'overview' && <AdminOverview onNavigate={(t) => selectTab(t)} />}
         {tab === 'users' && <AdminUsers />}
         {tab === 'listings' && <AdminListings />}
         {tab === 'leads' && <AdminLeads />}
         {tab === 'partners' && <AdminPartners />}
+        {tab === 'autopilot' && <AdminAutoPilot />}
         {tab === 'audit' && <AdminAudit />}
         {tab === 'settings' && <AdminSettings />}
       </div>

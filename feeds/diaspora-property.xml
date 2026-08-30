@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diasporaPropertyGroup feedVersion="1.0" agency="Diaspora Property Group">
+  <listing>
+    <ref>DPG-UK-019</ref>
+    <title>Diaspora Property Group — Karen Executive Villa</title>
+    <type>villa</type>
+    <area>Karen</area>
+    <price>58500000</price>
+    <size_sqm>380</size_sqm>
+    <bedrooms>5</bedrooms>
+    <bathrooms>4</bathrooms>
+    <agent>Esther Kimani</agent>
+    <phone>+254 705 118 663</phone>
+    <off_plan>no</off_plan>
+  </listing>
+  <listing>
+    <ref>DPG-UK-020</ref>
+    <title>Diaspora Property Group — Nyali Sea-Breeze 3-Bed</title>
+    <type>apartment</type>
+    <area>Nyali</area>
+    <price>14500000</price>
+    <size_sqm>150</size_sqm>
+    <bedrooms>3</bedrooms>
+    <bathrooms>2</bathrooms>
+    <agent>Kevin Ochieng</agent>
+    <phone>+254 745 902 210</phone>
+    <off_plan>no</off_plan>
+  </listing>
+  <listing>
+    <ref>DPG-UK-021</ref>
+    <title>Diaspora Property Group — Nakuru Milimani 2-Bed</title>
+    <type>apartment</type>
+    <area>Nakuru</area>
+    <price>6500000</price>
+    <size_sqm>85</size_sqm>
+    <bedrooms>2</bedrooms>
+    <bathrooms>1</bathrooms>
+    <agent>Esther Kimani</agent>
+    <phone>+254 705 118 663</phone>
+    <off_plan>yes</off_plan>
+  </listing>
+</diasporaPropertyGroup>
