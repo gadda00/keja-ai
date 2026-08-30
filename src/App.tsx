@@ -26,6 +26,7 @@ const Tokenize = lazy(() => import('@/pages/Tokenize'))
 const Admin = lazy(() => import('@/pages/Admin'))
 const Partners = lazy(() => import('@/pages/Partners'))
 const Compare = lazy(() => import('@/pages/Compare'))
+const ArticleDetail = lazy(() => import('@/pages/ArticleDetail'))
 const NotFound = lazy(() => import('@/pages/NotFound'))
 
 function ScrollManager() {
@@ -80,6 +81,7 @@ export default function App() {
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/insights" element={<Insights />} />
+              <Route path="/insights/:slug" element={<ArticleDetail />} />
               <Route path="/sell" element={<ListProperty />} />
               <Route path="/manage" element={<Manage />} />
               <Route path="/account" element={<Account />} />

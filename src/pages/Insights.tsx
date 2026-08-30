@@ -1,6 +1,7 @@
 import { usePageMeta } from '@/lib/seo'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { ARTICLES } from '@/data/articles'
 import { ArrowRight, TrendingUp, MapPinned, Landmark, Coins, ShieldCheck, Lightbulb } from 'lucide-react'
 
 const fadeUp = {
@@ -131,6 +132,30 @@ export default function Insights() {
           </motion.div>
         </div>
       </section>
-    </div>
-  )
+
+      {/* long-form guides */}
+      <section className="section-pad bg-cream">
+        <div className="container-luxe">
+          <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
+            <p className="eyebrow">The Keja guidebook</p>
+            <h2 className="heading-display mt-3 text-3xl sm:text-4xl">Long-form, worth your time</h2>
+            <p className="mt-4 text-sm leading-relaxed text-ink-muted">
+              The market desk writes the guides we wish someone had written for us — complete, current and honest about what is a fact, an estimate, or an assumption.
+            </p>
+          </motion.div>
+          <div className="mt-12 grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {ARTICLES.map((a, i) => (
+              <motion.div key={a.slug} {...fadeUp} transition={{ ...fadeUp.transition, delay: (i % 3) * 0.07 }}>
+                <Link to={`/insights/${a.slug}`} className="card-luxe card-luxe-hover flex h-full flex-col p-6">
+                  <p className="text-[10px] font-bold uppercase tracking-wide2 text-gold-700">{a.category}</p>
+                  <h3 className="mt-2 font-display text-lg font-bold leading-snug text-ink">{a.title}</h3>
+                  <p className="mt-2.5 line-clamp-3 text-sm leading-relaxed text-ink-muted">{a.excerpt}</p>
+                  <p className="mt-auto pt-4 text-xs font-semibold text-ink-muted">{a.minutes} min read · {new Date(a.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} <span className="text-gold-700">· Read →</span></p>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>  )
 }
