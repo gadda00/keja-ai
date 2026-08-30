@@ -1,6 +1,6 @@
 import { Link, useSearchParams } from 'react-router-dom'
-import { useEffect } from 'react'
-import { GitCompareArrows, X, TrendingUp, ShieldCheck, BedDouble, Bath, Ruler, Building2, Gauge, MapPin } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { GitCompareArrows, X, TrendingUp, ShieldCheck, BedDouble, Bath, Ruler, Building2, Gauge, MapPin, Share2, CheckCircle2 } from 'lucide-react'
 import { useAllProperties } from '@/lib/inventory'
 import { formatKES } from '@/lib/format'
 import { investmentScore, scoreTone } from '@/lib/investmentScore'
@@ -15,6 +15,17 @@ export default function Compare() {
   const [params, setParams] = useSearchParams()
   const all = useAllProperties()
   const [compare, setCompare] = useStore<string[]>(KEYS.compare, [])
+  const [copied, setCopied] = useState(false)
+  const shareUrl = items.length ? `${window.location.origin}/keja-ai/compare?ids=${items.map((p) => p.id).join(',')}` : ''
+  const shareCompare = () => {
+    navigator.clipboard
+      ?.writeText(shareUrl)
+      .then(() => {
+        setCopied(true)
+        window.setTimeout(() => setCopied(false), 2000)
+      })
+      .catch(() => undefined)
+  }
 
   const ids = params.get('ids')?.split(',').filter(Boolean) ?? compare
   const items = ids.map((id) => all.find((p) => p.id === id)).filter((p): p is NonNullable<typeof p> => Boolean(p)).slice(0, 4)
@@ -68,7 +79,7 @@ export default function Compare() {
         const s = investmentScore(p)
         return (
           <ul className="space-y-1 text-left text-xs">
-            {s.factors.slice(0, 5).map((f) => (
+            {s.factors.map((f) => (
               <li key={f.label} className="flex items-center justify-between gap-2">
                 <span className="text-ink-muted">{f.label}</span>
                 <b>{f.score.toFixed(1)}</b>
@@ -86,10 +97,22 @@ export default function Compare() {
       <h1 className="heading-display mt-2 text-3xl sm:text-4xl">
         Compare <span className="gold-text">side by side</span>
       </h1>
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted">
-        Up to four properties, one honest table: price, yields, Investment Score™, trust and mortgage
-        estimates — the numbers that actually decide a purchase, computed the same way for every listing.
-      </p>
+      <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
+        <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
+          Up to four properties, one honest table: price, yields, Investment Score™, trust and mortgage
+          estimates — the numbers that actually decide a purchase, computed the same way for every listing.
+        </p>
+        {items.length > 1 && (
+          <button
+            onClick={shareCompare}
+            className="btn-outline shrink-0 !py-2 !text-xs"
+            aria-live="polite"
+          >
+            {copied ? <CheckCircle2 className="h-4 w-4 text-emerald-600" /> : <Share2 className="h-4 w-4" />}
+            {copied ? 'Link copied' : 'Share comparison'}
+          </button>
+        )}
+      </div>
 
       {items.length === 0 ? (
         <div className="mt-14 flex flex-col items-center rounded-2xl bg-white py-16 text-center shadow-card ring-1 ring-gold-100">

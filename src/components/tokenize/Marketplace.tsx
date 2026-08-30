@@ -219,8 +219,17 @@ function PropertyCard({ p, index }: { p: TokenizedProperty; index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.45, delay: (index % 3) * 0.08 }}
-      className="group cursor-pointer overflow-hidden rounded-2xl border border-gold-100 bg-white shadow-card transition-all hover:-translate-y-1 hover:border-gold-200 hover:shadow-card-hover"
+      className="group cursor-pointer overflow-hidden rounded-2xl border border-gold-100 bg-white shadow-card transition-all hover:-translate-y-1 hover:border-gold-200 hover:shadow-card-hover focus-visible:ring-2 focus-visible:ring-gold-500 focus-visible:outline-none"
+      role="button"
+      tabIndex={0}
+      aria-label={`Open ${p.title} offering — ${p.tokenSymbol}`}
       onClick={() => openProperty(p.id)}
+      onKeyDown={(e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          openProperty(p.id)
+        }
+      }}
     >
       <div className="relative aspect-[16/10] overflow-hidden">
         <img

@@ -1,5 +1,5 @@
 import { usePageMeta } from '@/lib/seo'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -108,7 +108,23 @@ export default function ListProperty() {
   const { user, requireAuth, isLoggedIn } = useAuth()
   const [submissions, setSubmissions] = useSubmissions()
   const [step, setStep] = useState(0)
-  const [form, setForm] = useState<WizardForm>(EMPTY)
+
+  // Draft auto-save: a refresh mid-wizard no longer loses everything.
+  useEffect(() => {
+    try {
+      localStorage.setItem('keja:sell-draft', JSON.stringify(form))
+    } catch {
+      /* storage unavailable */
+    }
+  }, [form])
+  const [form, setForm] = useState<WizardForm>(() => {
+    try {
+      const draft = localStorage.getItem('keja:sell-draft')
+      return draft ? { ...EMPTY, ...JSON.parse(draft) } : EMPTY
+    } catch {
+      return EMPTY
+    }
+  })
   const [checksRun, setChecksRun] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submissionId, setSubmissionId] = useState('')
@@ -144,7 +160,14 @@ export default function ListProperty() {
 
   const canNext = () => {
     if (step === 0) return form.name.trim() && form.phone.trim()
-    if (step === 1) return form.title.trim() && form.area.trim() && Number(form.price) > 0
+    if (step === 1)
+      return (
+        form.title.trim() &&
+        form.area.trim() &&
+        Number(form.price) > 0 &&
+        // At least one purpose must be selected (was: submitted with purpose: [])
+        (form.purposeBuy || form.purposeRent || form.purposeInvest)
+      )
     if (step === 2) return Number(form.sizeSqm) > 0
     return true
   }

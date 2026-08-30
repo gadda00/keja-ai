@@ -5,7 +5,7 @@ import { useNotifications } from '@/lib/searchStore'
 
 /** Navbar notification bell + inbox dropdown. */
 export default function NotificationBell() {
-  const { notifs, unread, markAllRead, clearAll } = useNotifications()
+  const { notifs, unread, markAllRead, clearAll, markOneRead, removeOne } = useNotifications()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -72,19 +72,35 @@ export default function NotificationBell() {
               </p>
             ) : (
               notifs.slice(0, 12).map((n) => (
-                <Link
+                <div
                   key={n.id}
-                  to={n.href ?? '/properties'}
-                  onClick={() => setOpen(false)}
-                  className={`flex items-start gap-3 border-b border-gold-50 px-4 py-3 transition hover:bg-gold-50/60 ${n.read ? '' : 'bg-gold-50/40'}`}
+                  className={`group flex items-start gap-3 border-b border-gold-50 px-4 py-3 transition hover:bg-gold-50/60 ${n.read ? '' : 'bg-gold-50/40'}`}
                 >
                   <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${n.read ? 'bg-gold-200' : 'bg-gold-600'}`} aria-hidden="true" />
-                  <span className="min-w-0">
+                  <Link to={n.href ?? '/properties'} onClick={() => setOpen(false)} className="min-w-0 flex-1">
                     <span className={`block text-[13px] ${n.read ? 'font-medium text-ink-soft' : 'font-bold text-ink'}`}>{n.title}</span>
                     <span className="mt-0.5 block text-xs leading-relaxed text-ink-muted">{n.body}</span>
                     <span className="mt-1 block text-[10px] font-semibold uppercase tracking-wide text-ink-muted/70">{fmt(n.createdAt)}</span>
+                  </Link>
+                  <span className="flex shrink-0 flex-col gap-1 opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100">
+                    {!n.read && (
+                      <button
+                        onClick={() => markOneRead(n.id)}
+                        aria-label={`Mark "${n.title}" as read`}
+                        className="rounded-lg p-1.5 text-ink-muted hover:bg-gold-100 hover:text-gold-700"
+                      >
+                        <CheckCheck className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => removeOne(n.id)}
+                      aria-label={`Delete notification "${n.title}"`}
+                      className="rounded-lg p-1.5 text-ink-muted hover:bg-red-50 hover:text-red-600"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
                   </span>
-                </Link>
+                </div>
               ))
             )}
           </div>

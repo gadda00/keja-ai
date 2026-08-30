@@ -20,6 +20,16 @@ export default class ErrorBoundary extends Component<Props, State> {
     console.error('[Keja] Render error captured:', error, info.componentStack)
   }
 
+  /**
+   * Reset on navigation (children identity changes with the route): without
+   * this, one crash keeps every route on the error screen until a full reload.
+   */
+  componentDidUpdate(prev: Props) {
+    if (this.state.error && prev.children !== this.props.children) {
+      this.setState({ error: null })
+    }
+  }
+
   render() {
     if (this.state.error) {
       return (

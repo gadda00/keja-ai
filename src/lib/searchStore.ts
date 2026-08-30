@@ -175,7 +175,15 @@ export function useNotifications() {
   const unread = notifs.filter((n) => !n.read).length
   const markAllRead = useCallback(() => setNotifs(notifs.map((n) => ({ ...n, read: true }))), [notifs, setNotifs])
   const clearAll = useCallback(() => setNotifs([]), [setNotifs])
-  return { notifs, unread, markAllRead, clearAll }
+  const markOneRead = useCallback(
+    (id: string) => setNotifs(notifs.map((n) => (n.id === id ? { ...n, read: true } : n))),
+    [notifs, setNotifs],
+  )
+  const removeOne = useCallback(
+    (id: string) => setNotifs(notifs.filter((n) => n.id !== id)),
+    [notifs, setNotifs],
+  )
+  return { notifs, unread, markAllRead, clearAll, markOneRead, removeOne }
 }
 
 /** One-time alert sweep on mount (after inventory loads). */
