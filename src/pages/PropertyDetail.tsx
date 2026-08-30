@@ -51,7 +51,7 @@ export default function PropertyDetail() {
   usePageMeta(
     property ? `${property.title} — ${property.area}` : 'Property',
     property ? `${property.title} in ${property.area}, ${property.county}. Trust score ${property.trustScore}/100, verified by Keja.` : undefined,
-    { jsonLd, image: '/og/og-home.png' },
+    { jsonLd, image: '/og-image.jpg' },
   )
   const score = useMemo(() => (property ? investmentScore(property) : null), [property])
   const [activeImg, setActiveImg] = useState(0)
@@ -145,7 +145,7 @@ export default function PropertyDetail() {
                   Auto-Pilot listing
                 </span>
               )}
-              {property.offPlan && <span className="chip">Off-Plan · {property.completionDate}</span>}
+              {property.offPlan && <span className="chip">Off-Plan{property.completionDate ? ` · ${property.completionDate}` : ''}</span>}
               {property.furnished && <span className="chip">Furnished</span>}
               {property.availability === 'reserved' && (
                 <span className="rounded-full bg-ink px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-gold-300">

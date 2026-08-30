@@ -42,8 +42,8 @@ console.log(`[autopilot] ingest: ${scannerSightings.length} scanner + ${feedSigh
 /* 2 — enrich */
 const enriched = sightings.map((s) => enrich(s, seq++))
 
-/* 3 — dedupe (against each other + existing inventory) */
-const { unique, dupes } = dedupe(enriched, state.listings)
+/* 3 — dedupe (against each other + inventory + pending + signature graveyard) */
+const { unique, dupes } = dedupe(enriched, [...state.listings, ...state.pending], state.seenSignatures ?? [])
 console.log(`[autopilot] dedupe: ${dupes.length} duplicates dropped`)
 
 /* 4 — quality gate */

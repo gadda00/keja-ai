@@ -181,8 +181,11 @@ export class KejaAI {
     // Qualification flow (if active)
     if (this.qualificationState) return this.continueQualification(input)
 
-    // Start lead qualification — the 4-question matcher
-    if (/(qualif|find me a home|help me find|match me|what should i buy|book me a viewing|start (the |my )?(process|journey)|guide me)/.test(t)) {
+    // Start lead qualification — the 4-question matcher.
+    // Deliberately narrow: "help me find a mortgage/land…" must keep routing
+    // to their own intents, and "book me a viewing" belongs to the viewing
+    // flow below. Exact-ish phrases only.
+    if (/(^|\b)(qualif(y|ication|ied)? me|find me a home|match me|what should i buy|start (the |my )?(process|journey)|guide me)(\b|$)/.test(t)) {
       return this.startQualification()
     }
 
@@ -481,7 +484,11 @@ export class KejaAI {
       const ia = areaInsights[a]
       const ib = areaInsights[b]
       return {
-        text: `**${a} vs ${b}** — the side-by-side: ⚖️\n\n| | ${a} | ${b} |\n|---|---|---|\n| Pricing | ${ia.avgPricePerSqm} | ${ib.avgPricePerSqm} |\n| Gross yield | ${ia.yield} | ${ib.yield} |\n\n• **${a}:** ${ia.note}\n• **${b}:** ${ib.note}\n\nMy take (clearly labelled ESTIMATE): pick **${a}** for income, **${b}** for ${parseFloat(ia.yield) > parseFloat(ib.yield) ? 'growth' : 'income'} — and remember the best portfolio often holds both. Want listings in either?`,
+        text: `**${a} vs ${b}** — the side-by-side: ⚖️\n\n| | ${a} | ${b} |\n|---|---|---|\n| Pricing | ${ia.avgPricePerSqm} | ${ib.avgPricePerSqm} |\n| Gross yield | ${ia.yield} | ${ib.yield} |\n\n• **${a}:** ${ia.note}\n• **${b}:** ${ib.note}\n\nMy take (clearly labelled ESTIMATE): ${
+          parseFloat(ia.yield) >= parseFloat(ib.yield)
+            ? `pick **${a}** for income, **${b}** for growth`
+            : `pick **${a}** for growth, **${b}** for income`
+        } — and remember the best portfolio often holds both. Want listings in either?`,
         quickReplies: [`Show listings in ${a}`, `Show listings in ${b}`, 'Run yields on both'],
       }
     }
@@ -522,8 +529,14 @@ export class KejaAI {
         state.data.timeline = t
         const budgetT = state.data.budget || ''
         const budgetNum = parseFloat(budgetT.replace(/[^\d.]/g, '')) || 0
-        const isHot = /now|immediate|1 month|ready|this month/i.test(t) || /ready to (buy|transact|move)/i.test(t)
-        const isCold = /research|just looking|later|maybe|years/i.test(t)
+        // Cold/negative patterns are checked FIRST so "not now, still
+        // researching" classifies COLD (the old order rated it HOT).
+        const isCold = /research|just looking|later|maybe|years|not (now|ready)/i.test(t)
+        const isHot =
+          !isCold &&
+          (/^(now|immediate|ready|this month)/i.test(t) ||
+            /ready to (buy|transact|move)/i.test(t) ||
+            /\b(1 month|this month|immediately)\b/i.test(t))
         const temperature: 'HOT' | 'WARM' | 'COLD' = isHot ? 'HOT' : isCold ? 'COLD' : 'WARM'
         this.qualificationState = null
         this.lastQualification = { ...state.data, temperature }

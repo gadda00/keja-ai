@@ -1,12 +1,12 @@
 import { usePageMeta } from '@/lib/seo'
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Search, SlidersHorizontal, ShieldCheck, X, MapPin, LayoutGrid, Map as MapIcon, BookmarkPlus, BellRing, Trash2 } from 'lucide-react'
 import PropertyCard from '@/components/property/PropertyCard'
 import MapView from '@/components/property/MapView'
 import { AREAS, type Property } from '@/data/properties'
 import { isRentalPrice } from '@/lib/finance'
-import { PRICE_CEILING, RENT_CEILING } from '@/lib/searchStore'
+import { PRICE_CEILING, RENT_CEILING, VERIFIED_TRUST_FLOOR } from '@/lib/searchStore'
 import { useAllProperties } from '@/lib/inventory'
 import { useSavedSearches, useAlertSweep } from '@/lib/searchStore'
 
@@ -32,7 +32,10 @@ export default function Properties() {
   const [area, setArea] = useState<string>(params.get('area') ?? 'all')
   const [maxPrice, setMaxPrice] = useState<number>(() => {
     const mp = parseFloat(params.get('maxPrice') ?? '')
-    return Number.isFinite(mp) && mp > 0 ? mp : PRICE_CEILING
+    if (Number.isFinite(mp) && mp > 0) return mp
+    // Deep-linking ?purpose=rent must start at the RENT ceiling — otherwise
+    // the default 100 reads as "KES 100k/mo cap" and hides pricier rentals.
+    return params.get('purpose') === 'rent' ? RENT_CEILING : PRICE_CEILING
   })
   const [minBeds, setMinBeds] = useState<number>(() => parseInt(params.get('minBeds') ?? '0') || 0)
   const [verifiedOnly, setVerifiedOnly] = useState(params.get('verified') !== '0')
@@ -41,11 +44,16 @@ export default function Properties() {
   const [view, setView] = useState<'list' | 'map'>('list')
   const { searches, save, remove, toggleAlerts } = useSavedSearches()
 
+  const purposeRef = useRef(purpose)
   useEffect(() => {
     const q = params.get('q')
     if (q !== null) setQuery(q)
     const p = params.get('purpose')
-    if (p) setPurpose(p)
+    if (p && p !== purposeRef.current) {
+      purposeRef.current = p
+      setPurpose(p)
+      setMaxPrice(p === 'rent' ? RENT_CEILING : PRICE_CEILING)
+    }
   }, [params])
 
   // merged inventory: approved partner/user submissions + seed stock (see lib/inventory)
@@ -82,7 +90,7 @@ export default function Properties() {
       )
     }
     if (minBeds > 0) list = list.filter((p) => (p.bedrooms ?? 0) >= minBeds)
-    if (verifiedOnly) list = list.filter((p) => p.trustScore >= 75)
+    if (verifiedOnly) list = list.filter((p) => p.trustScore >= VERIFIED_TRUST_FLOOR)
 
     switch (sort) {
       case 'price-asc':

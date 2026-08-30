@@ -9,6 +9,7 @@
  * Ids are stable and monotonic: nextSeq continues from the existing file.
  */
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs'
+import { signature } from './dedupe.mjs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -20,7 +21,7 @@ export const RUNS_CAP = 40
 
 export function loadState() {
   if (!existsSync(DATA_PATH)) {
-    return { version: 1, generatedAt: new Date().toISOString(), runs: [], listings: [], pending: [] }
+    return emptyState()
   }
   try {
     const parsed = JSON.parse(readFileSync(DATA_PATH, 'utf8'))
@@ -30,10 +31,18 @@ export function loadState() {
       runs: parsed.runs ?? [],
       listings: parsed.listings ?? [],
       pending: parsed.pending ?? [],
+      // Graveyard of every signature ever published/queued/rejected — feed
+      // items have stable signatures, so without this the cap-60 eviction
+      // would recycle the same partner listings as "new" forever.
+      seenSignatures: parsed.seenSignatures ?? [],
     }
   } catch {
-    return { version: 1, generatedAt: new Date().toISOString(), runs: [], listings: [], pending: [] }
+    return emptyState()
   }
+}
+
+function emptyState() {
+  return { version: 1, generatedAt: new Date().toISOString(), runs: [], listings: [], pending: [], seenSignatures: [] }
 }
 
 export function publish({ state, screened, feedStatus, runId }) {
@@ -53,6 +62,16 @@ export function publish({ state, screened, feedStatus, runId }) {
   const nextPending = [...pending, ...state.pending]
     .sort((a, b) => b.listedAt.localeCompare(a.listedAt))
     .slice(0, PENDING_CAP)
+
+  // Signature graveyard: grows monotonically, never pruned (bounded by the
+  // realistic universe of postings, ~hundreds — negligible vs the data file).
+  const sigOf = (l) => signature({ ...l, bedrooms: l.bedrooms, price: l.price, type: l.type, area: l.area })
+  const nextSeen = [
+    ...new Set([
+      ...(state.seenSignatures ?? []),
+      ...screened.map(sigOf),
+    ]),
+  ].slice(-2000)
 
   const run = {
     id: runId,
@@ -75,6 +94,7 @@ export function publish({ state, screened, feedStatus, runId }) {
     runs: [run, ...(state.runs ?? [])].slice(0, RUNS_CAP),
     listings: nextListings,
     pending: nextPending,
+    seenSignatures: nextSeen,
     rejected: rejected.slice(0, REJECTED_CAP),
   }
   return { nextState, run, published, pending, rejected }

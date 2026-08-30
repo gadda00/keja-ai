@@ -56,7 +56,7 @@ jobs:
           git add src/data/auto-listings.json
           git commit -m "chore(autopilot): ingest new listings $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
-          echo "Committed — the deploy workflow will publish the marketplace update."
+          echo "Committed — deploy-pages.yml runs on workflow_run completion."
 
       - name: Run summary
         run: |

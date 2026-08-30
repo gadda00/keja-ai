@@ -19,7 +19,7 @@ export function qualityScore(listing) {
   // --- completeness (30) ---
   const missing = REQUIRED_FIELDS.filter((f) => {
     const v = f === 'agent' ? listing.agent?.name : listing[f]
-    return v === undefined || v === null || v === '' || (f === 'sizeSqm' && Number(v) <= 0)
+    return v === undefined || v === null || v === '' || ((f === 'sizeSqm' || f === 'price') && Number(v) <= 0)
   })
   const completeness = Math.max(0, 30 - missing.length * 6)
   score += completeness
@@ -34,7 +34,12 @@ export function qualityScore(listing) {
   let priceDetail = 'Price sits inside the area market band'
   const band = listing.auto?.areaPpsmBand ?? [20000, 160000]
   const acreBand = listing.auto?.areaAcreBand ?? [2, 15]
-  if (listing.type === 'land' && listing.sizeSqm > 0) {
+  if (!(listing.price > 0)) {
+    // No usable price at all — hard fail BEFORE any rental-warn branch can
+    // mis-score a zero-price row into the publish band.
+    priceStatus = 'fail'
+    priceDetail = 'No usable price supplied by the source feed'
+  } else if (listing.type === 'land' && listing.sizeSqm > 0) {
     // Land: price per acre vs the area acreage band
     const acres = listing.sizeSqm / 4047
     const perAcreM = listing.price / acres / 1_000_000
@@ -58,12 +63,12 @@ export function qualityScore(listing) {
     } else {
       priceDetail = `KES ${Math.round(ppsm / 1000)}k/sqm sits within the area band`
     }
+  } else if (listing.price >= 500000 && listing.sizeSqm <= 0) {
+    priceStatus = 'warn'
+    priceDetail = 'No size supplied — price sanity screen skipped; verify valuation manually'
   } else if (listing.price < 500000 && listing.price < 15000) {
     priceStatus = 'warn'
     priceDetail = 'Monthly rent below KES 15k — verify unit condition'
-  } else if (listing.price <= 0) {
-    priceStatus = 'fail'
-    priceDetail = 'No usable price supplied by the source feed'
   }
   score += priceStatus === 'pass' ? 30 : priceStatus === 'warn' ? 15 : 0
   checks.push({ label: 'Price-band screen', status: priceStatus, detail: priceDetail })
@@ -98,7 +103,10 @@ export function qualityScore(listing) {
   })
 
   score = Math.max(0, Math.min(100, Math.round(score)))
-  const route = score >= 80 ? 'publish' : score >= 60 ? 'review' : 'reject'
+  let route = score >= 80 ? 'publish' : score >= 60 ? 'review' : 'reject'
+  // Bait pricing is the #1 scam pattern this layer exists to catch — a failed
+  // price screen forces rejection regardless of how complete the row is.
+  if (priceStatus === 'fail') route = 'reject'
   return { score, route, checks }
 }
 

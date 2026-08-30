@@ -37,19 +37,28 @@ export function signature(listing) {
  * Deduplicate candidates against (a) each other and (b) existing inventory.
  * Keeps the earliest-seen / most complete candidate of each signature group.
  */
-export function dedupe(candidates, existing = []) {
+export function dedupe(candidates, existing = [], seenSignatures = []) {
   const existingSigs = new Map()
   for (const e of existing) {
     const sig = signature({ ...e, bedrooms: e.bedrooms, price: e.price, type: e.type, area: e.area })
     const tokens = titleTokens(e.title ?? '')
     if (!existingSigs.has(sig)) existingSigs.set(sig, tokens)
   }
+  // Graveyard: raw signatures of everything ever published/queued/rejected.
+  // A hit here is a hard skip (no title-overlap softening) — this is what
+  // stops evicted feed items from cycling back as "new" listings.
+  const graveyard = new Set(seenSignatures)
 
   const groups = new Map()
   const dupes = []
   for (const c of candidates) {
     const sig = signature(c)
     const tokens = titleTokens(c.title)
+    // 0. graveyard hit — this exact posting was already ingested once
+    if (graveyard.has(sig)) {
+      dupes.push({ id: c.id, reason: 'seen before (signature graveyard)' })
+      continue
+    }
     // 1. exact-ish signature + strong title overlap vs existing inventory
     if (existingSigs.has(sig)) {
       const exTok = existingSigs.get(sig)

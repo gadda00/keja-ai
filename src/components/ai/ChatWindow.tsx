@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Send, Sparkles, ShieldCheck, Languages, Trash2 } from 'lucide-react'
 import { kejaAI, AIResponse } from '@/lib/ai/engine'
-import { useStore, KEYS, ChatMessage } from '@/lib/store'
+import { useStore, KEYS, ChatMessage, type Lead } from '@/lib/store'
 import { useAuth } from '@/lib/auth'
 import Markdown from './Markdown'
 import { useAllProperties } from '@/lib/inventory'
@@ -31,6 +31,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
   const navigate = useNavigate()
   const { setAuthModalOpen } = useAuth()
   const allProperties = useAllProperties()
+  const [, setLeads] = useStore<Lead[]>(KEYS.leads, [])
 
   useEffect(() => {
     if (!started.current && messages.length === 0) {
@@ -38,6 +39,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
       const greeting: ChatMessage = { id: uid(), role: 'keja', text: '', ts: new Date().toISOString() }
       const r = kejaAI.respond('hello')
       greeting.text = r.text
+      greeting.quickReplies = r.quickReplies
       setMessages([greeting])
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -101,6 +103,25 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
       }
       setMessages((prev: ChatMessage[]) => [...prev, kejaMsg])
       setTyping(false)
+      // Completed qualification → write the lead so the sales CRM (Admin →
+      // Leads, agent Dashboard) actually receives what the bot promised.
+      if (kejaAI.lastQualification && /lead rating:|your profile:/i.test(response.text)) {
+        const q = kejaAI.lastQualification
+        const lead: Lead = {
+          id: `lead-${Date.now()}`,
+          name: q.name ?? 'AI qualification',
+          phone: '',
+          interest: q.interest ?? 'Qualified via Keja AI',
+          budget: q.budget,
+          timeline: q.timeline,
+          temperature: (q.temperature as Lead['temperature']) ?? 'WARM',
+          source: 'chat',
+          note: 'Captured by the 4-question AI qualification flow',
+          createdAt: new Date().toISOString(),
+        }
+        setLeads((prev: Lead[]) => [lead, ...prev])
+        kejaAI.lastQualification = null
+      }
       // Engine actions — the conversion moments (human handoff, calculator…)
       if (response.action === 'whatsapp') {
         window.open(whatsappLink('Hello Keja — I was chatting with Keja AI and would like to talk to the client desk.'), '_blank', 'noopener')
@@ -270,7 +291,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
             if (!lastKeja) return null
             const ids = lastKeja.propertyIds?.length
               ? lastKeja.propertyIds
-              : [...new Set([...lastKeja.text.matchAll(/KJA-\d{3}/g)].map((m) => m[0]))]
+              : [...new Set([...lastKeja.text.matchAll(/KJA-(?:A?\d{3,4})/g)].map((m) => m[0]))]
             if (ids.length === 0 || lastKeja.text.length > 2200) return null
             return propertyCards(ids)
           })()}

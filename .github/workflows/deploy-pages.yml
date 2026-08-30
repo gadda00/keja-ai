@@ -3,6 +3,13 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  # Auto-Pilot commits are pushed with the default GITHUB_TOKEN, which
+  # deliberately does not trigger on:push workflows — so we also deploy when
+  # the Auto-Pilot run itself completes successfully on main.
+  workflow_run:
+    workflows: ['Auto-Pilot listings']
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -16,6 +23,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

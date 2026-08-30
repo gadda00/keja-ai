@@ -11,6 +11,7 @@
  */
 import type { Property } from '@/data/properties'
 import raw from '@/data/auto-listings.json'
+import { asset } from '@/config'
 
 export interface AutoCheck {
   label: string
@@ -98,6 +99,8 @@ export function autoListingToProperty(l: AutoListing): Property {
     type: l.type as Property['type'],
     purpose: l.purpose as Property['purpose'],
     availability: l.availability as Property['availability'],
+    // base-path aware so images resolve under /keja-ai/ subpath hosting
+    images: l.images.map((img) => (img.startsWith('http') || img.startsWith('data:') ? img : asset(img))),
     trustScore: autoTrustScore(l),
     verification: {
       // Machine screens only — Ardhisasa title check remains PENDING until a

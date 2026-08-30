@@ -25,6 +25,9 @@ export interface SavedSearch {
   seenIds: string[]
 }
 
+/** Verified band used across the marketplace (Trust ≥ 75 earns the badge). */
+export const VERIFIED_TRUST_FLOOR = 75
+
 export interface Notification {
   id: string
   kind: 'match' | 'listing' | 'distribution' | 'system'
@@ -38,6 +41,7 @@ export interface Notification {
 /* Approximate area coordinates (Kenya) — powers the stylized map view. */
 export const AREA_COORDS: Record<string, { lat: number; lng: number }> = {
   Westlands: { lat: -1.267, lng: 36.806 },
+  Riverside: { lat: -1.277, lng: 36.766 },
   Kilimani: { lat: -1.283, lng: 36.784 },
   Kileleshwa: { lat: -1.279, lng: 36.773 },
   Lavington: { lat: -1.277, lng: 36.766 },
@@ -126,6 +130,7 @@ export function matchesSearch(p: Property, f: SavedSearch['filters']): boolean {
     }
   }
   if (f.minBeds && (p.bedrooms ?? 0) < f.minBeds) return false
+  if (f.verifiedOnly && p.trustScore < VERIFIED_TRUST_FLOOR) return false
   return true
 }
 

@@ -713,7 +713,7 @@ export const PROPERTIES: Property[] = [
   },
 ]
 
-export const AREAS = [...new Set(PROPERTIES.map((p) => p.area))].sort()
+export const AREAS = [...new Set(PROPERTIES.map((p) => p.area)), 'Kasarani', 'Madaraka', 'CBD', 'Eastleigh', 'Diani', 'Milimani', 'Nanyuki', 'Nakuru', 'Riverside'].sort()
 
 export const getProperty = (id: string) => PROPERTIES.find((p) => p.id === id)
 

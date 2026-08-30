@@ -61,12 +61,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://gadda00.github.io/keja-ai/mortgage</loc>
-    <lastmod>2026-08-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://gadda00.github.io/keja-ai/about</loc>
     <lastmod>2026-08-30</lastmod>
     <changefreq>monthly</changefreq>
@@ -100,6 +94,12 @@
     <loc>https://gadda00.github.io/keja-ai/account</loc>
     <lastmod>2026-08-30</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://gadda00.github.io/keja-ai/legal</loc>
+    <lastmod>2026-08-30</lastmod>
+    <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>

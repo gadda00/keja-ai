@@ -43,13 +43,13 @@ const STATIC_ROUTES = [
   { loc: '/ecosystem', priority: '0.7', changefreq: 'weekly' },
   { loc: '/partners', priority: '0.7', changefreq: 'weekly' },
   { loc: '/sell', priority: '0.7', changefreq: 'weekly' },
-  { loc: '/mortgage', priority: '0.7', changefreq: 'weekly' },
   { loc: '/about', priority: '0.6', changefreq: 'monthly' },
   { loc: '/contact', priority: '0.6', changefreq: 'monthly' },
   { loc: '/dashboard', priority: '0.4', changefreq: 'weekly' },
   { loc: '/manage', priority: '0.5', changefreq: 'weekly' },
   { loc: '/compare', priority: '0.5', changefreq: 'weekly' },
   { loc: '/account', priority: '0.3', changefreq: 'monthly' },
+  { loc: '/legal', priority: '0.3', changefreq: 'yearly' },
 ]
 
 const propertyIds = [

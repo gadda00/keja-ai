@@ -6,7 +6,7 @@ import { Flame, Search, Phone, Mail, MessageCircle, StickyNote, Plus, Trash2 } f
 import { useStore, KEYS, Lead } from '@/lib/store'
 import { useAuth } from '@/lib/auth'
 import { logAudit } from '@/lib/adminStore'
-import { PROPERTIES } from '@/data/properties'
+import { MARKET_INVENTORY } from '@/lib/inventory'
 import { whatsappLink } from '@/config'
 
 const TONE = {
@@ -152,7 +152,7 @@ export default function AdminLeads() {
       {/* lead cards */}
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         {filtered.map((l) => {
-          const prop = l.propertyId ? PROPERTIES.find((p) => p.id === l.propertyId) : undefined
+          const prop = l.propertyId ? MARKET_INVENTORY.find((p) => p.id === l.propertyId) : undefined
           return (
             <div
               key={l.id}

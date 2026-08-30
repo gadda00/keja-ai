@@ -8,6 +8,7 @@
  *  - fabricated trust scores (description length ≠ verification)
  */
 import { useMemo } from 'react'
+import { store } from '@/lib/store'
 import type { Property } from '@/data/properties'
 import { PROPERTIES } from '@/data/properties'
 import { useUserListings, type UserListing } from '@/lib/adminStore'
@@ -77,8 +78,16 @@ export function useAllProperties(): Property[] {
   )
 }
 
-/** Static merged inventory (no hooks) — for the AI engine and non-React code. */
-export const MARKET_INVENTORY: Property[] = [...AUTO_PROPERTIES, ...PROPERTIES]
+/**
+ * Static merged inventory (no hooks) — for the AI engine and non-React code.
+ * Reads approved user listings synchronously from the store so the AI, the
+ * Home stats and the marketplace all see the same world.
+ */
+export const MARKET_INVENTORY: Property[] = [
+  ...store.get<UserListing[]>('user-listings', []).map(userListingToProperty),
+  ...AUTO_PROPERTIES,
+  ...PROPERTIES,
+]
 
 /** Resolve one property from the merged inventory by id. */
 export function findProperty(all: Property[], id: string): Property | undefined {
