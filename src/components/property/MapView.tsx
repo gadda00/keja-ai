@@ -5,6 +5,7 @@ import type { Property } from '@/data/properties'
 import { areaCoords } from '@/lib/searchStore'
 import { formatKES } from '@/lib/format'
 import { investmentScore } from '@/lib/investmentScore'
+import { isRentalPrice } from '@/lib/finance'
 
 interface Props {
   properties: Property[]
@@ -25,14 +26,19 @@ export default function MapView({ properties, onSelectArea }: Props) {
       byArea.set(p.area, [...(byArea.get(p.area) ?? []), p])
     }
     const list = [...byArea.entries()].map(([area, props]) => {
-      const sorted = [...props].sort((a, b) => a.price - b.price)
-      const median = sorted[Math.floor(sorted.length / 2)].price
+      // Medians are computed per pricing scale — mixing monthly rents with
+      // sale prices in one median produced meaningless figures.
+      const sales = props.filter((p) => !isRentalPrice(p.price)).sort((a, b) => a.price - b.price)
+      const rents = props.filter((p) => isRentalPrice(p.price)).sort((a, b) => a.price - b.price)
+      const medianOf = (arr: Property[]) => (arr.length ? arr[Math.floor(arr.length / 2)].price : 0)
+      const median = medianOf(sales) || medianOf(rents)
       return {
         area,
         props,
         median,
+        rentMedian: medianOf(rents),
         avgScore: props.reduce((acc, p) => acc + investmentScore(p).overall, 0) / props.length,
-        ...areaCoords(area),
+        ...areaCoords(area, props[0]?.county),
       }
     })
     const maxMedian = Math.max(...list.map((c) => c.median), 1)

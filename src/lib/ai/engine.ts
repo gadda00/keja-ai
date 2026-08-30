@@ -5,7 +5,7 @@
  * Languages: English, Kiswahili, French (roadmap Step 15).
  */
 import { PROPERTIES, Property, areaInsights, getProperty } from '@/data/properties'
-import { analyzeInvestment, estimateMonthlyExpenses } from '@/lib/finance'
+import { analyzeInvestment, calculateMortgage, estimateMonthlyExpenses, isRentalPrice } from '@/lib/finance'
 import { formatKES } from '@/lib/format'
 import type { LanguageCode } from '@/config'
 
@@ -113,12 +113,12 @@ function matchProperties(q: ParsedQuery): Property[] {
     list = list.filter((p) => (q.purpose === 'rent' ? (p.rentEstimate ?? p.price) <= q.maxBudget! : p.price <= q.maxBudget!))
   }
   if (q.minBudget && q.purpose !== 'rent') list = list.filter((p) => p.price >= q.minBudget!)
-  // Trust-weighted ranking: score + recency
-  return list.sort((a, b) => b.trustScore - a.trustScore).slice(0, 4)
+  // Trust-weighted ranking: score first, recency as tiebreaker
+  return list.sort((a, b) => b.trustScore - a.trustScore || b.listedAt.localeCompare(a.listedAt)).slice(0, 4)
 }
 
 const propLine = (p: Property) =>
-  `• **${p.title}** (${p.id}) — ${p.type === 'land' ? formatKES(p.price) : p.purpose.includes('rent') && p.price < 500000 ? formatKES(p.price, { monthly: true }) : formatKES(p.price)} · Trust ${p.trustScore}/100`
+  `• **${p.title}** (${p.id}) — ${p.type === 'land' ? formatKES(p.price) : isRentalPrice(p.price) ? formatKES(p.price, { monthly: true }) : formatKES(p.price)} · Trust ${p.trustScore}/100`
 
 /* ------------------------------- language packs ---------------------------- */
 
@@ -145,6 +145,8 @@ const L = {
 export class KejaAI {
   language: LanguageCode = 'en'
   qualificationState: { step: number; data: Record<string, string> } | null = null
+  /** Last completed qualification — powers "show me matches" after the flow. */
+  lastQualification: Record<string, string> | null = null
 
   setLanguage(lang: LanguageCode) {
     this.language = lang
@@ -177,6 +179,23 @@ export class KejaAI {
 
     // Qualification flow (if active)
     if (this.qualificationState) return this.continueQualification(input)
+
+    // Start lead qualification — the 4-question matcher
+    if (/(qualif|find me a home|help me find|match me|what should i buy|book me a viewing|start (the |my )?(process|journey)|guide me)/.test(t)) {
+      return this.startQualification()
+    }
+
+    // Show matches from the last completed qualification
+    if (/(show me (my )?matches|my matches|based on my profile|my budget)/.test(t) && this.lastQualification) {
+      const q = parseQuery(`${this.lastQualification.interest ?? ''} ${this.lastQualification.budget ?? ''} ${this.lastQualification.timeline ?? ''}`)
+      const matches = matchProperties({ ...q, purpose: /rent|kodi/i.test(this.lastQualification.budget ?? '') ? 'rent' : q.purpose })
+      return this.searchAnswer(q, matches.length ? matches : PROPERTIES.slice(0, 4))
+    }
+
+    // Fresh inventory — newest listings first
+    if (/(new (listings?|arrivals?|posting?s?|on the market)|fresh (listings?|stock)|just (listed|added)|latest (listings?|properties)|what'?s new)/.test(t)) {
+      return this.newListingsAnswer()
+    }
 
     // Trust / verification questions
     if (/(verify|verification|verified|trust|legit|scam|fraud|fake|ardhisasa|title|kuthibitisha|ghal|how do you (check|know)|safe)/.test(t)) {
@@ -248,6 +267,12 @@ export class KejaAI {
       }
     }
 
+    // Compare areas — MUST run before the invest intent so "Kilimani vs
+    // Westlands as an investment" answers the comparison, not a Kilimani brief.
+    if (/(compare|vs|versus|better area|which area|difference between)/.test(t)) {
+      return this.compareAnswer(input)
+    }
+
     // Investment analysis for a specific area
     if (/(invest|roi|yield|return|appreciation|worth it|good deal|rental income|cash ?flow|mapato|uwekezaji)/.test(t)) {
       return this.investmentAnswer(input)
@@ -277,11 +302,6 @@ export class KejaAI {
         text: 'I help two kinds of clients here:\n\n**Selling?** Your listing goes through our verification pipeline — title check, photo verification, price benchmarking — then appears with the *Verified by Keja* badge, which sells faster and at fairer prices.\n\n**Landlord?** Our management desk handles tenant sourcing, rent collection (M-Pesa), maintenance and monthly owner statements.\n\nWhich one sounds like you?',
         quickReplies: ['I want to sell', 'I need property management', 'Talk to a human'],
       }
-    }
-
-    // Compare areas
-    if (/(compare|vs|versus|better area|which area|difference between)/.test(t)) {
-      return this.compareAnswer(input)
     }
 
     // Ask about specific property by ID
@@ -355,11 +375,25 @@ export class KejaAI {
     }
   }
 
+  /** Newest verified inventory — the "fresh listings" surface. */
+  private newListingsAnswer(): AIResponse {
+    const fresh = [...PROPERTIES]
+      .filter((p) => p.trustScore >= 75)
+      .sort((a, b) => b.listedAt.localeCompare(a.listedAt))
+      .slice(0, 4)
+    return {
+      text: `Fresh on the market — the newest verified listings: \u{1F195}\n\n${fresh.map(propLine).join('\n')}\n\nEvery new posting passes duplicate detection, price-band screening and completeness checks before it appears here. Want the full breakdown on any of them?`,
+      propertyIds: fresh.map((p) => p.id),
+      meta: [{ label: 'FACT', text: 'Sorted by listing date — verification status checked at publication.' }],
+      quickReplies: ['Tell me more about the newest one', 'How do listings get verified?', 'Show investment deals'],
+    }
+  }
+
   private tokenizeAnswer(): AIResponse {
     return {
       text: "**Keja Tokenize** is our real-estate tokenization platform. 🪙\n\nWe convert institutional-grade Kenyan property into digital tokens — a **$10M building becomes 1,000,000 tokens at $10 each** — so you can own a fraction from **$100** and earn your share of rental income, paid monthly or quarterly.\n\nHow we keep it safe:\n\n• Every property sits in its own **SPV** (legal ring-fence)\n• Titles verified on **Ardhisasa** — zero encumbrances\n• **KYC/AML-gated** investors only\n• Ownership recorded on-chain (the Keja Ledger)\n• Structured with Kenya's **CMA regulatory sandbox** in mind\n\nLive offerings right now include Westlands Tower One (7.0% net yield), Kilimani Sky Residences (8.0%) and Karen Village Retail Court (funding).\n\nIt's currently a **demonstration environment** — tokens, valuations and distributions are simulated.",
       meta: [
-        { label: 'FACT', text: 'Live demo offerings: 5 Nairobi assets, 6.0–8.0% net yields, $10 tokens.' },
+        { label: 'FACT', text: 'Live demo offerings: 5 Nairobi assets, 7.0–8.0% net yields, $10 tokens.' },
         { label: 'ASSUMPTION', text: 'Yields are projections — not guaranteed — and tokens are illiquid early on.' },
       ],
       quickReplies: ['Open Keja Tokenize', 'How does KYC work?', 'What are the risks?'],
@@ -371,7 +405,7 @@ export class KejaAI {
     const area = q.areas[0]
     if (area && areaInsights[area]) {
       const ins = areaInsights[area]
-      const areaProps = PROPERTIES.filter((p) => p.area === area && p.price > 500000).slice(0, 2)
+      const areaProps = PROPERTIES.filter((p) => p.area === area && !isRentalPrice(p.price)).slice(0, 2)
       const sample = areaProps[0]
       let calc = ''
       if (sample?.rentEstimate) {
@@ -419,8 +453,9 @@ export class KejaAI {
   }
 
   private mortgageAnswer(): AIResponse {
+    const m = calculateMortgage({ propertyPrice: 10_000_000, depositPct: 20, annualRatePct: 13.5, termYears: 15 })
     return {
-      text: '**Financing in Kenya — the honest version** 💳\n\nFACT (typical levels, always confirm with the bank):\n• Mortgage rates: **~10.5%–16.5%**, most banks around 13–14%\n• Minimum deposit: usually **10–20%** of price\n• Terms: up to **25 years**; most Kenyans take 10–15\n• Key lenders: KCB, Stanbic, Absa, NCBA, I&M, Co-op\n\n⚠️ Keja\u2019s caution (ASSUMPTION-FREE advice): at ~13.5%, a KES 10M loan over 15 years costs about **KES 124,000/month**. That only makes sense if rent achievable is close to that, you expect strong appreciation, or your alternative use of cash earns less.\n\nMany smart Nairobi investors instead buy **one smaller cash unit** (e.g. Madaraka studio at KES 4.8M) and scale from rent. Want me to model both paths?',
+      text: '**Financing in Kenya — the honest version** 💳\n\nFACT (typical levels, always confirm with the bank):\n• Mortgage rates: **~10.5%–16.5%**, most banks around 13–14%\n• Minimum deposit: usually **10–20%** of price\n• Terms: up to **25 years**; most Kenyans take 10–15\n• Key lenders: KCB, Stanbic, Absa, NCBA, I&M, Co-op\n\n⚠️ Keja\u2019s caution (ASSUMPTION-FREE advice): at ~13.5%, a KES 10M property with a 20% deposit (KES ' + m.principal.toLocaleString() + ' loan) over 15 years costs about **' + formatKES(m.monthlyRepayment, { monthly: true }) + '**. That only makes sense if rent achievable is close to that, you expect strong appreciation, or your alternative use of cash earns less.\n\nMany smart Nairobi investors instead buy **one smaller cash unit** (e.g. Madaraka studio at KES 4.8M) and scale from rent. Want me to model both paths?',
       meta: [
         { label: 'FACT', text: 'Rate ranges reflect typical published Kenyan mortgage pricing.' },
         { label: 'ESTIMATE', text: 'Your offered rate depends on income, credit profile and bank — I can connect you to partners.' },
@@ -461,6 +496,7 @@ export class KejaAI {
     return {
       text: 'Perfect — let\u2019s do this properly. It takes 4 quick questions and helps me match you with exactly the right property (and agent, if you want one). 📝\n\n**Question 1 of 4:** What\u2019s your name?',
       action: 'start-qualification',
+      quickReplies: [],
     }
   }
 
@@ -488,9 +524,11 @@ export class KejaAI {
         const isCold = /research|just looking|later|maybe|years/i.test(t)
         const temperature: 'HOT' | 'WARM' | 'COLD' = isHot ? 'HOT' : isCold ? 'COLD' : 'WARM'
         this.qualificationState = null
+        this.lastQualification = { ...state.data, temperature }
         const budgetHint = budgetNum >= 5 ? ` With a budget around ${state.data.budget}, you have real options.` : ''
         return {
           text: `Thank you, ${state.data.name.split(' ')[0]}! Here\u2019s your profile: ✅\n\n• **Budget:** ${state.data.budget}\n• **Interest:** ${state.data.interest}\n• **Timeline:** ${state.data.timeline}\n• **Lead rating:** ${temperature}${temperature === 'HOT' ? ' — I\u2019ll flag our sales desk to reach out within hours.' : temperature === 'WARM' ? ' — I\u2019ll keep sending you matched listings and market updates.' : ' — no pressure; I\u2019m here whenever you\u2019re ready.'}${budgetHint}\n\nNow — shall I show you properties that match?`,
+          meta: [{ label: 'FACT', text: `Profile captured: ${state.data.name} · ${temperature} lead · AI qualification flow` }],
           quickReplies: ['Show me matches', 'Save my profile', 'Talk to the sales team'],
         }
       }

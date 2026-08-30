@@ -15,7 +15,9 @@ import { investmentScore, scoreTone } from '@/lib/investmentScore'
 import { useAllProperties, findProperty } from '@/lib/inventory'
 import TrustBadge from '@/components/property/TrustBadge'
 import PropertyCard from '@/components/property/PropertyCard'
-import { useStore, KEYS } from '@/lib/store'
+import { useStore, KEYS, type Lead } from '@/lib/store'
+import { notify } from '@/lib/searchStore'
+import { isRentalPrice } from '@/lib/finance'
 import { whatsappLink } from '@/config'
 
 export default function PropertyDetail() {
@@ -29,10 +31,12 @@ export default function PropertyDetail() {
   const [viewingOpen, setViewingOpen] = useState(false)
   const [favorites, setFavorites] = useStore<string[]>(KEYS.favorites, [])
   const [viewed, setViewed] = useStore<string[]>(KEYS.viewed, [])
+  const [, setLeads] = useStore<Lead[]>(KEYS.leads, [])
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [date, setDate] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [copied, setCopied] = useState(false)
   const [reference, setReference] = useState('')
   const [mortgageDeposit, setMortgageDeposit] = useState(20)
 
@@ -47,7 +51,9 @@ export default function PropertyDetail() {
   }, [id])
 
   const investment = useMemo(() => {
-    if (!property?.rentEstimate) return null
+    // Rental listings (price = monthly rent) are not purchase assets — the
+    // rent/price yield model would produce absurd numbers (e.g. 980%).
+    if (!property?.rentEstimate || isRentalPrice(property.price)) return null
     return analyzeInvestment({
       price: property.price,
       furnishingCost: property.type === 'apartment' ? Math.round(property.price * 0.04) : 0,
@@ -60,7 +66,7 @@ export default function PropertyDetail() {
   }, [property])
 
   const mortgage = useMemo(() => {
-    if (!property || property.price < 500000) return null
+    if (!property || isRentalPrice(property.price)) return null
     return calculateMortgage({
       propertyPrice: property.price,
       depositPct: mortgageDeposit,
@@ -122,7 +128,7 @@ export default function PropertyDetail() {
           </div>
           <div className="text-right">
             <p className="font-display text-3xl font-bold text-ink sm:text-4xl">
-              {formatKES(property.price, { monthly: property.price < 500000 })}
+              {formatKES(property.price, { monthly: isRentalPrice(property.price) })}
             </p>
             {property.paymentPlan && <p className="mt-1 text-xs font-medium text-gold-700">{property.paymentPlan}</p>}
           </div>
@@ -139,16 +145,26 @@ export default function PropertyDetail() {
               <button
                 onClick={() => setFavorites(isFav ? favorites.filter((f) => f !== property.id) : [...favorites, property.id])}
                 className={`rounded-full p-3 shadow-md transition ${isFav ? 'bg-gold-500 text-white' : 'bg-white/95 text-ink hover:text-gold-600'}`}
-                aria-label="Save"
+                aria-label={isFav ? 'Remove from favourites' : 'Save to favourites'}
+                aria-pressed={isFav}
               >
                 <Heart className="h-5 w-5" fill={isFav ? 'currentColor' : 'none'} />
               </button>
               <button
-                onClick={() => navigator.clipboard?.writeText(window.location.href)}
-                className="rounded-full bg-white/95 p-3 text-ink shadow-md transition hover:text-gold-600"
-                aria-label="Share"
+                onClick={() => {
+                  navigator.clipboard
+                    ?.writeText(window.location.href)
+                    .then(() => {
+                      setCopied(true)
+                      window.setTimeout(() => setCopied(false), 2000)
+                    })
+                    .catch(() => undefined)
+                }}
+                className={`rounded-full p-3 shadow-md transition ${copied ? 'bg-gold-500 text-white' : 'bg-white/95 text-ink hover:text-gold-600'}`}
+                aria-label={copied ? 'Link copied' : 'Copy share link'}
+                aria-live="polite"
               >
-                <Share2 className="h-5 w-5" />
+                {copied ? <CheckCircle2 className="h-5 w-5" /> : <Share2 className="h-5 w-5" />}
               </button>
             </div>
           </motion.div>
@@ -175,11 +191,11 @@ export default function PropertyDetail() {
                 { icon: BedDouble, label: 'Bedrooms', value: property.bedrooms ?? '—' },
                 { icon: Bath, label: 'Bathrooms', value: property.bathrooms ?? '—' },
                 { icon: Ruler, label: 'Size', value: `${property.sizeSqm.toLocaleString()} sqm` },
-                { icon: Building2, label: 'Agency', value: property.agency.split(' ')[0] },
+                { icon: Building2, label: 'Agency', value: property.agency },
               ].map((s) => (
                 <div key={s.label} className="rounded-xl bg-cream p-4 text-center">
                   <s.icon className="mx-auto h-5 w-5 text-gold-600" />
-                  <p className="mt-2 text-sm font-bold text-ink">{s.value}</p>
+                  <p className="mt-2 truncate px-1 text-sm font-bold text-ink" title={String(s.value)}>{s.value}</p>
                   <p className="text-[11px] uppercase tracking-wider text-ink-faint">{s.label}</p>
                 </div>
               ))}
@@ -418,9 +434,15 @@ export default function PropertyDetail() {
               <button onClick={() => setViewingOpen(true)} className="btn-gold mt-5 w-full">
                 <Calendar className="h-4 w-4" /> Request viewing
               </button>
-              <a href={`tel:${property.agent.phone.replace(/\s/g, '')}`} className="btn-outline mt-3 w-full">
-                <Phone className="h-4 w-4" /> {property.agent.phone}
-              </a>
+              {/^\+?[\d\s()-]{7,}$/.test(property.agent.phone) ? (
+                <a href={`tel:${property.agent.phone.replace(/\s/g, '')}`} className="btn-outline mt-3 w-full">
+                  <Phone className="h-4 w-4" /> {property.agent.phone}
+                </a>
+              ) : (
+                <p className="mt-3 rounded-lg bg-gold-50 px-3 py-2 text-center text-xs text-ink-muted">
+                  Book a viewing or WhatsApp us — this partner lists without a direct line.
+                </p>
+              )}
               <a
                 href={whatsappLink(`Hello, I’m interested in ${property.id} — ${property.title} (${property.area}). Is it still available?`)}
                 target="_blank"
@@ -449,7 +471,28 @@ export default function PropertyDetail() {
                     <form
                       onSubmit={(e) => {
                         e.preventDefault()
-                        setReference(`VD-${property.id}-${Math.floor(Math.random() * 900 + 100)}`)
+                        const ref = `VD-${property.id}-${Math.floor(Math.random() * 900 + 100)}`
+                        // Persist as a HOT lead so the agent dashboard and admin
+                        // console actually see viewing requests (was: fire & forget).
+                        const lead: Lead = {
+                          id: `lead-${Date.now()}`,
+                          name: name.trim(),
+                          phone: phone.trim(),
+                          interest: `Viewing request — ${property.title}`,
+                          source: 'viewing',
+                          propertyId: property.id,
+                          temperature: 'HOT',
+                          note: `Preferred date: ${date || 'flexible'} · Ref ${ref} · Agent: ${property.agent.name} (${property.agency})`,
+                          createdAt: new Date().toISOString(),
+                        }
+                        setLeads((prev: Lead[]) => [lead, ...prev])
+                        notify({
+                          kind: 'listing',
+                          title: 'Viewing request sent',
+                          body: `${property.agent.name} will confirm your slot for ${property.title}. Ref ${ref}.`,
+                          href: `/properties/${property.id}`,
+                        })
+                        setReference(ref)
                         setSubmitted(true)
                       }}
                     >

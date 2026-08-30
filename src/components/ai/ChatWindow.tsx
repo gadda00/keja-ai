@@ -1,16 +1,25 @@
 import SmartImg from '@/components/ui/SmartImg'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Send, Sparkles, ShieldCheck, Languages } from 'lucide-react'
+import { Send, Sparkles, ShieldCheck, Languages, Trash2 } from 'lucide-react'
 import { kejaAI, AIResponse } from '@/lib/ai/engine'
 import { useStore, KEYS, ChatMessage } from '@/lib/store'
 import { useAuth } from '@/lib/auth'
 import Markdown from './Markdown'
-import { PROPERTIES } from '@/data/properties'
+import { useAllProperties } from '@/lib/inventory'
 import { formatKES } from '@/lib/format'
-import { asset } from '@/config'
+import { asset, whatsappLink } from '@/config'
+import { isRentalPrice } from '@/lib/finance'
 
 const uid = () => Math.random().toString(36).slice(2, 10)
+
+const fmtTime = (iso: string) => {
+  try {
+    return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  } catch {
+    return ''
+  }
+}
 
 export default function ChatWindow({ compact = false }: { compact?: boolean }) {
   const [messages, setMessages] = useStore<ChatMessage[]>(KEYS.chat, [])
@@ -21,6 +30,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
   const started = useRef(false)
   const navigate = useNavigate()
   const { setAuthModalOpen } = useAuth()
+  const allProperties = useAllProperties()
 
   useEffect(() => {
     if (!started.current && messages.length === 0) {
@@ -36,9 +46,9 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [messages, typing])
 
-  const send = (text: string) => {
+  const send = (text: string, force = false) => {
     const clean = text.trim()
-    if (!clean || typing) return
+    if (!clean || (typing && !force)) return
     const userMsg: ChatMessage = { id: uid(), role: 'user', text: clean, ts: new Date().toISOString() }
     setMessages([...messages, userMsg])
     setInput('')
@@ -77,7 +87,6 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
 
     setTyping(true)
 
-    const lastKeja = [...messages].reverse().find((m) => m.role === 'keja')
     const response = kejaAI.respond(clean)
     const delay = Math.min(900 + clean.length * 12, 2200)
     setTimeout(() => {
@@ -87,20 +96,28 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
         text: response.text,
         ts: new Date().toISOString(),
         meta: response.meta?.map((m) => `${m.label}: ${m.text}`),
+        quickReplies: response.quickReplies,
+        propertyIds: response.propertyIds,
       }
       setMessages((prev: ChatMessage[]) => [...prev, kejaMsg])
       setTyping(false)
-      if (lastKeja === undefined) void lastKeja
+      // Engine actions — the conversion moments (human handoff, calculator…)
+      if (response.action === 'whatsapp') {
+        window.open(whatsappLink('Hello Keja — I was chatting with Keja AI and would like to talk to the client desk.'), '_blank', 'noopener')
+      } else if (response.action === 'open-calculator') {
+        setTimeout(() => navigate('/calculator'), 700)
+      }
     }, delay)
   }
 
   const quickReplies = (() => {
-    const lastResp = messages.length
     const defaultQ = ['Find me a home', 'Show investment deals', 'How do you verify listings?']
     if (typing) return []
-    // derive quick replies from last keja message heuristically
+    // Engine-authored chips take priority (persisted on the message)
     const lastKeja = [...messages].reverse().find((m) => m.role === 'keja')
     if (!lastKeja) return defaultQ
+    if (lastKeja.quickReplies) return lastKeja.quickReplies
+    // Legacy fallback for history saved before quickReplies were persisted
     if (/What are you looking for|Natafuta|recherchez/.test(lastKeja.text)) return ['Find me a home', 'Show investment deals', 'Land under 4M', 'I want to rent']
     if (/Trust Score|trust is literally|Great question/.test(lastKeja.text)) return ['What is Ardhisasa?', 'Show me only verified listings', 'Show a flagged example']
     if (/Keja Tokenize/.test(lastKeja.text)) return ['Open Keja Tokenize', 'What are the risks?', 'Show investment deals']
@@ -108,6 +125,12 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
     if (/Habari|Bonjour/.test(lastKeja.text)) return defaultQ
     return []
   })()
+
+  const clearChat = () => {
+    kejaAI.qualificationState = null
+    const greeting: ChatMessage = { id: uid(), role: 'keja', text: kejaAI.respond('hello').text, ts: new Date().toISOString(), quickReplies: ['Find me a home', 'Show investment deals', 'How do you verify listings?', 'I want to sell property'] }
+    setMessages([greeting])
+  }
 
   const changeLanguage = (code: 'en' | 'sw' | 'fr') => {
     kejaAI.setLanguage(code)
@@ -117,11 +140,11 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
       sw: 'Habari',
       fr: 'Bonjour',
     }[code]
-    send(greeting)
+    send(greeting, true)
   }
 
   const propertyCards = (ids?: string[]) => {
-    const props = PROPERTIES.filter((p) => ids?.includes(p.id))
+    const props = allProperties.filter((p) => ids?.includes(p.id))
     if (!props.length) return null
     return (
       <div className={`mt-3 grid gap-3 ${compact ? '' : 'sm:grid-cols-2'}`}>
@@ -134,7 +157,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
             <SmartImg src={p.images[0]} alt={p.title} className="h-16 w-20 shrink-0 rounded-lg object-cover" />
             <div className="min-w-0">
               <p className="truncate text-xs font-semibold text-ink">{p.title}</p>
-              <p className="mt-0.5 text-xs text-gold-700">{formatKES(p.price, { monthly: p.price < 500000 })}</p>
+              <p className="mt-0.5 text-xs text-gold-700">{formatKES(p.price, { monthly: isRentalPrice(p.price) })}</p>
               <p className="mt-0.5 text-[10px] uppercase tracking-wider text-ink-faint">
                 Trust {p.trustScore} · {p.area}
               </p>
@@ -183,6 +206,15 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
           </div>
         </div>
         <div className="flex items-center gap-1.5">
+          <button
+            onClick={clearChat}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-semibold text-ink-muted transition hover:bg-gold-50 hover:text-gold-700"
+            aria-label="Clear conversation and start over"
+            title="Clear conversation"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Clear
+          </button>
           <Languages className="h-4 w-4 text-ink-faint" />
           {(['en', 'sw', 'fr'] as const).map((code) => (
             <button
@@ -216,6 +248,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
                 {m.role === 'user' ? m.text : <Markdown content={m.text} />}
                 {m.role === 'keja' && metaLabels(m.meta)}
               </div>
+              <p className={`mt-1 text-[10px] text-ink-faint ${m.role === 'user' ? 'text-right' : ''}`}>{fmtTime(m.ts)}</p>
             </div>
           </div>
         ))}
@@ -235,10 +268,11 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
           (() => {
             const lastKeja = [...messages].reverse().find((m) => m.role === 'keja')
             if (!lastKeja) return null
-            const ids = [...lastKeja.text.matchAll(/KJA-\d{3}/g)].map((m) => m[0])
-            const uniqueIds = [...new Set(ids)]
-            if (uniqueIds.length === 0 || lastKeja.text.length > 2200) return null
-            return propertyCards(uniqueIds)
+            const ids = lastKeja.propertyIds?.length
+              ? lastKeja.propertyIds
+              : [...new Set([...lastKeja.text.matchAll(/KJA-\d{3}/g)].map((m) => m[0]))]
+            if (ids.length === 0 || lastKeja.text.length > 2200) return null
+            return propertyCards(ids)
           })()}
 
         <div ref={bottomRef} />

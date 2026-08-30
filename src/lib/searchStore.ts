@@ -5,6 +5,7 @@
 import { useCallback, useEffect } from 'react'
 import type { Property } from '@/data/properties'
 import { useStore, store, KEYS } from '@/lib/store'
+import { isRentalPrice } from '@/lib/finance'
 
 export interface SavedSearch {
   id: string
@@ -16,6 +17,8 @@ export interface SavedSearch {
     area?: string
     maxPrice?: number
     minBeds?: number
+    verifiedOnly?: boolean
+    sort?: string
   }
   createdAt: string
   alerts: boolean
@@ -49,13 +52,20 @@ export const AREA_COORDS: Record<string, { lat: number; lng: number }> = {
   Kitengela: { lat: -1.483, lng: 36.983 },
   'Athi River': { lat: -1.453, lng: 36.983 },
   Nyali: { lat: -4.043, lng: 39.699 },
-  Milimani: { lat: -4.052, lng: 39.677 },
+  Milimani: { lat: -4.052, lng: 39.677 }, // Mombasa (Kisumu's Milimani resolved via county below)
+  Diani: { lat: -4.317, lng: 39.594 },
   Nanyuki: { lat: 0.016, lng: 37.072 },
   Nakuru: { lat: -0.303, lng: 36.08 },
   Kisumu: { lat: -0.091, lng: 34.768 },
 }
 
-export function areaCoords(area: string): { lat: number; lng: number } {
+/** Milimani exists in both Mombasa and Kisumu — disambiguate by county. */
+const COUNTY_COORD_OVERRIDES: Record<string, { lat: number; lng: number }> = {
+  Kisumu: { lat: -0.091, lng: 34.768 },
+}
+
+export function areaCoords(area: string, county?: string): { lat: number; lng: number } {
+  if (county && COUNTY_COORD_OVERRIDES[county]) return COUNTY_COORD_OVERRIDES[county]
   return AREA_COORDS[area] ?? { lat: -1.286, lng: 36.817 } // default: Nairobi
 }
 
@@ -85,8 +95,13 @@ export function useSavedSearches() {
   return { searches, save, remove, toggleAlerts }
 }
 
+/** True when the max-price filter sits at its ceiling (i.e. "Any"). */
+export const PRICE_CEILING = 100
+export const RENT_CEILING = 200
+
 /** Does a property satisfy a saved search? Mirrors Properties page filter logic. */
 export function matchesSearch(p: Property, f: SavedSearch['filters']): boolean {
+  const rentMode = f.purpose === 'rent'
   if (f.q) {
     const q = f.q.toLowerCase()
     const hay = `${p.title} ${p.area} ${p.county} ${p.id} ${p.type} ${p.agency}`.toLowerCase()
@@ -98,8 +113,17 @@ export function matchesSearch(p: Property, f: SavedSearch['filters']): boolean {
   if (f.purpose === 'invest' && !p.purpose.includes('invest')) return false
   if (f.area && f.area !== 'all' && p.area !== f.area) return false
   if (f.maxPrice != null) {
-    const cap = p.price < 500_000 ? f.maxPrice * 1000 : f.maxPrice * 1_000_000
-    if (p.price > cap) return false
+    const atCeiling = f.maxPrice >= (rentMode ? RENT_CEILING : PRICE_CEILING)
+    if (!atCeiling) {
+      // Rent-mode caps apply to rentals (monthly KES k); sale-mode caps to
+      // sale listings (KES M). Rentals pass sale caps and vice-versa — the
+      // units are incomparable, so a cap in one scale never filters the other.
+      if (isRentalPrice(p.price)) {
+        if (rentMode && p.price > f.maxPrice * 1000) return false
+      } else {
+        if (!rentMode && p.price > f.maxPrice * 1_000_000) return false
+      }
+    }
   }
   if (f.minBeds && (p.bedrooms ?? 0) < f.minBeds) return false
   return true

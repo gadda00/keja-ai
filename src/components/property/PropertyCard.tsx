@@ -6,12 +6,13 @@ import { formatKES } from '@/lib/format'
 import { investmentScore, scoreTone } from '@/lib/investmentScore'
 import TrustBadge from './TrustBadge'
 import { useStore, KEYS } from '@/lib/store'
+import { isRentalPrice } from '@/lib/finance'
 
 export default function PropertyCard({ property }: { property: Property }) {
   const [favorites, setFavorites] = useStore<string[]>(KEYS.favorites, [])
   const [compare, setCompare] = useStore<string[]>(KEYS.compare, [])
   const isFav = favorites.includes(property.id)
-  const isRent = property.price < 500000
+  const isRent = isRentalPrice(property.price)
   const inCompare = compare.includes(property.id)
   const score = investmentScore(property)
   const toggleFav = () => {
@@ -99,7 +100,7 @@ export default function PropertyCard({ property }: { property: Property }) {
             <Ruler className="h-4 w-4 text-gold-500" /> {property.sizeSqm.toLocaleString()} sqm
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <Building2 className="h-4 w-4 text-gold-500" /> {property.agency.split(' ')[0]}
+            <Building2 className="h-4 w-4 text-gold-500" /> {property.agency}
           </span>
         </div>
 

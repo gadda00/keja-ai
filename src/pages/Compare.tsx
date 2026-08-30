@@ -8,6 +8,7 @@ import { calculateMortgage } from '@/lib/finance'
 import { useStore, KEYS } from '@/lib/store'
 import SmartImg from '@/components/ui/SmartImg'
 import { usePageMeta } from '@/lib/seo'
+import { isRentalPrice } from '@/lib/finance'
 
 export default function Compare() {
   usePageMeta('Compare Properties', 'Side-by-side comparison of Keja-verified properties: price, yields, Investment Score, trust and mortgage estimates.')
@@ -25,7 +26,7 @@ export default function Compare() {
   }
 
   const rows: { label: string; render: (p: (typeof items)[number]) => React.ReactNode }[] = [
-    { label: 'Price', render: (p) => <b className="font-display text-lg text-ink">{formatKES(p.price, { monthly: p.price < 500_000 })}</b> },
+    { label: 'Price', render: (p) => <b className="font-display text-lg text-ink">{formatKES(p.price, { monthly: isRentalPrice(p.price) })}</b> },
     { label: 'Area', render: (p) => <span className="inline-flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5 text-gold-600" />{p.area}, {p.county}</span> },
     { label: 'Type', render: (p) => <span className="capitalize">{p.type}</span> },
     { label: 'Bedrooms', render: (p) => <span className="inline-flex items-center gap-1.5"><BedDouble className="h-3.5 w-3.5 text-gold-600" />{p.bedrooms ?? '—'}</span> },
@@ -56,7 +57,7 @@ export default function Compare() {
     {
       label: 'Mortgage (20% deposit, 15yr)',
       render: (p) => {
-        if (p.price < 500_000) return <span className="text-ink-muted">Rental listing</span>
+        if (isRentalPrice(p.price)) return <span className="text-ink-muted">Rental listing</span>
         const m = calculateMortgage({ propertyPrice: p.price, depositPct: 20, annualRatePct: 13.5, termYears: 15 })
         return <span>{formatKES(Math.round(m.monthlyRepayment), { monthly: true })}</span>
       },

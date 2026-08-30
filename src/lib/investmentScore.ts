@@ -4,7 +4,8 @@
  * price/value, liquidity and risk. Scores are decision-support tools, never
  * guarantees — the engine separates verified inputs from estimates.
  */
-import type { Property } from '@/data/properties'
+import { PROPERTIES, areaInsights, type Property } from '@/data/properties'
+import { isRentalPrice } from '@/lib/finance'
 
 export interface ScoreFactor {
   key: string
@@ -36,9 +37,19 @@ const LOCATION_SCORE: Record<string, number> = {
 }
 
 export function investmentScore(p: Property): InvestmentScore {
-  // 1 — Rental potential: gross yield vs 8% benchmark
-  const grossYield = p.rentEstimate && p.price ? ((p.rentEstimate * 12) / p.price) * 100 : 0
-  const rental = p.rentEstimate
+  // Rental listings are not sale assets — price/value per-sqm norm comparison
+  // is skipped for them (monthly rent vs sale price per sqm is meaningless).
+  // 1 — Rental potential. For rental listings (price = monthly rent) the
+  // rentEstimate/price ratio is meaningless — use the listing's own yield
+  // estimate or the area's typical yield band instead.
+  const isRental = isRentalPrice(p.price)
+  const areaYield = parseFloat(areaInsights[p.area]?.yield ?? '') || 0
+  const grossYield = isRental
+    ? p.grossYieldEstimate ?? areaYield
+    : p.rentEstimate && p.price
+      ? ((p.rentEstimate * 12) / p.price) * 100
+      : 0
+  const rental = grossYield > 0
     ? Math.max(3, Math.min(10, (grossYield / 8) * 8.5))
     : 5.5
 
@@ -52,8 +63,8 @@ export function investmentScore(p: Property): InvestmentScore {
   // 4 — Demand proxy: views + trust score blend
   const demand = Math.max(3, Math.min(10, 4 + p.views / 120 + (p.trustScore - 80) / 10))
 
-  // 5 — Price/value: price per sqm vs type norms
-  const perSqm = p.sizeSqm > 0 ? p.price / p.sizeSqm : 0
+  // 5 — Price/value: price per sqm vs type norms (sale listings only)
+  const perSqm = !isRental && p.sizeSqm > 0 ? p.price / p.sizeSqm : 0
   const typeNorm: Record<string, number> = {
     apartment: 120000,
     villa: 85000,
@@ -83,10 +94,12 @@ export function investmentScore(p: Property): InvestmentScore {
       key: 'rental',
       label: 'Rental Potential',
       score: round1(rental),
-      basis: p.rentEstimate ? 'FACT' : 'ASSUMPTION',
-      note: p.rentEstimate
-        ? `Gross yield ${grossYield.toFixed(1)}% (verified rent estimate)`
-        : 'No verified rent data — benchmark assumption applied',
+      basis: grossYield > 0 ? (isRental ? 'ESTIMATE' : 'FACT') : 'ASSUMPTION',
+      note: isRental
+        ? `Area typical gross yield ~${grossYield.toFixed(1)}% (rental listing — income yield context)`
+        : grossYield > 0
+          ? `Gross yield ${grossYield.toFixed(1)}% (verified rent estimate)`
+          : 'No verified rent data — benchmark assumption applied',
     },
     {
       key: 'growth',

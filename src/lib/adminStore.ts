@@ -521,7 +521,7 @@ export function submissionToListing(s: ListingSubmission): UserListing {
     images: s.images.length ? s.images : ['/images/props/apartment_2.jpg'],
     description: s.description,
     agency: s.agency || 'Keja Verified Partner',
-    agent: { name: s.submitterName, phone: s.submitterPhone ?? 'Contact via Keja' },
+    agent: { name: s.submitterName, phone: s.submitterPhone ?? '' },
     availability: 'available',
     listedAt: s.createdAt,
     source: s.source,

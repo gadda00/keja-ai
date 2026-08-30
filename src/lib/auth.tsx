@@ -74,7 +74,6 @@ export interface RegisterInput {
   email: string
   password: string
   phone?: string
-  role?: Role
 }
 
 /* ------------------------------------------------------------------ */
@@ -414,7 +413,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: `usr-${newToken().slice(0, 8)}`,
           name: data.name.trim(),
           email: data.email.trim(),
-          role: data.role ?? 'user',
+          role: 'user', // self-registration can never mint elevated roles (RBAC safety)
           provider: 'email',
           status: 'active',
           phone: data.phone?.trim(),

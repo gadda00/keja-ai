@@ -1,17 +1,24 @@
 /**
  * Minimal markdown renderer for Keja AI responses:
- * supports **bold**, bullets (• / - / numbers), tables (| a | b |), and line breaks.
+ * supports **bold**, `inline code`, bullets (• / - / numbers), tables (| a | b |), and line breaks.
  */
 import { Fragment } from 'react'
 
 function renderInline(text: string, keyPrefix: string) {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g)
+  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g)
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
       return (
         <strong key={`${keyPrefix}-b${i}`} className="font-semibold text-ink">
           {part.slice(2, -2)}
         </strong>
+      )
+    }
+    if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
+      return (
+        <code key={`${keyPrefix}-c${i}`} className="rounded bg-gold-50 px-1.5 py-0.5 font-mono text-[0.85em] text-gold-800 ring-1 ring-gold-100">
+          {part.slice(1, -1)}
+        </code>
       )
     }
     return <Fragment key={`${keyPrefix}-t${i}`}>{part}</Fragment>

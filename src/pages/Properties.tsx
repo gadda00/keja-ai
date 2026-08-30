@@ -5,6 +5,8 @@ import { Search, SlidersHorizontal, ShieldCheck, X, MapPin, LayoutGrid, Map as M
 import PropertyCard from '@/components/property/PropertyCard'
 import MapView from '@/components/property/MapView'
 import { AREAS, type Property } from '@/data/properties'
+import { isRentalPrice } from '@/lib/finance'
+import { PRICE_CEILING, RENT_CEILING } from '@/lib/searchStore'
 import { useAllProperties } from '@/lib/inventory'
 import { useSavedSearches, useAlertSweep } from '@/lib/searchStore'
 
@@ -25,13 +27,16 @@ export default function Properties() {
   )
   const [params, setParams] = useSearchParams()
   const [query, setQuery] = useState(params.get('q') ?? '')
-  const [type, setType] = useState<string>('all')
+  const [type, setType] = useState<string>(params.get('type') ?? 'all')
   const [purpose, setPurpose] = useState<string>(params.get('purpose') ?? 'all')
-  const [area, setArea] = useState<string>('all')
-  const [maxPrice, setMaxPrice] = useState<number>(100)
-  const [minBeds, setMinBeds] = useState<number>(0)
-  const [verifiedOnly, setVerifiedOnly] = useState(true)
-  const [sort, setSort] = useState<SortKey>('trust')
+  const [area, setArea] = useState<string>(params.get('area') ?? 'all')
+  const [maxPrice, setMaxPrice] = useState<number>(() => {
+    const mp = parseFloat(params.get('maxPrice') ?? '')
+    return Number.isFinite(mp) && mp > 0 ? mp : PRICE_CEILING
+  })
+  const [minBeds, setMinBeds] = useState<number>(() => parseInt(params.get('minBeds') ?? '0') || 0)
+  const [verifiedOnly, setVerifiedOnly] = useState(params.get('verified') !== '0')
+  const [sort, setSort] = useState<SortKey>((params.get('sort') as SortKey) ?? 'trust')
   const [showFilters, setShowFilters] = useState(false)
   const [view, setView] = useState<'list' | 'map'>('list')
   const { searches, save, remove, toggleAlerts } = useSavedSearches()
@@ -66,7 +71,16 @@ export default function Properties() {
     if (purpose === 'buy') list = list.filter((p) => p.purpose.includes('buy'))
     if (purpose === 'invest') list = list.filter((p) => p.purpose.includes('invest'))
     if (area !== 'all') list = list.filter((p) => p.area === area)
-    list = list.filter((p) => (p.price < 500000 ? p.price <= maxPrice * 1000 : p.price <= maxPrice * 1_000_000))
+    // Dual-scale price cap: rent mode caps monthly rent (KES k), sale mode
+    // caps sale price (KES M). At ceiling, no cap. Rentals never get filtered
+    // by a sale cap and vice-versa — the units are incomparable.
+    const rentMode = purpose === 'rent'
+    const atCeiling = maxPrice >= (rentMode ? RENT_CEILING : PRICE_CEILING)
+    if (!atCeiling) {
+      list = list.filter((p) =>
+        isRentalPrice(p.price) ? !(rentMode && p.price > maxPrice * 1000) : !(!rentMode && p.price > maxPrice * 1_000_000),
+      )
+    }
     if (minBeds > 0) list = list.filter((p) => (p.bedrooms ?? 0) >= minBeds)
     if (verifiedOnly) list = list.filter((p) => p.trustScore >= 75)
 
@@ -94,18 +108,34 @@ export default function Properties() {
     setType('all')
     setPurpose('all')
     setArea('all')
-    setMaxPrice(100)
+    setMaxPrice(PRICE_CEILING)
     setMinBeds(0)
     setVerifiedOnly(true)
+    setSort('trust')
     setParams({})
   }
+
+  // Keep the URL shareable: filters sync to query params (deep-linkable state)
+  useEffect(() => {
+    const next: Record<string, string> = {}
+    if (query.trim()) next.q = query.trim()
+    if (type !== 'all') next.type = type
+    if (purpose !== 'all') next.purpose = purpose
+    if (area !== 'all') next.area = area
+    if (maxPrice < (purpose === 'rent' ? RENT_CEILING : PRICE_CEILING)) next.maxPrice = String(maxPrice)
+    if (minBeds > 0) next.minBeds = String(minBeds)
+    if (!verifiedOnly) next.verified = '0'
+    if (sort !== 'trust') next.sort = sort
+    setParams(next, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, type, purpose, area, maxPrice, minBeds, verifiedOnly, sort])
 
   return (
     <div className="bg-cream/60">
       <div className="container-luxe py-10 sm:py-14">
         {/* header */}
         <div className="flex flex-col gap-2">
-          <p className="eyebrow">Marketplace · {allProperties.length} verified listings</p>
+          <p className="eyebrow">Marketplace · {allProperties.filter((p) => p.trustScore >= 75).length} verified · {allProperties.length} total</p>
           <h1 className="heading-display text-3xl sm:text-4xl">
             Verified property, <span className="gold-text">zero guesswork</span>
           </h1>
@@ -131,7 +161,10 @@ export default function Properties() {
               {PURPOSES.map((p) => (
                 <button
                   key={p.value}
-                  onClick={() => setPurpose(p.value)}
+                  onClick={() => {
+                    setPurpose(p.value)
+                    setMaxPrice(p.value === 'rent' ? RENT_CEILING : PRICE_CEILING)
+                  }}
                   className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
                     purpose === p.value ? 'bg-gold-gradient text-white shadow-gold-sm' : 'text-ink-muted hover:text-gold-700'
                   }`}
@@ -152,7 +185,7 @@ export default function Properties() {
             <button
               onClick={() =>
                 save(
-                  { q: query || undefined, type, purpose, area, maxPrice, minBeds },
+                  { q: query || undefined, type, purpose, area, maxPrice, minBeds, verifiedOnly, sort },
                   [query || 'All areas', type !== 'all' ? type : '', purpose !== 'all' ? purpose : ''].filter(Boolean).join(' · ') || 'All properties',
                 )
               }
@@ -207,16 +240,19 @@ export default function Properties() {
               </div>
               <div>
                 <label className="label-luxe">
-                  Max price: {maxPrice >= 100 ? 'Any' : maxPrice >= 1 ? `KES ${maxPrice}M` : `KES ${maxPrice * 1000}k`}
+                  {purpose === 'rent'
+                    ? `Max rent: ${maxPrice >= RENT_CEILING ? 'Any' : `KES ${maxPrice}k/mo`}`
+                    : `Max price: ${maxPrice >= PRICE_CEILING ? 'Any' : maxPrice >= 1 ? `KES ${maxPrice}M` : `KES ${maxPrice * 1000}k`}`}
                 </label>
                 <input
                   type="range"
-                  min={0.05}
-                  max={100}
-                  step={0.05}
+                  min={purpose === 'rent' ? 10 : 0.05}
+                  max={purpose === 'rent' ? RENT_CEILING : PRICE_CEILING}
+                  step={purpose === 'rent' ? 5 : 0.05}
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(parseFloat(e.target.value))}
                   className="mt-2.5 w-full accent-gold-600"
+                  aria-label={purpose === 'rent' ? 'Maximum monthly rent' : 'Maximum purchase price'}
                 />
               </div>
               <div>
@@ -261,7 +297,10 @@ export default function Properties() {
                     setPurpose(s.filters.purpose ?? 'all')
                     setArea(s.filters.area ?? 'all')
                     if (s.filters.maxPrice != null) setMaxPrice(s.filters.maxPrice)
+                    else setMaxPrice((s.filters.purpose ?? 'all') === 'rent' ? RENT_CEILING : PRICE_CEILING)
                     if (s.filters.minBeds != null) setMinBeds(s.filters.minBeds)
+                    if (s.filters.verifiedOnly != null) setVerifiedOnly(s.filters.verifiedOnly)
+                    if (s.filters.sort) setSort(s.filters.sort as SortKey)
                   }}
                   className="font-semibold"
                 >
@@ -289,7 +328,7 @@ export default function Properties() {
             <b className="text-ink">{filtered.length}</b> {filtered.length === 1 ? 'property' : 'properties'} found
             {verifiedOnly && <span className="chip ml-2">Verified only</span>}
           </p>
-          <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className="input-luxe !w-auto !py-2 text-xs">
+          <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} aria-label="Sort results" className="input-luxe !w-auto !py-2 text-xs">
             <option value="trust">Sort: Trust score</option>
             <option value="price-asc">Price: low → high</option>
             <option value="price-desc">Price: high → low</option>

@@ -12,7 +12,7 @@ export default function TrustBadge({ score, size = 'md' }: { score: number; size
     return (
       <span className={`badge-verified ${sizes.badge}`}>
         <ShieldCheck className={sizes.icon} />
-        {tier.tone === 'high' ? 'Verified' : 'Verified'} · {score}
+        {tier.tone === 'high' ? 'Highly Verified' : 'Verified'} · {score}
       </span>
     )
   }

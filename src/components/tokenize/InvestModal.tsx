@@ -2,7 +2,7 @@
  * Keja Tokenize — token purchase flow:
  * order → confirm → staged blockchain broadcast → ownership certificate.
  */
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowRight, ArrowLeft, CheckCircle2, Copy, Loader2, Link2, ShieldCheck, AlertTriangle, Coins, BadgeDollarSign,
@@ -54,28 +54,43 @@ export function InvestModal() {
   const incomePerToken = p && p.totalTokens > 0 ? p.annualNetIncomeUsd / p.totalTokens : 0
   const annualIncome = amount * incomePerToken
 
+  const stageTimerRef = useRef<number | null>(null)
+  const broadcastRef = useRef<number | null>(null)
+  // Safety net: if the modal unmounts mid-broadcast, stop timers and drop
+  // pending state updates (the old code leaked the interval and set state on
+  // an unmounted component).
+  useEffect(
+    () => () => {
+      if (stageTimerRef.current) window.clearInterval(stageTimerRef.current)
+      if (broadcastRef.current) window.clearTimeout(broadcastRef.current)
+    },
+    [],
+  )
+
   function execute() {
     if (!p) return
     setStep('processing')
     setStage(0)
-    const stageTimer = setInterval(() => setStage((s) => Math.min(s + 1, PROCESS_STAGES.length - 1)), 900)
-    try {
-      // simulated broadcast latency
-      setTimeout(() => {
+    const stageTimer = window.setInterval(() => setStage((s) => Math.min(s + 1, PROCESS_STAGES.length - 1)), 900)
+    stageTimerRef.current = stageTimer
+    broadcastRef.current = window.setTimeout(() => {
+      try {
         const r = buyTokens(p.id, amount)
         setResult(r)
         setStep('success')
-        clearInterval(stageTimer)
         toast({
           title: `${fmtNum(amount)} ${p.tokenSymbol} tokens acquired`,
           description: `Confirmed on Keja Ledger · block ${r.blockNumber.toLocaleString()}`,
         })
-      }, 3200)
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Purchase failed')
-      setStep('confirm')
-      clearInterval(stageTimer)
-    }
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Purchase failed')
+        setStep('order')
+      } finally {
+        window.clearInterval(stageTimer)
+        stageTimerRef.current = null
+        broadcastRef.current = null
+      }
+    }, 3200)
   }
 
   return (

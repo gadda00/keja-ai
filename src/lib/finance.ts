@@ -202,9 +202,12 @@ export function calculateAffordability(input: AffordabilityInput): Affordability
 /** Indicative KES→USD rate used across the app (single source of truth). */
 export const FX_KES_PER_USD = 129
 
+/** Listings priced below this floor are rentals (monthly pricing). Single source of truth. */
+export const RENTAL_PRICE_FLOOR = 500_000
+
 /** Rentals in this marketplace are priced below the 500k sale floor. */
 export function isRentalPrice(price: number): boolean {
-  return price < 500_000
+  return price < RENTAL_PRICE_FLOOR
 }
 
 /** Kenyan buyer cost stack (statutory + typical professional fees, % of price). */

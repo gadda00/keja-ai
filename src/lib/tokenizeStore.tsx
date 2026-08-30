@@ -189,6 +189,12 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
     (propertyId: string, tokenAmount: number): BuyResult => {
       const p = properties.find((x) => x.id === propertyId)
       if (!p) throw new Error('Property not found')
+      // Supply cap — offerings can never be oversold, whatever the UI allows.
+      const sold = p.tokensSold + (state.soldDelta[p.id] ?? 0)
+      const available = Math.max(0, p.totalTokens - sold)
+      if (tokenAmount <= 0) throw new Error('Enter a token amount')
+      if (tokenAmount > available)
+        throw new Error(`Only ${available.toLocaleString()} ${p.tokenSymbol} tokens remain — reduce your order`)
       const cost = tokenAmount * p.tokenPriceUsd
       const txHash = randomHex(64)
       const blockNumber = nextBlockNumber()
@@ -222,8 +228,8 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
         soldDelta: { ...s.soldDelta, [p.id]: (s.soldDelta[p.id] ?? 0) + tokenAmount },
       }))
 
-      const newSold = p.tokensSold + tokenAmount
-      const funded = p.totalTokens > 0 ? Math.round((newSold / p.totalTokens) * 100) : 0
+      const newSold = sold + tokenAmount
+      const funded = p.totalTokens > 0 ? Math.min(100, Math.round((newSold / p.totalTokens) * 100)) : 0
       const hint =
         p.status === 'LIVE'
           ? p.distributionFreq === 'MONTHLY'
@@ -243,7 +249,7 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
         fundedPct: funded,
       }
     },
-    [properties]
+    [properties, state.soldDelta]
   )
 
   const sellTokens = useCallback(
@@ -347,10 +353,10 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
   }, [state.customProperties])
 
   const loadDemoPortfolio = useCallback(() => {
-    const nowLedger: LedgerTx[] = DEMO_INVESTMENTS.map((inv, i) => ({
+    const nowLedger: LedgerTx[] = DEMO_INVESTMENTS.map((inv) => ({
       txHash: inv.txHash,
       blockNumber: inv.blockNumber,
-      symbol: DEMO_INVESTMENTS[i].propertyId === 'kj-wst1' ? 'KJ-WST1' : DEMO_INVESTMENTS[i].propertyId === 'kj-klm2' ? 'KJ-KLM2' : 'KJ-KRN3',
+      symbol: TOKENIZED_PROPERTIES.find((p) => p.id === inv.propertyId)?.tokenSymbol ?? 'KJ-KRN3',
       title: TOKENIZED_PROPERTIES.find((p) => p.id === inv.propertyId)?.title ?? '',
       tokens: inv.tokenAmount,
       totalCostUsd: inv.totalCostUsd,

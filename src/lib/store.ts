@@ -28,6 +28,10 @@ export interface ChatMessage {
   text: string
   ts: string
   meta?: string[]
+  /** Engine-provided follow-up chips (persisted so history keeps them). */
+  quickReplies?: string[]
+  /** Engine-provided property cards for this answer. */
+  propertyIds?: string[]
 }
 
 function read<T>(key: string, fallback: T): T {

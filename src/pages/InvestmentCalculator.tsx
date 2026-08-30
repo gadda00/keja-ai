@@ -8,8 +8,9 @@ import { Calculator, TrendingUp, Info, Bot, Globe2, Landmark, Wallet } from 'luc
 import { analyzeInvestment, calculateMortgage, calculateAffordability, FX_KES_PER_USD, MORTGAGE_MARKET } from '@/lib/finance'
 import { formatKES } from '@/lib/format'
 import { PROPERTIES } from '@/data/properties'
+import { isRentalPrice } from '@/lib/finance'
 
-const PRESETS = PROPERTIES.filter((p) => p.rentEstimate && p.price > 500000).slice(0, 6)
+const PRESETS = PROPERTIES.filter((p) => p.rentEstimate && !isRentalPrice(p.price)).slice(0, 6)
 
 export default function InvestmentCalculator() {
   usePageMeta(
