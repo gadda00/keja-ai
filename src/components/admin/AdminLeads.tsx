@@ -1,5 +1,7 @@
 /** Admin Leads — HOT/WARM/COLD pipeline CRM (blueprint Ch.9). */
+import { exportCSV } from '@/lib/csv'
 import { useMemo, useState } from 'react'
+import { Download } from 'lucide-react'
 import { Flame, Search, Phone, Mail, MessageCircle, StickyNote, Plus, Trash2 } from 'lucide-react'
 import { useStore, KEYS, Lead } from '@/lib/store'
 import { useAuth } from '@/lib/auth'
@@ -131,6 +133,16 @@ export default function AdminLeads() {
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
+          <button
+            onClick={() =>
+              exportCSV(`keja-leads-${new Date().toISOString().slice(0, 10)}.csv`,
+                ['Name', 'Phone', 'Email', 'Interest', 'Budget', 'Timeline', 'Temperature', 'Source', 'Property', 'Created'],
+                filtered.map((l) => [l.name, l.phone, l.email ?? '', l.interest, l.budget ?? '', l.timeline ?? '', l.temperature, l.source, l.propertyId ?? '', l.createdAt]))
+            }
+            className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3.5 py-2.5 text-xs font-semibold text-gold-300 hover:bg-ink-soft"
+          >
+            <Download className="h-3.5 w-3.5" /> Export CSV
+          </button>
           <button onClick={() => setNewLead(true)} className="btn-gold !px-4 !py-2.5 !text-xs">
             <Plus className="h-4 w-4" /> Add lead
           </button>

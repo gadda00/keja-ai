@@ -358,8 +358,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true)
       try {
         await new Promise((r) => setTimeout(r, 450))
+        // brute-force throttle: 5 failures per email → 60s lockout (demo-grade, client-side)
+        const fails = store.get<Record<string, { n: number; ts: number }>>('login-fails', {})
+        const f = fails[email.trim().toLowerCase()]
+        if (f && f.n >= 5 && Date.now() - f.ts < 60_000) {
+          throw new Error('Too many attempts. Wait one minute and try again.')
+        }
+        const recordFail = () => {
+          const cur = store.get<Record<string, { n: number; ts: number }>>('login-fails', {})
+          cur[email.trim().toLowerCase()] = { n: (cur[email.trim().toLowerCase()]?.n ?? 0) + 1, ts: Date.now() }
+          store.set('login-fails', cur)
+        }
+        if (email.length > 254 || password.length > 128) throw new Error('Invalid credentials.')
         const account = users.find((u) => u.email.toLowerCase() === email.trim().toLowerCase())
-        if (!account) throw new Error('No account found with that email. Create one below.')
+        if (!account) {
+          recordFail()
+          throw new Error('No account found with that email. Create one below.')
+        }
         if (account.status === 'suspended')
           throw new Error('This account has been suspended. Contact support@keja.ai.')
         const pw = store.get<Record<string, string>>('pw', {})
@@ -371,8 +386,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           'investor@keja.ai': hashPassword('investor123'),
         }
         if (expected !== hashPassword(password) && demoPw[account.email] !== hashPassword(password)) {
+          recordFail()
           throw new Error('Incorrect password. Try again or use Google sign-in.')
         }
+        // success clears the throttle
+        const cur = store.get<Record<string, { n: number; ts: number }>>('login-fails', {})
+        delete cur[email.trim().toLowerCase()]
+        store.set('login-fails', cur)
         return persistLogin(account, remember)
       } finally {
         setLoading(false)

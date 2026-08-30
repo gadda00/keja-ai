@@ -1,4 +1,6 @@
 /** Admin Users — RBAC management: roles, status, sign-in history. */
+import { Download } from 'lucide-react'
+import { exportCSV } from '@/lib/csv'
 import { useState } from 'react'
 import { Search, ShieldCheck, UserX, UserCheck, Trash2, Ban, Users, Mail } from 'lucide-react'
 import { useAuth, UserAccount, Role, initials } from '@/lib/auth'
@@ -75,7 +77,17 @@ export default function AdminUsers() {
       {/* table */}
       <div className="card-luxe overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[760px] text-left text-sm">
+          <button
+          onClick={() =>
+            exportCSV(`keja-users-${new Date().toISOString().slice(0, 10)}.csv`,
+              ['Name', 'Email', 'Role', 'Status', 'Sign-ins', 'Last active'],
+              filtered.map((u) => [u.name, u.email, u.role, u.status, 0, u.createdAt ?? '']))
+          }
+          className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-ink px-3.5 py-1.5 text-xs font-semibold text-gold-300 hover:bg-ink-soft"
+        >
+          <Download className="h-3.5 w-3.5" /> Export CSV
+        </button>
+        <table className="w-full min-w-[760px] text-left text-sm">
             <thead>
               <tr className="border-b border-gold-100 bg-gold-50/60 text-[11px] uppercase tracking-wider text-ink-muted">
                 <th className="px-5 py-3 font-semibold">User</th>

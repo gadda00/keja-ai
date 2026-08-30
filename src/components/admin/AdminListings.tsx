@@ -17,7 +17,9 @@ import {
   Copy,
   Gauge,
   Clock,
+  Download,
 } from 'lucide-react'
+import { exportCSV } from '@/lib/csv'
 import { useAuth } from '@/lib/auth'
 import {
   useSubmissions,
@@ -51,6 +53,7 @@ export default function AdminListings() {
   const [filter, setFilter] = useState<Filter>('pending')
   const [selected, setSelected] = useState<ListingSubmission | null>(null)
   const [note, setNote] = useState('')
+  const [checked, setChecked] = useState<string[]>([])
 
   const counts = useMemo(
     () => ({
@@ -63,7 +66,42 @@ export default function AdminListings() {
     [submissions],
   )
 
-  const list = submissions.filter((s) => filter === 'all' || s.status === filter)
+  const list = submissions.filter((s) => s.status === filter || filter === 'all')
+
+  /** submissions with no flags meeting the auto-approve completeness threshold */
+  const autoApproveEligible = (s: ListingSubmission) =>
+    s.flags.length === 0 && s.completeness >= (settings.autoApproveThreshold ?? 85)
+
+  const bulkReview = (status: 'approved' | 'rejected') => {
+    const targets = submissions.filter((s) => checked.includes(s.id) && s.status === 'pending')
+    if (!targets.length) return
+    const next = submissions.map((x) =>
+      checked.includes(x.id) && x.status === 'pending'
+        ? { ...x, status, reviewedAt: new Date().toISOString(), reviewedBy: user?.name ?? 'admin', reviewNote: status === 'rejected' ? 'Bulk rejection' : 'Bulk approval' }
+        : x,
+    )
+    setSubmissions(next)
+    if (status === 'approved') {
+      setUserListings([...targets.map(submissionToListing), ...userListings])
+    }
+    logAudit({
+      actor: user?.name ?? 'admin',
+      actorEmail: user?.email ?? '',
+      action: `listing.bulk-${status}`,
+      target: `${targets.length} submissions`,
+      detail: `Bulk ${status} of ${targets.length} pending submissions`,
+      severity: status === 'rejected' ? 'warning' : 'info',
+    })
+    setChecked([])
+  }
+
+  const exportCsv = () => {
+    exportCSV(`keja-listings-${new Date().toISOString().slice(0, 10)}.csv`,
+      ['ID', 'Title', 'Type', 'Area', 'County', 'Price KES', 'Status', 'Completeness %', 'Flags', 'Source', 'Submitted'],
+      list.map((s) => [s.id, s.title, s.type, s.area, s.county, s.price, s.status, s.completeness, s.flags.join('; '), s.source, s.createdAt]),
+    )
+    logAudit({ actor: user?.name ?? 'admin', actorEmail: user?.email ?? '', action: 'listing.export', target: `${list.length} submissions`, detail: `CSV export of ${list.length} listings (${filter})`, severity: 'info' })
+  }
 
   const review = (s: ListingSubmission, status: 'approved' | 'rejected' | 'flagged') => {
     const next = submissions.map((x) =>
@@ -104,7 +142,7 @@ export default function AdminListings() {
   return (
     <div className="flex flex-col gap-5">
       {/* filter chips */}
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap items-center gap-1.5">
         {(['pending', 'flagged', 'approved', 'rejected', 'all'] as Filter[]).map((f) => (
           <button
             key={f}
@@ -118,9 +156,47 @@ export default function AdminListings() {
             {f} <span className="opacity-70">({counts[f]})</span>
           </button>
         ))}
-        <span className="ml-auto flex items-center gap-1.5 text-[11px] text-ink-faint">
-          <Gauge className="h-3.5 w-3.5" /> Auto-approve threshold: {settings.autoApproveThreshold}%
+        <span className="ml-auto flex flex-wrap items-center gap-2">
+          <button
+            onClick={exportCsv}
+            className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3.5 py-1.5 text-xs font-semibold text-gold-300 transition hover:bg-ink-soft"
+          >
+            <Download className="h-3.5 w-3.5" /> Export CSV
+          </button>
+          <span className="flex items-center gap-1.5 text-[11px] text-ink-muted">
+            <Gauge className="h-3.5 w-3.5" /> Auto-approve threshold: {settings.autoApproveThreshold}%
+          </span>
         </span>
+      </div>
+
+      {/* bulk actions */}
+      <div className="flex flex-wrap items-center gap-3 rounded-xl bg-cream/70 px-4 py-3 ring-1 ring-gold-100">
+        <label className="flex cursor-pointer items-center gap-2 text-xs font-semibold text-ink-soft">
+          <input
+            type="checkbox"
+            checked={checked.length > 0 && checked.length === list.filter((s) => s.status === 'pending').length}
+            onChange={(e) =>
+              setChecked(e.target.checked ? list.filter((s) => s.status === 'pending').map((s) => s.id) : [])
+            }
+            className="h-4 w-4 rounded border-gold-300 accent-gold-600"
+          />
+          Select all pending
+        </label>
+        <span className="text-xs text-ink-muted">{checked.length} selected</span>
+        <button
+          onClick={() => bulkReview('approved')}
+          disabled={!checked.length}
+          className="rounded-lg bg-gold-gradient px-3.5 py-1.5 text-xs font-bold text-white shadow-gold-sm transition disabled:opacity-40"
+        >
+          Approve selected
+        </button>
+        <button
+          onClick={() => bulkReview('rejected')}
+          disabled={!checked.length}
+          className="rounded-lg border border-red-200 px-3.5 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-50 disabled:opacity-40"
+        >
+          Reject selected
+        </button>
       </div>
 
       {/* queue */}
@@ -135,6 +211,17 @@ export default function AdminListings() {
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
+                  {s.status === 'pending' && (
+                    <input
+                      type="checkbox"
+                      checked={checked.includes(s.id)}
+                      onChange={(e) =>
+                        setChecked(e.target.checked ? [...checked, s.id] : checked.filter((c) => c !== s.id))
+                      }
+                      aria-label={`Select ${s.title}`}
+                      className="h-4 w-4 shrink-0 rounded border-gold-300 accent-gold-600"
+                    />
+                  )}
                   <h3 className="font-display text-base font-bold text-ink">{s.title}</h3>
                   <span
                     className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
@@ -199,6 +286,11 @@ export default function AdminListings() {
                       </span>
                     )
                   })}
+                  {s.flags.length === 0 && autoApproveEligible(s) && s.status === 'pending' && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-200">
+                      Auto-approve eligible
+                    </span>
+                  )}
                   {s.flags.length === 0 && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700 ring-1 ring-green-200">
                       <ShieldCheck className="h-3 w-3" /> clean
