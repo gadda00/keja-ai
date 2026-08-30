@@ -4,6 +4,7 @@
  * cross-portal networks, agent/developer partnerships, self-service + feeds).
  * Includes the partner application form and the listing-submission wizard.
  */
+import { usePageMeta } from '@/lib/seo'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -72,6 +73,10 @@ const FEED_FORMATS = [
 ]
 
 export default function Partners() {
+  usePageMeta(
+    'Partners — Global Listing Supply',
+    'Agencies, developers, landlords and portals: five channels to put your inventory in front of qualified African property demand.',
+  )
   const { user, isLoggedIn } = useAuth()
   const [partners, setPartners] = usePartners()
   const [applied, setApplied] = useState(false)

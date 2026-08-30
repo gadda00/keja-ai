@@ -1,3 +1,4 @@
+import { usePageMeta } from '@/lib/seo'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -18,6 +19,10 @@ const fadeUp = {
 }
 
 export default function Home() {
+  usePageMeta(
+    'Keja.ai — Intelligent Real Estate. Verified Trust.',
+    "Kenya's AI real-estate advisor: verified listings, trust scores, investment intelligence and tokenized fractional ownership.",
+  )
   const navigate = useNavigate()
   const avgTrust = Math.round(PROPERTIES.reduce((s, p) => s + p.trustScore, 0) / PROPERTIES.length)
   const verifiedCount = PROPERTIES.filter((p) => p.trustScore >= 75).length
@@ -28,7 +33,10 @@ export default function Home() {
       {/* ============================== HERO ============================== */}
       <section className="relative overflow-hidden bg-ink">
         <div className="absolute inset-0">
-          <img src={asset('/images/props/skyline_hero.jpg')} alt="Nairobi skyline" className="h-full w-full object-cover opacity-40" />
+          <picture>
+              <source srcSet={asset('/images/props/skyline_hero.webp')} type="image/webp" />
+              <img src={asset('/images/props/skyline_hero.jpg')} alt="Nairobi skyline" width={1600} height={1000} fetchPriority="high" className="h-full w-full object-cover opacity-40" />
+            </picture>
           <div className="absolute inset-0 bg-gradient-to-b from-ink/80 via-ink/60 to-ink" />
         </div>
 
@@ -186,7 +194,10 @@ export default function Home() {
           <motion.div {...fadeUp} className="relative">
             <div className="absolute -inset-4 sm:-inset-6 -z-10 rounded-[2.5rem] bg-gold-100/40 blur-2xl" />
             <div className="overflow-hidden rounded-3xl shadow-card-hover ring-1 ring-gold-200">
-              <img src={asset('/brand/keja-banner.jpg')} alt="Keja AI assistant" className="w-full object-cover" />
+              <picture>
+                <source srcSet={asset('/brand/keja-banner.webp')} type="image/webp" />
+                <img src={asset('/brand/keja-banner-opt.jpg')} alt="Keja AI assistant" loading="lazy" className="w-full object-cover" />
+              </picture>
             </div>
             <div className="absolute -bottom-5 -left-3 rounded-2xl bg-white p-4 shadow-card-hover ring-1 ring-gold-100 sm:-left-8">
               <div className="flex items-center gap-3">

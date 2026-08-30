@@ -2,9 +2,10 @@
  * Keja Tokenize — shared UI primitives.
  * Uses the keja-ai design system (gold / ink / cream, Playfair + Inter).
  */
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useFocusTrap } from '@/lib/useFocusTrap'
 import { Building2, Home, Store, Warehouse, Layers, Landmark, ShieldCheck, CheckCircle2, X } from 'lucide-react'
 import { propertyTypeLabel } from '@/data/tokenize'
 import type { TokenizedProperty } from '@/data/tokenize'
@@ -101,25 +102,24 @@ export function Modal({
   children: ReactNode
   maxWidth?: string
 }) {
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef, open, onClose)
+
   useEffect(() => {
     if (!open) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', onKey)
     modalOpenCount += 1
     document.body.style.overflow = 'hidden'
     return () => {
-      document.removeEventListener('keydown', onKey)
       modalOpenCount = Math.max(0, modalOpenCount - 1)
       if (modalOpenCount === 0) document.body.style.overflow = ''
     }
-  }, [open, onClose])
+  }, [open])
 
   return (
     <AnimatePresence>
       {open && (
         <motion.div
+          ref={dialogRef}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -183,7 +183,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastCtx.Provider value={{ toast }}>
       {children}
-      <div className="pointer-events-none fixed bottom-6 right-6 z-[80] flex w-[calc(100vw-3rem)] max-w-sm flex-col gap-2">
+      <div className="pointer-events-none fixed bottom-6 right-6 z-[80] flex w-[calc(100vw-3rem)] max-w-sm flex-col gap-2" role="status" aria-live="polite">
         <AnimatePresence>
           {toasts.map((t) => (
             <motion.div

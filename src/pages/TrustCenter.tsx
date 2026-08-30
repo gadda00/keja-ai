@@ -1,3 +1,4 @@
+import { usePageMeta } from '@/lib/seo'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -46,6 +47,10 @@ const PILLARS = [
 ]
 
 export default function TrustCenter() {
+  usePageMeta(
+    'Trust Center — How Keja Verifies Every Listing',
+    'Ardhisasa title cross-checks, photo and duplicate scans, pricing anomaly detection and agent reputation scoring.',
+  )
   return (
     <div>
       {/* hero */}

@@ -1,3 +1,4 @@
+import { usePageMeta } from '@/lib/seo'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowRight, TrendingUp, MapPinned, Landmark, Coins, ShieldCheck, Lightbulb } from 'lucide-react'
@@ -10,6 +11,10 @@ const fadeUp = {
 }
 
 export default function Insights() {
+  usePageMeta(
+    'Insights — Guides & Market Notes',
+    'Practical guides for Kenyan property: buying processes, costs, mortgages, diaspora investing and area spotlights.',
+  )
   return (
     <div>
       <section className="bg-ink py-20 sm:py-24">

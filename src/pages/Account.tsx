@@ -2,6 +2,7 @@
  * Account — signed-in user home: profile, session details, role, activity.
  * Blueprint Ch.14: role-based access, privacy by design, session control.
  */
+import { usePageMeta } from '@/lib/seo'
 import { Link } from 'react-router-dom'
 import {
   UserCircle2,
@@ -23,6 +24,10 @@ import { useAllProperties } from '@/lib/inventory'
 import PropertyCard from '@/components/property/PropertyCard'
 
 export default function Account() {
+  usePageMeta(
+    'My Account — Keja.ai',
+    'Your saved properties, portfolio, sessions and preferences.',
+  )
   const { user, session, logout, isAdmin, setAuthModalOpen } = useAuth()
   const [favorites] = useStore<string[]>(KEYS.favorites, [])
   const [viewed] = useStore<string[]>(KEYS.viewed, [])

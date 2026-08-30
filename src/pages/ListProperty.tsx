@@ -1,3 +1,4 @@
+import { usePageMeta } from '@/lib/seo'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
@@ -100,6 +101,10 @@ const EMPTY: WizardForm = {
 }
 
 export default function ListProperty() {
+  usePageMeta(
+    'List Your Property — Verified by Keja',
+    'Submit your property in four steps. Trust-by-design screening, then the Verified badge and qualified demand.',
+  )
   const { user, requireAuth, isLoggedIn } = useAuth()
   const [submissions, setSubmissions] = useSubmissions()
   const [step, setStep] = useState(0)

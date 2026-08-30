@@ -1,3 +1,5 @@
+import { usePageMeta } from '@/lib/seo'
+import SmartImg from '@/components/ui/SmartImg'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
@@ -20,6 +22,7 @@ export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>()
   const allProperties = useAllProperties()
   const property = findProperty(allProperties, id ?? '')
+  usePageMeta(property ? `${property.title} — ${property.area}` : 'Property', property ? `${property.title} in ${property.area}, ${property.county}. Trust score ${property.trustScore}/100, verified by Keja.` : undefined)
   const score = useMemo(() => (property ? investmentScore(property) : null), [property])
   const [activeImg, setActiveImg] = useState(0)
   const [showAllSignals, setShowAllSignals] = useState(false)
@@ -128,7 +131,7 @@ export default function PropertyDetail() {
         {/* gallery */}
         <div className="mt-6 grid gap-3 grid-cols-1 lg:grid-cols-[2fr_1fr]">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative overflow-hidden rounded-2xl">
-            <img src={property.images[activeImg]} alt={property.title} className="h-[300px] w-full object-cover sm:h-[460px]" />
+            <SmartImg src={property.images[activeImg]} alt={property.title} loading="eager" className="h-[300px] w-full object-cover sm:h-[460px]" />
             <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-ink">
               {activeImg + 1} / {property.images.length}
             </div>
@@ -156,7 +159,7 @@ export default function PropertyDetail() {
                 onClick={() => setActiveImg(i)}
                 className={`overflow-hidden rounded-xl ring-2 transition ${activeImg === i ? 'ring-gold-500' : 'ring-transparent hover:ring-gold-200'}`}
               >
-                <img src={img} alt="" className="h-24 w-full object-cover sm:h-[145px]" loading="lazy" />
+                <SmartImg src={img} alt={`${property.title} photo`} className="h-24 w-full object-cover sm:h-[145px]" />
               </button>
             ))}
           </div>

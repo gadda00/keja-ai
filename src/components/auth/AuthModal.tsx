@@ -4,9 +4,10 @@
  * otherwise the demo account picker keeps the full journey working on
  * static hosting (GitHub Pages) — clearly labelled as demo mode.
  */
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { X, Lock, Mail, User as UserIcon, ShieldCheck, Sparkles, ChevronLeft } from 'lucide-react'
 import { useAuth, DEMO_GOOGLE_ACCOUNTS, initials } from '@/lib/auth'
+import { useFocusTrap } from '@/lib/useFocusTrap'
 
 type Mode = 'choose' | 'login' | 'register'
 
@@ -50,6 +51,7 @@ export default function AuthModal() {
   const [error, setError] = useState('')
   const [form, setForm] = useState({ name: '', email: '', password: '', phone: '' })
   const [remember, setRemember] = useState(true)
+  const dialogRef = useRef<HTMLDivElement>(null)
 
   const close = () => {
     setAuthModalOpen(false)
@@ -58,6 +60,8 @@ export default function AuthModal() {
     setMode('choose')
     setDemoPicker(false)
   }
+
+  useFocusTrap(dialogRef, authModalOpen, close)
 
   // close intent once signed in
   useEffect(() => {
@@ -106,6 +110,7 @@ export default function AuthModal() {
         aria-hidden="true"
       />
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label="Sign in to Keja.ai"

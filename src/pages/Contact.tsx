@@ -1,3 +1,4 @@
+import { usePageMeta } from '@/lib/seo'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Mail, Phone, MapPin, Send, CheckCircle2, Bot, MessageCircle } from 'lucide-react'
@@ -6,6 +7,10 @@ import { useStore, KEYS, Lead } from '@/lib/store'
 import { asset } from '@/config'
 
 export default function Contact() {
+  usePageMeta(
+    'Contact — Talk to Team Keja',
+    'Reach the Keja.ai team on WhatsApp, email or phone — or request an escorted viewing.',
+  )
   const [leads, setLeads] = useStore<Lead[]>(KEYS.leads, [])
   const [form, setForm] = useState({ name: '', email: '', phone: '', interest: '', message: '' })
   const [sent, setSent] = useState(false)

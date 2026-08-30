@@ -1,3 +1,4 @@
+import { usePageMeta } from '@/lib/seo'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -11,6 +12,10 @@ import { PROPERTIES } from '@/data/properties'
 const PRESETS = PROPERTIES.filter((p) => p.rentEstimate && p.price > 500000).slice(0, 6)
 
 export default function InvestmentCalculator() {
+  usePageMeta(
+    'Investment Calculator — Yields, Mortgages & Projections',
+    'Model rental yields, mortgage payments, expenses and 10-year projections for Kenyan property — in KES or USD.',
+  )
   const [price, setPrice] = useState(14500000)
   const [furnishing, setFurnishing] = useState(580000)
   const [rent, setRent] = useState(110000)

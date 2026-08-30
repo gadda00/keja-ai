@@ -1,7 +1,12 @@
+import { usePageMeta } from '@/lib/seo'
 import { Bot, ShieldCheck, Languages, Zap } from 'lucide-react'
 import ChatWindow from '@/components/ai/ChatWindow'
 
 export default function AskKeja() {
+  usePageMeta(
+    'Ask Keja AI — Conversational Property Advisor',
+    "Chat with Kenya's real-estate AI: search verified listings, compare yields, check titles and get honest investment math.",
+  )
   return (
     <div className="bg-cream/60">
       <div className="container-luxe py-10 sm:py-14">

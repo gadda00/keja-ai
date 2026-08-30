@@ -1,3 +1,4 @@
+import { usePageMeta } from '@/lib/seo'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -13,6 +14,10 @@ const fadeUp = {
 }
 
 export default function Manage() {
+  usePageMeta(
+    'Keja Manage — Landlords & Property Managers',
+    'Tenant communication, maintenance, rental analytics and occupancy reporting in one place.',
+  )
   return (
     <div>
       <section className="bg-ink py-20 sm:py-24">

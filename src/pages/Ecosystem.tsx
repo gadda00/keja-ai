@@ -3,6 +3,7 @@
  * around one intelligence layer, plus the platform hierarchy, data flywheel
  * and end-to-end property journey (Ch.6–8).
  */
+import { usePageMeta } from '@/lib/seo'
 import { Link } from 'react-router-dom'
 import {
   Home,
@@ -102,6 +103,10 @@ const JOURNEY = [
 ]
 
 export default function Ecosystem() {
+  usePageMeta(
+    'The Keja Ecosystem — One Intelligence Layer',
+    'Eight products — Home, Invest, Pro, Manage, Data, Search, AI Advisor and Token — on one intelligence layer.',
+  )
   return (
     <div className="container-luxe py-14">
       {/* hero */}

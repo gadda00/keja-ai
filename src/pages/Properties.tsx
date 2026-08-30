@@ -1,3 +1,4 @@
+import { usePageMeta } from '@/lib/seo'
 import { useMemo, useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Search, SlidersHorizontal, ShieldCheck, X, MapPin } from 'lucide-react'
@@ -16,6 +17,10 @@ const PURPOSES = [
 type SortKey = 'trust' | 'price-asc' | 'price-desc' | 'recent' | 'views'
 
 export default function Properties() {
+  usePageMeta(
+    'Property Marketplace — Buy, Rent & Invest',
+    'Browse verified apartments, villas, townhouses and land across Nairobi, Mombasa and beyond — every listing trust-scored.',
+  )
   const [params, setParams] = useSearchParams()
   const [query, setQuery] = useState(params.get('q') ?? '')
   const [type, setType] = useState<string>('all')

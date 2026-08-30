@@ -5,6 +5,7 @@
  *
  * Deep links: /tokenize?view=marketplace|learn|portfolio|issuer
  */
+import { usePageMeta } from '@/lib/seo'
 import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Coins, Store, GraduationCap, Briefcase, LayoutDashboard } from 'lucide-react'
@@ -91,6 +92,10 @@ function TokenizeInner() {
 }
 
 export default function Tokenize() {
+  usePageMeta(
+    'Keja Tokenize — Fractional Ownership from $100',
+    "Own a fraction of Nairobi's finest real estate. KYC-gated, SPV-structured, simulated-ledger tokenization demo.",
+  )
   return (
     <Suspense
       fallback={

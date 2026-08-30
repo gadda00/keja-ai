@@ -1,3 +1,5 @@
+import { usePageMeta } from '@/lib/seo'
+import SmartImg from '@/components/ui/SmartImg'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -19,6 +21,10 @@ const TEMPS = [
 ] as const
 
 export default function Dashboard() {
+  usePageMeta(
+    'Sales Dashboard — Leads & Pipeline',
+    'HOT/WARM/COLD lead qualification, pipeline analytics and the verification queue for Keja partners.',
+  )
   const [userLeads, setUserLeads] = useStore<Lead[]>(KEYS.leads, [])
   const [viewed] = useStore<string[]>(KEYS.viewed, [])
   const [favorites] = useStore<string[]>(KEYS.favorites, [])
@@ -243,7 +249,7 @@ export default function Dashboard() {
           <div className="card-luxe mt-4 divide-y divide-gold-100">
             {verificationQueue.map((p) => (
               <div key={p.id} className="flex flex-wrap items-center gap-4 p-4">
-                <img src={p.images[0]} alt="" className="h-14 w-20 rounded-lg object-cover" loading="lazy" />
+                <SmartImg src={p.images[0]} alt={p.title} className="h-14 w-20 rounded-lg object-cover" />
                 <div className="min-w-[200px] flex-1">
                   <Link to={`/properties/${p.id}`} className="text-sm font-bold text-ink hover:text-gold-700">
                     {p.title}

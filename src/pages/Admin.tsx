@@ -3,6 +3,7 @@
  * overview KPIs, user management (RBAC), listing review with trust-by-design
  * anomaly flags, lead pipeline, partner & feed ops, audit trail, settings.
  */
+import { usePageMeta } from '@/lib/seo'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -40,6 +41,10 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid }[] = [
 ]
 
 export default function Admin() {
+  usePageMeta(
+    'Admin Console — Keja Platform Operations',
+    'Users, verification queue, leads, partners, audit trail and settings.',
+  )
   const { isAdmin, isLoggedIn, setAuthModalOpen } = useAuth()
   const [tab, setTab] = useState<Tab>('overview')
 

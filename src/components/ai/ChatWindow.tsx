@@ -1,3 +1,4 @@
+import SmartImg from '@/components/ui/SmartImg'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Send, Sparkles, ShieldCheck, Languages } from 'lucide-react'
@@ -130,7 +131,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
             to={`/properties/${p.id}`}
             className="card-luxe card-luxe-hover flex items-center gap-3 p-3"
           >
-            <img src={p.images[0]} alt={p.title} className="h-16 w-20 shrink-0 rounded-lg object-cover" loading="lazy" />
+            <SmartImg src={p.images[0]} alt={p.title} className="h-16 w-20 shrink-0 rounded-lg object-cover" />
             <div className="min-w-0">
               <p className="truncate text-xs font-semibold text-ink">{p.title}</p>
               <p className="mt-0.5 text-xs text-gold-700">{formatKES(p.price, { monthly: p.price < 500000 })}</p>
@@ -198,7 +199,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
       </div>
 
       {/* messages */}
-      <div className="flex-1 space-y-4 overflow-y-auto bg-cream/40 px-4 py-5 sm:px-5" style={{ minHeight: compact ? 320 : 440 }}>
+      <div className="flex-1 space-y-4 overflow-y-auto bg-cream/40 px-4 py-5 sm:px-5" style={{ minHeight: compact ? 320 : 440 }} aria-live="polite" aria-label="Conversation with Keja AI">
         {messages.map((m) => (
           <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[88%] sm:max-w-[78%] ${m.role === 'user' ? 'order-1' : ''}`}>

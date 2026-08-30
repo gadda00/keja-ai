@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import SmartImg from '@/components/ui/SmartImg'
 import { MapPin, BedDouble, Bath, Ruler, Heart, TrendingUp, Eye, Building2, Gauge } from 'lucide-react'
 import type { Property } from '@/data/properties'
 import { formatKES } from '@/lib/format'
@@ -19,10 +20,9 @@ export default function PropertyCard({ property }: { property: Property }) {
     <div className="card-luxe card-luxe-hover group relative flex flex-col overflow-hidden">
       <div className="relative h-56 overflow-hidden">
         <Link to={`/properties/${property.id}`}>
-          <img
+          <SmartImg
             src={property.images[0]}
             alt={property.title}
-            loading="lazy"
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
         </Link>
@@ -41,7 +41,8 @@ export default function PropertyCard({ property }: { property: Property }) {
         </div>
         <button
           onClick={toggleFav}
-          aria-label="Toggle favourite"
+          aria-label={isFav ? `Remove ${property.title} from favourites` : `Save ${property.title} to favourites`}
+          aria-pressed={isFav}
           className={`absolute right-3 top-3 rounded-full p-2 shadow-sm transition ${
             isFav ? 'bg-gold-500 text-white' : 'bg-white/90 text-ink-muted hover:text-gold-600'
           }`}
