@@ -1,7 +1,40 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-30T09:47:01.675Z",
+  "generatedAt": "2026-08-30T10:18:04.027Z",
   "runs": [
+    {
+      "id": "run-2026-08-30-84013",
+      "startedAt": "2026-08-30T10:18:04.027Z",
+      "ingested": 4,
+      "published": 4,
+      "queued": 0,
+      "rejected": 0,
+      "deduped": 9,
+      "sources": {
+        "scanner": 4,
+        "feeds": 0
+      },
+      "feedStatus": [
+        {
+          "feed": "diaspora-property.xml",
+          "format": "XML",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "horizon-realtors.csv",
+          "format": "CSV",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "skyline-agents.json",
+          "format": "JSON",
+          "items": 3,
+          "state": "ok"
+        }
+      ]
+    },
     {
       "id": "run-2026-08-30-21659",
       "startedAt": "2026-08-30T09:47:01.675Z",
@@ -1096,6 +1129,85 @@
       }
     },
     {
+      "id": "KJA-A0026",
+      "title": "Refined Building Plot in Runda",
+      "type": "land",
+      "purpose": [
+        "buy"
+      ],
+      "area": "Runda",
+      "county": "Nairobi",
+      "price": 53800000,
+      "sizeSqm": 5966,
+      "amenities": [
+        "Beaconed boundaries",
+        "Ready title deed",
+        "Electricity on site",
+        "Clean freehold title"
+      ],
+      "images": [
+        "/images/props/land_1.jpg"
+      ],
+      "description": "Set in the heart of Runda, this land parcel delivers 5966 sqm of comfortable living with genuine character. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Runda at this price point rarely lingers.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Esther Kimani",
+        "phone": "+254 705 118 663"
+      },
+      "availability": "available",
+      "listedAt": "2026-08-30T07:22:00.000Z",
+      "appreciationForecast": 7.7,
+      "offPlan": true,
+      "furnished": false,
+      "highlights": [
+        "KES 9k/sqm — below the Runda band",
+        "Close to Runda Mhasibu shops",
+        "Popular with young professional tenants",
+        "Off-plan with staged payment plan",
+        "1.47 acres with beaconed boundaries"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-08-30T07:22:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 6,
+        "areaPpsmBand": [
+          60000,
+          95000
+        ],
+        "areaAcreBand": [
+          15,
+          40
+        ],
+        "qualityScore": 86,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 36.5M/acre within the area band (15–40M)"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "43-word description · 1 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
       "id": "KJA-A0017",
       "title": "Charming 5-Bedroom Villa in Riverside",
       "type": "villa",
@@ -1327,6 +1439,87 @@
             "label": "Content quality screen",
             "status": "warn",
             "detail": "51-word description · 2 photos · 3 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0027",
+      "title": "Well-kept 4-Bedroom Bungalow in Karen",
+      "type": "bungalow",
+      "purpose": [
+        "buy"
+      ],
+      "area": "Karen",
+      "county": "Nairobi",
+      "price": 16100000,
+      "rentEstimate": 78000,
+      "grossYieldEstimate": 5.8,
+      "bedrooms": 4,
+      "bathrooms": 2,
+      "sizeSqm": 183,
+      "amenities": [
+        "Car porch",
+        "Mature garden",
+        "Fenced compound"
+      ],
+      "images": [
+        "/images/props/apartment_1.jpg",
+        "/images/props/interior_1.jpg"
+      ],
+      "description": "Set in the heart of Karen, this bungalow delivers 183 sqm of comfortable living with genuine character. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. A practical choice for anyone seeking a genuine Karen address without overpaying.",
+      "agency": "Horizon Realtors",
+      "agent": {
+        "name": "Dennis Otieno",
+        "phone": "+254 701 644 087"
+      },
+      "availability": "available",
+      "listedAt": "2026-08-30T04:33:00.000Z",
+      "appreciationForecast": 6.4,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 88k/sqm — above the Karen band",
+        "Close to The Hub Karen",
+        "Est. gross yield ~5.8% p.a. (area band 5.8%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-08-30T04:33:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "above",
+        "areaYieldBand": 5.8,
+        "areaPpsmBand": [
+          55000,
+          90000
+        ],
+        "areaAcreBand": [
+          18,
+          45
+        ],
+        "qualityScore": 87,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 88k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "43-word description · 2 photos · 3 amenities"
           },
           {
             "label": "Source screening",
@@ -1745,6 +1938,89 @@
       }
     },
     {
+      "id": "KJA-A0025",
+      "title": "Bright 5-Bedroom Family Villa in Kilimani",
+      "type": "villa",
+      "purpose": [
+        "buy",
+        "invest"
+      ],
+      "area": "Kilimani",
+      "county": "Nairobi",
+      "price": 26750000,
+      "rentEstimate": 183000,
+      "grossYieldEstimate": 8.2,
+      "bedrooms": 5,
+      "bathrooms": 3,
+      "sizeSqm": 275,
+      "amenities": [
+        "Staff quarters",
+        "Solar backup",
+        "Swimming pool",
+        "Gated community"
+      ],
+      "images": [
+        "/images/props/villa_1.jpg",
+        "/images/props/interior_0.jpg"
+      ],
+      "description": "A well-presented villa in Kilimani, Nairobi, offering 275 sqm of bright, efficiently planned space. The property sits on a mature, well-kept compound with room for family life and entertaining. The Kilimani market band and 8.2% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Prestige Homes KE",
+      "agent": {
+        "name": "Alice Mumbi",
+        "phone": "+254 726 900 451"
+      },
+      "availability": "available",
+      "listedAt": "2026-08-30T02:21:00.000Z",
+      "appreciationForecast": 8,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 97k/sqm — below the Kilimani band",
+        "Close to Prestige Plaza",
+        "Est. gross yield ~8.2% p.a. (area band 8.2%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-08-30T02:21:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 8.2,
+        "areaPpsmBand": [
+          95000,
+          145000
+        ],
+        "areaAcreBand": [
+          80,
+          160
+        ],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 97k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "45-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
       "id": "KJA-A0023",
       "title": "Contemporary 3-Bedroom Cluster Home in Riverside",
       "type": "townhouse",
@@ -1911,6 +2187,90 @@
       }
     },
     {
+      "id": "KJA-A0024",
+      "title": "Elegant 1-Bedroom City Apartment in Riverside",
+      "type": "apartment",
+      "purpose": [
+        "buy",
+        "invest"
+      ],
+      "area": "Riverside",
+      "county": "Nairobi",
+      "price": 4850000,
+      "rentEstimate": 29000,
+      "grossYieldEstimate": 7.2,
+      "bedrooms": 1,
+      "bathrooms": 2,
+      "sizeSqm": 48,
+      "amenities": [
+        "Fibre internet ready",
+        "24/7 security",
+        "Gym",
+        "Lift access"
+      ],
+      "images": [
+        "/images/props/apartment_0.jpg",
+        "/images/props/apartment_2.jpg",
+        "/images/props/apartment_1.jpg"
+      ],
+      "description": "Set in the heart of Riverside, this apartment delivers 48 sqm of comfortable living with genuine character. Interiors are clean and neutral, ready for immediate occupation or a light personal refresh. Benchmarked against comparable stock in Riverside, this listing offers defensible entry pricing for an income-focused buyer.",
+      "agency": "Coastal Living Estates",
+      "agent": {
+        "name": "Halima Yusuf",
+        "phone": "+254 718 337 540"
+      },
+      "availability": "available",
+      "listedAt": "2026-08-30T01:42:00.000Z",
+      "appreciationForecast": 7.1,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 101k/sqm — below the Riverside band",
+        "Close to Chiromo Lane",
+        "Est. gross yield ~7.2% p.a. (area band 7.2%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-08-30T01:42:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 7.2,
+        "areaPpsmBand": [
+          95000,
+          140000
+        ],
+        "areaAcreBand": [
+          85,
+          170
+        ],
+        "qualityScore": 92,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 101k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "47-word description · 3 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
       "id": "KJA-A0019",
       "title": "Bright 5-Bedroom Cluster Home in Madaraka",
       "type": "townhouse",
@@ -1995,5 +2355,11 @@
     }
   ],
   "pending": [],
+  "seenSignatures": [
+    "apartment|Riverside|1br|5",
+    "villa|Kilimani|5br|27",
+    "land|Runda|0br|54",
+    "bungalow|Karen|4br|16"
+  ],
   "rejected": []
 }
