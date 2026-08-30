@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, X, ShieldCheck, Home, LayoutDashboard, LogOut, Settings2, UserCircle2, Building2 } from 'lucide-react'
 import { SITE } from '@/config'
+import NotificationBell from '@/components/layout/NotificationBell'
 import { useAuth, initials } from '@/lib/auth'
 
 const NAV = [
@@ -196,6 +197,7 @@ export default function Navbar() {
               Sign in
             </button>
           )}
+          <NotificationBell />
           <Link to="/ask" className="btn-gold !px-4 !py-2">
             Ask Keja
           </Link>

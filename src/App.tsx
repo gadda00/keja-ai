@@ -5,6 +5,7 @@ import Footer from '@/components/layout/Footer'
 import WhatsAppFloat from '@/components/layout/WhatsAppFloat'
 import AuthModal from '@/components/auth/AuthModal'
 import ErrorBoundary from '@/components/layout/ErrorBoundary'
+import CompareBar from '@/components/property/CompareBar'
 import Home from '@/pages/Home'
 import Properties from '@/pages/Properties'
 
@@ -24,6 +25,7 @@ const Dashboard = lazy(() => import('@/pages/Dashboard'))
 const Tokenize = lazy(() => import('@/pages/Tokenize'))
 const Admin = lazy(() => import('@/pages/Admin'))
 const Partners = lazy(() => import('@/pages/Partners'))
+const Compare = lazy(() => import('@/pages/Compare'))
 const NotFound = lazy(() => import('@/pages/NotFound'))
 
 function ScrollManager() {
@@ -84,6 +86,7 @@ export default function App() {
               <Route path="/admin" element={<Admin />} />
               <Route path="/ecosystem" element={<Ecosystem />} />
               <Route path="/partners" element={<Partners />} />
+              <Route path="/compare" element={<Compare />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
@@ -91,6 +94,7 @@ export default function App() {
       </main>
       <Footer />
       <WhatsAppFloat />
+      <CompareBar />
       <AuthModal />
     </div>
   )

@@ -1,10 +1,12 @@
 import { usePageMeta } from '@/lib/seo'
 import { useMemo, useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Search, SlidersHorizontal, ShieldCheck, X, MapPin } from 'lucide-react'
+import { Search, SlidersHorizontal, ShieldCheck, X, MapPin, LayoutGrid, Map as MapIcon, BookmarkPlus, BellRing, Trash2 } from 'lucide-react'
 import PropertyCard from '@/components/property/PropertyCard'
+import MapView from '@/components/property/MapView'
 import { AREAS, type Property } from '@/data/properties'
 import { useAllProperties } from '@/lib/inventory'
+import { useSavedSearches, useAlertSweep } from '@/lib/searchStore'
 
 const TYPES = ['apartment', 'villa', 'townhouse', 'bungalow', 'land', 'commercial'] as const
 const PURPOSES = [
@@ -31,6 +33,8 @@ export default function Properties() {
   const [verifiedOnly, setVerifiedOnly] = useState(true)
   const [sort, setSort] = useState<SortKey>('trust')
   const [showFilters, setShowFilters] = useState(false)
+  const [view, setView] = useState<'list' | 'map'>('list')
+  const { searches, save, remove, toggleAlerts } = useSavedSearches()
 
   useEffect(() => {
     const q = params.get('q')
@@ -41,6 +45,7 @@ export default function Properties() {
 
   // merged inventory: approved partner/user submissions + seed stock (see lib/inventory)
   const allProperties: Property[] = useAllProperties()
+  useAlertSweep(allProperties)
 
   const filtered = useMemo(() => {
     let list = [...allProperties]
@@ -144,6 +149,36 @@ export default function Properties() {
               <SlidersHorizontal className="h-4 w-4" />
               Filters
             </button>
+            <button
+              onClick={() =>
+                save(
+                  { q: query || undefined, type, purpose, area, maxPrice, minBeds },
+                  [query || 'All areas', type !== 'all' ? type : '', purpose !== 'all' ? purpose : ''].filter(Boolean).join(' · ') || 'All properties',
+                )
+              }
+              className="inline-flex items-center gap-2 rounded-xl border border-gold-100 px-4 py-2.5 text-sm font-semibold text-ink-soft transition hover:border-gold-300 hover:text-gold-700"
+            >
+              <BookmarkPlus className="h-4 w-4" />
+              Save search
+            </button>
+            <div className="flex items-center gap-1 rounded-xl bg-gold-50 p-1" role="group" aria-label="Result view">
+              <button
+                onClick={() => setView('list')}
+                aria-pressed={view === 'list'}
+                aria-label="List view"
+                className={`rounded-lg p-2 transition ${view === 'list' ? 'bg-gold-gradient text-white shadow-gold-sm' : 'text-ink-muted hover:text-gold-700'}`}
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setView('map')}
+                aria-pressed={view === 'map'}
+                aria-label="Map view"
+                className={`rounded-lg p-2 transition ${view === 'map' ? 'bg-gold-gradient text-white shadow-gold-sm' : 'text-ink-muted hover:text-gold-700'}`}
+              >
+                <MapIcon className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
           {showFilters && (
@@ -213,6 +248,41 @@ export default function Properties() {
           )}
         </div>
 
+        {/* saved searches */}
+        {searches.length > 0 && (
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">Saved searches</span>
+            {searches.map((s) => (
+              <span key={s.id} className="chip group">
+                <button
+                  onClick={() => {
+                    setQuery(s.filters.q ?? '')
+                    setType(s.filters.type ?? 'all')
+                    setPurpose(s.filters.purpose ?? 'all')
+                    setArea(s.filters.area ?? 'all')
+                    if (s.filters.maxPrice != null) setMaxPrice(s.filters.maxPrice)
+                    if (s.filters.minBeds != null) setMinBeds(s.filters.minBeds)
+                  }}
+                  className="font-semibold"
+                >
+                  {s.label}
+                </button>
+                <button
+                  onClick={() => toggleAlerts(s.id)}
+                  aria-label={s.alerts ? `Disable alerts for ${s.label}` : `Enable alerts for ${s.label}`}
+                  aria-pressed={s.alerts}
+                  className={s.alerts ? 'text-gold-700' : 'text-ink-muted/50'}
+                >
+                  <BellRing className="h-3 w-3" />
+                </button>
+                <button onClick={() => remove(s.id)} aria-label={`Delete saved search ${s.label}`} className="text-ink-muted/50 hover:text-red-600">
+                  <Trash2 className="h-3 w-3" />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+
         {/* results */}
         <div className="mt-6 flex items-center justify-between">
           <p className="text-sm text-ink-muted">
@@ -238,6 +308,21 @@ export default function Properties() {
             <button onClick={clearAll} className="btn-outline mt-6">
               Clear all filters
             </button>
+          </div>
+        ) : view === 'map' ? (
+          <div className="mt-6">
+            <MapView
+              properties={filtered}
+              onSelectArea={(a) => {
+                setArea(a)
+                setView('list')
+              }}
+            />
+            <div className="mt-6 grid gap-6 pb-4 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.slice(0, 6).map((p) => (
+                <PropertyCard key={p.id} property={p} />
+              ))}
+            </div>
           </div>
         ) : (
           <div className="mt-6 grid gap-6 pb-4 sm:grid-cols-2 lg:grid-cols-3">

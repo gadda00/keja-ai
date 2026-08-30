@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import SmartImg from '@/components/ui/SmartImg'
-import { MapPin, BedDouble, Bath, Ruler, Heart, TrendingUp, Eye, Building2, Gauge } from 'lucide-react'
+import { MapPin, BedDouble, Bath, Ruler, Heart, TrendingUp, Eye, Building2, Gauge, GitCompareArrows } from 'lucide-react'
 import type { Property } from '@/data/properties'
 import { formatKES } from '@/lib/format'
 import { investmentScore, scoreTone } from '@/lib/investmentScore'
@@ -9,11 +9,17 @@ import { useStore, KEYS } from '@/lib/store'
 
 export default function PropertyCard({ property }: { property: Property }) {
   const [favorites, setFavorites] = useStore<string[]>(KEYS.favorites, [])
+  const [compare, setCompare] = useStore<string[]>(KEYS.compare, [])
   const isFav = favorites.includes(property.id)
   const isRent = property.price < 500000
+  const inCompare = compare.includes(property.id)
   const score = investmentScore(property)
   const toggleFav = () => {
     setFavorites(isFav ? favorites.filter((f) => f !== property.id) : [...favorites, property.id])
+  }
+  const toggleCompare = () => {
+    if (inCompare) setCompare(compare.filter((c) => c !== property.id))
+    else setCompare([...compare, property.id].slice(-4))
   }
 
   return (
@@ -48,6 +54,16 @@ export default function PropertyCard({ property }: { property: Property }) {
           }`}
         >
           <Heart className="h-4 w-4" fill={isFav ? 'currentColor' : 'none'} />
+        </button>
+        <button
+          onClick={toggleCompare}
+          aria-label={inCompare ? `Remove ${property.title} from comparison` : `Add ${property.title} to comparison`}
+          aria-pressed={inCompare}
+          className={`absolute right-14 top-3 rounded-full p-2 shadow-sm transition ${
+            inCompare ? 'bg-ink text-gold-300' : 'bg-white/90 text-ink-muted hover:text-gold-700'
+          }`}
+        >
+          <GitCompareArrows className="h-4 w-4" />
         </button>
         <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-medium text-ink-muted">
           <Eye className="h-3 w-3" /> {property.views}

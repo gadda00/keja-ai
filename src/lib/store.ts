@@ -80,6 +80,8 @@ export const KEYS = {
   language: 'language',
   viewed: 'recently-viewed',
   searches: 'saved-searches',
+  compare: 'compare-list',
+  notifications: 'notifications',
 }
 
 export const seedLeads: Lead[] = [
