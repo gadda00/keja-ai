@@ -18,8 +18,8 @@ export default function ArticleDetail() {
             author: 'Keja.ai Insights Desk',
           }),
           breadcrumbJsonLd([
-            { name: 'Home', path: '/keja-ai/' },
-            { name: 'Insights', path: '/keja-ai/insights' },
+            { name: 'Home', path: '/' },
+            { name: 'Insights', path: '/insights' },
             { name: article.title, path: `/keja-ai/insights/${article.slug}` },
           ]),
         ]

@@ -2,7 +2,7 @@
  * Minimal markdown renderer for Keja AI responses:
  * supports **bold**, `inline code`, bullets (• / - / numbers), tables (| a | b |), and line breaks.
  */
-import { Fragment } from 'react';
+import { Fragment, type ReactNode } from 'react';
 
 function renderInline(text: string, keyPrefix: string) {
   const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
@@ -30,7 +30,7 @@ function renderInline(text: string, keyPrefix: string) {
 
 export default function Markdown({ content }: { content: string }) {
   const lines = content.split('\n');
-  const blocks: React.ReactNode[] = [];
+  const blocks: ReactNode[] = [];
   let tableRows: string[][] = [];
 
   const flushTable = (key: string) => {

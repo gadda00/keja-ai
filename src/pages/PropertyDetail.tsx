@@ -62,8 +62,8 @@ export default function PropertyDetail() {
           monthly: isRentalPrice(property.price),
         }),
         breadcrumbJsonLd([
-          { name: 'Home', path: '/keja-ai/' },
-          { name: 'Properties', path: '/keja-ai/properties' },
+          { name: 'Home', path: '/' },
+          { name: 'Properties', path: '/properties' },
           { name: property.title, path: `/keja-ai/properties/${property.id}` },
         ]),
       ]

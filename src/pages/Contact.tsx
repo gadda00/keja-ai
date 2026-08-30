@@ -1,5 +1,5 @@
 import { Bot, CheckCircle2, Mail, MapPin, MessageCircle, Phone, Send } from 'lucide-react';
-import { useState } from 'react';
+import { type FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { SITE, whatsappLink } from '@/config';
@@ -17,7 +17,7 @@ export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', interest: '', message: '' });
   const [sent, setSent] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = (e: FormEvent) => {
     e.preventDefault();
     const lead: Lead = {
       id: `L-${Date.now()}`,

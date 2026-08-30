@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { asset, SITE, SITE_URL } from '@/config';
 
@@ -56,6 +57,7 @@ export function usePageMeta(
   description?: string,
   options?: Omit<PageMetaOptions, 'title' | 'description'>
 ) {
+  const location = useLocation();
   useEffect(() => {
     const full = title.includes(SITE.name) ? title : `${title} — ${SITE.name}`;
     document.title = full;
@@ -77,14 +79,15 @@ export function usePageMeta(
     }
     if (options?.robots) upsertMeta('name', 'robots', options.robots);
     else document.head.querySelector<HTMLMetaElement>('meta[name="robots"]')?.remove();
-    // Canonical must match the sitemap/JSON-LD origin (SITE_URL), not
-    // window.location — otherwise dual hosts (Pages + Netlify) emit
-    // conflicting signals to crawlers.
-    const canonical = `${SITE_URL}${window.location.pathname}`;
+    // Canonical must match the sitemap/JSON-LD origin (SITE_URL) AND carry the
+    // deployment base path — building it from the router's base-stripped
+    // pathname makes it correct on every host (Pages, Netlify mirror, local),
+    // always pointing at the canonical GitHub Pages URL.
+    const canonical = `${SITE_URL}${import.meta.env.BASE_URL}${location.pathname.replace(/^\//, '')}`;
     upsertLink('canonical', canonical);
     upsertMeta('property', 'og:url', canonical);
     setRouteJsonLd(options?.jsonLd ?? null);
-  }, [title, description, options?.image, options?.robots, options?.jsonLd]);
+  }, [title, description, options?.image, options?.robots, options?.jsonLd, location.pathname]);
 }
 
 /* ------------------------- structured data builders ------------------------ */
@@ -97,7 +100,7 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
       '@type': 'ListItem',
       position: i + 1,
       name: it.name,
-      item: `${SITE_URL}${it.path}`,
+      item: `${SITE_URL}${import.meta.env.BASE_URL}${it.path.replace(/^\//, '')}`,
     })),
   };
 }

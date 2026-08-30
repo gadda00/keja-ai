@@ -27,7 +27,7 @@ import {
   useSubmissions,
   useUserListings,
 } from '@/lib/adminStore';
-import { logAudit } from '@/lib/adminStore';
+import { logAudit, recordListingSignature } from '@/lib/adminStore';
 import { useAuth } from '@/lib/auth';
 import { exportCSV } from '@/lib/csv';
 import { useFocusTrap } from '@/lib/useFocusTrap';
@@ -198,12 +198,20 @@ export default function AdminListings() {
     setSubmissions(next);
     if (status === 'approved') {
       // idempotent publish: never duplicate a listing already in the marketplace
-      if (!userListings.some((u) => u.id === s.id || u.title === s.title)) {
+      if (!userListings.some((u) => u.submissionId === s.id || u.title === s.title)) {
         setUserListings([submissionToListing(s), ...userListings]);
       }
+      // feed the duplicate-detection set from the admin path too — the
+      // signature graveyard previously only learned from wizard submissions
+      recordListingSignature({
+        title: s.title,
+        area: s.area,
+        price: s.price,
+        bedrooms: s.bedrooms,
+      });
     } else if (status === 'rejected' || status === 'flagged') {
       // pull the listing out of the marketplace when review turns negative
-      setUserListings(userListings.filter((u) => u.id !== s.id && u.title !== s.title));
+      setUserListings(userListings.filter((u) => u.submissionId !== s.id && u.title !== s.title));
     }
     logAudit({
       actor: user?.name ?? 'admin',

@@ -37,8 +37,11 @@ jobs:
       - name: Unit tests (finance, scoring, search engines)
         run: npm test
 
-      - name: Lint (blocking quality gate)
+      - name: Lint (oxlint fast pass)
         run: npx oxlint src
+
+      - name: Lint (ESLint flat config, blocking)
+        run: npm run lint:eslint
 
       - name: Generate sitemap (properties + articles + routes)
         run: node scripts/generate-sitemap.mjs

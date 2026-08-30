@@ -61,7 +61,7 @@ jobs:
           git add src/data/auto-listings.json
           git commit -m "chore(autopilot): ingest new listings $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
-          echo "Committed — deploy-pages.yml runs on workflow_run completion."
+          echo "Committed — the gated deploy job below (same workflow) ships it."
 
       - name: Run summary
         run: |
@@ -116,8 +116,11 @@ jobs:
       - name: Unit tests
         run: npm test
 
-      - name: Lint (blocking quality gate)
+      - name: Lint (oxlint fast pass)
         run: npx oxlint src
+
+      - name: Lint (ESLint flat config, blocking)
+        run: npm run lint:eslint
 
       - name: Generate sitemap (properties + articles + routes)
         run: node scripts/generate-sitemap.mjs

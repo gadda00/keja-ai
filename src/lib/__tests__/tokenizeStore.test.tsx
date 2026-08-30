@@ -62,6 +62,41 @@ describe('tokenizeStore buy/sell accounting', () => {
     expect(after.tokensSold).toBe(Math.min(target.totalTokens, before + 10));
   });
 
+  it('second purchase still sees correct availability (double-count regression)', () => {
+    // Pins the soldDelta fix: the OLD code recomputed sold = tokensSold +
+    // soldDelta inside buyTokens even though the properties memo already
+    // folds the delta in — from the SECOND purchase on, availability was
+    // understated by everything the investor already owned.
+    const r = getStore();
+    const target = openOffering(r);
+    const seed = target.tokensSold;
+    const initialAvailable = target.totalTokens - seed;
+
+    act(() => {
+      r.current.completeKyc({
+        email: 't@keja.ai',
+        fullName: 'Test Investor',
+        phone: '+254700000000',
+        country: 'Kenya',
+        idType: 'PASSPORT',
+        idNumber: 'A123456',
+        sourceOfFunds: 'salary',
+      });
+    });
+
+    // buy #1: takes 10 off the market
+    act(() => {
+      r.current.buyTokens(target.id, 10);
+    });
+    // buy #2: the REMAINING supply must still be purchasable in one order —
+    // with the double-count bug this throws "Only N-10 tokens remain"
+    expect(() => act(() => r.current.buyTokens(target.id, initialAvailable - 10))).not.toThrow();
+
+    // and the offering reports fully funded exactly once
+    const after = r.current.properties.find((p) => p.id === target.id)!;
+    expect(after.tokensSold).toBe(target.totalTokens);
+  });
+
   it('rejects orders exceeding the remaining supply exactly at the cap', () => {
     const r = getStore();
     const target = openOffering(r);

@@ -513,6 +513,8 @@ export function runAnomalyDetection(
 
 export interface UserListing {
   id: string;
+  /** the submission that produced this listing (publish/rollback idempotence) */
+  submissionId?: string;
   title: string;
   type: string;
   purpose: string[];
@@ -539,6 +541,7 @@ export const useUserListings = () => useStore<UserListing[]>('user-listings', []
 
 export function submissionToListing(s: ListingSubmission): UserListing {
   return {
+    submissionId: s.id,
     // Collision-safe id: the old `slice(-4)` scheme collided whenever two
     // submissions shared trailing digits — use a random 6-hex suffix instead.
     id: `KJA-U${

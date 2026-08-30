@@ -4,7 +4,8 @@ export const SITE = {
   tagline: 'Intelligent Real Estate. Verified Trust.',
   secondaryTagline: 'Smarter Investments.',
   parent: 'Chacadom Investments',
-  whatsapp: '254700123456',
+  // digits-only international format; overridable via VITE_WHATSAPP
+  whatsapp: import.meta.env.VITE_WHATSAPP ?? '254700123456',
   email: 'hello@keja.ai',
   phone: '+254 700 123 456',
   offices: 'Westlands, Nairobi · Kenya',

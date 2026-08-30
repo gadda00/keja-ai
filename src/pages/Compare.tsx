@@ -12,7 +12,7 @@ import {
   TrendingUp,
   X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
 import SmartImg from '@/components/ui/SmartImg';
@@ -59,7 +59,7 @@ export default function Compare() {
     if (params.get('ids')) setParams(next.length ? { ids: next.join(',') } : {}, { replace: true });
   };
 
-  const rows: { label: string; render: (p: (typeof items)[number]) => React.ReactNode }[] = [
+  const rows: { label: string; render: (p: (typeof items)[number]) => ReactNode }[] = [
     {
       label: 'Price',
       render: (p) => (

@@ -15,7 +15,16 @@
  * Moving to the Phase-2 backend, the same interface is served by real APIs —
  * Google credential JWTs must then be verified server-side.
  */
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  type FC,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import { logAudit } from '@/lib/adminStore';
 import { store } from '@/lib/store';
@@ -258,7 +267,7 @@ const touchSession = (s: Session): Session => {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [users, setUsers] = useState<UserAccount[]>(() => loadUsers());
   const [session, setSession] = useState<Session | null>(() => readSession());
   const [loading, setLoading] = useState(false);

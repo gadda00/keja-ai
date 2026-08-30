@@ -228,6 +228,13 @@ export default function ListProperty() {
       price: Number(form.price),
       bedrooms: Number(form.bedrooms) || undefined,
     });
+    // clear the persisted draft: the submission is complete, and a stale
+    // draft reloading on next visit would pre-flag itself as a duplicate
+    try {
+      localStorage.removeItem('keja:sell-draft');
+    } catch {
+      /* storage unavailable */
+    }
     logAudit({
       actor: user?.name ?? form.name,
       actorEmail: user?.email ?? form.email,
