@@ -26,7 +26,7 @@ export default function InvestmentCalculator() {
   const [rentGrowth, setRentGrowth] = useState(5)
   const [horizon, setHorizon] = useState<5 | 10>(10)
   const [usdMode, setUsdMode] = useState(false)
-  const fx = FX_KES_PER_USD
+  const fx = FX_KES_PER_USD // indicative rate — confirm with your bank at transaction time
 
   // mortgage + affordability state
   const [depositPct, setDepositPct] = useState(20)

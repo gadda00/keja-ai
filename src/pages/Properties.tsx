@@ -154,6 +154,7 @@ export default function Properties() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search area, type, ID (e.g. Kilimani, villa, KJA-001)..."
+                aria-label="Search properties by area, type or listing ID"
                 className="input-luxe !pl-10"
               />
             </div>
@@ -161,6 +162,7 @@ export default function Properties() {
               {PURPOSES.map((p) => (
                 <button
                   key={p.value}
+                  aria-pressed={purpose === p.value}
                   onClick={() => {
                     setPurpose(p.value)
                     setMaxPrice(p.value === 'rent' ? RENT_CEILING : PRICE_CEILING)

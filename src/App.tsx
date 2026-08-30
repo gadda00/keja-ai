@@ -8,6 +8,7 @@ import ErrorBoundary from '@/components/layout/ErrorBoundary'
 import CompareBar from '@/components/property/CompareBar'
 import Home from '@/pages/Home'
 import Properties from '@/pages/Properties'
+import { MotionConfig } from 'framer-motion'
 
 // Route-level code splitting — heavy pages load on demand
 const PropertyDetail = lazy(() => import('@/pages/PropertyDetail'))
@@ -70,7 +71,8 @@ export default function App() {
       <main id="main-content" className="flex-1 pt-16">
         <ErrorBoundary>
           <Suspense fallback={<LazyFallback />}>
-            <Routes>
+            <MotionConfig reducedMotion="user">
+          <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/properties" element={<Properties />} />
               <Route path="/properties/:id" element={<PropertyDetail />} />
@@ -93,6 +95,7 @@ export default function App() {
               <Route path="/legal" element={<TermsPrivacy />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+        </MotionConfig>
           </Suspense>
         </ErrorBoundary>
       </main>

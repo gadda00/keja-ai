@@ -1,7 +1,7 @@
 /** Format Kenyan Shillings: KES 14.5M, KES 850,000, KES 65,000/mo */
 export function formatKES(amount: number, opts?: { monthly?: boolean; compact?: boolean }): string {
   const suffix = opts?.monthly ? '/mo' : ''
-  if (amount >= 1_000_000_000) return `KES ${(amount / 1_000_000_000).toFixed(2)}B${suffix}`
+  if (amount >= 1_000_000_000) return `KES ${(amount / 1_000_000_000).toFixed(1)}B${suffix}`
   if (amount >= 1_000_000 && opts?.compact !== false) {
     const m = amount / 1_000_000
     return `KES ${m % 1 === 0 ? m.toFixed(0) : m.toFixed(1)}M${suffix}`
