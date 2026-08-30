@@ -1,0 +1,2 @@
+# lint-staged runs eslint --fix + prettier --write on staged files (see package.json)
+npx lint-staged

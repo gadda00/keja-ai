@@ -9,118 +9,119 @@
  * a static host; every collection is designed to map 1:1 onto an API table
  * in the Phase-2 backend migration.
  */
-import { useStore, store } from '@/lib/store'
+import { store, useStore } from '@/lib/store';
 
 /* ------------------------------------------------------------------ */
 /* Types                                                               */
 /* ------------------------------------------------------------------ */
 
 export interface AuditEntry {
-  id: string
-  actor: string
-  actorEmail: string
-  action: string
-  target: string
-  detail: string
-  severity: 'info' | 'warning' | 'critical'
-  ts: string
+  id: string;
+  actor: string;
+  actorEmail: string;
+  action: string;
+  target: string;
+  detail: string;
+  severity: 'info' | 'warning' | 'critical';
+  ts: string;
 }
 
-export type SubmissionStatus = 'pending' | 'approved' | 'rejected' | 'flagged'
+export type SubmissionStatus = 'pending' | 'approved' | 'rejected' | 'flagged';
 
 export interface ListingSubmission {
-  id: string
-  submitterName: string
-  submitterEmail: string
-  submitterPhone?: string
-  agency?: string
-  title: string
-  type: string
-  purpose: string[]
-  area: string
-  county: string
-  price: number
-  rentEstimate?: number
-  bedrooms?: number
-  bathrooms?: number
-  sizeSqm: number
-  description: string
-  amenities: string[]
-  images: string[]
-  source: 'self-service' | 'partner' | 'feed' | 'wizard'
-  status: SubmissionStatus
-  flags: string[] // trust-by-design anomaly detection
-  completeness: number // 0–100
-  createdAt: string
-  reviewedAt?: string
-  reviewedBy?: string
-  reviewNote?: string
+  id: string;
+  submitterName: string;
+  submitterEmail: string;
+  submitterPhone?: string;
+  agency?: string;
+  title: string;
+  type: string;
+  purpose: string[];
+  area: string;
+  county: string;
+  price: number;
+  rentEstimate?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  sizeSqm: number;
+  description: string;
+  amenities: string[];
+  images: string[];
+  source: 'self-service' | 'partner' | 'feed' | 'wizard';
+  status: SubmissionStatus;
+  flags: string[]; // trust-by-design anomaly detection
+  completeness: number; // 0–100
+  createdAt: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  reviewNote?: string;
 }
 
-export type PartnerType = 'agency' | 'developer' | 'landlord' | 'portal' | 'data-partner' | 'diaspora-agent'
+export type PartnerType =
+  'agency' | 'developer' | 'landlord' | 'portal' | 'data-partner' | 'diaspora-agent';
 
 export interface PartnerApplication {
-  id: string
-  orgName: string
-  contactName: string
-  email: string
-  phone?: string
-  type: PartnerType
-  market: string
-  listingsCount: number
-  message?: string
-  status: 'pending' | 'approved' | 'rejected'
-  createdAt: string
+  id: string;
+  orgName: string;
+  contactName: string;
+  email: string;
+  phone?: string;
+  type: PartnerType;
+  market: string;
+  listingsCount: number;
+  message?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: string;
 }
 
-export type FeedType = 'api' | 'csv' | 'portal-syndication' | 'manual' | 'whatsapp'
+export type FeedType = 'api' | 'csv' | 'portal-syndication' | 'manual' | 'whatsapp';
 
 export interface FeedConnection {
-  id: string
-  name: string
-  type: FeedType
-  url?: string
-  market: string
-  intervalHours: number
-  lastSync: string
-  status: 'healthy' | 'degraded' | 'paused' | 'error'
-  listingsImported: number
-  duplicatesBlocked: number
+  id: string;
+  name: string;
+  type: FeedType;
+  url?: string;
+  market: string;
+  intervalHours: number;
+  lastSync: string;
+  status: 'healthy' | 'degraded' | 'paused' | 'error';
+  listingsImported: number;
+  duplicatesBlocked: number;
 }
 
 export interface PlatformSettings {
-  autoApproveThreshold: number // completeness above which submissions auto-approve
-  requirePhoneVerification: boolean
-  enableGlobalFeeds: boolean
-  maintenanceMode: boolean
-  listingReviewSLA: number // hours
+  autoApproveThreshold: number; // completeness above which submissions auto-approve
+  requirePhoneVerification: boolean;
+  enableGlobalFeeds: boolean;
+  maintenanceMode: boolean;
+  listingReviewSLA: number; // hours
 }
 
 /* ------------------------------------------------------------------ */
 /* Audit trail                                                         */
 /* ------------------------------------------------------------------ */
 
-const AUDIT_KEY = 'audit'
-const MAX_AUDIT = 500
+const AUDIT_KEY = 'audit';
+const MAX_AUDIT = 500;
 
-const uid = () => Math.random().toString(36).slice(2, 10)
+const uid = () => Math.random().toString(36).slice(2, 10);
 
 export function logAudit(e: Omit<AuditEntry, 'id' | 'ts'>) {
-  const entries = store.get<AuditEntry[]>(AUDIT_KEY, [])
-  const entry: AuditEntry = { ...e, id: uid(), ts: new Date().toISOString() }
-  entries.unshift(entry)
-  store.set(AUDIT_KEY, entries.slice(0, MAX_AUDIT))
-  window.dispatchEvent(new CustomEvent('keja-store-change', { detail: AUDIT_KEY }))
+  const entries = store.get<AuditEntry[]>(AUDIT_KEY, []);
+  const entry: AuditEntry = { ...e, id: uid(), ts: new Date().toISOString() };
+  entries.unshift(entry);
+  store.set(AUDIT_KEY, entries.slice(0, MAX_AUDIT));
+  window.dispatchEvent(new CustomEvent('keja-store-change', { detail: AUDIT_KEY }));
 }
 
-export const useAuditLog = () => useStore<AuditEntry[]>(AUDIT_KEY, [])
+export const useAuditLog = () => useStore<AuditEntry[]>(AUDIT_KEY, []);
 
 /* ------------------------------------------------------------------ */
 /* Seeds — demo data so every workflow is explorable from first load   */
 /* ------------------------------------------------------------------ */
 
-const now = Date.now()
-const iso = (h: number) => new Date(now - h * 3600_000).toISOString()
+const now = Date.now();
+const iso = (h: number) => new Date(now - h * 3600_000).toISOString();
 
 const seedSubmissions: ListingSubmission[] = [
   {
@@ -216,7 +217,13 @@ const seedSubmissions: ListingSubmission[] = [
     images: [],
     source: 'self-service',
     status: 'flagged',
-    flags: ['suspicious-price', 'duplicate-suspected', 'thin-description', 'no-images', 'off-platform-contact'],
+    flags: [
+      'suspicious-price',
+      'duplicate-suspected',
+      'thin-description',
+      'no-images',
+      'off-platform-contact',
+    ],
     completeness: 22,
     createdAt: iso(40),
     reviewedAt: iso(39),
@@ -247,7 +254,7 @@ const seedSubmissions: ListingSubmission[] = [
     completeness: 84,
     createdAt: iso(1),
   },
-]
+];
 
 const seedPartners: PartnerApplication[] = [
   {
@@ -302,7 +309,7 @@ const seedPartners: PartnerApplication[] = [
     status: 'pending',
     createdAt: iso(50),
   },
-]
+];
 
 const seedFeeds: FeedConnection[] = [
   {
@@ -364,7 +371,7 @@ const seedFeeds: FeedConnection[] = [
     listingsImported: 0,
     duplicatesBlocked: 0,
   },
-]
+];
 
 const DEFAULT_SETTINGS: PlatformSettings = {
   autoApproveThreshold: 95,
@@ -372,29 +379,27 @@ const DEFAULT_SETTINGS: PlatformSettings = {
   enableGlobalFeeds: true,
   maintenanceMode: false,
   listingReviewSLA: 24,
-}
+};
 
 /* ------------------------------------------------------------------ */
 /* Hooks                                                               */
 /* ------------------------------------------------------------------ */
 
-export const useSubmissions = () =>
-  useStore<ListingSubmission[]>('submissions', seedSubmissions)
+export const useSubmissions = () => useStore<ListingSubmission[]>('submissions', seedSubmissions);
 
-export const usePartners = () => useStore<PartnerApplication[]>('partners', seedPartners)
+export const usePartners = () => useStore<PartnerApplication[]>('partners', seedPartners);
 
-export const useFeeds = () => useStore<FeedConnection[]>('feeds', seedFeeds)
+export const useFeeds = () => useStore<FeedConnection[]>('feeds', seedFeeds);
 
-export const useSettings = () =>
-  useStore<PlatformSettings>('settings', DEFAULT_SETTINGS)
+export const useSettings = () => useStore<PlatformSettings>('settings', DEFAULT_SETTINGS);
 
 /* ------------------------------------------------------------------ */
 /* Trust-by-Design anomaly detection (blueprint Ch.8)                  */
 /* ------------------------------------------------------------------ */
 
 export interface AnomalyResult {
-  flags: string[]
-  completeness: number
+  flags: string[];
+  completeness: number;
 }
 
 const MARKET_RATE_PER_SQM: Record<string, [number, number]> = {
@@ -407,71 +412,99 @@ const MARKET_RATE_PER_SQM: Record<string, [number, number]> = {
   'Upper Hill': [120000, 300000],
   Diani: [2000, 9000], // land
   default: [40000, 260000],
+};
+
+/**
+ * Pure anomaly detection — no side effects. Pass `seenSignatures` to
+ * include the duplicate heuristic in read-only mode (safe inside useMemo /
+ * render). Signatures are only *recorded* via `recordListingSignature()` at
+ * submit time, so a user's own live draft can never flag itself.
+ */
+export function getListingSignatures(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem('keja:listing-sigs') ?? '[]') as string[];
+  } catch {
+    return [];
+  }
 }
 
-export function runAnomalyDetection(s: {
-  title: string
-  area: string
-  county: string
-  price: number
-  sizeSqm: number
-  bedrooms?: number
-  description: string
-  images: string[]
-  amenities: string[]
-}): AnomalyResult {
-  const flags: string[] = []
-  let completeness = 0
+export function recordListingSignature(s: {
+  title: string;
+  area: string;
+  price: number;
+  bedrooms?: number;
+}): void {
+  if (!(s.title && s.area && s.price > 0 && s.bedrooms)) return;
+  const signature = `${s.bedrooms}br|${s.area}|${Math.round(s.price / 500000)}`;
+  try {
+    const seen = getListingSignatures();
+    if (!seen.includes(signature)) {
+      seen.unshift(signature);
+      localStorage.setItem('keja:listing-sigs', JSON.stringify(seen.slice(0, 200)));
+    }
+  } catch {
+    /* storage unavailable — signatures are best-effort only */
+  }
+}
+
+export function runAnomalyDetection(
+  s: {
+    title: string;
+    area: string;
+    county: string;
+    price: number;
+    sizeSqm: number;
+    bedrooms?: number;
+    description: string;
+    images: string[];
+    amenities: string[];
+  },
+  seenSignatures?: string[]
+): AnomalyResult {
+  const flags: string[] = [];
+  let completeness = 0;
 
   // completeness scoring
-  if (s.title?.trim().length >= 15) completeness += 15
-  else flags.push('short-title')
-  if (s.description?.trim().length >= 120) completeness += 20
-  else flags.push('thin-description')
-  if (s.images.length >= 3) completeness += 20
-  else if (s.images.length >= 1) completeness += 10
-  else flags.push('no-images')
-  if (s.amenities.length >= 4) completeness += 15
-  else if (s.amenities.length >= 1) completeness += 8
-  if (s.bedrooms && s.bedrooms > 0) completeness += 10
-  if (s.sizeSqm > 0) completeness += 10
-  if (s.price > 0) completeness += 10
+  if (s.title?.trim().length >= 15) completeness += 15;
+  else flags.push('short-title');
+  if (s.description?.trim().length >= 120) completeness += 20;
+  else flags.push('thin-description');
+  if (s.images.length >= 3) completeness += 20;
+  else if (s.images.length >= 1) completeness += 10;
+  else flags.push('no-images');
+  if (s.amenities.length >= 4) completeness += 15;
+  else if (s.amenities.length >= 1) completeness += 8;
+  if (s.bedrooms && s.bedrooms > 0) completeness += 10;
+  if (s.sizeSqm > 0) completeness += 10;
+  if (s.price > 0) completeness += 10;
 
   // price anomaly (per-sqm band)
   if (s.price > 0 && s.sizeSqm > 0) {
-    const band = MARKET_RATE_PER_SQM[s.area] ?? MARKET_RATE_PER_SQM.default
-    const perSqm = s.price / s.sizeSqm
-    if (perSqm < band[0] * 0.45) flags.push('suspicious-price')
+    const band = MARKET_RATE_PER_SQM[s.area] ?? MARKET_RATE_PER_SQM.default;
+    const perSqm = s.price / s.sizeSqm;
+    if (perSqm < band[0] * 0.45) flags.push('suspicious-price');
     // rental listings (low absolute price, monthly) get a pass on band checks
-    if (perSqm > band[1] * 3.5 && s.price > 1000000) flags.push('price-outlier-high')
+    if (perSqm > band[1] * 3.5 && s.price > 1000000) flags.push('price-outlier-high');
   }
 
   // off-platform contact pattern
-  const txt = `${s.title} ${s.description}`.toLowerCase()
+  const txt = `${s.title} ${s.description}`.toLowerCase();
   if (/(whatsapp\s*only|dm\s*only|urgent\s*sale|cheap|no\s*agents)/.test(txt))
-    flags.push('off-platform-contact')
-  if (/[A-Z]{6,}/.test(s.title)) flags.push('shouty-title')
+    flags.push('off-platform-contact');
+  if (/[A-Z]{6,}/.test(s.title)) flags.push('shouty-title');
 
   // currency mismatch heuristic (common with diaspora feeds)
   if (s.price > 0 && s.price < 500000 && s.price % 1000 === 0 && txt.includes('acre'))
-    flags.push('currency-mismatch')
+    flags.push('currency-mismatch');
 
-  // duplicate heuristic — same-ish signature
-  if (s.title && s.area && s.price > 0 && s.bedrooms) {
-    const signature = `${s.bedrooms}br|${s.area}|${Math.round(s.price / 500000)}`
-    try {
-      const seen = JSON.parse(localStorage.getItem('keja:listing-sigs') ?? '[]') as string[]
-      if (seen.includes(signature)) flags.push('duplicate-suspected')
-      else {
-        seen.unshift(signature)
-        localStorage.setItem('keja:listing-sigs', JSON.stringify(seen.slice(0, 200)))
-      }
-    } catch {
-      /* ignore */
-    }
+  // duplicate heuristic — same-ish signature (pure read; recording happens
+  // only in recordListingSignature() at submit time)
+  if (s.title && s.area && s.price > 0 && s.bedrooms && seenSignatures) {
+    const signature = `${s.bedrooms}br|${s.area}|${Math.round(s.price / 500000)}`;
+    if (seenSignatures.includes(signature)) flags.push('duplicate-suspected');
   }
 
-  return { flags: [...new Set(flags)], completeness: Math.min(100, completeness) }
+  return { flags: [...new Set(flags)], completeness: Math.min(100, completeness) };
 }
 
 /* ------------------------------------------------------------------ */
@@ -479,34 +512,42 @@ export function runAnomalyDetection(s: {
 /* ------------------------------------------------------------------ */
 
 export interface UserListing {
-  id: string
-  title: string
-  type: string
-  purpose: string[]
-  area: string
-  county: string
-  price: number
-  rentEstimate?: number
-  bedrooms?: number
-  bathrooms?: number
-  sizeSqm: number
-  amenities: string[]
-  images: string[]
-  description: string
-  agency: string
-  agent: { name: string; phone: string }
-  availability: 'available' | 'reserved' | 'sold'
-  listedAt: string
-  source: string
-  userSubmitted: true
-  views: number
+  id: string;
+  title: string;
+  type: string;
+  purpose: string[];
+  area: string;
+  county: string;
+  price: number;
+  rentEstimate?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  sizeSqm: number;
+  amenities: string[];
+  images: string[];
+  description: string;
+  agency: string;
+  agent: { name: string; phone: string };
+  availability: 'available' | 'reserved' | 'sold';
+  listedAt: string;
+  source: string;
+  userSubmitted: true;
+  views: number;
 }
 
-export const useUserListings = () => useStore<UserListing[]>('user-listings', [])
+export const useUserListings = () => useStore<UserListing[]>('user-listings', []);
 
 export function submissionToListing(s: ListingSubmission): UserListing {
   return {
-    id: `KJA-U${s.id.replace(/\D/g, '').slice(-4) || Math.floor(Math.random() * 9000 + 1000)}`,
+    // Collision-safe id: the old `slice(-4)` scheme collided whenever two
+    // submissions shared trailing digits — use a random 6-hex suffix instead.
+    id: `KJA-U${
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID().replace(/-/g, '').slice(0, 6)
+        : Math.floor(Math.random() * 0xffffff)
+            .toString(16)
+            .padStart(6, '0')
+    }`,
     title: s.title,
     type: s.type,
     purpose: s.purpose,
@@ -520,12 +561,12 @@ export function submissionToListing(s: ListingSubmission): UserListing {
     amenities: s.amenities,
     images: s.images.length ? s.images : ['/images/props/apartment_2.jpg'],
     description: s.description,
-    agency: s.agency || 'Keja Verified Partner',
+    agency: s.agency ?? 'Keja Verified Partner',
     agent: { name: s.submitterName, phone: s.submitterPhone ?? '' },
     availability: 'available',
     listedAt: s.createdAt,
     source: s.source,
     userSubmitted: true,
     views: 0,
-  }
+  };
 }

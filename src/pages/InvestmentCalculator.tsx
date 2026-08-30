@@ -1,40 +1,54 @@
-import { usePageMeta } from '@/lib/seo'
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Bot, Calculator, Globe2, Info, Landmark, TrendingUp, Wallet } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine,
-} from 'recharts'
-import { Calculator, TrendingUp, Info, Bot, Globe2, Landmark, Wallet } from 'lucide-react'
-import { analyzeInvestment, calculateMortgage, calculateAffordability, FX_KES_PER_USD, MORTGAGE_MARKET } from '@/lib/finance'
-import { formatKES } from '@/lib/format'
-import { PROPERTIES } from '@/data/properties'
-import { isRentalPrice } from '@/lib/finance'
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
-const PRESETS = PROPERTIES.filter((p) => p.rentEstimate && !isRentalPrice(p.price)).slice(0, 6)
+import { PROPERTIES } from '@/data/properties';
+import {
+  analyzeInvestment,
+  calculateAffordability,
+  calculateMortgage,
+  FX_KES_PER_USD,
+  MORTGAGE_MARKET,
+} from '@/lib/finance';
+import { isRentalPrice } from '@/lib/finance';
+import { formatKES } from '@/lib/format';
+import { usePageMeta } from '@/lib/seo';
+
+const PRESETS = PROPERTIES.filter((p) => p.rentEstimate && !isRentalPrice(p.price)).slice(0, 6);
 
 export default function InvestmentCalculator() {
   usePageMeta(
     'Investment Calculator — Yields, Mortgages & Projections',
-    'Model rental yields, mortgage payments, expenses and 10-year projections for Kenyan property — in KES or USD.',
-  )
-  const [price, setPrice] = useState(14500000)
-  const [furnishing, setFurnishing] = useState(580000)
-  const [rent, setRent] = useState(110000)
-  const [occupancy, setOccupancy] = useState(85)
-  const [expenses, setExpenses] = useState(32000)
-  const [appreciation, setAppreciation] = useState(7.5)
-  const [rentGrowth, setRentGrowth] = useState(5)
-  const [horizon, setHorizon] = useState<5 | 10>(10)
-  const [usdMode, setUsdMode] = useState(false)
-  const fx = FX_KES_PER_USD // indicative rate — confirm with your bank at transaction time
+    'Model rental yields, mortgage payments, expenses and 10-year projections for Kenyan property — in KES or USD.'
+  );
+  const [price, setPrice] = useState(14500000);
+  const [furnishing, setFurnishing] = useState(580000);
+  const [rent, setRent] = useState(110000);
+  const [occupancy, setOccupancy] = useState(85);
+  const [expenses, setExpenses] = useState(32000);
+  const [appreciation, setAppreciation] = useState(7.5);
+  const [rentGrowth, setRentGrowth] = useState(5);
+  const [horizon, setHorizon] = useState<5 | 10>(10);
+  const [usdMode, setUsdMode] = useState(false);
+  const fx = FX_KES_PER_USD; // indicative rate — confirm with your bank at transaction time
 
   // mortgage + affordability state
-  const [depositPct, setDepositPct] = useState(20)
-  const [rate, setRate] = useState(MORTGAGE_MARKET.typicalRate)
-  const [term, setTerm] = useState(MORTGAGE_MARKET.typicalTerm)
-  const [extraMonthly, setExtraMonthly] = useState(0)
-  const [income, setIncome] = useState(350000)
-  const [obligations, setObligations] = useState(15000)
+  const [depositPct, setDepositPct] = useState(20);
+  const [rate, setRate] = useState(MORTGAGE_MARKET.typicalRate);
+  const [term, setTerm] = useState(MORTGAGE_MARKET.typicalTerm);
+  const [extraMonthly, setExtraMonthly] = useState(0);
+  const [income, setIncome] = useState(350000);
+  const [obligations, setObligations] = useState(15000);
 
   const result = useMemo(
     () =>
@@ -47,42 +61,63 @@ export default function InvestmentCalculator() {
         appreciationPct: appreciation,
         rentGrowthPct: rentGrowth,
       }),
-    [price, furnishing, rent, occupancy, expenses, appreciation, rentGrowth],
-  )
+    [price, furnishing, rent, occupancy, expenses, appreciation, rentGrowth]
+  );
 
   const money = (v: number, opts?: { monthly?: boolean }) =>
     usdMode
       ? `$${Math.round(v / fx).toLocaleString('en-US')}${opts?.monthly ? '/mo' : ''}`
-      : formatKES(v, opts)
+      : formatKES(v, opts);
 
   const mortgage = useMemo(
-    () => calculateMortgage({ propertyPrice: price, depositPct, annualRatePct: rate, termYears: term, extraMonthly }),
-    [price, depositPct, rate, term, extraMonthly],
-  )
+    () =>
+      calculateMortgage({
+        propertyPrice: price,
+        depositPct,
+        annualRatePct: rate,
+        termYears: term,
+        extraMonthly,
+      }),
+    [price, depositPct, rate, term, extraMonthly]
+  );
   const afford = useMemo(
-    () => calculateAffordability({ netMonthlyIncome: income, otherMonthlyObligations: obligations, annualRatePct: rate, termYears: term, depositPct }),
-    [income, obligations, rate, term, depositPct],
-  )
+    () =>
+      calculateAffordability({
+        netMonthlyIncome: income,
+        otherMonthlyObligations: obligations,
+        annualRatePct: rate,
+        termYears: term,
+        depositPct,
+      }),
+    [income, obligations, rate, term, depositPct]
+  );
 
   const chartData = result[`year${horizon}`].map((p) => ({
     year: `Y${p.year}`,
     value: Math.round(p.propertyValue / 1_000_000),
     net: Math.round(p.cumulativeNet / 1_000_000),
     total: Math.round(p.equityPlusIncome / 1_000_000),
-  }))
-  const finalPoint = result[`year${horizon}`][result[`year${horizon}`].length - 1]
+  }));
+  const finalPoint = result[`year${horizon}`][result[`year${horizon}`].length - 1];
 
   const Slider = ({
-    label, value, onChange, min, max, step, display, hint,
+    label,
+    value,
+    onChange,
+    min,
+    max,
+    step,
+    display,
+    hint,
   }: {
-    label: string
-    value: number
-    onChange: (v: number) => void
-    min: number
-    max: number
-    step: number
-    display: string
-    hint?: string
+    label: string;
+    value: number;
+    onChange: (v: number) => void;
+    min: number;
+    max: number;
+    step: number;
+    display: string;
+    hint?: string;
   }) => (
     <div>
       <div className="flex items-baseline justify-between">
@@ -98,9 +133,9 @@ export default function InvestmentCalculator() {
         onChange={(e) => onChange(parseFloat(e.target.value))}
         className="mt-2 w-full accent-gold-600"
       />
-      {hint && <p className="mt-1 text-[11px] text-ink-faint">{hint}</p>}
+      {hint ? <p className="mt-1 text-[11px] text-ink-faint">{hint}</p> : null}
     </div>
-  )
+  );
 
   return (
     <div className="bg-cream/60">
@@ -111,23 +146,29 @@ export default function InvestmentCalculator() {
             Investment <span className="gold-text">calculator</span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-ink-muted sm:text-base">
-            The same engine Keja uses in conversation: gross & net yield, payback period, and full 5/10-year
-            projections. Every input is yours to question — no black boxes.
+            The same engine Keja uses in conversation: gross & net yield, payback period, and full
+            5/10-year projections. Every input is yours to question — no black boxes.
           </p>
         </div>
 
         {/* presets */}
         <div className="mx-auto mt-8 flex max-w-4xl flex-wrap items-center justify-center gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-ink-faint">Load a real listing:</span>
+          <span className="text-xs font-semibold uppercase tracking-wider text-ink-faint">
+            Load a real listing:
+          </span>
           {PRESETS.map((p) => (
             <button
               key={p.id}
               onClick={() => {
-                setPrice(p.price)
-                setFurnishing(p.type === 'apartment' ? Math.round(p.price * 0.04) : 0)
-                setRent(p.rentEstimate!)
-                setAppreciation(p.appreciationForecast ?? 7)
-                setExpenses(Math.round((p.sizeSqm * 25 + p.rentEstimate! * 0.08 + (p.price * 0.005) / 12) || 20000))
+                setPrice(p.price);
+                setFurnishing(p.type === 'apartment' ? Math.round(p.price * 0.04) : 0);
+                setRent(p.rentEstimate ?? 0);
+                setAppreciation(p.appreciationForecast ?? 7);
+                setExpenses(
+                  Math.round(
+                    p.sizeSqm * 25 + (p.rentEstimate ?? 0) * 0.08 + (p.price * 0.005) / 12 || 20000
+                  )
+                );
               }}
               className="rounded-full border border-gold-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-gold-700 transition hover:border-gold-400 hover:bg-gold-50"
             >
@@ -146,7 +187,9 @@ export default function InvestmentCalculator() {
               <button
                 onClick={() => setUsdMode(!usdMode)}
                 className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
-                  usdMode ? 'bg-gold-gradient text-white shadow-gold-sm' : 'bg-gold-50 text-gold-700'
+                  usdMode
+                    ? 'bg-gold-gradient text-white shadow-gold-sm'
+                    : 'bg-gold-50 text-gold-700'
                 }`}
               >
                 <Globe2 className="h-3.5 w-3.5" />
@@ -154,27 +197,82 @@ export default function InvestmentCalculator() {
               </button>
             </div>
 
-            <Slider label="Purchase price" value={price} onChange={setPrice} min={1000000} max={90000000} step={100000}
-              display={money(price)} />
-            <Slider label="Furnishing cost" value={furnishing} onChange={setFurnishing} min={0} max={5000000} step={50000}
-              display={money(furnishing)} hint="Typical 4% of price for new apartments" />
-            <Slider label="Monthly rent" value={rent} onChange={setRent} min={10000} max={500000} step={1000}
-              display={money(rent, { monthly: true })} />
-            <Slider label="Occupancy" value={occupancy} onChange={setOccupancy} min={40} max={100} step={5}
-              display={`${occupancy}%`} hint="Nairobi apartments typically run 80–90%" />
-            <Slider label="Monthly expenses" value={expenses} onChange={setExpenses} min={0} max={200000} step={1000}
+            <Slider
+              label="Purchase price"
+              value={price}
+              onChange={setPrice}
+              min={1000000}
+              max={90000000}
+              step={100000}
+              display={money(price)}
+            />
+            <Slider
+              label="Furnishing cost"
+              value={furnishing}
+              onChange={setFurnishing}
+              min={0}
+              max={5000000}
+              step={50000}
+              display={money(furnishing)}
+              hint="Typical 4% of price for new apartments"
+            />
+            <Slider
+              label="Monthly rent"
+              value={rent}
+              onChange={setRent}
+              min={10000}
+              max={500000}
+              step={1000}
+              display={money(rent, { monthly: true })}
+            />
+            <Slider
+              label="Occupancy"
+              value={occupancy}
+              onChange={setOccupancy}
+              min={40}
+              max={100}
+              step={5}
+              display={`${occupancy}%`}
+              hint="Nairobi apartments typically run 80–90%"
+            />
+            <Slider
+              label="Monthly expenses"
+              value={expenses}
+              onChange={setExpenses}
+              min={0}
+              max={200000}
+              step={1000}
               display={money(expenses, { monthly: true })}
-              hint="Service charge + 8% management + insurance + rates" />
-            <Slider label="Capital appreciation / yr" value={appreciation} onChange={setAppreciation} min={0} max={15} step={0.5}
-              display={`${appreciation}%`} hint="Growth corridors: 9–12%; established suburbs: 6–8%" />
-            <Slider label="Rent growth / yr" value={rentGrowth} onChange={setRentGrowth} min={0} max={12} step={0.5}
-              display={`${rentGrowth}%`} />
+              hint="Service charge + 8% management + insurance + rates"
+            />
+            <Slider
+              label="Capital appreciation / yr"
+              value={appreciation}
+              onChange={setAppreciation}
+              min={0}
+              max={15}
+              step={0.5}
+              display={`${appreciation}%`}
+              hint="Growth corridors: 9–12%; established suburbs: 6–8%"
+            />
+            <Slider
+              label="Rent growth / yr"
+              value={rentGrowth}
+              onChange={setRentGrowth}
+              min={0}
+              max={12}
+              step={0.5}
+              display={`${rentGrowth}%`}
+            />
 
             <div className="rounded-xl bg-gold-50 p-4 text-xs leading-relaxed text-ink-soft">
               <Info className="mb-1 h-4 w-4 text-gold-600" />
-              These are <b>your assumptions</b> — Keja shows the math transparently so you can stress-test any deal.
-              Presets load real verified listings. Want Keja to fill these in conversationally with market bands?{' '}
-              <Link to="/ask" className="font-semibold text-gold-700">Ask Keja →</Link>
+              These are <b>your assumptions</b> — Keja shows the math transparently so you can
+              stress-test any deal. Presets load real verified listings. Want Keja to fill these in
+              conversationally with market bands?{' '}
+              <Link to="/ask" className="font-semibold text-gold-700">
+                Ask Keja →
+              </Link>
             </div>
           </div>
 
@@ -182,14 +280,43 @@ export default function InvestmentCalculator() {
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {[
-                { label: 'Gross yield', value: `${result.grossYield.toFixed(1)}%`, good: result.grossYield >= 7 },
-                { label: 'Net yield', value: `${result.netYield.toFixed(1)}%`, good: result.netYield >= 5 },
-                { label: 'Monthly cashflow', value: money(Math.max(result.monthlyCashflow, 0), { monthly: true }), good: result.monthlyCashflow > 0 },
-                { label: 'Payback', value: Number.isFinite(result.paybackYears) ? `${result.paybackYears.toFixed(1)} yrs` : '—', good: Number.isFinite(result.paybackYears) && result.paybackYears < 15 },
+                {
+                  label: 'Gross yield',
+                  value: `${result.grossYield.toFixed(1)}%`,
+                  good: result.grossYield >= 7,
+                },
+                {
+                  label: 'Net yield',
+                  value: `${result.netYield.toFixed(1)}%`,
+                  good: result.netYield >= 5,
+                },
+                {
+                  label: 'Monthly cashflow',
+                  value: money(Math.max(result.monthlyCashflow, 0), { monthly: true }),
+                  good: result.monthlyCashflow > 0,
+                },
+                {
+                  label: 'Payback',
+                  value: Number.isFinite(result.paybackYears)
+                    ? `${result.paybackYears.toFixed(1)} yrs`
+                    : '—',
+                  good: Number.isFinite(result.paybackYears) && result.paybackYears < 15,
+                },
               ].map((s) => (
-                <div key={s.label} className={`rounded-2xl p-4 text-center shadow-card ring-1 ${s.good ? 'bg-ink ring-gold-600/40' : 'bg-white ring-gold-100'}`}>
-                  <p className={`font-display text-xl font-bold sm:text-2xl ${s.good ? 'text-gold-300' : 'text-ink'}`}>{s.value}</p>
-                  <p className={`mt-1 text-[10px] font-semibold uppercase tracking-wider ${s.good ? 'text-white/50' : 'text-ink-faint'}`}>{s.label}</p>
+                <div
+                  key={s.label}
+                  className={`rounded-2xl p-4 text-center shadow-card ring-1 ${s.good ? 'bg-ink ring-gold-600/40' : 'bg-white ring-gold-100'}`}
+                >
+                  <p
+                    className={`font-display text-xl font-bold sm:text-2xl ${s.good ? 'text-gold-300' : 'text-ink'}`}
+                  >
+                    {s.value}
+                  </p>
+                  <p
+                    className={`mt-1 text-[10px] font-semibold uppercase tracking-wider ${s.good ? 'text-white/50' : 'text-ink-faint'}`}
+                  >
+                    {s.label}
+                  </p>
                 </div>
               ))}
             </div>
@@ -228,31 +355,68 @@ export default function InvestmentCalculator() {
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#F0E8D5" />
                     <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#8F887C' }} />
-                    <YAxis tick={{ fontSize: 11, fill: '#8F887C' }} tickFormatter={(v) => `${v}M`} />
+                    <YAxis
+                      tick={{ fontSize: 11, fill: '#8F887C' }}
+                      tickFormatter={(v) => `${v}M`}
+                    />
                     <Tooltip
-                      formatter={(value, name) => [`${Number(value).toLocaleString()}M`, String(name)]}
+                      formatter={(value, name) => [
+                        `${Number(value).toLocaleString()}M`,
+                        String(name),
+                      ]}
                       contentStyle={{ borderRadius: 12, border: '1px solid #EAD8A0', fontSize: 12 }}
                     />
-                    <ReferenceLine y={Math.round((price + furnishing) / 1_000_000)} stroke="#8F887C" strokeDasharray="4 4"
-                      label={{ value: 'Invested', fontSize: 10, fill: '#8F887C', position: 'insideTopRight' }} />
-                    <Area type="monotone" dataKey="value" name="Property value" stroke="#A88430" strokeWidth={2} fill="url(#gValue)" />
-                    <Area type="monotone" dataKey="net" name="Cumulative net rent" stroke="#0E7A5F" strokeWidth={2} fill="url(#gNet)" />
+                    <ReferenceLine
+                      y={Math.round((price + furnishing) / 1_000_000)}
+                      stroke="#8F887C"
+                      strokeDasharray="4 4"
+                      label={{
+                        value: 'Invested',
+                        fontSize: 10,
+                        fill: '#8F887C',
+                        position: 'insideTopRight',
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="value"
+                      name="Property value"
+                      stroke="#A88430"
+                      strokeWidth={2}
+                      fill="url(#gValue)"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="net"
+                      name="Cumulative net rent"
+                      stroke="#0E7A5F"
+                      strokeWidth={2}
+                      fill="url(#gNet)"
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
 
               <div className="mt-4 grid gap-3 rounded-xl bg-cream/70 p-4 text-sm sm:grid-cols-3">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint">Value at Y{horizon}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint">
+                    Value at Y{horizon}
+                  </p>
                   <p className="mt-0.5 font-bold text-ink">{money(finalPoint.propertyValue)}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint">Net rent collected</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint">
+                    Net rent collected
+                  </p>
                   <p className="mt-0.5 font-bold text-ink">{money(finalPoint.cumulativeNet)}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint">Total gain</p>
-                  <p className="mt-0.5 font-bold text-gold-700">{money(finalPoint.equityPlusIncome)}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint">
+                    Total gain
+                  </p>
+                  <p className="mt-0.5 font-bold text-gold-700">
+                    {money(finalPoint.equityPlusIncome)}
+                  </p>
                 </div>
               </div>
             </div>
@@ -262,13 +426,17 @@ export default function InvestmentCalculator() {
                 <Bot className="h-6 w-6 text-white" />
               </span>
               <div className="flex-1">
-                <p className="font-display text-lg font-bold text-ink">Want this analysed against real listings?</p>
+                <p className="font-display text-lg font-bold text-ink">
+                  Want this analysed against real listings?
+                </p>
                 <p className="mt-1 text-sm text-ink-muted">
-                  Ask Keja to run these numbers on verified inventory — with market bands, comparable deals and a
-                  written investment verdict.
+                  Ask Keja to run these numbers on verified inventory — with market bands,
+                  comparable deals and a written investment verdict.
                 </p>
               </div>
-              <Link to="/ask" className="btn-gold shrink-0">Ask Keja</Link>
+              <Link to="/ask" className="btn-gold shrink-0">
+                Ask Keja
+              </Link>
             </div>
           </div>
         </div>
@@ -279,47 +447,105 @@ export default function InvestmentCalculator() {
             <h2 className="flex items-center gap-2 font-display text-lg font-bold text-ink">
               <Landmark className="h-5 w-5 text-gold-600" /> Mortgage on this property
             </h2>
-            <Slider label="Deposit" value={depositPct} onChange={setDepositPct} min={10} max={60} step={5}
-              display={`${depositPct}% (${money(mortgage.deposit)})`} hint="Kenyan banks typically require 10–20%" />
-            <Slider label="Interest rate" value={rate} onChange={setRate} min={9} max={18} step={0.25}
-              display={`${rate.toFixed(2)}% p.a.`} hint="2026 market range 10.5–16.5% (ESTIMATE)" />
-            <Slider label="Term" value={term} onChange={setTerm} min={5} max={25} step={1}
-              display={`${term} years`} />
-            <Slider label="Extra monthly payment" value={extraMonthly} onChange={setExtraMonthly} min={0} max={150000} step={5000}
-              display={extraMonthly ? money(extraMonthly, { monthly: true }) : 'None'} hint="Every extra shilling shortens the loan — see below" />
+            <Slider
+              label="Deposit"
+              value={depositPct}
+              onChange={setDepositPct}
+              min={10}
+              max={60}
+              step={5}
+              display={`${depositPct}% (${money(mortgage.deposit)})`}
+              hint="Kenyan banks typically require 10–20%"
+            />
+            <Slider
+              label="Interest rate"
+              value={rate}
+              onChange={setRate}
+              min={9}
+              max={18}
+              step={0.25}
+              display={`${rate.toFixed(2)}% p.a.`}
+              hint="2026 market range 10.5–16.5% (ESTIMATE)"
+            />
+            <Slider
+              label="Term"
+              value={term}
+              onChange={setTerm}
+              min={5}
+              max={25}
+              step={1}
+              display={`${term} years`}
+            />
+            <Slider
+              label="Extra monthly payment"
+              value={extraMonthly}
+              onChange={setExtraMonthly}
+              min={0}
+              max={150000}
+              step={5000}
+              display={extraMonthly ? money(extraMonthly, { monthly: true }) : 'None'}
+              hint="Every extra shilling shortens the loan — see below"
+            />
 
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-xl bg-ink p-4 text-center">
-                <p className="font-display text-xl font-bold text-gold-300">{money(Math.round(mortgage.monthlyRepayment), { monthly: true })}</p>
-                <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-white/50">Monthly repayment</p>
+                <p className="font-display text-xl font-bold text-gold-300">
+                  {money(Math.round(mortgage.monthlyRepayment), { monthly: true })}
+                </p>
+                <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-white/50">
+                  Monthly repayment
+                </p>
               </div>
               <div className="rounded-xl bg-white p-4 text-center ring-1 ring-gold-100">
-                <p className="font-display text-xl font-bold text-ink">{money(Math.round(mortgage.totalInterest))}</p>
-                <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-ink-muted">Total interest</p>
+                <p className="font-display text-xl font-bold text-ink">
+                  {money(Math.round(mortgage.totalInterest))}
+                </p>
+                <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-ink-muted">
+                  Total interest
+                </p>
               </div>
             </div>
-            {mortgage.extra && extraMonthly > 0 && (
+            {mortgage.extra && extraMonthly > 0 ? (
               <p className="rounded-xl bg-emerald-50 p-3.5 text-xs font-semibold leading-relaxed text-emerald-800 ring-1 ring-emerald-200">
-                Paying {money(extraMonthly, { monthly: true })} extra clears the loan {(mortgage.extra.monthsSaved / 12).toFixed(1)} years earlier and saves {money(Math.round(mortgage.extra.interestSaved))} in interest.
+                Paying {money(extraMonthly, { monthly: true })} extra clears the loan{' '}
+                {(mortgage.extra.monthsSaved / 12).toFixed(1)} years earlier and saves{' '}
+                {money(Math.round(mortgage.extra.interestSaved))} in interest.
               </p>
-            )}
+            ) : null}
             <div className="max-h-52 overflow-y-auto rounded-xl ring-1 ring-gold-100">
               <table className="w-full text-left text-xs">
                 <thead className="sticky top-0 bg-cream">
                   <tr>
-                    <th scope="col" className="px-3 py-2 font-bold uppercase tracking-wider text-ink-muted">Year</th>
-                    <th scope="col" className="px-3 py-2 font-bold uppercase tracking-wider text-ink-muted">Balance</th>
-                    <th scope="col" className="px-3 py-2 font-bold uppercase tracking-wider text-ink-muted">Paid so far</th>
+                    <th
+                      scope="col"
+                      className="px-3 py-2 font-bold uppercase tracking-wider text-ink-muted"
+                    >
+                      Year
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-3 py-2 font-bold uppercase tracking-wider text-ink-muted"
+                    >
+                      Balance
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-3 py-2 font-bold uppercase tracking-wider text-ink-muted"
+                    >
+                      Paid so far
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {mortgage.schedule.filter((s) => s.year % 2 === 0 || s.year === 1).map((s) => (
-                    <tr key={s.year} className="border-t border-gold-50">
-                      <td className="px-3 py-1.5 font-semibold text-ink">Y{s.year}</td>
-                      <td className="px-3 py-1.5 text-ink-soft">{money(s.balance)}</td>
-                      <td className="px-3 py-1.5 text-ink-soft">{money(s.paid)}</td>
-                    </tr>
-                  ))}
+                  {mortgage.schedule
+                    .filter((s) => s.year % 2 === 0 || s.year === 1)
+                    .map((s) => (
+                      <tr key={s.year} className="border-t border-gold-50">
+                        <td className="px-3 py-1.5 font-semibold text-ink">Y{s.year}</td>
+                        <td className="px-3 py-1.5 text-ink-soft">{money(s.balance)}</td>
+                        <td className="px-3 py-1.5 text-ink-soft">{money(s.paid)}</td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -330,48 +556,91 @@ export default function InvestmentCalculator() {
 
           <div className="card-luxe space-y-5 p-6 sm:p-8">
             <h2 className="flex items-center gap-2 font-display text-lg font-bold text-ink">
-              <Wallet className="h-5 w-5 text-gold-600" /> Affordability — what can your income carry?
+              <Wallet className="h-5 w-5 text-gold-600" /> Affordability — what can your income
+              carry?
             </h2>
-            <Slider label="Net monthly income" value={income} onChange={setIncome} min={50000} max={2000000} step={25000}
-              display={money(income, { monthly: true })} />
-            <Slider label="Other monthly obligations" value={obligations} onChange={setObligations} min={0} max={500000} step={5000}
-              display={money(obligations, { monthly: true })} hint="Car loans, other loans, school fees obligations" />
+            <Slider
+              label="Net monthly income"
+              value={income}
+              onChange={setIncome}
+              min={50000}
+              max={2000000}
+              step={25000}
+              display={money(income, { monthly: true })}
+            />
+            <Slider
+              label="Other monthly obligations"
+              value={obligations}
+              onChange={setObligations}
+              min={0}
+              max={500000}
+              step={5000}
+              display={money(obligations, { monthly: true })}
+              hint="Car loans, other loans, school fees obligations"
+            />
             <p className="text-[11px] leading-relaxed text-ink-muted">
-              Assumes the CBK-guided debt-to-income ceiling of ~33% of net income for the instalment, at {rate.toFixed(2)}% over {term} years with a {depositPct}% deposit.
+              Assumes the CBK-guided debt-to-income ceiling of ~33% of net income for the
+              instalment, at {rate.toFixed(2)}% over {term} years with a {depositPct}% deposit.
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-xl bg-ink p-4 text-center">
-                <p className="font-display text-xl font-bold text-gold-300">{money(Math.round(afford.maxPropertyPrice))}</p>
-                <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-white/50">Max property price</p>
+                <p className="font-display text-xl font-bold text-gold-300">
+                  {money(Math.round(afford.maxPropertyPrice))}
+                </p>
+                <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-white/50">
+                  Max property price
+                </p>
               </div>
               <div className="rounded-xl bg-white p-4 text-center ring-1 ring-gold-100">
-                <p className="font-display text-xl font-bold text-ink">{money(Math.round(afford.maxInstalment), { monthly: true })}</p>
-                <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-ink-muted">Max instalment (33% DTI)</p>
+                <p className="font-display text-xl font-bold text-ink">
+                  {money(Math.round(afford.maxInstalment), { monthly: true })}
+                </p>
+                <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-ink-muted">
+                  Max instalment (33% DTI)
+                </p>
               </div>
             </div>
             <div className="rounded-xl bg-cream/70 p-4 text-sm">
               <p className="font-bold text-ink">Cash you need up front</p>
               <ul className="mt-2 space-y-1.5 text-xs text-ink-soft">
-                <li className="flex justify-between"><span>Deposit ({depositPct}%)</span><b>{money(Math.round(afford.requiredDeposit))}</b></li>
-                <li className="flex justify-between"><span>Stamp duty (4% urban)</span><b>{money(Math.round(afford.maxPropertyPrice * 0.04))}</b></li>
-                <li className="flex justify-between"><span>Legal + valuation (~1.9%)</span><b>{money(Math.round(afford.maxPropertyPrice * 0.019))}</b></li>
-                <li className="flex justify-between border-t border-gold-200 pt-1.5 text-sm"><span className="font-bold text-ink">Total cash</span><b className="text-gold-700">{money(Math.round(afford.requiredDeposit + afford.maxPropertyPrice * 0.059))}</b></li>
+                <li className="flex justify-between">
+                  <span>Deposit ({depositPct}%)</span>
+                  <b>{money(Math.round(afford.requiredDeposit))}</b>
+                </li>
+                <li className="flex justify-between">
+                  <span>Stamp duty (4% urban)</span>
+                  <b>{money(Math.round(afford.maxPropertyPrice * 0.04))}</b>
+                </li>
+                <li className="flex justify-between">
+                  <span>Legal + valuation (~1.9%)</span>
+                  <b>{money(Math.round(afford.maxPropertyPrice * 0.019))}</b>
+                </li>
+                <li className="flex justify-between border-t border-gold-200 pt-1.5 text-sm">
+                  <span className="font-bold text-ink">Total cash</span>
+                  <b className="text-gold-700">
+                    {money(Math.round(afford.requiredDeposit + afford.maxPropertyPrice * 0.059))}
+                  </b>
+                </li>
               </ul>
             </div>
             {afford.maxPropertyPrice < price ? (
               <p className="rounded-xl bg-gold-50 p-3.5 text-xs leading-relaxed text-ink-soft ring-1 ring-gold-200">
-                Your current assumptions ({money(price)}) sit above this budget. Raise the deposit, extend the term,
-                or explore listings under {money(Math.round(afford.maxPropertyPrice))} —{' '}
-                <Link to={`/properties?q=&purpose=buy`} className="font-semibold text-gold-700">browse the marketplace →</Link>
+                Your current assumptions ({money(price)}) sit above this budget. Raise the deposit,
+                extend the term, or explore listings under{' '}
+                {money(Math.round(afford.maxPropertyPrice))} —{' '}
+                <Link to="/properties?q=&purpose=buy" className="font-semibold text-gold-700">
+                  browse the marketplace →
+                </Link>
               </p>
             ) : (
               <p className="rounded-xl bg-emerald-50 p-3.5 text-xs leading-relaxed text-emerald-800 ring-1 ring-emerald-200">
-                Comfortably within budget — you could carry this property at {((mortgage.monthlyRepayment / income) * 100).toFixed(0)}% of net income.
+                Comfortably within budget — you could carry this property at{' '}
+                {((mortgage.monthlyRepayment / income) * 100).toFixed(0)}% of net income.
               </p>
             )}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

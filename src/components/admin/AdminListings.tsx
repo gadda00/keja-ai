@@ -3,60 +3,96 @@
  * Design): anomaly flags, completeness scores, approve/reject workflow and
  * promotion of approved submissions into the live marketplace.
  */
-import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  Check,
-  X,
-  Flag,
   AlertTriangle,
-  ShieldCheck,
-  Eye,
-  ExternalLink,
-  ImageOff,
-  FileText,
-  Copy,
-  Gauge,
+  Check,
   Clock,
+  Copy,
   Download,
-} from 'lucide-react'
-import { exportCSV } from '@/lib/csv'
-import { useFocusTrap } from '@/lib/useFocusTrap'
-import { useAuth } from '@/lib/auth'
+  ExternalLink,
+  Eye,
+  FileText,
+  Flag,
+  Gauge,
+  ImageOff,
+  ShieldCheck,
+  X,
+} from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
+
+import type { ListingSubmission } from '@/lib/adminStore';
 import {
-  useSubmissions,
-  ListingSubmission,
   submissionToListing,
-  useUserListings,
   useSettings,
-} from '@/lib/adminStore'
-import { logAudit } from '@/lib/adminStore'
-import { store } from '@/lib/store'
+  useSubmissions,
+  useUserListings,
+} from '@/lib/adminStore';
+import { logAudit } from '@/lib/adminStore';
+import { useAuth } from '@/lib/auth';
+import { exportCSV } from '@/lib/csv';
+import { useFocusTrap } from '@/lib/useFocusTrap';
 
 const FLAG_META: Record<string, { label: string; icon: typeof AlertTriangle; tone: string }> = {
-  'suspicious-price': { label: 'Suspicious price', icon: AlertTriangle, tone: 'bg-red-100 text-red-700 ring-red-200' },
-  'duplicate-suspected': { label: 'Duplicate suspected', icon: Copy, tone: 'bg-red-100 text-red-700 ring-red-200' },
-  'off-platform-contact': { label: 'Off-platform contact', icon: AlertTriangle, tone: 'bg-amber-100 text-amber-800 ring-amber-200' },
-  'thin-description': { label: 'Thin description', icon: FileText, tone: 'bg-amber-100 text-amber-800 ring-amber-200' },
-  'no-images': { label: 'No images', icon: ImageOff, tone: 'bg-amber-100 text-amber-800 ring-amber-200' },
-  'short-title': { label: 'Short title', icon: FileText, tone: 'bg-amber-100 text-amber-800 ring-amber-200' },
-  'shouty-title': { label: 'Shouty title', icon: FileText, tone: 'bg-amber-100 text-amber-800 ring-amber-200' },
-  'currency-mismatch': { label: 'Currency mismatch', icon: AlertTriangle, tone: 'bg-amber-100 text-amber-800 ring-amber-200' },
-  'price-outlier-high': { label: 'Price outlier (high)', icon: AlertTriangle, tone: 'bg-amber-100 text-amber-800 ring-amber-200' },
-}
+  'suspicious-price': {
+    label: 'Suspicious price',
+    icon: AlertTriangle,
+    tone: 'bg-red-100 text-red-700 ring-red-200',
+  },
+  'duplicate-suspected': {
+    label: 'Duplicate suspected',
+    icon: Copy,
+    tone: 'bg-red-100 text-red-700 ring-red-200',
+  },
+  'off-platform-contact': {
+    label: 'Off-platform contact',
+    icon: AlertTriangle,
+    tone: 'bg-amber-100 text-amber-800 ring-amber-200',
+  },
+  'thin-description': {
+    label: 'Thin description',
+    icon: FileText,
+    tone: 'bg-amber-100 text-amber-800 ring-amber-200',
+  },
+  'no-images': {
+    label: 'No images',
+    icon: ImageOff,
+    tone: 'bg-amber-100 text-amber-800 ring-amber-200',
+  },
+  'short-title': {
+    label: 'Short title',
+    icon: FileText,
+    tone: 'bg-amber-100 text-amber-800 ring-amber-200',
+  },
+  'shouty-title': {
+    label: 'Shouty title',
+    icon: FileText,
+    tone: 'bg-amber-100 text-amber-800 ring-amber-200',
+  },
+  'currency-mismatch': {
+    label: 'Currency mismatch',
+    icon: AlertTriangle,
+    tone: 'bg-amber-100 text-amber-800 ring-amber-200',
+  },
+  'price-outlier-high': {
+    label: 'Price outlier (high)',
+    icon: AlertTriangle,
+    tone: 'bg-amber-100 text-amber-800 ring-amber-200',
+  },
+};
 
-type Filter = 'pending' | 'approved' | 'rejected' | 'flagged' | 'all'
+type Filter = 'pending' | 'approved' | 'rejected' | 'flagged' | 'all';
 
 export default function AdminListings() {
-  const { user } = useAuth()
-  const [submissions, setSubmissions] = useSubmissions()
-  const [userListings, setUserListings] = useUserListings()
-  const [settings] = useSettings()
-  const [filter, setFilter] = useState<Filter>('pending')
-  const [selected, setSelected] = useState<ListingSubmission | null>(null)
-  const [note, setNote] = useState('')
-  const [checked, setChecked] = useState<string[]>([])
-  const reviewRef = useRef<HTMLDivElement>(null)
-  useFocusTrap(reviewRef, !!selected, () => setSelected(null))
+  const { user } = useAuth();
+  const [submissions, setSubmissions] = useSubmissions();
+  const [userListings, setUserListings] = useUserListings();
+  const [settings] = useSettings();
+  const [filter, setFilter] = useState<Filter>('pending');
+  const [selected, setSelected] = useState<ListingSubmission | null>(null);
+  const [note, setNote] = useState('');
+  const [checked, setChecked] = useState<string[]>([]);
+  const reviewRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(reviewRef, !!selected, () => setSelected(null));
 
   const counts = useMemo(
     () => ({
@@ -66,29 +102,35 @@ export default function AdminListings() {
       flagged: submissions.filter((s) => s.status === 'flagged').length,
       all: submissions.length,
     }),
-    [submissions],
-  )
+    [submissions]
+  );
 
-  const list = submissions.filter((s) => s.status === filter || filter === 'all')
+  const list = submissions.filter((s) => s.status === filter || filter === 'all');
 
   /** submissions with no flags meeting the auto-approve completeness threshold */
   const autoApproveEligible = (s: ListingSubmission) =>
-    s.flags.length === 0 && s.completeness >= (settings.autoApproveThreshold ?? 85)
+    s.flags.length === 0 && s.completeness >= (settings.autoApproveThreshold ?? 85);
 
   const bulkReview = (status: 'approved' | 'rejected') => {
-    const targets = submissions.filter((s) => checked.includes(s.id) && s.status === 'pending')
-    if (!targets.length) return
+    const targets = submissions.filter((s) => checked.includes(s.id) && s.status === 'pending');
+    if (!targets.length) return;
     const next = submissions.map((x) =>
       checked.includes(x.id) && x.status === 'pending'
-        ? { ...x, status, reviewedAt: new Date().toISOString(), reviewedBy: user?.name ?? 'admin', reviewNote: status === 'rejected' ? 'Bulk rejection' : 'Bulk approval' }
-        : x,
-    )
-    setSubmissions(next)
+        ? {
+            ...x,
+            status,
+            reviewedAt: new Date().toISOString(),
+            reviewedBy: user?.name ?? 'admin',
+            reviewNote: status === 'rejected' ? 'Bulk rejection' : 'Bulk approval',
+          }
+        : x
+    );
+    setSubmissions(next);
     if (status === 'approved') {
       const fresh = targets
         .map(submissionToListing)
-        .filter((l) => !userListings.some((u) => u.id === l.id || u.title === l.title))
-      setUserListings([...fresh, ...userListings])
+        .filter((l) => !userListings.some((u) => u.id === l.id || u.title === l.title));
+      setUserListings([...fresh, ...userListings]);
     }
     logAudit({
       actor: user?.name ?? 'admin',
@@ -97,17 +139,49 @@ export default function AdminListings() {
       target: `${targets.length} submissions`,
       detail: `Bulk ${status} of ${targets.length} pending submissions`,
       severity: status === 'rejected' ? 'warning' : 'info',
-    })
-    setChecked([])
-  }
+    });
+    setChecked([]);
+  };
 
   const exportCsv = () => {
-    exportCSV(`keja-listings-${new Date().toISOString().slice(0, 10)}.csv`,
-      ['ID', 'Title', 'Type', 'Area', 'County', 'Price KES', 'Status', 'Completeness %', 'Flags', 'Source', 'Submitted'],
-      list.map((s) => [s.id, s.title, s.type, s.area, s.county, s.price, s.status, s.completeness, s.flags.join('; '), s.source, s.createdAt]),
-    )
-    logAudit({ actor: user?.name ?? 'admin', actorEmail: user?.email ?? '', action: 'listing.export', target: `${list.length} submissions`, detail: `CSV export of ${list.length} listings (${filter})`, severity: 'info' })
-  }
+    exportCSV(
+      `keja-listings-${new Date().toISOString().slice(0, 10)}.csv`,
+      [
+        'ID',
+        'Title',
+        'Type',
+        'Area',
+        'County',
+        'Price KES',
+        'Status',
+        'Completeness %',
+        'Flags',
+        'Source',
+        'Submitted',
+      ],
+      list.map((s) => [
+        s.id,
+        s.title,
+        s.type,
+        s.area,
+        s.county,
+        s.price,
+        s.status,
+        s.completeness,
+        s.flags.join('; '),
+        s.source,
+        s.createdAt,
+      ])
+    );
+    logAudit({
+      actor: user?.name ?? 'admin',
+      actorEmail: user?.email ?? '',
+      action: 'listing.export',
+      target: `${list.length} submissions`,
+      detail: `CSV export of ${list.length} listings (${filter})`,
+      severity: 'info',
+    });
+  };
 
   const review = (s: ListingSubmission, status: 'approved' | 'rejected' | 'flagged') => {
     const next = submissions.map((x) =>
@@ -119,17 +193,17 @@ export default function AdminListings() {
             reviewedBy: user?.name ?? 'admin',
             reviewNote: note || x.reviewNote,
           }
-        : x,
-    )
-    setSubmissions(next)
+        : x
+    );
+    setSubmissions(next);
     if (status === 'approved') {
       // idempotent publish: never duplicate a listing already in the marketplace
       if (!userListings.some((u) => u.id === s.id || u.title === s.title)) {
-        setUserListings([submissionToListing(s), ...userListings])
+        setUserListings([submissionToListing(s), ...userListings]);
       }
     } else if (status === 'rejected' || status === 'flagged') {
       // pull the listing out of the marketplace when review turns negative
-      setUserListings(userListings.filter((u) => u.id !== s.id && u.title !== s.title))
+      setUserListings(userListings.filter((u) => u.id !== s.id && u.title !== s.title));
     }
     logAudit({
       actor: user?.name ?? 'admin',
@@ -145,10 +219,10 @@ export default function AdminListings() {
             ? `Rejected — ${note || 'did not meet listing standards'}`
             : `Flagged — ${s.flags.join(', ')}`,
       severity: status === 'rejected' ? 'warning' : status === 'flagged' ? 'critical' : 'info',
-    })
-    setSelected(null)
-    setNote('')
-  }
+    });
+    setSelected(null);
+    setNote('');
+  };
 
   return (
     <div className="flex flex-col gap-5">
@@ -175,7 +249,8 @@ export default function AdminListings() {
             <Download className="h-3.5 w-3.5" /> Export CSV
           </button>
           <span className="flex items-center gap-1.5 text-[11px] text-ink-muted">
-            <Gauge className="h-3.5 w-3.5" /> Auto-approve threshold: {settings.autoApproveThreshold}%
+            <Gauge className="h-3.5 w-3.5" /> Auto-approve threshold:{' '}
+            {settings.autoApproveThreshold}%
           </span>
         </span>
       </div>
@@ -185,9 +260,14 @@ export default function AdminListings() {
         <label className="flex cursor-pointer items-center gap-2 text-xs font-semibold text-ink-soft">
           <input
             type="checkbox"
-            checked={checked.length > 0 && checked.length === list.filter((s) => s.status === 'pending').length}
+            checked={
+              checked.length > 0 &&
+              checked.length === list.filter((s) => s.status === 'pending').length
+            }
             onChange={(e) =>
-              setChecked(e.target.checked ? list.filter((s) => s.status === 'pending').map((s) => s.id) : [])
+              setChecked(
+                e.target.checked ? list.filter((s) => s.status === 'pending').map((s) => s.id) : []
+              )
             }
             className="h-4 w-4 rounded border-gold-300 accent-gold-600"
           />
@@ -227,7 +307,9 @@ export default function AdminListings() {
                       type="checkbox"
                       checked={checked.includes(s.id)}
                       onChange={(e) =>
-                        setChecked(e.target.checked ? [...checked, s.id] : checked.filter((c) => c !== s.id))
+                        setChecked(
+                          e.target.checked ? [...checked, s.id] : checked.filter((c) => c !== s.id)
+                        )
                       }
                       aria-label={`Select ${s.title}`}
                       className="h-4 w-4 shrink-0 rounded border-gold-300 accent-gold-600"
@@ -254,13 +336,19 @@ export default function AdminListings() {
 
                 <p className="mt-1 text-xs text-ink-muted">
                   {s.area}, {s.county} · {s.type} · {s.sizeSqm} sqm
-                  {s.bedrooms ? ` · ${s.bedrooms}BR` : ''} · KES{' '}
-                  {(s.price / 1000).toLocaleString()}k · by{' '}
+                  {s.bedrooms ? ` · ${s.bedrooms}BR` : ''} · KES {(s.price / 1000).toLocaleString()}
+                  k · by{' '}
                   <strong className="text-ink-soft">
                     {s.submitterName}
                     {s.agency ? ` (${s.agency})` : ''}
                   </strong>{' '}
-                  · {new Date(s.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                  ·{' '}
+                  {new Date(s.createdAt).toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
                 </p>
 
                 {/* completeness + flags */}
@@ -287,7 +375,7 @@ export default function AdminListings() {
                       label: f,
                       icon: AlertTriangle,
                       tone: 'bg-amber-100 text-amber-800 ring-amber-200',
-                    }
+                    };
                     return (
                       <span
                         key={f}
@@ -295,7 +383,7 @@ export default function AdminListings() {
                       >
                         <meta.icon className="h-3 w-3" /> {meta.label}
                       </span>
-                    )
+                    );
                   })}
                   {s.flags.length === 0 && autoApproveEligible(s) && s.status === 'pending' && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-200">
@@ -309,20 +397,20 @@ export default function AdminListings() {
                   )}
                 </div>
 
-                {s.reviewNote && (
+                {s.reviewNote ? (
                   <p className="mt-2 rounded-lg bg-gold-50 px-3 py-2 text-[11px] text-ink-muted ring-1 ring-gold-100">
                     <Clock className="mr-1 inline h-3 w-3" />
                     Reviewer note ({s.reviewedBy}): {s.reviewNote}
                   </p>
-                )}
+                ) : null}
               </div>
 
               {/* actions */}
               <div className="flex shrink-0 gap-2 lg:flex-col">
                 <button
                   onClick={() => {
-                    setSelected(s)
-                    setNote('')
+                    setSelected(s);
+                    setNote('');
                   }}
                   className="btn-outline !px-3 !py-2 !text-xs"
                 >
@@ -380,7 +468,7 @@ export default function AdminListings() {
       </div>
 
       {/* review drawer/modal */}
-      {selected && (
+      {selected ? (
         <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-ink/60 backdrop-blur-sm"
@@ -493,7 +581,7 @@ export default function AdminListings() {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
-  )
+  );
 }

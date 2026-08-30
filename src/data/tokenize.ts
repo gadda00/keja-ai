@@ -5,96 +5,96 @@
  * All ledger entries are simulated on-device — no real chain, no real money.
  */
 
-export type TokenizeStatus = 'LIVE' | 'FUNDING' | 'FUNDED' | 'UPCOMING'
-export type PropertyType = 'OFFICE' | 'RESIDENTIAL' | 'RETAIL' | 'MIXED_USE' | 'LOGISTICS'
-export type DistributionFreq = 'MONTHLY' | 'QUARTERLY'
+export type TokenizeStatus = 'LIVE' | 'FUNDING' | 'FUNDED' | 'UPCOMING';
+export type PropertyType = 'OFFICE' | 'RESIDENTIAL' | 'RETAIL' | 'MIXED_USE' | 'LOGISTICS';
+export type DistributionFreq = 'MONTHLY' | 'QUARTERLY';
 
 export interface TokenizedProperty {
-  id: string
-  slug: string
-  title: string
-  tagline: string
-  description: string
-  location: string
-  city: string
-  country: string
-  propertyType: PropertyType
-  imageUrl: string
-  totalValueUsd: number
-  totalTokens: number
-  tokensSold: number
-  tokenPriceUsd: number
-  annualNetIncomeUsd: number
-  distributionFreq: DistributionFreq
-  legalStructure: string
-  jurisdiction: string
-  tokenSymbol: string
-  contractAddress: string
-  status: TokenizeStatus
-  minTokens: number
-  appreciationPct: number
-  occupancyPct: number
-  managementFeePct: number
-  highlights: string[]
+  id: string;
+  slug: string;
+  title: string;
+  tagline: string;
+  description: string;
+  location: string;
+  city: string;
+  country: string;
+  propertyType: PropertyType;
+  imageUrl: string;
+  totalValueUsd: number;
+  totalTokens: number;
+  tokensSold: number;
+  tokenPriceUsd: number;
+  annualNetIncomeUsd: number;
+  distributionFreq: DistributionFreq;
+  legalStructure: string;
+  jurisdiction: string;
+  tokenSymbol: string;
+  contractAddress: string;
+  status: TokenizeStatus;
+  minTokens: number;
+  appreciationPct: number;
+  occupancyPct: number;
+  managementFeePct: number;
+  highlights: string[];
   /** property-level distribution history shown on the detail page */
-  distributions: PropertyDistribution[]
-  investorCount: number
+  distributions: PropertyDistribution[];
+  investorCount: number;
   /** true when issued at runtime through the Issuer Console */
-  custom?: boolean
+  custom?: boolean;
 }
 
 export interface PropertyDistribution {
-  id: string
-  periodLabel: string
-  payDate: string
-  amountUsd: number
-  perTokenUsd: number
+  id: string;
+  periodLabel: string;
+  payDate: string;
+  amountUsd: number;
+  perTokenUsd: number;
 }
 
 export interface Investor {
-  id: string
-  email: string
-  fullName: string
-  phone: string
-  country: string
-  kycStatus: 'VERIFIED'
-  walletAddress: string
+  id: string;
+  email: string;
+  fullName: string;
+  phone: string;
+  country: string;
+  kycStatus: 'VERIFIED';
+  walletAddress: string;
   /** demo portfolio flag */
-  demo?: boolean
+  demo?: boolean;
 }
 
 export interface Investment {
-  id: string
-  propertyId: string
-  tokenAmount: number
-  pricePerTokenUsd: number
-  totalCostUsd: number
-  txHash: string
-  blockNumber: number
-  createdAt: string
+  id: string;
+  propertyId: string;
+  tokenAmount: number;
+  pricePerTokenUsd: number;
+  totalCostUsd: number;
+  txHash: string;
+  blockNumber: number;
+  createdAt: string;
 }
 
 export interface LedgerTx {
-  txHash: string
-  blockNumber: number
-  symbol: string
-  title: string
-  tokens: number
-  totalCostUsd: number
-  timestamp: string
-  type: 'PURCHASE' | 'ISSUANCE' | 'SALE'
+  txHash: string;
+  blockNumber: number;
+  symbol: string;
+  title: string;
+  tokens: number;
+  totalCostUsd: number;
+  timestamp: string;
+  type: 'PURCHASE' | 'ISSUANCE' | 'SALE';
 }
 
 export interface ReceivedDistribution {
-  id: string
-  propertyId: string
-  symbol: string
-  title: string
-  period: string
-  payDate: string
-  tokens: number
-  perTokenUsd: number
-  amountUsd: number
+  id: string;
+  propertyId: string;
+  symbol: string;
+  title: string;
+  period: string;
+  payDate: string;
+  tokens: number;
+  perTokenUsd: number;
+  amountUsd: number;
 }
 
 /* ------------------------------- seeded data ------------------------------- */
@@ -134,9 +134,27 @@ export const TOKENIZED_PROPERTIES: TokenizedProperty[] = [
       'Title verified on Ardhisasa land registry — zero encumbrances',
     ],
     distributions: [
-      { id: 'wst1-q425', periodLabel: 'Q4 2025', payDate: '2026-01-15', amountUsd: 210_000, perTokenUsd: 0.175 },
-      { id: 'wst1-q126', periodLabel: 'Q1 2026', payDate: '2026-04-15', amountUsd: 210_000, perTokenUsd: 0.175 },
-      { id: 'wst1-q226', periodLabel: 'Q2 2026', payDate: '2026-07-15', amountUsd: 210_000, perTokenUsd: 0.175 },
+      {
+        id: 'wst1-q425',
+        periodLabel: 'Q4 2025',
+        payDate: '2026-01-15',
+        amountUsd: 210_000,
+        perTokenUsd: 0.175,
+      },
+      {
+        id: 'wst1-q126',
+        periodLabel: 'Q1 2026',
+        payDate: '2026-04-15',
+        amountUsd: 210_000,
+        perTokenUsd: 0.175,
+      },
+      {
+        id: 'wst1-q226',
+        periodLabel: 'Q2 2026',
+        payDate: '2026-07-15',
+        amountUsd: 210_000,
+        perTokenUsd: 0.175,
+      },
     ],
     investorCount: 412,
   },
@@ -174,8 +192,20 @@ export const TOKENIZED_PROPERTIES: TokenizedProperty[] = [
       'Fully renovated 2023: solar water heating, backup generator',
     ],
     distributions: [
-      { id: 'klm2-q226', periodLabel: 'Q2 2026', payDate: '2026-07-05', amountUsd: 90_000, perTokenUsd: 0.2 },
-      { id: 'klm2-jul26', periodLabel: 'July 2026', payDate: '2026-08-05', amountUsd: 30_000, perTokenUsd: 0.0667 },
+      {
+        id: 'klm2-q226',
+        periodLabel: 'Q2 2026',
+        payDate: '2026-07-05',
+        amountUsd: 90_000,
+        perTokenUsd: 0.2,
+      },
+      {
+        id: 'klm2-jul26',
+        periodLabel: 'July 2026',
+        payDate: '2026-08-05',
+        amountUsd: 30_000,
+        perTokenUsd: 0.0667,
+      },
     ],
     investorCount: 367,
   },
@@ -287,7 +317,7 @@ export const TOKENIZED_PROPERTIES: TokenizedProperty[] = [
     distributions: [],
     investorCount: 0,
   },
-]
+];
 
 /* ------------------------------ demo investor ------------------------------ */
 
@@ -300,7 +330,7 @@ export const DEMO_INVESTOR: Investor = {
   kycStatus: 'VERIFIED',
   walletAddress: '0x7F3dA9c14B8e25E6fA0b71C4dD88e09B3a2F5cE7',
   demo: true,
-}
+};
 
 export const DEMO_INVESTMENTS: Investment[] = [
   {
@@ -333,43 +363,99 @@ export const DEMO_INVESTMENTS: Investment[] = [
     blockNumber: 5_102_883,
     createdAt: '2026-08-02T09:41:00Z',
   },
-]
+];
 
 export const DEMO_DISTRIBUTIONS: ReceivedDistribution[] = [
-  { id: 'dd-1', propertyId: 'kj-wst1', symbol: 'KJ-WST1', title: 'Westlands Tower One', period: 'Q4 2025', payDate: '2026-01-15', tokens: 2_500, perTokenUsd: 0.175, amountUsd: 437.5 },
-  { id: 'dd-2', propertyId: 'kj-wst1', symbol: 'KJ-WST1', title: 'Westlands Tower One', period: 'Q1 2026', payDate: '2026-04-15', tokens: 2_500, perTokenUsd: 0.175, amountUsd: 437.5 },
-  { id: 'dd-3', propertyId: 'kj-wst1', symbol: 'KJ-WST1', title: 'Westlands Tower One', period: 'Q2 2026', payDate: '2026-07-15', tokens: 2_500, perTokenUsd: 0.175, amountUsd: 437.5 },
-  { id: 'dd-4', propertyId: 'kj-klm2', symbol: 'KJ-KLM2', title: 'Kilimani Sky Residences', period: 'Q2 2026', payDate: '2026-07-05', tokens: 1_200, perTokenUsd: 0.2, amountUsd: 240 },
-  { id: 'dd-5', propertyId: 'kj-klm2', symbol: 'KJ-KLM2', title: 'Kilimani Sky Residences', period: 'July 2026', payDate: '2026-08-05', tokens: 1_200, perTokenUsd: 0.0667, amountUsd: 80 },
-]
+  {
+    id: 'dd-1',
+    propertyId: 'kj-wst1',
+    symbol: 'KJ-WST1',
+    title: 'Westlands Tower One',
+    period: 'Q4 2025',
+    payDate: '2026-01-15',
+    tokens: 2_500,
+    perTokenUsd: 0.175,
+    amountUsd: 437.5,
+  },
+  {
+    id: 'dd-2',
+    propertyId: 'kj-wst1',
+    symbol: 'KJ-WST1',
+    title: 'Westlands Tower One',
+    period: 'Q1 2026',
+    payDate: '2026-04-15',
+    tokens: 2_500,
+    perTokenUsd: 0.175,
+    amountUsd: 437.5,
+  },
+  {
+    id: 'dd-3',
+    propertyId: 'kj-wst1',
+    symbol: 'KJ-WST1',
+    title: 'Westlands Tower One',
+    period: 'Q2 2026',
+    payDate: '2026-07-15',
+    tokens: 2_500,
+    perTokenUsd: 0.175,
+    amountUsd: 437.5,
+  },
+  {
+    id: 'dd-4',
+    propertyId: 'kj-klm2',
+    symbol: 'KJ-KLM2',
+    title: 'Kilimani Sky Residences',
+    period: 'Q2 2026',
+    payDate: '2026-07-05',
+    tokens: 1_200,
+    perTokenUsd: 0.2,
+    amountUsd: 240,
+  },
+  {
+    id: 'dd-5',
+    propertyId: 'kj-klm2',
+    symbol: 'KJ-KLM2',
+    title: 'Kilimani Sky Residences',
+    period: 'July 2026',
+    payDate: '2026-08-05',
+    tokens: 1_200,
+    perTokenUsd: 0.0667,
+    amountUsd: 80,
+  },
+];
 
 /* --------------------------------- helpers --------------------------------- */
 
 export const propertyTypeLabel = (t: PropertyType) =>
-  ({ OFFICE: 'Office', RESIDENTIAL: 'Residential', RETAIL: 'Retail', MIXED_USE: 'Mixed-Use', LOGISTICS: 'Logistics' })[t]
+  ({
+    OFFICE: 'Office',
+    RESIDENTIAL: 'Residential',
+    RETAIL: 'Retail',
+    MIXED_USE: 'Mixed-Use',
+    LOGISTICS: 'Logistics',
+  })[t];
 
 export const yieldPct = (p: TokenizedProperty) =>
-  p.totalValueUsd > 0 ? (p.annualNetIncomeUsd / p.totalValueUsd) * 100 : 0
+  p.totalValueUsd > 0 ? (p.annualNetIncomeUsd / p.totalValueUsd) * 100 : 0;
 
-export const tokensAvailable = (p: TokenizedProperty) => Math.max(0, p.totalTokens - p.tokensSold)
+export const tokensAvailable = (p: TokenizedProperty) => Math.max(0, p.totalTokens - p.tokensSold);
 
 export const fundedPct = (p: TokenizedProperty) =>
-  p.totalTokens > 0 ? Math.round((p.tokensSold / p.totalTokens) * 100) : 0
+  p.totalTokens > 0 ? Math.round((p.tokensSold / p.totalTokens) * 100) : 0;
 
 /** Deterministic pseudo-random hex generator (wallet-safe, no real chain). */
 export function randomHex(len: number): string {
-  const bytes = new Uint8Array(len / 2)
-  if (typeof crypto !== 'undefined' && crypto.getRandomValues) crypto.getRandomValues(bytes)
-  else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256)
-  return '0x' + Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+  const bytes = new Uint8Array(len / 2);
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) crypto.getRandomValues(bytes);
+  else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+  return `0x${Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')}`;
 }
 
-export const nextBlockNumber = () => 5_200_000 + Math.floor(Math.random() * 90_000)
+export const nextBlockNumber = () => 5_200_000 + Math.floor(Math.random() * 90_000);
 
 export function nextTokenSymbol(existing: TokenizedProperty[]): string {
   const nums = existing
     .map((p) => parseInt((p.tokenSymbol.match(/(\d+)$/) ?? ['0'])[0], 10))
-    .filter((n) => !isNaN(n))
-  const next = (nums.length ? Math.max(...nums) : 0) + 1
-  return `KJ-CUS${next}`
+    .filter((n) => !isNaN(n));
+  const next = (nums.length ? Math.max(...nums) : 0) + 1;
+  return `KJ-CUS${next}`;
 }

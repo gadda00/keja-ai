@@ -5,21 +5,29 @@
  *
  * Deep links: /tokenize?view=marketplace|learn|portfolio|issuer
  */
-import { usePageMeta } from '@/lib/seo'
-import { Suspense, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { Coins, Store, GraduationCap, Briefcase, LayoutDashboard, CandlestickChart } from 'lucide-react'
-import { useTokenize } from '@/lib/tokenizeStore'
-import type { TokenizeView } from '@/lib/tokenizeStore'
-import { ToastProvider } from '@/components/tokenize/shared'
-import { Marketplace } from '@/components/tokenize/Marketplace'
-import SecondaryMarket from '@/components/tokenize/Market'
-import { PropertyDetail } from '@/components/tokenize/PropertyDetail'
-import { PortfolioView } from '@/components/tokenize/PortfolioView'
-import { IssuerConsole } from '@/components/tokenize/IssuerConsole'
-import { Learn } from '@/components/tokenize/Learn'
-import { KycModal } from '@/components/tokenize/KycModal'
-import { InvestModal } from '@/components/tokenize/InvestModal'
+import {
+  Briefcase,
+  CandlestickChart,
+  Coins,
+  GraduationCap,
+  LayoutDashboard,
+  Store,
+} from 'lucide-react';
+import { Suspense, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+
+import { InvestModal } from '@/components/tokenize/InvestModal';
+import { IssuerConsole } from '@/components/tokenize/IssuerConsole';
+import { KycModal } from '@/components/tokenize/KycModal';
+import { Learn } from '@/components/tokenize/Learn';
+import SecondaryMarket from '@/components/tokenize/Market';
+import { Marketplace } from '@/components/tokenize/Marketplace';
+import { PortfolioView } from '@/components/tokenize/PortfolioView';
+import { PropertyDetail } from '@/components/tokenize/PropertyDetail';
+import { ToastProvider } from '@/components/tokenize/shared';
+import { usePageMeta } from '@/lib/seo';
+import type { TokenizeView } from '@/lib/tokenizeStore';
+import { useTokenize } from '@/lib/tokenizeStore';
 
 const VIEW_TABS: { v: TokenizeView; label: string; icon: typeof Store }[] = [
   { v: 'marketplace', label: 'Marketplace', icon: Store },
@@ -27,12 +35,12 @@ const VIEW_TABS: { v: TokenizeView; label: string; icon: typeof Store }[] = [
   { v: 'portfolio', label: 'My Portfolio', icon: LayoutDashboard },
   { v: 'issuer', label: 'Issuer Console', icon: Briefcase },
   { v: 'learn', label: 'Learn', icon: GraduationCap },
-]
+];
 
-const VALID_VIEWS: TokenizeView[] = ['marketplace', 'market', 'portfolio', 'issuer', 'learn']
+const VALID_VIEWS: TokenizeView[] = ['marketplace', 'market', 'portfolio', 'issuer', 'learn'];
 
 function TabBar() {
-  const { view, setView } = useTokenize()
+  const { view, setView } = useTokenize();
   return (
     <div className="sticky top-16 z-30 border-b border-gold-100 bg-white/95 backdrop-blur-md">
       <div className="container-luxe no-scrollbar flex items-center gap-1 overflow-x-auto py-2.5">
@@ -59,31 +67,31 @@ function TabBar() {
         </span>
       </div>
     </div>
-  )
+  );
 }
 
 function TokenizeInner() {
-  const { view, setView, properties, selectedPropertyId } = useTokenize()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const { view, setView, properties, selectedPropertyId } = useTokenize();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // deep-link support: /tokenize?view=learn
   useEffect(() => {
-    const q = searchParams.get('view')
+    const q = searchParams.get('view');
     if (q && VALID_VIEWS.includes(q as TokenizeView)) {
-      setView(q as TokenizeView)
-      setSearchParams({}, { replace: true })
+      setView(q as TokenizeView);
+      setSearchParams({}, { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
-  const selected = properties.find((p) => p.id === selectedPropertyId) ?? properties[0] ?? null
+  const selected = properties.find((p) => p.id === selectedPropertyId) ?? properties[0] ?? null;
 
   return (
     <div>
       <TabBar />
       {view === 'marketplace' && <Marketplace />}
       {view === 'market' && <SecondaryMarket />}
-      {view === 'property' && selected && <PropertyDetail property={selected} />}
+      {view === 'property' && selected ? <PropertyDetail property={selected} /> : null}
       {view === 'portfolio' && <PortfolioView />}
       {view === 'issuer' && <IssuerConsole />}
       {view === 'learn' && <Learn />}
@@ -91,21 +99,23 @@ function TokenizeInner() {
       <InvestModal />
       <KycModal />
     </div>
-  )
+  );
 }
 
 export default function Tokenize() {
   usePageMeta(
     'Keja Tokenize — Fractional Ownership from $100',
-    "Own a fraction of Nairobi's finest real estate. KYC-gated, SPV-structured, simulated-ledger tokenization demo.",
-  )
+    "Own a fraction of Nairobi's finest real estate. KYC-gated, SPV-structured, simulated-ledger tokenization demo."
+  );
   return (
     <Suspense
       fallback={
         <div className="flex min-h-[60vh] items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <span className="h-10 w-10 animate-spin rounded-full border-4 border-gold-100 border-t-gold-600" />
-            <p className="text-xs font-semibold uppercase tracking-wider text-ink-faint">Loading Keja Tokenize…</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-ink-faint">
+              Loading Keja Tokenize…
+            </p>
           </div>
         </div>
       }
@@ -114,5 +124,5 @@ export default function Tokenize() {
         <TokenizeInner />
       </ToastProvider>
     </Suspense>
-  )
+  );
 }

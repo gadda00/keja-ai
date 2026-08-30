@@ -1,23 +1,33 @@
-import { usePageMeta } from '@/lib/seo'
-import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 import {
-  KeyRound, Wrench, Sparkles, CalendarClock, FileBarChart, Building2, MessageCircle, Bot, ArrowRight, CheckCircle2,
-} from 'lucide-react'
-import { asset } from '@/config'
+  ArrowRight,
+  Bot,
+  Building2,
+  CalendarClock,
+  CheckCircle2,
+  FileBarChart,
+  KeyRound,
+  MessageCircle,
+  Sparkles,
+  Wrench,
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+import { asset } from '@/config';
+import { usePageMeta } from '@/lib/seo';
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: '-60px' },
   transition: { duration: 0.6 },
-}
+};
 
 export default function Manage() {
   usePageMeta(
     'Keja Manage — Landlords & Property Managers',
-    'Tenant communication, maintenance, rental analytics and occupancy reporting in one place.',
-  )
+    'Tenant communication, maintenance, rental analytics and occupancy reporting in one place.'
+  );
   return (
     <div>
       <section className="bg-ink py-20 sm:py-24">
@@ -27,9 +37,9 @@ export default function Manage() {
             Your property, <span className="gold-text">professionally boring</span>
           </h1>
           <p className="mt-6 leading-relaxed text-white/65">
-            The best property management is the kind you never notice: tenants pay on time, issues get fixed before
-            you hear about them, and your statement lands monthly like clockwork. That’s the Keja standard —
-            M-Pesa-native, Airbnb-capable, boringly reliable.
+            The best property management is the kind you never notice: tenants pay on time, issues
+            get fixed before you hear about them, and your statement lands monthly like clockwork.
+            That’s the Keja standard — M-Pesa-native, Airbnb-capable, boringly reliable.
           </p>
         </div>
       </section>
@@ -69,7 +79,12 @@ export default function Manage() {
               text: 'Monthly statements: rent collected, expenses, arrears status, and portfolio performance. Annual summaries ready for your accountant. No surprises, ever.',
             },
           ].map((s, i) => (
-            <motion.div key={s.title} {...fadeUp} transition={{ ...fadeUp.transition, delay: i * 0.05 }} className="card-luxe card-luxe-hover p-6">
+            <motion.div
+              key={s.title}
+              {...fadeUp}
+              transition={{ ...fadeUp.transition, delay: i * 0.05 }}
+              className="card-luxe card-luxe-hover p-6"
+            >
               <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold-gradient shadow-gold-sm">
                 <s.icon className="h-6 w-6 text-white" />
               </span>
@@ -85,7 +100,9 @@ export default function Manage() {
         <div className="container-luxe grid items-center gap-12 lg:grid-cols-2">
           <motion.div {...fadeUp}>
             <p className="eyebrow">Simple, honest fees</p>
-            <h2 className="heading-display mt-3 text-3xl sm:text-4xl">One line of math you’ll like</h2>
+            <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
+              One line of math you’ll like
+            </h2>
             <div className="mt-8 space-y-3">
               {[
                 'Long-let management: 8% of collected rent — nothing when nothing is collected.',
@@ -93,7 +110,10 @@ export default function Manage() {
                 'Letting only (find the tenant): one month’s rent, once.',
                 'Furnishing packages for landlords: staged, financed, and rent-optimised.',
               ].map((p) => (
-                <div key={p} className="flex items-start gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gold-100">
+                <div
+                  key={p}
+                  className="flex items-start gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gold-100"
+                >
                   <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-gold-600" />
                   <p className="text-sm leading-relaxed text-ink-soft">{p}</p>
                 </div>
@@ -103,14 +123,19 @@ export default function Manage() {
               <Building2 className="h-6 w-6 text-gold-400" />
               <p className="mt-2 font-display text-lg font-semibold text-white">Portfolio owners</p>
               <p className="mt-1.5 text-sm leading-relaxed text-white/60">
-                Managing 5+ units? Chacadom’s portfolio desk builds you a consolidated asset plan — yields,
-                capex priorities, divest/refinance signals — on top of day-to-day management.
+                Managing 5+ units? Chacadom’s portfolio desk builds you a consolidated asset plan —
+                yields, capex priorities, divest/refinance signals — on top of day-to-day
+                management.
               </p>
             </div>
           </motion.div>
 
           <motion.div {...fadeUp} className="card-luxe overflow-hidden">
-            <img src={asset('/images/props/interior_0.jpg')} alt="Managed apartment interior" className="h-64 w-full object-cover" />
+            <img
+              src={asset('/images/props/interior_0.jpg')}
+              alt="Managed apartment interior"
+              className="h-64 w-full object-cover"
+            />
             <div className="p-6">
               <h3 className="font-display text-xl font-bold text-ink">What owners see, monthly</h3>
               <div className="mt-4 space-y-2.5 text-sm">
@@ -121,13 +146,18 @@ export default function Manage() {
                   ['Net to owner', 'KES 93,080'],
                   ['Arrears', 'None — tenant A+'],
                 ].map(([k, v]) => (
-                  <p key={k} className="flex items-center justify-between border-b border-gold-100 pb-2.5">
+                  <p
+                    key={k}
+                    className="flex items-center justify-between border-b border-gold-100 pb-2.5"
+                  >
                     <span className="text-ink-muted">{k}</span>
                     <b className="text-ink">{v}</b>
                   </p>
                 ))}
               </div>
-              <Link to="/contact" className="btn-gold mt-6 w-full">Get a management quote</Link>
+              <Link to="/contact" className="btn-gold mt-6 w-full">
+                Get a management quote
+              </Link>
             </div>
           </motion.div>
         </div>
@@ -139,9 +169,12 @@ export default function Manage() {
             <Bot className="h-8 w-8 text-white" />
           </span>
           <div className="flex-1">
-            <h2 className="font-display text-2xl font-bold text-white sm:text-3xl">Buying first? Start with the math.</h2>
+            <h2 className="font-display text-2xl font-bold text-white sm:text-3xl">
+              Buying first? Start with the math.
+            </h2>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/60">
-              The best-managed property still starts as the best-bought property. Run the numbers before you commit.
+              The best-managed property still starts as the best-bought property. Run the numbers
+              before you commit.
             </p>
           </div>
           <Link to="/invest" className="btn-gold shrink-0">
@@ -150,5 +183,5 @@ export default function Manage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

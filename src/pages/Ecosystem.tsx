@@ -3,22 +3,23 @@
  * around one intelligence layer, plus the platform hierarchy, data flywheel
  * and end-to-end property journey (Ch.6–8).
  */
-import { usePageMeta } from '@/lib/seo'
-import { Link } from 'react-router-dom'
 import {
-  Home,
-  TrendingUp,
+  ArrowRight,
   Briefcase,
   Building,
+  Coins,
   Database,
+  Globe2,
+  Home,
+  Layers,
+  RefreshCw,
   Search,
   Sparkles,
-  Coins,
-  ArrowRight,
-  RefreshCw,
-  Layers,
-  Globe2,
-} from 'lucide-react'
+  TrendingUp,
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+import { usePageMeta } from '@/lib/seo';
 
 const PRODUCTS = [
   {
@@ -85,28 +86,45 @@ const PRODUCTS = [
     status: 'Demo (simulated)',
     to: '/tokenize',
   },
-]
+];
 
 const HIERARCHY = [
   { n: '01', t: 'Property', d: 'The real-world asset — structured, verified, investable.' },
-  { n: '02', t: 'Data', d: 'The structured information layer — prices, rents, comparables, provenance.' },
+  {
+    n: '02',
+    t: 'Data',
+    d: 'The structured information layer — prices, rents, comparables, provenance.',
+  },
   { n: '03', t: 'AI', d: 'The interpretation and automation layer — intelligence on demand.' },
   { n: '04', t: 'Investment Intelligence', d: 'The decision layer — scores, scenarios, verdicts.' },
   { n: '05', t: 'Marketplace', d: 'The transaction and professional network.' },
   { n: '06', t: 'Tokenization', d: 'The digital representation layer for eligible interests.' },
-  { n: '07', t: 'Financial Ecosystem', d: 'Payments, financing, custody — where regulation permits.' },
-]
+  {
+    n: '07',
+    t: 'Financial Ecosystem',
+    d: 'Payments, financing, custody — where regulation permits.',
+  },
+];
 
 const JOURNEY = [
-  'Discover', 'Compare', 'Analyse', 'Verify', 'Finance', 'Transact',
-  'Furnish', 'Manage', 'Monitor', 'Optimise', 'Exit',
-]
+  'Discover',
+  'Compare',
+  'Analyse',
+  'Verify',
+  'Finance',
+  'Transact',
+  'Furnish',
+  'Manage',
+  'Monitor',
+  'Optimise',
+  'Exit',
+];
 
 export default function Ecosystem() {
   usePageMeta(
     'The Keja Ecosystem — One Intelligence Layer',
-    'Eight products — Home, Invest, Pro, Manage, Data, Search, AI Advisor and Token — on one intelligence layer.',
-  )
+    'Eight products — Home, Invest, Pro, Manage, Data, Search, AI Advisor and Token — on one intelligence layer.'
+  );
   return (
     <div className="container-luxe py-14">
       {/* hero */}
@@ -117,8 +135,8 @@ export default function Ecosystem() {
           <span className="gold-text">one intelligence layer</span>
         </h1>
         <p className="mt-4 text-base leading-relaxed text-ink-muted">
-          KEJA is not a collection of disconnected features — every layer strengthens the next.
-          Data feeds intelligence; intelligence improves discovery; discovery feeds transactions;
+          KEJA is not a collection of disconnected features — every layer strengthens the next. Data
+          feeds intelligence; intelligence improves discovery; discovery feeds transactions;
           transactions generate more data; and the flywheel compounds with every participant.
         </p>
       </div>
@@ -212,7 +230,7 @@ export default function Ecosystem() {
                 'More investors',
                 'More opportunities',
                 'More developers',
-              ].map((step, i) => (
+              ].map((step) => (
                 <div
                   key={step}
                   className="flex items-center justify-between gap-2 rounded-xl bg-white/5 px-4 py-3.5 ring-1 ring-white/10"
@@ -257,9 +275,18 @@ export default function Ecosystem() {
         </div>
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
           {[
-            { t: 'Intelligence first', d: 'Build the intelligence layer and prove customer value before marketplace scale — the deliberate sequence of the KEJA blueprint.' },
-            { t: 'Trust by design', d: 'Duplicate detection, anomaly flags, agent verification and document completeness checks on every listing.' },
-            { t: 'Compliance-aware', d: 'Classification first, licensing second, issuance third — tokenization only when legally, economically and operationally defensible.' },
+            {
+              t: 'Intelligence first',
+              d: 'Build the intelligence layer and prove customer value before marketplace scale — the deliberate sequence of the KEJA blueprint.',
+            },
+            {
+              t: 'Trust by design',
+              d: 'Duplicate detection, anomaly flags, agent verification and document completeness checks on every listing.',
+            },
+            {
+              t: 'Compliance-aware',
+              d: 'Classification first, licensing second, issuance third — tokenization only when legally, economically and operationally defensible.',
+            },
           ].map((c) => (
             <div key={c.t} className="card-luxe p-5">
               <h3 className="font-display text-base font-bold text-ink">{c.t}</h3>
@@ -269,5 +296,5 @@ export default function Ecosystem() {
         </div>
       </section>
     </div>
-  )
+  );
 }

@@ -2,102 +2,116 @@
  * Keja Tokenize — token purchase flow:
  * order → confirm → staged blockchain broadcast → ownership certificate.
  */
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  ArrowRight, ArrowLeft, CheckCircle2, Copy, Loader2, Link2, ShieldCheck, AlertTriangle, Coins, BadgeDollarSign,
-} from 'lucide-react'
-import { useTokenize } from '@/lib/tokenizeStore'
-import type { BuyResult } from '@/lib/tokenizeStore'
-import { tokensAvailable } from '@/data/tokenize'
-import { Modal, useToast, fmtNum, fmtUsd, img } from './shared'
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  BadgeDollarSign,
+  CheckCircle2,
+  Coins,
+  Copy,
+  Link2,
+  Loader2,
+  ShieldCheck,
+} from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+import { tokensAvailable } from '@/data/tokenize';
+import type { BuyResult } from '@/lib/tokenizeStore';
+import { useTokenize } from '@/lib/tokenizeStore';
+
+import { fmtNum, fmtUsd, img, Modal, useToast } from './shared';
 
 const PROCESS_STAGES = [
   'Building transaction…',
   'Signing with your wallet…',
   'Broadcasting to Keja Ledger…',
   'Awaiting block confirmation…',
-]
+];
 
 export function InvestModal() {
-  const { investPropertyId, closeInvest, investor, setView, properties, buyTokens } = useTokenize()
-  const { toast } = useToast()
+  const { investPropertyId, closeInvest, investor, setView, properties, buyTokens } = useTokenize();
+  const { toast } = useToast();
 
   const p = useMemo(
     () => properties.find((x) => x.id === investPropertyId) ?? null,
     [properties, investPropertyId]
-  )
+  );
 
-  const [step, setStep] = useState<'order' | 'confirm' | 'processing' | 'success'>('order')
-  const [tokens, setTokens] = useState<number | null>(null)
-  const [ack, setAck] = useState(false)
-  const [stage, setStage] = useState(0)
-  const [result, setResult] = useState<BuyResult | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [step, setStep] = useState<'order' | 'confirm' | 'processing' | 'success'>('order');
+  const [tokens, setTokens] = useState<number | null>(null);
+  const [ack, setAck] = useState(false);
+  const [stage, setStage] = useState(0);
+  const [result, setResult] = useState<BuyResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (investPropertyId) {
-      setStep('order')
-      setTokens(null)
-      setAck(false)
-      setStage(0)
-      setResult(null)
-      setError(null)
+      setStep('order');
+      setTokens(null);
+      setAck(false);
+      setStage(0);
+      setResult(null);
+      setError(null);
     }
-  }, [investPropertyId])
+  }, [investPropertyId]);
 
-  const maxBuy = p ? Math.max(p.minTokens, Math.min(tokensAvailable(p), 2000)) : 0
+  const maxBuy = p ? Math.max(p.minTokens, Math.min(tokensAvailable(p), 2000)) : 0;
   const amount = p
     ? Math.min(Math.max(tokens ?? Math.min(p.minTokens * 5, maxBuy), p.minTokens), maxBuy)
-    : 0
-  const cost = amount * (p?.tokenPriceUsd ?? 0)
-  const incomePerToken = p && p.totalTokens > 0 ? p.annualNetIncomeUsd / p.totalTokens : 0
-  const annualIncome = amount * incomePerToken
+    : 0;
+  const cost = amount * (p?.tokenPriceUsd ?? 0);
+  const incomePerToken = p && p.totalTokens > 0 ? p.annualNetIncomeUsd / p.totalTokens : 0;
+  const annualIncome = amount * incomePerToken;
 
-  const stageTimerRef = useRef<number | null>(null)
-  const broadcastRef = useRef<number | null>(null)
+  const stageTimerRef = useRef<number | null>(null);
+  const broadcastRef = useRef<number | null>(null);
   // Safety net: if the modal unmounts mid-broadcast, stop timers and drop
   // pending state updates (the old code leaked the interval and set state on
   // an unmounted component).
   useEffect(
     () => () => {
-      if (stageTimerRef.current) window.clearInterval(stageTimerRef.current)
-      if (broadcastRef.current) window.clearTimeout(broadcastRef.current)
+      if (stageTimerRef.current) window.clearInterval(stageTimerRef.current);
+      if (broadcastRef.current) window.clearTimeout(broadcastRef.current);
     },
-    [],
-  )
+    []
+  );
 
   function execute() {
-    if (!p) return
-    setStep('processing')
-    setStage(0)
-    const stageTimer = window.setInterval(() => setStage((s) => Math.min(s + 1, PROCESS_STAGES.length - 1)), 900)
-    stageTimerRef.current = stageTimer
+    if (!p) return;
+    setStep('processing');
+    setStage(0);
+    const stageTimer = window.setInterval(
+      () => setStage((s) => Math.min(s + 1, PROCESS_STAGES.length - 1)),
+      900
+    );
+    stageTimerRef.current = stageTimer;
     broadcastRef.current = window.setTimeout(() => {
       try {
-        const r = buyTokens(p.id, amount)
-        setResult(r)
-        setStep('success')
+        const r = buyTokens(p.id, amount);
+        setResult(r);
+        setStep('success');
         toast({
           title: `${fmtNum(amount)} ${p.tokenSymbol} tokens acquired`,
           description: `Confirmed on Keja Ledger · block ${r.blockNumber.toLocaleString()}`,
-        })
+        });
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Purchase failed')
-        setStep('order')
+        setError(e instanceof Error ? e.message : 'Purchase failed');
+        setStep('order');
       } finally {
-        window.clearInterval(stageTimer)
-        stageTimerRef.current = null
-        broadcastRef.current = null
+        window.clearInterval(stageTimer);
+        stageTimerRef.current = null;
+        broadcastRef.current = null;
       }
-    }, 3200)
+    }, 3200);
   }
 
   return (
     <Modal
       open={!!investPropertyId}
       onClose={() => {
-        if (step !== 'processing') closeInvest()
+        if (step !== 'processing') closeInvest();
       }}
       title={p ? `Buy ${p.tokenSymbol} — Keja Tokenize` : 'Buy tokens'}
       subtitle={
@@ -109,8 +123,13 @@ export function InvestModal() {
     >
       <AnimatePresence mode="wait">
         {/* ─── order ─── */}
-        {step === 'order' && p && (
-          <motion.div key="order" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }}>
+        {step === 'order' && p ? (
+          <motion.div
+            key="order"
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -12 }}
+          >
             <div className="flex items-center justify-between text-[13px]">
               <span className="font-semibold text-ink">{fmtNum(amount)} tokens</span>
               <span className="text-ink-muted">
@@ -129,7 +148,7 @@ export function InvestModal() {
             />
             <div className="mt-3 flex flex-wrap gap-2">
               {[p.minTokens, 100, 500, 1000].map((t) => {
-                const val = Math.max(p.minTokens, Math.min(t, maxBuy))
+                const val = Math.max(p.minTokens, Math.min(t, maxBuy));
                 return (
                   <button
                     key={t}
@@ -142,7 +161,7 @@ export function InvestModal() {
                   >
                     {fmtNum(val)} · {fmtUsd(val * p.tokenPriceUsd)}
                   </button>
-                )
+                );
               })}
             </div>
 
@@ -164,7 +183,8 @@ export function InvestModal() {
               <div className="flex justify-between text-[12.5px]">
                 <span className="text-ink-muted">Projected income</span>
                 <span className="font-semibold text-emerald-700">
-                  {fmtUsd(annualIncome, 2)}/yr · {((p.annualNetIncomeUsd / p.totalValueUsd) * 100).toFixed(1)}%
+                  {fmtUsd(annualIncome, 2)}/yr ·{' '}
+                  {((p.annualNetIncomeUsd / p.totalValueUsd) * 100).toFixed(1)}%
                 </span>
               </div>
             </div>
@@ -173,14 +193,23 @@ export function InvestModal() {
               Review order <ArrowRight className="h-4 w-4" />
             </button>
           </motion.div>
-        )}
+        ) : null}
 
         {/* ─── confirm ─── */}
-        {step === 'confirm' && p && (
-          <motion.div key="confirm" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }}>
+        {step === 'confirm' && p ? (
+          <motion.div
+            key="confirm"
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -12 }}
+          >
             <div className="rounded-xl border border-gold-100 p-4">
               <div className="flex items-center gap-3">
-                <img src={img(p.imageUrl)} alt={p.title} className="h-14 w-20 rounded-lg object-cover" />
+                <img
+                  src={img(p.imageUrl)}
+                  alt={p.title}
+                  className="h-14 w-20 rounded-lg object-cover"
+                />
                 <div>
                   <p className="text-[14px] font-semibold text-ink">{p.title}</p>
                   <p className="text-[12px] text-ink-muted">
@@ -203,17 +232,19 @@ export function InvestModal() {
                 </div>
                 <div className="rounded-lg bg-cream p-2.5">
                   <p className="text-[10px] font-bold uppercase text-gold-700">Buyer</p>
-                  <p className="truncate font-bold text-ink">{investor?.fullName ?? 'Demo investor'}</p>
+                  <p className="truncate font-bold text-ink">
+                    {investor?.fullName ?? 'Demo investor'}
+                  </p>
                 </div>
               </div>
             </div>
 
-            {error && (
+            {error ? (
               <div className="mt-3 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-[12.5px] text-red-700">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                 {error}
               </div>
-            )}
+            ) : null}
 
             <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-gold-100 p-3.5">
               <input
@@ -239,7 +270,7 @@ export function InvestModal() {
               </button>
             </div>
           </motion.div>
-        )}
+        ) : null}
 
         {/* ─── processing ─── */}
         {step === 'processing' && (
@@ -254,7 +285,11 @@ export function InvestModal() {
                   <div
                     key={s}
                     className={`flex items-center gap-2 text-[13px] ${
-                      i < stage ? 'text-emerald-700' : i === stage ? 'font-semibold text-ink' : 'text-ink-faint'
+                      i < stage
+                        ? 'text-emerald-700'
+                        : i === stage
+                          ? 'font-semibold text-ink'
+                          : 'text-ink-faint'
                     }`}
                   >
                     {i < stage ? (
@@ -273,8 +308,12 @@ export function InvestModal() {
         )}
 
         {/* ─── success ─── */}
-        {step === 'success' && result && p && (
-          <motion.div key="success" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}>
+        {step === 'success' && result && p ? (
+          <motion.div
+            key="success"
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
             <div className="flex flex-col items-center text-center">
               <div className="rounded-full bg-emerald-100 p-3">
                 <CheckCircle2 className="h-10 w-10 text-emerald-600" />
@@ -314,12 +353,14 @@ export function InvestModal() {
                 </div>
                 <button
                   onClick={() => {
-                    navigator.clipboard?.writeText(result.txHash)
-                    toast({ title: 'Transaction hash copied' })
+                    navigator.clipboard?.writeText(result.txHash).catch(() => {});
+                    toast({ title: 'Transaction hash copied' });
                   }}
                   className="mt-3 flex w-full items-center justify-between rounded-lg border border-gold-300 bg-white px-3 py-2"
                 >
-                  <span className="truncate font-mono text-[11px] text-gold-700">{result.txHash}</span>
+                  <span className="truncate font-mono text-[11px] text-gold-700">
+                    {result.txHash}
+                  </span>
                   <Copy className="ml-2 h-3.5 w-3.5 shrink-0 text-gold-700" />
                 </button>
                 <p className="mt-2 text-[11.5px] text-ink-muted">{result.firstDistributionHint}</p>
@@ -333,16 +374,16 @@ export function InvestModal() {
               <button
                 className="btn-gold flex-[2]"
                 onClick={() => {
-                  closeInvest()
-                  setView('portfolio')
+                  closeInvest();
+                  setView('portfolio');
                 }}
               >
                 View my portfolio <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           </motion.div>
-        )}
+        ) : null}
       </AnimatePresence>
     </Modal>
-  )
+  );
 }

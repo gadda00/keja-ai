@@ -28,6 +28,8 @@ concurrency:
 
 jobs:
   ingest:
+    outputs:
+      changed: ${{ steps.pipeline.outputs.changed }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,8 +40,11 @@ jobs:
 
       - name: Run Auto-Pilot pipeline
         id: pipeline
+        env:
+          # Pass user input through env — never interpolate it directly into
+          # the shell string (GitHub script-injection hardening guidance).
+          COUNT: ${{ github.event.inputs.count || '4' }}
         run: |
-          COUNT="${{ github.event.inputs.count || '4' }}"
           echo "Running Auto-Pilot (scanner volume: $COUNT)"
           # Exit code 3 = nothing new (still a success for CI)
           node scripts/auto-listings/run.mjs --count "$COUNT" && echo "changed=true" >> "$GITHUB_OUTPUT" || {
@@ -72,3 +77,62 @@ jobs:
             console.log('feed health:', JSON.stringify(r.feedStatus));
           " >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+  # Deploy only when the pipeline actually published new listings. This used
+  # to be handled by deploy-pages.yml's workflow_run trigger, which rebuilt
+  # production on every Auto-Pilot run — including the ~3/4 runs that ingest
+  # nothing. Gating here removes those no-op production deployments.
+  deploy:
+    needs: ingest
+    if: needs.ingest.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # the ingest job just pushed the new listings commit — check out main
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc -b
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Lint (blocking quality gate)
+        run: npx oxlint src
+
+      - name: Generate sitemap (properties + articles + routes)
+        run: node scripts/generate-sitemap.mjs
+
+      - name: Build (with GitHub Pages base path)
+        run: npm run build -- --base=/keja-ai/
+
+      - name: SPA fallback (404 page)
+        run: cp dist/index.html dist/404.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -2,9 +2,10 @@
  * Legal — Terms of Service & Privacy Policy (KEJA).
  * KDPA (Kenya Data Protection Act 2019)-aligned, honest about demo scope.
  */
-import { usePageMeta } from '@/lib/seo'
-import { Link } from 'react-router-dom'
-import { Scale, ShieldCheck, Database, Users, Lock, AlertTriangle, RefreshCw } from 'lucide-react'
+import { AlertTriangle, Database, Lock, RefreshCw, Scale, ShieldCheck, Users } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+import { usePageMeta } from '@/lib/seo';
 
 const SECTIONS = [
   {
@@ -56,23 +57,25 @@ const SECTIONS = [
       'Questions: hello@keja.ai · Chacadom Investments, Westlands, Nairobi, Kenya.',
     ],
   },
-]
+];
 
 export default function TermsPrivacy() {
   usePageMeta(
     'Terms of Service & Privacy Policy',
-    'How Keja.ai operates: what scores mean, how listings are screened, your account responsibilities, and how we handle personal data under the Kenya Data Protection Act.',
-  )
+    'How Keja.ai operates: what scores mean, how listings are screened, your account responsibilities, and how we handle personal data under the Kenya Data Protection Act.'
+  );
   return (
     <div className="bg-white">
       <section className="bg-ink py-16 sm:py-20">
         <div className="container-luxe">
           <p className="eyebrow text-gold-300">Legal — plain language</p>
-          <h1 className="heading-display mt-3 text-3xl sm:text-4xl text-white">Terms of Service &amp; Privacy Policy</h1>
+          <h1 className="heading-display mt-3 text-3xl sm:text-4xl text-white">
+            Terms of Service &amp; Privacy Policy
+          </h1>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/70">
-            Last updated 30 August 2026. We wrote this to be readable, not to hide behind legalese. The
-            short version: our scores are decision support, your data stays yours, and in this demo
-            build everything is stored on your own device.
+            Last updated 30 August 2026. We wrote this to be readable, not to hide behind legalese.
+            The short version: our scores are decision support, your data stays yours, and in this
+            demo build everything is stored on your own device.
           </p>
         </div>
       </section>
@@ -89,7 +92,9 @@ export default function TermsPrivacy() {
               </h2>
               <div className="mt-4 space-y-3">
                 {sec.paras.map((p, i) => (
-                  <p key={i} className="text-sm leading-relaxed text-ink-soft">{p}</p>
+                  <p key={i} className="text-sm leading-relaxed text-ink-soft">
+                    {p}
+                  </p>
                 ))}
               </div>
             </div>
@@ -106,10 +111,13 @@ export default function TermsPrivacy() {
           </div>
 
           <p className="text-center text-sm text-ink-muted">
-            Questions about these terms? <Link to="/contact" className="font-semibold text-gold-700">Talk to us →</Link>
+            Questions about these terms?{' '}
+            <Link to="/contact" className="font-semibold text-gold-700">
+              Talk to us →
+            </Link>
           </p>
         </div>
       </section>
     </div>
-  )
+  );
 }

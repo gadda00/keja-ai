@@ -2,20 +2,40 @@
  * Keja Tokenize — marketplace view: hero, live stats, property cards,
  * how-it-works and the issuer console CTA.
  */
-import { motion } from 'framer-motion'
-import { MapPin, ArrowRight, Coins, CalendarClock, Building2, ShieldCheck, Sparkles, TrendingUp, Link2 } from 'lucide-react'
-import { useTokenize } from '@/lib/tokenizeStore'
-import type { TokenizedProperty } from '@/data/tokenize'
-import { fundedPct, tokensAvailable, yieldPct } from '@/data/tokenize'
-import { StatusBadge, TypeIcon, SectionTitle, propertyTypeLabel, fmtNum, fmtUsd, fmtUsdCompact, img } from './shared'
+import { motion } from 'framer-motion';
+import {
+  ArrowRight,
+  Building2,
+  CalendarClock,
+  Coins,
+  Link2,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
+  TrendingUp,
+} from 'lucide-react';
+
+import type { TokenizedProperty } from '@/data/tokenize';
+import { fundedPct, tokensAvailable, yieldPct } from '@/data/tokenize';
+import { useTokenize } from '@/lib/tokenizeStore';
+
+import {
+  fmtNum,
+  fmtUsdCompact,
+  img,
+  propertyTypeLabel,
+  SectionTitle,
+  StatusBadge,
+  TypeIcon,
+} from './shared';
 
 export function Marketplace() {
-  const { properties, setView } = useTokenize()
+  const { properties, setView } = useTokenize();
 
-  const totalValue = properties.reduce((s, p) => s + p.totalValueUsd, 0)
-  const totalIncome = properties.reduce((s, p) => s + p.annualNetIncomeUsd, 0)
-  const avgYield = totalValue > 0 ? (totalIncome / totalValue) * 100 : 0
-  const tokensIssued = properties.reduce((s, p) => s + p.totalTokens, 0)
+  const totalValue = properties.reduce((s, p) => s + p.totalValueUsd, 0);
+  const totalIncome = properties.reduce((s, p) => s + p.annualNetIncomeUsd, 0);
+  const avgYield = totalValue > 0 ? (totalIncome / totalValue) * 100 : 0;
+  const tokensIssued = properties.reduce((s, p) => s + p.totalTokens, 0);
 
   return (
     <div>
@@ -24,7 +44,11 @@ export function Marketplace() {
         <div className="absolute inset-x-0 top-0 h-1 bg-gold-gradient" />
         <div className="container-luxe py-14 lg:py-20">
           <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
-            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
               <div className="inline-flex items-center gap-2 rounded-full border border-gold-200 bg-white px-3.5 py-1.5">
                 <Sparkles className="h-3.5 w-3.5 text-gold-600" />
                 <span className="text-[11px] font-bold uppercase tracking-wide2 text-gold-700">
@@ -32,21 +56,28 @@ export function Marketplace() {
                 </span>
               </div>
               <h1 className="mt-6 font-display text-4xl font-bold leading-[1.08] text-ink sm:text-5xl lg:text-[3.4rem]">
-                Own a fraction of <span className="gold-text italic">Nairobi’s finest</span> real estate
+                Own a fraction of <span className="gold-text italic">Nairobi’s finest</span> real
+                estate
               </h1>
               <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-ink-muted sm:text-base">
                 From <strong className="text-ink">$100</strong>, buy blockchain-verified tokens in
-                institutional-grade Kenyan property and earn your share of rental income — distributed
-                monthly or quarterly to your wallet. KYC-gated, Ardhisasa-verified, CMA-sandbox informed.
+                institutional-grade Kenyan property and earn your share of rental income —
+                distributed monthly or quarterly to your wallet. KYC-gated, Ardhisasa-verified,
+                CMA-sandbox informed.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <button
                   className="btn-gold !h-12 !px-7 !text-[15px]"
-                  onClick={() => document.getElementById('offerings')?.scrollIntoView({ behavior: 'smooth' })}
+                  onClick={() =>
+                    document.getElementById('offerings')?.scrollIntoView({ behavior: 'smooth' })
+                  }
                 >
                   Explore offerings <ArrowRight className="h-4 w-4" />
                 </button>
-                <button className="btn-outline !h-12 !px-7 !text-[15px]" onClick={() => setView('learn')}>
+                <button
+                  className="btn-outline !h-12 !px-7 !text-[15px]"
+                  onClick={() => setView('learn')}
+                >
                   How tokenization works
                 </button>
               </div>
@@ -55,7 +86,8 @@ export function Marketplace() {
                   <ShieldCheck className="h-4 w-4 text-gold-600" /> Title-verified on Ardhisasa
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <CalendarClock className="h-4 w-4 text-gold-600" /> Income from month one (live assets)
+                  <CalendarClock className="h-4 w-4 text-gold-600" /> Income from month one (live
+                  assets)
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <Link2 className="h-4 w-4 text-gold-600" /> On-chain ownership record
@@ -78,7 +110,9 @@ export function Marketplace() {
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3">
                   <div>
-                    <p className="text-[11px] font-bold uppercase tracking-wide2 text-gold-300">Live portfolio</p>
+                    <p className="text-[11px] font-bold uppercase tracking-wide2 text-gold-300">
+                      Live portfolio
+                    </p>
                     <p className="font-display text-xl font-semibold text-white">
                       {fmtUsdCompact(totalValue)} tokenized across {properties.length} assets
                     </p>
@@ -97,7 +131,9 @@ export function Marketplace() {
                   </div>
                   <div>
                     <p className="text-[11px] font-medium text-ink-muted">Blended net yield</p>
-                    <p className="text-lg font-bold leading-none text-ink">{avgYield.toFixed(1)}%</p>
+                    <p className="text-lg font-bold leading-none text-ink">
+                      {avgYield.toFixed(1)}%
+                    </p>
                   </div>
                 </div>
               </motion.div>
@@ -140,7 +176,11 @@ export function Marketplace() {
       {/* ────────────────────────── how it works ────────────────────────── */}
       <section className="border-y border-gold-100 bg-cream">
         <div className="container-luxe py-16">
-          <SectionTitle center eyebrow="How it works" title="From dollars to dividends in three steps" />
+          <SectionTitle
+            center
+            eyebrow="How it works"
+            title="From dollars to dividends in three steps"
+          />
           <div className="mt-10 grid gap-6 grid-cols-1 md:grid-cols-3">
             {[
               {
@@ -170,7 +210,9 @@ export function Marketplace() {
                 transition={{ duration: 0.45 }}
                 className="relative rounded-2xl border border-gold-100 bg-white p-6"
               >
-                <span className="absolute right-5 top-4 font-display text-4xl font-bold text-gold-100">{s.step}</span>
+                <span className="absolute right-5 top-4 font-display text-4xl font-bold text-gold-100">
+                  {s.step}
+                </span>
                 <div className="inline-flex rounded-xl bg-gold-50 p-3">
                   <s.icon className="h-5 w-5 text-gold-600" />
                 </div>
@@ -187,7 +229,9 @@ export function Marketplace() {
         <div className="relative overflow-hidden rounded-3xl bg-ink px-6 py-12 sm:px-12">
           <div className="relative flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
             <div className="max-w-xl">
-              <p className="text-[11px] font-bold uppercase tracking-wide2 text-gold-300">For property owners</p>
+              <p className="text-[11px] font-bold uppercase tracking-wide2 text-gold-300">
+                For property owners
+              </p>
               <h2 className="mt-3 font-display text-2xl font-semibold leading-tight text-white sm:text-3xl">
                 Tokenize your property in six guided steps
               </h2>
@@ -196,22 +240,25 @@ export function Marketplace() {
                 compliance gating and distribution setup — the full model, operationalized.
               </p>
             </div>
-            <button className="btn-gold !h-12 shrink-0 !px-8 !text-[15px]" onClick={() => setView('issuer')}>
+            <button
+              className="btn-gold !h-12 shrink-0 !px-8 !text-[15px]"
+              onClick={() => setView('issuer')}
+            >
               Open Issuer Console <ArrowRight className="h-4 w-4" />
             </button>
           </div>
         </div>
       </section>
     </div>
-  )
+  );
 }
 
 /* ───────────────────────────── property card ───────────────────────────── */
 
 function PropertyCard({ p, index }: { p: TokenizedProperty; index: number }) {
-  const { openProperty } = useTokenize()
-  const available = tokensAvailable(p)
-  const funded = fundedPct(p)
+  const { openProperty } = useTokenize();
+  const available = tokensAvailable(p);
+  const funded = fundedPct(p);
 
   return (
     <motion.article
@@ -226,8 +273,8 @@ function PropertyCard({ p, index }: { p: TokenizedProperty; index: number }) {
       onClick={() => openProperty(p.id)}
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          openProperty(p.id)
+          e.preventDefault();
+          openProperty(p.id);
         }
       }}
     >
@@ -279,7 +326,9 @@ function PropertyCard({ p, index }: { p: TokenizedProperty; index: number }) {
               {p.status === 'UPCOMING' ? 'Offering opens Q4 2026' : `${funded}% funded`}
             </span>
             <span className="text-ink-muted">
-              {p.status === 'UPCOMING' ? `${fmtNum(p.totalTokens)} tokens` : `${fmtNum(available)} left`}
+              {p.status === 'UPCOMING'
+                ? `${fmtNum(p.totalTokens)} tokens`
+                : `${fmtNum(available)} left`}
             </span>
           </div>
           <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-gold-100">
@@ -291,10 +340,14 @@ function PropertyCard({ p, index }: { p: TokenizedProperty; index: number }) {
         </div>
 
         <span className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-gold-300 py-2.5 text-[13px] font-semibold text-gold-700 transition-colors group-hover:bg-gold-gradient group-hover:text-white group-hover:ring-0">
-          {p.status === 'UPCOMING' ? 'Join the waitlist' : p.status === 'LIVE' ? 'View live offering' : 'View offering'}
+          {p.status === 'UPCOMING'
+            ? 'Join the waitlist'
+            : p.status === 'LIVE'
+              ? 'View live offering'
+              : 'View offering'}
           <ArrowRight className="h-3.5 w-3.5" />
         </span>
       </div>
     </motion.article>
-  )
+  );
 }

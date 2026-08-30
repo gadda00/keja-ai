@@ -1,35 +1,41 @@
-import { usePageMeta } from '@/lib/seo'
-import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 import {
-  Home,
-  TrendingUp,
-  BadgeCheck,
-  Camera,
-  FileSearch,
-  Rocket,
-  CheckCircle2,
-  ChevronRight,
-  ChevronLeft,
-  Bot,
-  ShieldCheck,
   AlertTriangle,
-  Building2,
+  BadgeCheck,
   BedDouble,
-  Ruler,
-  MapPin,
+  Bot,
+  Building2,
+  Camera,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   ClipboardCheck,
-} from 'lucide-react'
-import { useAuth } from '@/lib/auth'
-import { useSubmissions, runAnomalyDetection, logAudit } from '@/lib/adminStore'
+  FileSearch,
+  MapPin,
+  Rocket,
+  Ruler,
+  ShieldCheck,
+  TrendingUp,
+} from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+
+import {
+  getListingSignatures,
+  logAudit,
+  recordListingSignature,
+  runAnomalyDetection,
+  useSubmissions,
+} from '@/lib/adminStore';
+import { useAuth } from '@/lib/auth';
+import { usePageMeta } from '@/lib/seo';
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: '-60px' },
   transition: { duration: 0.6 },
-}
+};
 
 const STEPS = [
   {
@@ -52,31 +58,31 @@ const STEPS = [
     title: 'Keja markets it — everywhere',
     text: 'Your property enters the AI recommendation engine: matched to qualified buyers in chat, on WhatsApp, and across every agency channel in the network. You get weekly performance reports.',
   },
-]
+];
 
-const WIZARD_STEPS = ['Contact', 'Property', 'Details', 'Review & checks']
+const WIZARD_STEPS = ['Contact', 'Property', 'Details', 'Review & checks'];
 
 type WizardForm = {
-  name: string
-  email: string
-  phone: string
-  agency: string
-  title: string
-  type: string
-  purposeBuy: boolean
-  purposeRent: boolean
-  purposeInvest: boolean
-  area: string
-  county: string
-  price: string
-  rentEstimate: string
-  bedrooms: string
-  bathrooms: string
-  sizeSqm: string
-  description: string
-  amenities: string
-  imageCount: number
-}
+  name: string;
+  email: string;
+  phone: string;
+  agency: string;
+  title: string;
+  type: string;
+  purposeBuy: boolean;
+  purposeRent: boolean;
+  purposeInvest: boolean;
+  area: string;
+  county: string;
+  price: string;
+  rentEstimate: string;
+  bedrooms: string;
+  bathrooms: string;
+  sizeSqm: string;
+  description: string;
+  amenities: string;
+  imageCount: number;
+};
 
 const EMPTY: WizardForm = {
   name: '',
@@ -98,69 +104,72 @@ const EMPTY: WizardForm = {
   description: '',
   amenities: '',
   imageCount: 0,
-}
+};
 
 export default function ListProperty() {
   usePageMeta(
     'List Your Property — Verified by Keja',
-    'Submit your property in four steps. Trust-by-design screening, then the Verified badge and qualified demand.',
-  )
-  const { user, requireAuth, isLoggedIn } = useAuth()
-  const [submissions, setSubmissions] = useSubmissions()
-  const [step, setStep] = useState(0)
+    'Submit your property in four steps. Trust-by-design screening, then the Verified badge and qualified demand.'
+  );
+  const { user, requireAuth, isLoggedIn } = useAuth();
+  const [submissions, setSubmissions] = useSubmissions();
+  const [step, setStep] = useState(0);
 
   const [form, setForm] = useState<WizardForm>(() => {
     try {
-      const draft = localStorage.getItem('keja:sell-draft')
-      return draft ? { ...EMPTY, ...JSON.parse(draft) } : EMPTY
+      const draft = localStorage.getItem('keja:sell-draft');
+      return draft ? { ...EMPTY, ...JSON.parse(draft) } : EMPTY;
     } catch {
-      return EMPTY
+      return EMPTY;
     }
-  })
+  });
 
   // Draft auto-save: a refresh mid-wizard no longer loses everything.
   useEffect(() => {
     try {
-      localStorage.setItem('keja:sell-draft', JSON.stringify(form))
+      localStorage.setItem('keja:sell-draft', JSON.stringify(form));
     } catch {
       /* storage unavailable */
     }
-  }, [form])
-  const [checksRun, setChecksRun] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [submissionId, setSubmissionId] = useState('')
+  }, [form]);
+  const [submitted, setSubmitted] = useState(false);
+  const [submissionId, setSubmissionId] = useState('');
 
   // prefill from account
   const prefill = () =>
     setForm((f) => ({
       ...f,
-      name: f.name || user?.name || '',
-      email: f.email || user?.email || '',
-      phone: f.phone || user?.phone || '',
-      agency: f.agency || user?.company || '',
-    }))
+      name: f.name || (user?.name ?? ''),
+      email: f.email || (user?.email ?? ''),
+      phone: f.phone || (user?.phone ?? ''),
+      agency: f.agency || (user?.company ?? ''),
+    }));
 
   const anomaly = useMemo(
     () =>
-      runAnomalyDetection({
-        title: form.title,
-        area: form.area,
-        county: form.county,
-        price: Number(form.price) || 0,
-        sizeSqm: Number(form.sizeSqm) || 0,
-        bedrooms: Number(form.bedrooms) || undefined,
-        description: form.description,
-        images: Array.from({ length: form.imageCount }),
-        amenities: form.amenities
-          .split(',')
-          .map((a) => a.trim())
-          .filter(Boolean),
-      }),
-    [form],
-  )
+      runAnomalyDetection(
+        {
+          title: form.title,
+          area: form.area,
+          county: form.county,
+          price: Number(form.price) || 0,
+          sizeSqm: Number(form.sizeSqm) || 0,
+          bedrooms: Number(form.bedrooms) || undefined,
+          description: form.description,
+          images: Array.from({ length: form.imageCount }),
+          amenities: form.amenities
+            .split(',')
+            .map((a) => a.trim())
+            .filter(Boolean),
+        },
+        // read-only duplicate scan — recording happens once, at submit
+        getListingSignatures()
+      ),
+    [form]
+  );
 
   const canNext = () => {
-    if (step === 0) return form.name.trim() && form.phone.trim()
+    if (step === 0) return form.name.trim() && form.phone.trim();
     if (step === 1)
       return (
         form.title.trim() &&
@@ -168,14 +177,14 @@ export default function ListProperty() {
         Number(form.price) > 0 &&
         // At least one purpose must be selected (was: submitted with purpose: [])
         (form.purposeBuy || form.purposeRent || form.purposeInvest)
-      )
-    if (step === 2) return Number(form.sizeSqm) > 0
-    return true
-  }
+      );
+    if (step === 2) return Number(form.sizeSqm) > 0;
+    return true;
+  };
 
   const submit = () => {
-    const id = `sub-${Math.floor(Math.random() * 9000 + 1000)}`
-    const images = form.imageCount > 0 ? ['/images/props/apartment_2.jpg'] : []
+    const id = `sub-${Date.now().toString(36)}${Math.floor(Math.random() * 1000)}`;
+    const images = form.imageCount > 0 ? ['/images/props/apartment_2.jpg'] : [];
     const sub = {
       id,
       submitterName: form.name,
@@ -207,10 +216,18 @@ export default function ListProperty() {
       flags: anomaly.flags,
       completeness: anomaly.completeness,
       createdAt: new Date().toISOString(),
-    }
-    setSubmissions([sub, ...submissions])
-    setSubmissionId(id)
-    setSubmitted(true)
+    };
+    setSubmissions([sub, ...submissions]);
+    setSubmissionId(id);
+    setSubmitted(true);
+    // register the listing signature exactly once, at submit — the live draft
+    // itself must never enter the "seen" set while the user is still typing
+    recordListingSignature({
+      title: form.title,
+      area: form.area,
+      price: Number(form.price),
+      bedrooms: Number(form.bedrooms) || undefined,
+    });
     logAudit({
       actor: user?.name ?? form.name,
       actorEmail: user?.email ?? form.email,
@@ -218,8 +235,8 @@ export default function ListProperty() {
       target: form.title,
       detail: `New listing submission — completeness ${anomaly.completeness}%${anomaly.flags.length ? `, flags: ${anomaly.flags.join(', ')}` : ''}`,
       severity: 'info',
-    })
-  }
+    });
+  };
 
   const stepContent = (
     <div className="flex flex-col gap-5">
@@ -239,8 +256,11 @@ export default function ListProperty() {
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="label-luxe">Your name *</label>
+              <label htmlFor="lp-name" className="label-luxe">
+                Your name *
+              </label>
               <input
+                id="lp-name"
                 className="input-luxe"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -248,8 +268,11 @@ export default function ListProperty() {
               />
             </div>
             <div>
-              <label className="label-luxe">Phone / WhatsApp *</label>
+              <label htmlFor="lp-phone" className="label-luxe">
+                Phone / WhatsApp *
+              </label>
               <input
+                id="lp-phone"
                 className="input-luxe"
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
@@ -257,8 +280,11 @@ export default function ListProperty() {
               />
             </div>
             <div>
-              <label className="label-luxe">Email</label>
+              <label htmlFor="lp-email" className="label-luxe">
+                Email
+              </label>
               <input
+                id="lp-email"
                 type="email"
                 className="input-luxe"
                 value={form.email}
@@ -267,8 +293,11 @@ export default function ListProperty() {
               />
             </div>
             <div>
-              <label className="label-luxe">Agency / company</label>
+              <label htmlFor="lp-agency" className="label-luxe">
+                Agency / company
+              </label>
               <input
+                id="lp-agency"
                 className="input-luxe"
                 value={form.agency}
                 onChange={(e) => setForm({ ...form, agency: e.target.value })}
@@ -283,8 +312,11 @@ export default function ListProperty() {
         <>
           <h3 className="font-display text-xl font-bold text-ink">The property</h3>
           <div>
-            <label className="label-luxe">Listing title *</label>
+            <label htmlFor="lp-title" className="label-luxe">
+              Listing title *
+            </label>
             <input
+              id="lp-title"
               className="input-luxe"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
@@ -293,8 +325,11 @@ export default function ListProperty() {
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="label-luxe">Property type</label>
+              <label htmlFor="lp-type" className="label-luxe">
+                Property type
+              </label>
               <select
+                id="lp-type"
                 className="input-luxe"
                 value={form.type}
                 onChange={(e) => setForm({ ...form, type: e.target.value })}
@@ -308,8 +343,11 @@ export default function ListProperty() {
               </select>
             </div>
             <div>
-              <label className="label-luxe">Area / neighbourhood *</label>
+              <label htmlFor="lp-area" className="label-luxe">
+                Area / neighbourhood *
+              </label>
               <input
+                id="lp-area"
                 className="input-luxe"
                 value={form.area}
                 onChange={(e) => setForm({ ...form, area: e.target.value })}
@@ -317,22 +355,38 @@ export default function ListProperty() {
               />
             </div>
             <div>
-              <label className="label-luxe">County</label>
+              <label htmlFor="lp-county" className="label-luxe">
+                County
+              </label>
               <select
+                id="lp-county"
                 className="input-luxe"
                 value={form.county}
                 onChange={(e) => setForm({ ...form, county: e.target.value })}
               >
-                {['Nairobi', 'Kiambu', 'Kajiado', 'Machakos', 'Mombasa', 'Kwale', 'Nakuru', 'Kisumu', 'Nyeri', 'Uasin Gishu', 'Other'].map(
-                  (c) => (
-                    <option key={c}>{c}</option>
-                  ),
-                )}
+                {[
+                  'Nairobi',
+                  'Kiambu',
+                  'Kajiado',
+                  'Machakos',
+                  'Mombasa',
+                  'Kwale',
+                  'Nakuru',
+                  'Kisumu',
+                  'Nyeri',
+                  'Uasin Gishu',
+                  'Other',
+                ].map((c) => (
+                  <option key={c}>{c}</option>
+                ))}
               </select>
             </div>
             <div>
-              <label className="label-luxe">Asking price (KES) *</label>
+              <label htmlFor="lp-price" className="label-luxe">
+                Asking price (KES) *
+              </label>
               <input
+                id="lp-price"
                 type="number"
                 className="input-luxe"
                 value={form.price}
@@ -342,14 +396,14 @@ export default function ListProperty() {
             </div>
           </div>
           <div>
-            <label className="label-luxe">Listing purpose</label>
+            <span className="label-luxe">Listing purpose</span>
             <div className="flex flex-wrap gap-2">
               {[
                 ['purposeBuy', 'For sale'],
                 ['purposeRent', 'For rent'],
                 ['purposeInvest', 'Investment-grade'],
               ].map(([key, label]) => {
-                const k = key as keyof WizardForm
+                const k = key as keyof WizardForm;
                 return (
                   <button
                     type="button"
@@ -363,7 +417,7 @@ export default function ListProperty() {
                   >
                     {label as string}
                   </button>
-                )
+                );
               })}
             </div>
           </div>
@@ -375,8 +429,11 @@ export default function ListProperty() {
           <h3 className="font-display text-xl font-bold text-ink">Details that build trust</h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
-              <label className="label-luxe">Bedrooms</label>
+              <label htmlFor="lp-bedrooms" className="label-luxe">
+                Bedrooms
+              </label>
               <input
+                id="lp-bedrooms"
                 type="number"
                 min={0}
                 className="input-luxe"
@@ -386,8 +443,11 @@ export default function ListProperty() {
               />
             </div>
             <div>
-              <label className="label-luxe">Bathrooms</label>
+              <label htmlFor="lp-bathrooms" className="label-luxe">
+                Bathrooms
+              </label>
               <input
+                id="lp-bathrooms"
                 type="number"
                 min={0}
                 className="input-luxe"
@@ -397,8 +457,11 @@ export default function ListProperty() {
               />
             </div>
             <div>
-              <label className="label-luxe">Size (sqm) *</label>
+              <label htmlFor="lp-size" className="label-luxe">
+                Size (sqm) *
+              </label>
               <input
+                id="lp-size"
                 type="number"
                 min={1}
                 className="input-luxe"
@@ -409,8 +472,11 @@ export default function ListProperty() {
             </div>
           </div>
           <div>
-            <label className="label-luxe">Monthly rent estimate (KES)</label>
+            <label htmlFor="lp-rent" className="label-luxe">
+              Monthly rent estimate (KES)
+            </label>
             <input
+              id="lp-rent"
               type="number"
               className="input-luxe"
               value={form.rentEstimate}
@@ -419,8 +485,11 @@ export default function ListProperty() {
             />
           </div>
           <div>
-            <label className="label-luxe">Description</label>
+            <label htmlFor="lp-description" className="label-luxe">
+              Description
+            </label>
             <textarea
+              id="lp-description"
               className="input-luxe min-h-28"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -432,8 +501,11 @@ export default function ListProperty() {
             </p>
           </div>
           <div>
-            <label className="label-luxe">Amenities (comma-separated)</label>
+            <label htmlFor="lp-amenities" className="label-luxe">
+              Amenities (comma-separated)
+            </label>
             <input
+              id="lp-amenities"
               className="input-luxe"
               value={form.amenities}
               onChange={(e) => setForm({ ...form, amenities: e.target.value })}
@@ -441,7 +513,7 @@ export default function ListProperty() {
             />
           </div>
           <div>
-            <label className="label-luxe">Photos ready?</label>
+            <span className="label-luxe">Photos ready?</span>
             <div className="flex gap-2">
               {[0, 1, 2, 3, 4].map((n) => (
                 <button
@@ -500,7 +572,10 @@ export default function ListProperty() {
               { label: 'Title quality', pass: form.title.trim().length >= 15 },
               { label: 'Description depth', pass: form.description.trim().length >= 120 },
               { label: 'Photo coverage', pass: form.imageCount >= 3 },
-              { label: 'Amenities listed', pass: form.amenities.split(',').filter((a) => a.trim()).length >= 4 },
+              {
+                label: 'Amenities listed',
+                pass: form.amenities.split(',').filter((a) => a.trim()).length >= 4,
+              },
               { label: 'Price vs market band', pass: !anomaly.flags.includes('suspicious-price') },
               { label: 'Duplicate scan', pass: !anomaly.flags.includes('duplicate-suspected') },
               { label: 'Contact pattern', pass: !anomaly.flags.includes('off-platform-contact') },
@@ -530,18 +605,28 @@ export default function ListProperty() {
               Submission summary
             </p>
             <div className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs text-white/75 sm:grid-cols-3">
-              <span><strong className="text-white">{form.title || '—'}</strong></span>
-              <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {form.area || '—'}, {form.county}</span>
-              <span className="flex items-center gap-1"><Building2 className="h-3 w-3" /> {form.type}</span>
+              <span>
+                <strong className="text-white">{form.title || '—'}</strong>
+              </span>
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3 w-3" /> {form.area || '—'}, {form.county}
+              </span>
+              <span className="flex items-center gap-1">
+                <Building2 className="h-3 w-3" /> {form.type}
+              </span>
               <span>KES {Number(form.price || 0).toLocaleString()}</span>
-              <span className="flex items-center gap-1"><Ruler className="h-3 w-3" /> {form.sizeSqm || '—'} sqm</span>
-              <span className="flex items-center gap-1"><BedDouble className="h-3 w-3" /> {form.bedrooms || '—'} BR</span>
+              <span className="flex items-center gap-1">
+                <Ruler className="h-3 w-3" /> {form.sizeSqm || '—'} sqm
+              </span>
+              <span className="flex items-center gap-1">
+                <BedDouble className="h-3 w-3" /> {form.bedrooms || '—'} BR
+              </span>
             </div>
           </div>
         </>
       )}
     </div>
-  )
+  );
 
   return (
     <div>
@@ -676,10 +761,26 @@ export default function ListProperty() {
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">No sale, no fee. Ever.</h2>
             <div className="mt-8 space-y-4">
               {[
-                { name: 'Verification & badge', price: 'Free', note: 'Title check, photo scan, pricing benchmark — free for every listing.' },
-                { name: 'Standard sale', price: '2.5%', note: 'Paid on completion. Includes AI matching, escorted viewings, escrowed deposits and closing support.' },
-                { name: 'Premium / luxury stock', price: 'Custom', note: 'Dedicated marketing, drone media, investor-targeted distribution through Chacadom\u2019s network.' },
-                { name: 'Landlords — management', price: '8% of rent', note: 'Tenant sourcing, M-Pesa rent collection, maintenance, monthly owner statements.' },
+                {
+                  name: 'Verification & badge',
+                  price: 'Free',
+                  note: 'Title check, photo scan, pricing benchmark — free for every listing.',
+                },
+                {
+                  name: 'Standard sale',
+                  price: '2.5%',
+                  note: 'Paid on completion. Includes AI matching, escorted viewings, escrowed deposits and closing support.',
+                },
+                {
+                  name: 'Premium / luxury stock',
+                  price: 'Custom',
+                  note: 'Dedicated marketing, drone media, investor-targeted distribution through Chacadom\u2019s network.',
+                },
+                {
+                  name: 'Landlords — management',
+                  price: '8% of rent',
+                  note: 'Tenant sourcing, M-Pesa rent collection, maintenance, monthly owner statements.',
+                },
               ].map((r) => (
                 <div key={r.name} className="card-luxe flex items-start justify-between gap-6 p-5">
                   <div>
@@ -724,5 +825,5 @@ export default function ListProperty() {
         </div>
       </section>
     </div>
-  )
+  );
 }

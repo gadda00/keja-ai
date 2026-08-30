@@ -11,22 +11,7 @@ module.exports = {
   endOfLine: 'lf',
   jsxSingleQuote: false,
   plugins: [],
-  importOrder: [
-    '^(react/(.*)$)|^(react$)',
-    '^(next/(.*)$)|^(next$)',
-    '<THIRD_PARTY_MODULES>',
-    '',
-    '^@/config/(.*)$',
-    '^@/lib/(.*)$',
-    '^@/data/(.*)$',
-    '^@/hooks/(.*)$',
-    '^@/components/(.*)$',
-    '^@/pages/(.*)$',
-    '^@/(.*)$',
-    '',
-    '^[./]',
-  ],
-  importOrderSeparation: false,
-  importOrderSortSpecifiers: true,
-  importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
+  // NOTE: import ordering is enforced by ESLint's simple-import-sort plugin,
+  // not by prettier — the old prettier-plugin-import-sort was unmaintained and
+  // its options were silently ignored (prettier warned "unknown option").
 };

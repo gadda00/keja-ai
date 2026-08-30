@@ -62,7 +62,7 @@ self.addEventListener('fetch', (event) => {
         return fetch(request).then((res) => {
           if (ok(res)) {
             const copy = res.clone()
-            caches.open(IMG_CACHE).then((c) => c.put(request, copy))
+            event.waitUntil(caches.open(IMG_CACHE).then((c) => c.put(request, copy)))
           }
           return res
         })
@@ -77,7 +77,7 @@ self.addEventListener('fetch', (event) => {
         .then((res) => {
           if (ok(res)) {
             const copy = res.clone()
-            caches.open(PAGE_CACHE).then((c) => c.put(request, copy))
+            event.waitUntil(caches.open(PAGE_CACHE).then((c) => c.put(request, copy)))
           }
           return res
         })

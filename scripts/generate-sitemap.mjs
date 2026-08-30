@@ -11,7 +11,8 @@ import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const BASE = 'https://gadda00.github.io/keja-ai'
+// Overridable for future custom domains: SITE_URL=https://keja.ai node scripts/generate-sitemap.mjs
+const BASE = process.env.SITE_URL ?? 'https://gadda00.github.io/keja-ai'
 const today = new Date().toISOString().slice(0, 10)
 
 /* ------------------------------ data extraction ---------------------------- */
@@ -45,10 +46,8 @@ const STATIC_ROUTES = [
   { loc: '/sell', priority: '0.7', changefreq: 'weekly' },
   { loc: '/about', priority: '0.6', changefreq: 'monthly' },
   { loc: '/contact', priority: '0.6', changefreq: 'monthly' },
-  { loc: '/dashboard', priority: '0.4', changefreq: 'weekly' },
   { loc: '/manage', priority: '0.5', changefreq: 'weekly' },
   { loc: '/compare', priority: '0.5', changefreq: 'weekly' },
-  { loc: '/account', priority: '0.3', changefreq: 'monthly' },
   { loc: '/legal', priority: '0.3', changefreq: 'yearly' },
 ]
 

@@ -1,47 +1,73 @@
 /** Admin Overview — KPIs, health, funnel, recent audit activity. */
-import { Link } from 'react-router-dom'
 import {
-  Users,
-  Building2,
-  Flame,
-  Handshake,
-  FileClock,
-  TrendingUp,
-  ArrowUpRight,
   AlertTriangle,
-  ShieldCheck,
+  ArrowUpRight,
+  Building2,
+  FileClock,
+  Flame,
   Globe2,
-} from 'lucide-react'
-import { useAuth } from '@/lib/auth'
-import { useSubmissions, usePartners, useFeeds, useAuditLog } from '@/lib/adminStore'
-import { useStore, KEYS, Lead } from '@/lib/store'
-import { useTokenize } from '@/lib/tokenizeStore'
+  Handshake,
+  ShieldCheck,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
+
+import { useAuditLog, useFeeds, usePartners, useSubmissions } from '@/lib/adminStore';
+import { useAuth } from '@/lib/auth';
+import type { Lead } from '@/lib/store';
+import { KEYS, useStore } from '@/lib/store';
+import { useTokenize } from '@/lib/tokenizeStore';
 
 export default function AdminOverview({ onNavigate }: { onNavigate: (tab: string) => void }) {
-  const { users } = useAuth()
-  const [submissions] = useSubmissions()
-  const [partners] = usePartners()
-  const [feeds] = useFeeds()
-  const [audit] = useAuditLog()
-  const [leads] = useStore<Lead[]>(KEYS.leads, [])
-  const tokenize = useTokenize()
-  const kycVerified = tokenize.investor ? 1 : 0
-  const waitlistCount = tokenize.waitlist.length
+  const { users } = useAuth();
+  const [submissions] = useSubmissions();
+  const [partners] = usePartners();
+  const [feeds] = useFeeds();
+  const [audit] = useAuditLog();
+  const [leads] = useStore<Lead[]>(KEYS.leads, []);
+  const tokenize = useTokenize();
+  const kycVerified = tokenize.investor ? 1 : 0;
+  const waitlistCount = tokenize.waitlist.length;
 
-  const pending = submissions.filter((s) => s.status === 'pending')
-  const flagged = submissions.filter((s) => s.status === 'flagged')
-  const hot = leads.filter((l) => l.temperature === 'HOT')
-  const warm = leads.filter((l) => l.temperature === 'WARM')
-  const cold = leads.filter((l) => l.temperature === 'COLD')
-  const pendingPartners = partners.filter((p) => p.status === 'pending')
-  const healthyFeeds = feeds.filter((f) => f.status === 'healthy').length
+  const pending = submissions.filter((s) => s.status === 'pending');
+  const flagged = submissions.filter((s) => s.status === 'flagged');
+  const hot = leads.filter((l) => l.temperature === 'HOT');
+  const warm = leads.filter((l) => l.temperature === 'WARM');
+  const cold = leads.filter((l) => l.temperature === 'COLD');
+  const pendingPartners = partners.filter((p) => p.status === 'pending');
+  const healthyFeeds = feeds.filter((f) => f.status === 'healthy').length;
 
   const kpis = [
-    { label: 'Registered users', value: (users.length * 47 + 113).toLocaleString(), sub: `${users.length} in this demo`, icon: Users, trend: '+12% this week' },
-    { label: 'Listings under review', value: String(pending.length), sub: `${flagged.length} flagged · SLA 24h`, icon: Building2, trend: 'needs attention', warn: pending.length > 2 },
-    { label: 'HOT leads', value: String(hot.length), sub: `${warm.length} WARM · ${cold.length} COLD`, icon: Flame, trend: 'route to sales now' },
-    { label: 'Tokenize waitlist', value: String(waitlistCount + 38), sub: `${kycVerified} KYC record${kycVerified === 1 ? '' : 's'} in demo`, icon: TrendingUp, trend: '+4 this week' },
-  ]
+    {
+      label: 'Registered users',
+      value: (users.length * 47 + 113).toLocaleString(),
+      sub: `${users.length} in this demo`,
+      icon: Users,
+      trend: '+12% this week',
+    },
+    {
+      label: 'Listings under review',
+      value: String(pending.length),
+      sub: `${flagged.length} flagged · SLA 24h`,
+      icon: Building2,
+      trend: 'needs attention',
+      warn: pending.length > 2,
+    },
+    {
+      label: 'HOT leads',
+      value: String(hot.length),
+      sub: `${warm.length} WARM · ${cold.length} COLD`,
+      icon: Flame,
+      trend: 'route to sales now',
+    },
+    {
+      label: 'Tokenize waitlist',
+      value: String(waitlistCount + 38),
+      sub: `${kycVerified} KYC record${kycVerified === 1 ? '' : 's'} in demo`,
+      icon: TrendingUp,
+      trend: '+4 this week',
+    },
+  ];
 
   return (
     <div className="flex flex-col gap-8">
@@ -82,9 +108,24 @@ export default function AdminOverview({ onNavigate }: { onNavigate: (tab: string
           </div>
           <div className="mt-5 flex flex-col gap-3">
             {[
-              { label: 'HOT — budget confirmed, ready to buy', count: hot.length, width: Math.max(hot.length / Math.max(leads.length, 1) * 100, 12), color: 'bg-red-500' },
-              { label: 'WARM — comparing options', count: warm.length, width: Math.max(warm.length / Math.max(leads.length, 1) * 100, 12), color: 'bg-amber-500' },
-              { label: 'COLD — researching', count: cold.length, width: Math.max(cold.length / Math.max(leads.length, 1) * 100, 12), color: 'bg-sky-500' },
+              {
+                label: 'HOT — budget confirmed, ready to buy',
+                count: hot.length,
+                width: Math.max((hot.length / Math.max(leads.length, 1)) * 100, 12),
+                color: 'bg-red-500',
+              },
+              {
+                label: 'WARM — comparing options',
+                count: warm.length,
+                width: Math.max((warm.length / Math.max(leads.length, 1)) * 100, 12),
+                color: 'bg-amber-500',
+              },
+              {
+                label: 'COLD — researching',
+                count: cold.length,
+                width: Math.max((cold.length / Math.max(leads.length, 1)) * 100, 12),
+                color: 'bg-sky-500',
+              },
             ].map((row) => (
               <div key={row.label}>
                 <div className="mb-1 flex items-center justify-between text-xs">
@@ -167,8 +208,10 @@ export default function AdminOverview({ onNavigate }: { onNavigate: (tab: string
             >
               <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600" />
               <span className="text-xs leading-snug text-amber-900">
-                <strong>{flagged.length} flagged listing{flagged.length > 1 ? 's' : ''}</strong> —
-                trust-by-design anomaly detection caught suspicious patterns. Review now.
+                <strong>
+                  {flagged.length} flagged listing{flagged.length > 1 ? 's' : ''}
+                </strong>{' '}
+                — trust-by-design anomaly detection caught suspicious patterns. Review now.
               </span>
             </button>
           )}
@@ -206,7 +249,13 @@ export default function AdminOverview({ onNavigate }: { onNavigate: (tab: string
                     <strong className="text-ink">{a.actor}</strong> — {a.detail}
                   </p>
                   <p className="mt-0.5 text-[10px] text-ink-faint">
-                    {a.action} · {new Date(a.ts).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    {a.action} ·{' '}
+                    {new Date(a.ts).toLocaleString('en-GB', {
+                      day: 'numeric',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                   </p>
                 </div>
               </li>
@@ -219,5 +268,5 @@ export default function AdminOverview({ onNavigate }: { onNavigate: (tab: string
         )}
       </div>
     </div>
-  )
+  );
 }

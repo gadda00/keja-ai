@@ -1,38 +1,57 @@
-import { usePageMeta } from '@/lib/seo'
-import { Link, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 import {
-  Search, ShieldCheck, TrendingUp, Bot, MapPin, ChevronRight, Sparkles,
-  Building2, BadgeCheck, AlertTriangle, Calculator, LayoutDashboard, FileSearch, Zap, Coins, Link2, CalendarClock,
-} from 'lucide-react'
-import PropertyCard from '@/components/property/PropertyCard'
-import { featuredProperties, PROPERTIES } from '@/data/properties'
-import { AUTO_PROPERTIES, autoPilotStats } from '@/lib/autoListings'
-import { formatKES } from '@/lib/format'
-import { whatsappLink } from '@/config'
-import { asset } from '@/config'
+  AlertTriangle,
+  BadgeCheck,
+  Bot,
+  Building2,
+  Calculator,
+  CalendarClock,
+  ChevronRight,
+  Coins,
+  FileSearch,
+  LayoutDashboard,
+  Link2,
+  MapPin,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  TrendingUp,
+  Zap,
+} from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+
+import PropertyCard from '@/components/property/PropertyCard';
+import { whatsappLink } from '@/config';
+import { asset } from '@/config';
+import { featuredProperties } from '@/data/properties';
+import { autoPilotStats } from '@/lib/autoListings';
+import { formatKES } from '@/lib/format';
+import { useAllProperties } from '@/lib/inventory';
+import { usePageMeta } from '@/lib/seo';
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: '-60px' },
   transition: { duration: 0.6 },
-}
+};
 
 export default function Home() {
   usePageMeta(
     'Keja.ai — Intelligent Real Estate. Verified Trust.',
-    "Kenya's AI real-estate advisor: verified listings, trust scores, investment intelligence and tokenized fractional ownership.",
-  )
-  const navigate = useNavigate()
-  const MARKET = [...AUTO_PROPERTIES, ...PROPERTIES]
-  const avgTrust = Math.round(MARKET.reduce((s, p) => s + p.trustScore, 0) / MARKET.length)
-  const verifiedCount = MARKET.filter((p) => p.trustScore >= 75).length
-  const flaggedCount = MARKET.filter((p) => p.trustScore < 60).length
+    "Kenya's AI real-estate advisor: verified listings, trust scores, investment intelligence and tokenized fractional ownership."
+  );
+  const navigate = useNavigate();
+  // Unified inventory (auto + approved partner submissions + seed) so Home
+  // stats always match what the Properties marketplace actually shows.
+  const MARKET = useAllProperties();
+  const avgTrust = Math.round(MARKET.reduce((s, p) => s + p.trustScore, 0) / MARKET.length);
+  const verifiedCount = MARKET.filter((p) => p.trustScore >= 75).length;
+  const flaggedCount = MARKET.filter((p) => p.trustScore < 60).length;
   const freshThisWeek = [...MARKET]
     .sort((a, b) => b.listedAt.localeCompare(a.listedAt))
     .filter((p) => Date.now() - +new Date(p.listedAt) < 7 * 24 * 3600 * 1000)
-    .slice(0, 3)
+    .slice(0, 3);
 
   return (
     <div>
@@ -40,14 +59,25 @@ export default function Home() {
       <section className="relative overflow-hidden bg-ink">
         <div className="absolute inset-0">
           <picture>
-              <source srcSet={asset('/images/props/skyline_hero.webp')} type="image/webp" />
-              <img src={asset('/images/props/skyline_hero.jpg')} alt="Nairobi skyline" width={1600} height={1000} fetchPriority="high" className="h-full w-full object-cover opacity-40" />
-            </picture>
+            <source srcSet={asset('/images/props/skyline_hero.webp')} type="image/webp" />
+            <img
+              src={asset('/images/props/skyline_hero.jpg')}
+              alt="Nairobi skyline"
+              width={1600}
+              height={1000}
+              fetchPriority="high"
+              className="h-full w-full object-cover opacity-40"
+            />
+          </picture>
           <div className="absolute inset-0 bg-gradient-to-b from-ink/80 via-ink/60 to-ink" />
         </div>
 
         <div className="container-luxe relative flex flex-col items-center py-24 text-center sm:py-32">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+          >
             <span className="inline-flex items-center gap-2 rounded-full border border-gold-400/40 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide2 text-gold-300 backdrop-blur">
               <Sparkles className="h-3.5 w-3.5" />
               AI Real Estate · by Chacadom Investments
@@ -72,8 +102,9 @@ export default function Home() {
             transition={{ duration: 0.7, delay: 0.24 }}
             className="mt-6 max-w-2xl text-base leading-relaxed text-white/70 sm:text-lg"
           >
-            Keja.ai is Kenya’s AI property advisor and cross-agency trust layer. We don’t just list property —
-            we tell you which listings you can trust, with verified titles, transparent yields and honest investment math.
+            Keja.ai is Kenya’s AI property advisor and cross-agency trust layer. We don’t just list
+            property — we tell you which listings you can trust, with verified titles, transparent
+            yields and honest investment math.
           </motion.p>
 
           {/* Search bar */}
@@ -83,9 +114,9 @@ export default function Home() {
             transition={{ duration: 0.7, delay: 0.36 }}
             className="mt-10 w-full max-w-3xl"
             onSubmit={(e) => {
-              e.preventDefault()
-              const q = new FormData(e.currentTarget).get('q') as string
-              navigate(`/properties?q=${encodeURIComponent(q || '')}`)
+              e.preventDefault();
+              const q = new FormData(e.currentTarget).get('q') as string;
+              void navigate(`/properties?q=${encodeURIComponent(q || '')}`);
             }}
           >
             <div className="flex items-center gap-2 rounded-2xl bg-white p-2 shadow-gold-lg">
@@ -155,10 +186,16 @@ export default function Home() {
             { icon: AlertTriangle, value: `${flaggedCount}`, label: 'Fraud flags caught' },
             { icon: ShieldCheck, value: `${avgTrust}/100`, label: 'Avg. trust score' },
           ].map((s) => (
-            <motion.div key={s.label} {...fadeUp} className="flex flex-col items-center text-center">
+            <motion.div
+              key={s.label}
+              {...fadeUp}
+              className="flex flex-col items-center text-center"
+            >
               <s.icon className="h-5 w-5 text-gold-600" />
               <p className="mt-2 font-display text-3xl font-bold text-ink">{s.value}</p>
-              <p className="mt-1 text-xs font-medium uppercase tracking-wider text-ink-muted">{s.label}</p>
+              <p className="mt-1 text-xs font-medium uppercase tracking-wider text-ink-muted">
+                {s.label}
+              </p>
             </motion.div>
           ))}
         </div>
@@ -173,16 +210,29 @@ export default function Home() {
               Conversational property search, <span className="gold-text">done right</span>
             </h2>
             <p className="mt-5 leading-relaxed text-ink-soft">
-              Chat with Keja in English, Kiswahili or French. Ask anything — &ldquo;2BR in Kilimani under 15M&rdquo;,
-              &ldquo;is Kitengela a good investment?&rdquo;, &ldquo;how do you verify titles?&rdquo; — and get answers
-              grounded in verified inventory, with every number labelled as fact, estimate or assumption.
+              Chat with Keja in English, Kiswahili or French. Ask anything — &ldquo;2BR in Kilimani
+              under 15M&rdquo;, &ldquo;is Kitengela a good investment?&rdquo;, &ldquo;how do you
+              verify titles?&rdquo; — and get answers grounded in verified inventory, with every
+              number labelled as fact, estimate or assumption.
             </p>
             <ul className="mt-6 space-y-3.5">
               {[
-                { icon: Search, text: 'Conversational search across multiple agencies — neutral, not one developer’s stock' },
-                { icon: Calculator, text: 'Live investment math: yields, ROI, payback, 5 & 10-year projections' },
-                { icon: ShieldCheck, text: 'Trust answers you can check — Ardhisasa title logic, fraud red flags' },
-                { icon: Zap, text: 'Lead qualification that routes you to the right agent — only when you’re ready' },
+                {
+                  icon: Search,
+                  text: 'Conversational search across multiple agencies — neutral, not one developer’s stock',
+                },
+                {
+                  icon: Calculator,
+                  text: 'Live investment math: yields, ROI, payback, 5 & 10-year projections',
+                },
+                {
+                  icon: ShieldCheck,
+                  text: 'Trust answers you can check — Ardhisasa title logic, fraud red flags',
+                },
+                {
+                  icon: Zap,
+                  text: 'Lead qualification that routes you to the right agent — only when you’re ready',
+                },
               ].map((f) => (
                 <li key={f.text} className="flex gap-3">
                   <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gold-100">
@@ -202,15 +252,26 @@ export default function Home() {
             <div className="overflow-hidden rounded-3xl shadow-card-hover ring-1 ring-gold-200">
               <picture>
                 <source srcSet={asset('/brand/keja-banner.webp')} type="image/webp" />
-                <img src={asset('/brand/keja-banner-opt.jpg')} alt="Keja AI assistant" loading="lazy" className="w-full object-cover" />
+                <img
+                  src={asset('/brand/keja-banner-opt.jpg')}
+                  alt="Keja AI assistant"
+                  loading="lazy"
+                  className="w-full object-cover"
+                />
               </picture>
             </div>
             <div className="absolute -bottom-5 -left-3 rounded-2xl bg-white p-4 shadow-card-hover ring-1 ring-gold-100 sm:-left-8">
               <div className="flex items-center gap-3">
-                <img src={asset('/brand/keja-mascot.jpg')} alt="Keja mascot" className="h-12 w-12 rounded-xl object-cover ring-2 ring-gold-200" />
+                <img
+                  src={asset('/brand/keja-mascot.jpg')}
+                  alt="Keja mascot"
+                  className="h-12 w-12 rounded-xl object-cover ring-2 ring-gold-200"
+                />
                 <div>
                   <p className="text-sm font-bold text-ink">&ldquo;Hi, I’m Keja.&rdquo;</p>
-                  <p className="text-xs text-ink-muted">Here to help you discover, analyse and invest smarter.</p>
+                  <p className="text-xs text-ink-muted">
+                    Here to help you discover, analyse and invest smarter.
+                  </p>
                 </div>
               </div>
             </div>
@@ -228,8 +289,9 @@ export default function Home() {
               <span className="gold-text block">We tell you which listings you can trust.</span>
             </h2>
             <p className="mt-5 leading-relaxed text-white/60">
-              A tool owned by one agency can never tell you a listing looks suspicious. Keja sits above multiple
-              agencies — so trust-scoring is structurally possible, and structurally defensible.
+              A tool owned by one agency can never tell you a listing looks suspicious. Keja sits
+              above multiple agencies — so trust-scoring is structurally possible, and structurally
+              defensible.
             </p>
           </motion.div>
 
@@ -272,7 +334,10 @@ export default function Home() {
           </div>
 
           <motion.div {...fadeUp} className="mt-10 text-center">
-            <Link to="/trust" className="inline-flex items-center gap-2 text-sm font-semibold text-gold-300 hover:text-gold-200">
+            <Link
+              to="/trust"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-gold-300 hover:text-gold-200"
+            >
               Explore the Trust Center <ChevronRight className="h-4 w-4" />
             </Link>
           </motion.div>
@@ -291,10 +356,10 @@ export default function Home() {
                 </p>
                 <h2 className="heading-display mt-3 text-3xl sm:text-4xl">Fresh on the market</h2>
                 <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-muted">
-                  Our AI pipeline scans the market and our partner feeds (JSON · CSV · XML) every few
-                  hours — new postings are enriched, screened for duplicates and price anomalies, and
-                  published here automatically. Auto-ingested listings are always labelled and
-                  trust-capped until human verification.
+                  Our AI pipeline scans the market and our partner feeds (JSON · CSV · XML) every
+                  few hours — new postings are enriched, screened for duplicates and price
+                  anomalies, and published here automatically. Auto-ingested listings are always
+                  labelled and trust-capped until human verification.
                 </p>
               </div>
               <Link to="/properties?sort=recent" className="btn-outline">
@@ -321,7 +386,9 @@ export default function Home() {
           <motion.div {...fadeUp} className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="eyebrow">Featured — trust score 90+</p>
-              <h2 className="heading-display mt-3 text-3xl sm:text-4xl">Top-verified properties this week</h2>
+              <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
+                Top-verified properties this week
+              </h2>
             </div>
             <Link to="/properties" className="btn-outline">
               Browse all {MARKET.length} listings <ChevronRight className="h-4 w-4" />
@@ -330,7 +397,11 @@ export default function Home() {
 
           <div className="mt-10 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {featuredProperties.slice(0, 6).map((p, i) => (
-              <motion.div key={p.id} {...fadeUp} transition={{ ...fadeUp.transition, delay: i * 0.06 }}>
+              <motion.div
+                key={p.id}
+                {...fadeUp}
+                transition={{ ...fadeUp.transition, delay: i * 0.06 }}
+              >
                 <PropertyCard property={p} />
               </motion.div>
             ))}
@@ -350,16 +421,23 @@ export default function Home() {
             </h2>
             <p className="mt-5 leading-relaxed text-ink-soft">
               Keja Tokenize converts institutional-grade property into digital tokens — a $10M tower
-              becomes 1,000,000 tokens at $10 each. From $100, KYC-verified investors buy fractions and
-              earn monthly or quarterly rental income, recorded on-chain. Compliance-first: every asset
-              sits in its own SPV, is Ardhisasa title-verified and is informed by Kenya’s CMA sandbox.
+              becomes 1,000,000 tokens at $10 each. From $100, KYC-verified investors buy fractions
+              and earn monthly or quarterly rental income, recorded on-chain. Compliance-first:
+              every asset sits in its own SPV, is Ardhisasa title-verified and is informed by
+              Kenya’s CMA sandbox.
             </p>
             <ul className="mt-6 space-y-3.5">
               {[
                 { icon: Coins, text: 'Fractional ownership from $100 — no $100K minimums' },
-                { icon: CalendarClock, text: 'Rental income distributed monthly or quarterly, pro-rata' },
+                {
+                  icon: CalendarClock,
+                  text: 'Rental income distributed monthly or quarterly, pro-rata',
+                },
                 { icon: Link2, text: 'Blockchain-verified ownership record — the Keja Ledger' },
-                { icon: ShieldCheck, text: 'KYC/AML-gated, SPV-wrapped, independently valued assets' },
+                {
+                  icon: ShieldCheck,
+                  text: 'KYC/AML-gated, SPV-wrapped, independently valued assets',
+                },
               ].map((f) => (
                 <li key={f.text} className="flex gap-3">
                   <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gold-100">
@@ -391,12 +469,18 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/10 to-transparent" />
               <div className="absolute inset-x-6 bottom-6 flex flex-wrap items-end justify-between gap-4 text-white">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wide2 text-gold-300">Live offering · KJ-WST1</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wide2 text-gold-300">
+                    Live offering · KJ-WST1
+                  </p>
                   <p className="font-display text-2xl font-bold">Westlands Tower One</p>
-                  <p className="mt-0.5 text-[13px] text-white/70">$12M Grade-A offices · from $100</p>
+                  <p className="mt-0.5 text-[13px] text-white/70">
+                    $12M Grade-A offices · from $100
+                  </p>
                 </div>
                 <div className="rounded-2xl bg-white/95 px-4 py-3 text-ink shadow-gold-md">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-gold-700">Net yield</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-gold-700">
+                    Net yield
+                  </p>
                   <p className="text-xl font-bold text-emerald-700">7.0%</p>
                 </div>
               </div>
@@ -407,7 +491,9 @@ export default function Home() {
                   <Link2 className="h-5 w-5 text-white" />
                 </span>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-ink-muted">Tokenized value</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-ink-muted">
+                    Tokenized value
+                  </p>
                   <p className="text-lg font-bold leading-none text-ink">$45.5M+</p>
                 </div>
               </div>
@@ -428,11 +514,31 @@ export default function Home() {
 
           <div className="mt-14 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
             {[
-              { step: '01', title: 'Discover', text: 'Search verified inventory across agencies — or just ask Keja.' },
-              { step: '02', title: 'Verify', text: 'Trust scores, title checks and fraud signals on every listing.' },
-              { step: '03', title: 'Analyse', text: 'Yields, ROI, projections and investor reports — the honest math.' },
-              { step: '04', title: 'Transact', text: 'Escorted viewings, M-Pesa escrow deposits, advocate-led closing.' },
-              { step: '05', title: 'Manage', text: 'Tenants, rent collection, maintenance and owner statements.' },
+              {
+                step: '01',
+                title: 'Discover',
+                text: 'Search verified inventory across agencies — or just ask Keja.',
+              },
+              {
+                step: '02',
+                title: 'Verify',
+                text: 'Trust scores, title checks and fraud signals on every listing.',
+              },
+              {
+                step: '03',
+                title: 'Analyse',
+                text: 'Yields, ROI, projections and investor reports — the honest math.',
+              },
+              {
+                step: '04',
+                title: 'Transact',
+                text: 'Escorted viewings, M-Pesa escrow deposits, advocate-led closing.',
+              },
+              {
+                step: '05',
+                title: 'Manage',
+                text: 'Tenants, rent collection, maintenance and owner statements.',
+              },
             ].map((s, i) => (
               <motion.div
                 key={s.step}
@@ -443,7 +549,9 @@ export default function Home() {
                 <p className="font-display text-3xl font-bold text-gold-300">{s.step}</p>
                 <h3 className="mt-2 font-display text-lg font-semibold text-ink">{s.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted">{s.text}</p>
-                {i < 4 && <ChevronRight className="absolute -right-3 top-1/2 hidden h-5 w-5 -translate-y-1/2 text-gold-400 lg:block" />}
+                {i < 4 && (
+                  <ChevronRight className="absolute -right-3 top-1/2 hidden h-5 w-5 -translate-y-1/2 text-gold-400 lg:block" />
+                )}
               </motion.div>
             ))}
           </div>
@@ -476,18 +584,30 @@ export default function Home() {
               cta: 'Chat now',
             },
           ].map((t) => (
-            <motion.div key={t.title} {...fadeUp} className="card-luxe card-luxe-hover flex flex-col p-7">
+            <motion.div
+              key={t.title}
+              {...fadeUp}
+              className="card-luxe card-luxe-hover flex flex-col p-7"
+            >
               <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold-gradient shadow-gold-sm">
                 <t.icon className="h-6 w-6 text-white" />
               </span>
               <h3 className="mt-5 font-display text-xl font-semibold text-ink">{t.title}</h3>
               <p className="mt-2.5 flex-1 text-sm leading-relaxed text-ink-muted">{t.text}</p>
               {t.to ? (
-                <Link to={t.to} className="mt-5 text-sm font-semibold text-gold-700 hover:text-gold-600">
+                <Link
+                  to={t.to}
+                  className="mt-5 text-sm font-semibold text-gold-700 hover:text-gold-600"
+                >
                   {t.cta} →
                 </Link>
               ) : (
-                <a href={t.href} target="_blank" rel="noreferrer" className="mt-5 text-sm font-semibold text-emerald-700 hover:text-emerald-600">
+                <a
+                  href={t.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-5 text-sm font-semibold text-emerald-700 hover:text-emerald-600"
+                >
                   {t.cta} →
                 </a>
               )}
@@ -507,9 +627,10 @@ export default function Home() {
               This week, our trust layer caught a listing priced 34% below market
             </h3>
             <p className="mt-2 max-w-3xl text-sm leading-relaxed text-ink-muted">
-              Re-posted three times under different agent names, with photos lifted from another building. It’s still
-              on our site — openly flagged — because transparency is how markets get safer. That’s the difference
-              between a listings board and a trust layer. {formatKES(4200000)} looked like a deal. It wasn’t.
+              Re-posted three times under different agent names, with photos lifted from another
+              building. It’s still on our site — openly flagged — because transparency is how
+              markets get safer. That’s the difference between a listings board and a trust layer.{' '}
+              {formatKES(4200000)} looked like a deal. It wasn’t.
             </p>
           </div>
           <Link to="/properties/KJA-020" className="btn-dark shrink-0">
@@ -577,7 +698,8 @@ export default function Home() {
               <span className="gold-text block">We help you build a legacy.</span>
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-white/60">
-              Join the buyers, renters and investors getting honest answers from Kenya’s AI real-estate advisor.
+              Join the buyers, renters and investors getting honest answers from Kenya’s AI
+              real-estate advisor.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link to="/ask" className="btn-gold">
@@ -594,5 +716,5 @@ export default function Home() {
         </div>
       </section>
     </div>
-  )
+  );
 }

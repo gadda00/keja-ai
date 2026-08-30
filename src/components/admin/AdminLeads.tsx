@@ -1,45 +1,47 @@
 /** Admin Leads — HOT/WARM/COLD pipeline CRM (blueprint Ch.9). */
-import { exportCSV } from '@/lib/csv'
-import { useMemo, useState } from 'react'
-import { Download } from 'lucide-react'
-import { Flame, Search, Phone, Mail, MessageCircle, StickyNote, Plus, Trash2 } from 'lucide-react'
-import { useStore, KEYS, Lead } from '@/lib/store'
-import { useAuth } from '@/lib/auth'
-import { logAudit } from '@/lib/adminStore'
-import { MARKET_INVENTORY } from '@/lib/inventory'
-import { whatsappLink } from '@/config'
+import { Download } from 'lucide-react';
+import { Flame, Mail, MessageCircle, Phone, Plus, Search, StickyNote, Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+
+import { whatsappLink } from '@/config';
+import { logAudit } from '@/lib/adminStore';
+import { useAuth } from '@/lib/auth';
+import { exportCSV } from '@/lib/csv';
+import { marketInventory } from '@/lib/inventory';
+import type { Lead } from '@/lib/store';
+import { KEYS, useStore } from '@/lib/store';
 
 const TONE = {
   HOT: { chip: 'bg-red-500 text-white', bar: 'bg-red-500', ring: 'ring-red-200' },
   WARM: { chip: 'bg-amber-500 text-white', bar: 'bg-amber-500', ring: 'ring-amber-200' },
   COLD: { chip: 'bg-sky-500 text-white', bar: 'bg-sky-500', ring: 'ring-sky-200' },
-} as const
+} as const;
 
 export default function AdminLeads() {
-  const { user } = useAuth()
-  const [leads, setLeads] = useStore<Lead[]>(KEYS.leads, [])
-  const [tab, setTab] = useState<'all' | Lead['temperature']>('all')
-  const [query, setQuery] = useState('')
-  const [newLead, setNewLead] = useState(false)
-  const [form, setForm] = useState({ name: '', phone: '', email: '', interest: '', budget: '' })
+  const { user } = useAuth();
+  const [leads, setLeads] = useStore<Lead[]>(KEYS.leads, []);
+  const [tab, setTab] = useState<'all' | Lead['temperature']>('all');
+  const [query, setQuery] = useState('');
+  const [newLead, setNewLead] = useState(false);
+  const [form, setForm] = useState({ name: '', phone: '', email: '', interest: '', budget: '' });
 
   const filtered = useMemo(
     () =>
       leads.filter((l) => {
-        const q = query.trim().toLowerCase()
+        const q = query.trim().toLowerCase();
         const matchQ =
           !q ||
           l.name.toLowerCase().includes(q) ||
           (l.email ?? '').toLowerCase().includes(q) ||
-          l.interest.toLowerCase().includes(q)
-        const matchTab = tab === 'all' || l.temperature === tab
-        return matchQ && matchTab
+          l.interest.toLowerCase().includes(q);
+        const matchTab = tab === 'all' || l.temperature === tab;
+        return matchQ && matchTab;
       }),
-    [leads, query, tab],
-  )
+    [leads, query, tab]
+  );
 
   const setTemperature = (lead: Lead, temperature: Lead['temperature']) => {
-    setLeads(leads.map((l) => (l.id === lead.id ? { ...l, temperature } : l)))
+    setLeads(leads.map((l) => (l.id === lead.id ? { ...l, temperature } : l)));
     logAudit({
       actor: user?.name ?? 'admin',
       actorEmail: user?.email ?? '',
@@ -47,11 +49,11 @@ export default function AdminLeads() {
       target: lead.name,
       detail: `${lead.name} → ${temperature}`,
       severity: 'info',
-    })
-  }
+    });
+  };
 
   const remove = (lead: Lead) => {
-    setLeads(leads.filter((l) => l.id !== lead.id))
+    setLeads(leads.filter((l) => l.id !== lead.id));
     logAudit({
       actor: user?.name ?? 'admin',
       actorEmail: user?.email ?? '',
@@ -59,11 +61,11 @@ export default function AdminLeads() {
       target: lead.name,
       detail: `Removed lead ${lead.name}`,
       severity: 'warning',
-    })
-  }
+    });
+  };
 
   const addLead = () => {
-    if (!form.name.trim() || !form.phone.trim()) return
+    if (!form.name.trim() || !form.phone.trim()) return;
     const lead: Lead = {
       id: `lead-${Date.now()}`,
       name: form.name,
@@ -74,10 +76,10 @@ export default function AdminLeads() {
       temperature: 'COLD',
       source: 'manual',
       createdAt: new Date().toISOString(),
-    }
-    setLeads([lead, ...leads])
-    setForm({ name: '', phone: '', email: '', interest: '', budget: '' })
-    setNewLead(false)
+    };
+    setLeads([lead, ...leads]);
+    setForm({ name: '', phone: '', email: '', interest: '', budget: '' });
+    setNewLead(false);
     logAudit({
       actor: user?.name ?? 'admin',
       actorEmail: user?.email ?? '',
@@ -85,14 +87,14 @@ export default function AdminLeads() {
       target: lead.name,
       detail: `Manual lead added: ${lead.name}`,
       severity: 'info',
-    })
-  }
+    });
+  };
 
   const stats = {
     HOT: leads.filter((l) => l.temperature === 'HOT').length,
     WARM: leads.filter((l) => l.temperature === 'WARM').length,
     COLD: leads.filter((l) => l.temperature === 'COLD').length,
-  }
+  };
 
   return (
     <div className="flex flex-col gap-5">
@@ -115,7 +117,7 @@ export default function AdminLeads() {
               onClick={() => setTab(t)}
               className={`rounded-full px-3.5 py-1.5 text-xs font-bold tracking-wide transition ${
                 tab === t
-                  ? TONE[t].chip + ' shadow-sm'
+                  ? `${TONE[t].chip} shadow-sm`
                   : 'bg-gold-50 text-gold-700 ring-1 ring-gold-100 hover:bg-gold-100'
               }`}
             >
@@ -135,9 +137,33 @@ export default function AdminLeads() {
           </div>
           <button
             onClick={() =>
-              exportCSV(`keja-leads-${new Date().toISOString().slice(0, 10)}.csv`,
-                ['Name', 'Phone', 'Email', 'Interest', 'Budget', 'Timeline', 'Temperature', 'Source', 'Property', 'Created'],
-                filtered.map((l) => [l.name, l.phone, l.email ?? '', l.interest, l.budget ?? '', l.timeline ?? '', l.temperature, l.source, l.propertyId ?? '', l.createdAt]))
+              exportCSV(
+                `keja-leads-${new Date().toISOString().slice(0, 10)}.csv`,
+                [
+                  'Name',
+                  'Phone',
+                  'Email',
+                  'Interest',
+                  'Budget',
+                  'Timeline',
+                  'Temperature',
+                  'Source',
+                  'Property',
+                  'Created',
+                ],
+                filtered.map((l) => [
+                  l.name,
+                  l.phone,
+                  l.email ?? '',
+                  l.interest,
+                  l.budget ?? '',
+                  l.timeline ?? '',
+                  l.temperature,
+                  l.source,
+                  l.propertyId ?? '',
+                  l.createdAt,
+                ])
+              )
             }
             className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3.5 py-2.5 text-xs font-semibold text-gold-300 hover:bg-ink-soft"
           >
@@ -152,7 +178,9 @@ export default function AdminLeads() {
       {/* lead cards */}
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         {filtered.map((l) => {
-          const prop = l.propertyId ? MARKET_INVENTORY.find((p) => p.id === l.propertyId) : undefined
+          const prop = l.propertyId
+            ? marketInventory().find((p) => p.id === l.propertyId)
+            : undefined;
           return (
             <div
               key={l.id}
@@ -177,14 +205,14 @@ export default function AdminLeads() {
                   <p className="mt-0.5 text-xs text-ink-muted">
                     {l.interest} {l.budget ? `· Budget ${l.budget}` : ''}
                   </p>
-                  {prop && (
+                  {prop ? (
                     <a
                       href={`/properties/${prop.id}`}
                       className="mt-1 inline-block text-[11px] font-semibold text-gold-700 hover:underline"
                     >
                       {prop.title.slice(0, 42)}… →
                     </a>
-                  )}
+                  ) : null}
                   <p className="mt-2 flex items-start gap-1.5 text-[11px] leading-relaxed text-ink-faint">
                     <StickyNote className="mt-0.5 h-3 w-3 shrink-0" />
                     {l.note ?? 'No notes yet.'}
@@ -194,7 +222,7 @@ export default function AdminLeads() {
                   <div className="flex gap-1.5">
                     <a
                       href={whatsappLink(
-                        `Hello ${l.name.split(' ')[0]}, this is Keja.ai following up on: ${l.interest}`,
+                        `Hello ${l.name.split(' ')[0]}, this is Keja.ai following up on: ${l.interest}`
                       )}
                       target="_blank"
                       rel="noreferrer"
@@ -210,7 +238,7 @@ export default function AdminLeads() {
                     >
                       <Phone className="h-4 w-4" />
                     </a>
-                    {l.email && (
+                    {l.email ? (
                       <a
                         href={`mailto:${l.email}`}
                         title="Email"
@@ -218,7 +246,7 @@ export default function AdminLeads() {
                       >
                         <Mail className="h-4 w-4" />
                       </a>
-                    )}
+                    ) : null}
                     <button
                       onClick={() => remove(l)}
                       title="Remove"
@@ -228,7 +256,11 @@ export default function AdminLeads() {
                     </button>
                   </div>
                   <span className="text-[10px] text-ink-faint">
-                    {new Date(l.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} · {l.source}
+                    {new Date(l.createdAt).toLocaleDateString('en-GB', {
+                      day: 'numeric',
+                      month: 'short',
+                    })}{' '}
+                    · {l.source}
                   </span>
                 </div>
               </div>
@@ -239,9 +271,7 @@ export default function AdminLeads() {
                     key={t}
                     onClick={() => setTemperature(l, t)}
                     className={`rounded-lg px-3 py-1.5 text-[10px] font-bold tracking-wide transition ${
-                      l.temperature === t
-                        ? TONE[t].chip
-                        : 'bg-ink/5 text-ink-muted hover:bg-ink/10'
+                      l.temperature === t ? TONE[t].chip : 'bg-ink/5 text-ink-muted hover:bg-ink/10'
                     }`}
                   >
                     {t}
@@ -249,7 +279,7 @@ export default function AdminLeads() {
                 ))}
               </div>
             </div>
-          )
+          );
         })}
       </div>
 
@@ -261,9 +291,21 @@ export default function AdminLeads() {
       )}
 
       {/* new lead dialog */}
-      {newLead && (
+      {newLead ? (
         <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm" onClick={() => setNewLead(false)} />
+          <div
+            role="button"
+            tabIndex={0}
+            aria-label="Close dialog"
+            className="absolute inset-0 bg-ink/60 backdrop-blur-sm"
+            onClick={() => setNewLead(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setNewLead(false);
+              }
+            }}
+          />
           <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-gold-200">
             <h3 className="heading-display text-lg">Add lead manually</h3>
             <p className="mt-1 text-xs text-ink-muted">
@@ -306,7 +348,7 @@ export default function AdminLeads() {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
-  )
+  );
 }

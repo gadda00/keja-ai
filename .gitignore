@@ -22,4 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# tsc -b composite emit for vite/vitest configs (redirected, but just in case)
+vite.config.js
+vite.config.d.ts
+vitest.config.js
+vitest.config.d.ts

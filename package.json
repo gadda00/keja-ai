@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "lint:eslint": "eslint src --ext .ts,.tsx --max-warnings 0",
+    "lint:eslint": "eslint src --max-warnings 0",
     "lint:prettier": "prettier --check src",
     "lint:all": "npm run lint:eslint && npm run lint:prettier",
     "lint:fix": "npm run lint:eslint -- --fix && npm run lint:prettier -- --write",
@@ -16,8 +16,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc -b --noEmit",
-    "prepare": "husky install"
+    "typecheck": "tsc -b",
+    "prepare": "husky",
+    "verify": "npm run typecheck && npm run lint:eslint && npm run test && npm run build"
   },
   "dependencies": {
     "framer-motion": "^13.1.1",
@@ -25,10 +26,10 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",
-    "recharts": "^3.10.1",
-    "zustand": "^4.5.2"
+    "recharts": "^3.10.1"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.3.3",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
@@ -45,17 +46,18 @@
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-unused-imports": "^4.1.4",
     "husky": "^9.1.6",
+    "jsdom": "^30.0.1",
     "lint-staged": "^15.2.10",
     "oxlint": "^1.79.0",
     "postcss": "^8.5.26",
     "prettier": "^3.3.3",
-    "prettier-plugin-import-sort": "^0.0.7",
     "tailwindcss": "^3.4.17",
     "typescript": "~6.0.2",
+    "typescript-eslint": "^8.68.0",
     "vite": "^8.2.2",
     "vitest": "^4.1.11"
   },
-  "description": "Keja.ai \u2014 Intelligent Real Estate. Verified Trust. Kenya's AI real-estate advisor and cross-agency trust layer. A Chacadom Investments venture.",
+  "description": "Keja.ai — Intelligent Real Estate. Verified Trust. Kenya's AI real-estate advisor and cross-agency trust layer. A Chacadom Investments venture.",
   "author": "Chacadom Investments",
   "license": "UNLICENSED",
   "lint-staged": {

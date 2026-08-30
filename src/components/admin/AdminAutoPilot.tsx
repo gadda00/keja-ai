@@ -6,12 +6,23 @@
  * auto-ingested inventory. The pipeline itself runs as code on a schedule
  * (see scripts/auto-listings + .github/workflows/auto-listings.yml).
  */
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Bot, Activity, CheckCircle2, AlertTriangle, XCircle, Clock, Database, Cpu, ChevronDown } from 'lucide-react'
-import { AUTO_LISTINGS, AUTO_PENDING, AUTO_RUNS, autoPilotStats } from '@/lib/autoListings'
-import { formatKES, timeAgo } from '@/lib/format'
-import { isRentalPrice } from '@/lib/finance'
+import {
+  Activity,
+  AlertTriangle,
+  Bot,
+  CheckCircle2,
+  ChevronDown,
+  Clock,
+  Cpu,
+  Database,
+  XCircle,
+} from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+
+import { AUTO_LISTINGS, AUTO_PENDING, AUTO_RUNS, autoPilotStats } from '@/lib/autoListings';
+import { isRentalPrice } from '@/lib/finance';
+import { formatKES, timeAgo } from '@/lib/format';
 
 const checkIcon = (status: string) =>
   status === 'pass' ? (
@@ -20,11 +31,11 @@ const checkIcon = (status: string) =>
     <AlertTriangle className="h-4 w-4 shrink-0 text-amber-500" />
   ) : (
     <XCircle className="h-4 w-4 shrink-0 text-red-600" />
-  )
+  );
 
 export default function AdminAutoPilot() {
-  const stats = autoPilotStats()
-  const [expanded, setExpanded] = useState<string | null>(AUTO_LISTINGS[0]?.id ?? null)
+  const stats = autoPilotStats();
+  const [expanded, setExpanded] = useState<string | null>(AUTO_LISTINGS[0]?.id ?? null);
 
   return (
     <div className="space-y-6">
@@ -35,12 +46,14 @@ export default function AdminAutoPilot() {
             <p className="eyebrow flex items-center gap-1.5">
               <Bot className="h-3.5 w-3.5" /> Keja Auto-Pilot — AI listing ingestion
             </p>
-            <h2 className="mt-2 font-display text-xl font-bold text-ink">The marketplace grows itself</h2>
+            <h2 className="mt-2 font-display text-xl font-bold text-ink">
+              The marketplace grows itself
+            </h2>
             <p className="mt-2 text-sm leading-relaxed text-ink-muted">
               Every 6 hours the pipeline ingests new postings from the market scanner and contracted
-              partner feeds (JSON · CSV · XML), enriches them with AI-written descriptions and pricing
-              intelligence, deduplicates across sources, screens for anomalies, and publishes what
-              passes. Fully automated by code — this console is the audit window.
+              partner feeds (JSON · CSV · XML), enriches them with AI-written descriptions and
+              pricing intelligence, deduplicates across sources, screens for anomalies, and
+              publishes what passes. Fully automated by code — this console is the audit window.
             </p>
           </div>
           <div className="rounded-xl bg-gold-50 px-4 py-3 text-xs leading-relaxed text-ink-soft ring-1 ring-gold-200">
@@ -61,7 +74,9 @@ export default function AdminAutoPilot() {
         <div className="card-luxe p-5">
           <Activity className="h-5 w-5 text-gold-600" />
           <p className="mt-2 font-display text-2xl font-bold text-ink">{stats.totalRuns}</p>
-          <p className="text-[11px] uppercase tracking-wider text-ink-faint">Pipeline runs logged</p>
+          <p className="text-[11px] uppercase tracking-wider text-ink-faint">
+            Pipeline runs logged
+          </p>
         </div>
         <div className="card-luxe p-5">
           <Cpu className="h-5 w-5 text-gold-600" />
@@ -76,25 +91,34 @@ export default function AdminAutoPilot() {
       </div>
 
       {/* feed health + last run */}
-      {stats.lastRun && (
+      {stats.lastRun ? (
         <div className="grid gap-4 lg:grid-cols-[1fr_1.4fr]">
           <div className="card-luxe p-5">
             <p className="eyebrow">Feed health — last run</p>
             <div className="mt-3 space-y-2.5">
               {(stats.lastRun.feedStatus ?? []).map((f) => (
-                <div key={f.feed} className="flex items-center justify-between gap-3 rounded-lg bg-cream px-3 py-2.5 text-xs">
+                <div
+                  key={f.feed}
+                  className="flex items-center justify-between gap-3 rounded-lg bg-cream px-3 py-2.5 text-xs"
+                >
                   <span className="min-w-0">
                     <b className="truncate text-ink">{f.feed}</b>
-                    <span className="ml-2 rounded bg-gold-100 px-1.5 py-0.5 font-mono text-[9px] font-bold text-gold-700">{f.format}</span>
+                    <span className="ml-2 rounded bg-gold-100 px-1.5 py-0.5 font-mono text-[9px] font-bold text-gold-700">
+                      {f.format}
+                    </span>
                   </span>
-                  <span className={`shrink-0 font-semibold ${f.state === 'ok' ? 'text-emerald-700' : 'text-red-600'}`}>
+                  <span
+                    className={`shrink-0 font-semibold ${f.state === 'ok' ? 'text-emerald-700' : 'text-red-600'}`}
+                  >
                     {f.state === 'ok' ? `OK · ${f.items} items` : f.state}
                   </span>
                 </div>
               ))}
               <div className="flex items-center justify-between gap-3 rounded-lg bg-cream px-3 py-2.5 text-xs">
                 <b className="text-ink">market-scanner</b>
-                <span className="font-semibold text-emerald-700">OK · {stats.lastRun.sources.scanner} sightings</span>
+                <span className="font-semibold text-emerald-700">
+                  OK · {stats.lastRun.sources.scanner} sightings
+                </span>
               </div>
             </div>
           </div>
@@ -131,7 +155,7 @@ export default function AdminAutoPilot() {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* review queue */}
       {AUTO_PENDING.length > 0 && (
@@ -139,21 +163,26 @@ export default function AdminAutoPilot() {
           <p className="eyebrow">Review queue — routed here by the quality gate (score 60–79)</p>
           <div className="mt-3 space-y-2">
             {AUTO_PENDING.slice(0, 6).map((l) => (
-              <div key={l.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-cream px-3 py-2.5 text-xs">
+              <div
+                key={l.id}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-cream px-3 py-2.5 text-xs"
+              >
                 <span className="min-w-0">
                   <b className="text-ink">{l.title}</b>
                   <span className="ml-2 font-mono text-[10px] text-ink-faint">{l.id}</span>
                 </span>
                 <span className="flex items-center gap-2">
-                  <span className="rounded bg-amber-100 px-2 py-0.5 font-bold text-amber-700">quality {l.auto.qualityScore}</span>
+                  <span className="rounded bg-amber-100 px-2 py-0.5 font-bold text-amber-700">
+                    quality {l.auto.qualityScore}
+                  </span>
                   <span className="text-ink-faint">{l.auto.source}</span>
                 </span>
               </div>
             ))}
           </div>
           <p className="mt-3 text-[11px] leading-relaxed text-ink-faint">
-            In production these route to the human verification desk (Listings tab). Demo build keeps
-            them parked here to show the gate working.
+            In production these route to the human verification desk (Listings tab). Demo build
+            keeps them parked here to show the gate working.
           </p>
         </div>
       )}
@@ -162,7 +191,9 @@ export default function AdminAutoPilot() {
       <div className="card-luxe p-5">
         <div className="flex items-center justify-between">
           <p className="eyebrow">Live auto-ingested inventory ({AUTO_LISTINGS.length})</p>
-          <p className="text-[11px] text-ink-faint">Newest first · click a row to see its machine screens</p>
+          <p className="text-[11px] text-ink-faint">
+            Newest first · click a row to see its machine screens
+          </p>
         </div>
         <div className="mt-3 space-y-2">
           {AUTO_LISTINGS.slice(0, 12).map((l) => (
@@ -173,19 +204,29 @@ export default function AdminAutoPilot() {
                   onClick={() => setExpanded(expanded === l.id ? null : l.id)}
                   aria-expanded={expanded === l.id}
                 >
-                  <ChevronDown className={`h-4 w-4 shrink-0 text-gold-600 transition ${expanded === l.id ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`h-4 w-4 shrink-0 text-gold-600 transition ${expanded === l.id ? 'rotate-180' : ''}`}
+                  />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-semibold text-ink">{l.title}</span>
                     <span className="text-[11px] text-ink-muted">
-                      {l.id} · {l.area}, {l.county} · {formatKES(l.price, { monthly: isRentalPrice(l.price) })}
+                      {l.id} · {l.area}, {l.county} ·{' '}
+                      {formatKES(l.price, { monthly: isRentalPrice(l.price) })}
                     </span>
                   </span>
                 </button>
-                <span className={`hidden shrink-0 rounded px-2 py-0.5 text-[10px] font-bold sm:inline ${l.auto.source.startsWith('feed:') ? 'bg-sky-100 text-sky-700' : 'bg-gold-100 text-gold-700'}`}>
+                <span
+                  className={`hidden shrink-0 rounded px-2 py-0.5 text-[10px] font-bold sm:inline ${l.auto.source.startsWith('feed:') ? 'bg-sky-100 text-sky-700' : 'bg-gold-100 text-gold-700'}`}
+                >
                   {l.auto.source.startsWith('feed:') ? l.auto.source.split(':')[2] : 'SCANNER'}
                 </span>
-                <span className="shrink-0 rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">Q{l.auto.qualityScore}</span>
-                <Link to={`/properties/${l.id}`} className="shrink-0 text-[11px] font-semibold text-gold-700 hover:text-gold-600">
+                <span className="shrink-0 rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                  Q{l.auto.qualityScore}
+                </span>
+                <Link
+                  to={`/properties/${l.id}`}
+                  className="shrink-0 text-[11px] font-semibold text-gold-700 hover:text-gold-600"
+                >
                   View →
                 </Link>
               </div>
@@ -203,8 +244,8 @@ export default function AdminAutoPilot() {
                     ))}
                   </div>
                   <p className="mt-3 text-[10px] text-ink-faint">
-                    Enriched by {l.auto.enrichedBy} · price grade: {l.auto.priceGrade} · area yield band {l.auto.areaYieldBand}% ·
-                    ingested {timeAgo(l.auto.firstSeenAt)}
+                    Enriched by {l.auto.enrichedBy} · price grade: {l.auto.priceGrade} · area yield
+                    band {l.auto.areaYieldBand}% · ingested {timeAgo(l.auto.firstSeenAt)}
                   </p>
                 </div>
               )}
@@ -213,5 +254,5 @@ export default function AdminAutoPilot() {
         </div>
       </div>
     </div>
-  )
+  );
 }

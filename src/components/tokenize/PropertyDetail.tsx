@@ -2,41 +2,66 @@
  * Keja Tokenize — property detail: investment case, structure & compliance,
  * distribution history and the sticky investment calculator.
  */
-import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 import {
-  ArrowLeft, MapPin, ShieldCheck, Scale, FileText, CalendarClock, Landmark, Percent,
-  CheckCircle2, Copy, BellRing, Info, TrendingUp,
-} from 'lucide-react'
-import { useTokenize } from '@/lib/tokenizeStore'
-import { fundedPct, tokensAvailable, yieldPct } from '@/data/tokenize'
-import type { TokenizedProperty } from '@/data/tokenize'
-import { StatusBadge, TypeIcon, propertyTypeLabel, useToast, fmtNum, fmtUsd, fmtDate, img } from './shared'
+  ArrowLeft,
+  BellRing,
+  CalendarClock,
+  CheckCircle2,
+  Copy,
+  FileText,
+  Info,
+  Landmark,
+  MapPin,
+  Percent,
+  Scale,
+  ShieldCheck,
+  TrendingUp,
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
+
+import type { TokenizedProperty } from '@/data/tokenize';
+import { fundedPct, tokensAvailable, yieldPct } from '@/data/tokenize';
+import { useTokenize } from '@/lib/tokenizeStore';
+
+import {
+  fmtDate,
+  fmtNum,
+  fmtUsd,
+  img,
+  propertyTypeLabel,
+  StatusBadge,
+  TypeIcon,
+  useToast,
+} from './shared';
 
 export function PropertyDetail({ property }: { property: TokenizedProperty }) {
-  const { setView, openInvest, investor, openKyc, joinWaitlist, waitlist } = useTokenize()
-  const { toast } = useToast()
-  const [tokens, setTokens] = useState<number | null>(null)
+  const { setView, openInvest, investor, openKyc, joinWaitlist, waitlist } = useTokenize();
+  const { toast } = useToast();
+  const [tokens, setTokens] = useState<number | null>(null);
 
-  const p = property
-  const maxBuy = Math.max(p.minTokens, Math.min(tokensAvailable(p), 2000))
-  const buyAmount = Math.min(Math.max(tokens ?? Math.min(p.minTokens * 5, maxBuy), p.minTokens), Math.max(maxBuy, p.minTokens))
+  const p = property;
+  const maxBuy = Math.max(p.minTokens, Math.min(tokensAvailable(p), 2000));
+  const buyAmount = Math.min(
+    Math.max(tokens ?? Math.min(p.minTokens * 5, maxBuy), p.minTokens),
+    Math.max(maxBuy, p.minTokens)
+  );
 
-  const incomePerToken = p.totalTokens > 0 ? p.annualNetIncomeUsd / p.totalTokens : 0
-  const annualIncome = buyAmount * incomePerToken
-  const cost = buyAmount * p.tokenPriceUsd
-  const year5 = cost * Math.pow(1 + p.appreciationPct / 100, 5)
-  const income5yr = annualIncome * 5
+  const incomePerToken = p.totalTokens > 0 ? p.annualNetIncomeUsd / p.totalTokens : 0;
+  const annualIncome = buyAmount * incomePerToken;
+  const cost = buyAmount * p.tokenPriceUsd;
+  const year5 = cost * (1 + p.appreciationPct / 100) ** 5;
+  const income5yr = annualIncome * 5;
 
-  const soldOut = tokensAvailable(p) <= 0
-  const canBuy = (p.status === 'FUNDING' || p.status === 'LIVE') && !soldOut
-  const upcoming = p.status === 'UPCOMING'
-  const onWaitlist = waitlist.includes(p.id)
+  const soldOut = tokensAvailable(p) <= 0;
+  const canBuy = (p.status === 'FUNDING' || p.status === 'LIVE') && !soldOut;
+  const upcoming = p.status === 'UPCOMING';
+  const onWaitlist = waitlist.includes(p.id);
 
   const quickTokens = useMemo(
     () => [p.minTokens, 100, 500, 1000].map((t) => Math.max(p.minTokens, Math.min(t, maxBuy))),
     [p.minTokens, maxBuy]
-  )
+  );
 
   return (
     <div className="bg-cream">
@@ -56,7 +81,11 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
               animate={{ opacity: 1, y: 0 }}
               className="relative overflow-hidden rounded-2xl border border-gold-200 shadow-gold-md"
             >
-              <img src={img(p.imageUrl)} alt={p.title} className="h-[280px] w-full object-cover sm:h-[380px]" />
+              <img
+                src={img(p.imageUrl)}
+                alt={p.title}
+                className="h-[280px] w-full object-cover sm:h-[380px]"
+              />
               <div className="absolute inset-x-4 top-4 flex items-start justify-between">
                 <StatusBadge status={p.status} />
                 <span className="rounded-full bg-ink/85 px-3 py-1 text-[11px] font-bold text-emerald-300 backdrop-blur">
@@ -68,9 +97,12 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
             <div className="mt-6">
               <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-gold-600">
                 <TypeIcon type={p.propertyType} className="h-3.5 w-3.5" />
-                {propertyTypeLabel(p.propertyType)} · {p.tokenSymbol} · {p.city.toUpperCase()}, {p.country.toUpperCase()}
+                {propertyTypeLabel(p.propertyType)} · {p.tokenSymbol} · {p.city.toUpperCase()},{' '}
+                {p.country.toUpperCase()}
               </div>
-              <h1 className="mt-2 font-display text-3xl font-bold text-ink sm:text-4xl">{p.title}</h1>
+              <h1 className="mt-2 font-display text-3xl font-bold text-ink sm:text-4xl">
+                {p.title}
+              </h1>
               <p className="mt-2 flex items-center gap-1.5 text-sm text-ink-muted">
                 <MapPin className="h-4 w-4 text-gold-600" /> {p.location}, {p.city} · {p.tagline}
               </p>
@@ -80,10 +112,15 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
                   { label: 'Property value', value: fmtUsd(p.totalValueUsd) },
                   { label: 'Token price', value: `$${p.tokenPriceUsd}` },
                   { label: 'Net yield', value: `${yieldPct(p).toFixed(1)}%` },
-                  { label: 'Distributions', value: p.distributionFreq === 'MONTHLY' ? 'Monthly' : 'Quarterly' },
+                  {
+                    label: 'Distributions',
+                    value: p.distributionFreq === 'MONTHLY' ? 'Monthly' : 'Quarterly',
+                  },
                 ].map((m) => (
                   <div key={m.label} className="rounded-xl border border-gold-100 bg-white p-3.5">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-gold-700">{m.label}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-gold-700">
+                      {m.label}
+                    </p>
                     <p className="mt-1 text-lg font-bold text-ink">{m.value}</p>
                   </div>
                 ))}
@@ -128,21 +165,27 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
                   <button
                     className="mt-2 flex items-center gap-1.5 font-mono text-[12px] text-gold-700 hover:text-ink"
                     onClick={() => {
-                      navigator.clipboard?.writeText(p.contractAddress)
-                      toast({ title: 'Contract address copied' })
+                      navigator.clipboard?.writeText(p.contractAddress).catch(() => {});
+                      toast({ title: 'Contract address copied' });
                     }}
                   >
                     {p.contractAddress.slice(0, 18)}…{p.contractAddress.slice(-6)}
                     <Copy className="h-3 w-3" />
                   </button>
-                  <p className="mt-1 text-[12px] text-gold-700">Keja Ledger — Regulated Simulation</p>
+                  <p className="mt-1 text-[12px] text-gold-700">
+                    Keja Ledger — Regulated Simulation
+                  </p>
                 </div>
                 <div className="rounded-xl border border-gold-100 bg-white p-4">
                   <div className="flex items-center gap-2 text-[13px] font-semibold text-ink">
                     <FileText className="h-4 w-4 text-gold-600" /> Offering documents
                   </div>
-                  <p className="mt-2 text-[13px] text-ink-muted">SPA · Independent valuation · Lease schedules</p>
-                  <p className="mt-1 text-[12px] text-gold-700">Available to KYC-verified investors</p>
+                  <p className="mt-2 text-[13px] text-ink-muted">
+                    SPA · Independent valuation · Lease schedules
+                  </p>
+                  <p className="mt-1 text-[12px] text-gold-700">
+                    Available to KYC-verified investors
+                  </p>
                 </div>
               </div>
 
@@ -164,8 +207,12 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
                           <tr key={d.id} className="border-b border-gold-50 last:border-0">
                             <td className="px-4 py-2.5 font-semibold text-ink">{d.periodLabel}</td>
                             <td className="px-4 py-2.5 text-ink-muted">{fmtDate(d.payDate)}</td>
-                            <td className="px-4 py-2.5 text-right font-mono text-ink">${d.perTokenUsd.toFixed(4)}</td>
-                            <td className="px-4 py-2.5 text-right text-ink-muted">{fmtUsd(d.amountUsd)}</td>
+                            <td className="px-4 py-2.5 text-right font-mono text-ink">
+                              ${d.perTokenUsd.toFixed(4)}
+                            </td>
+                            <td className="px-4 py-2.5 text-right text-ink-muted">
+                              {fmtUsd(d.amountUsd)}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -177,12 +224,18 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
           </div>
 
           {/* ─── right sticky: invest card ─── */}
-          <motion.aside initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="lg:sticky lg:top-24">
+          <motion.aside
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="lg:sticky lg:top-24"
+          >
             <div className="overflow-hidden rounded-2xl border border-gold-200 bg-white shadow-gold-md">
               <div className="bg-gold-gradient px-5 py-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-wide2 text-white/80">Investment calculator</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wide2 text-white/80">
+                      Investment calculator
+                    </p>
                     <p className="font-display text-xl font-bold text-white">{p.tokenSymbol}</p>
                   </div>
                   <Percent className="h-8 w-8 text-white/70" />
@@ -190,11 +243,13 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
               </div>
 
               <div className="p-5">
-                {canBuy && (
+                {canBuy ? (
                   <>
                     <div className="flex items-center justify-between text-[13px]">
                       <span className="font-semibold text-ink">{fmtNum(buyAmount)} tokens</span>
-                      <span className="text-ink-muted">max {fmtNum(Math.min(maxBuy, tokensAvailable(p)))}</span>
+                      <span className="text-ink-muted">
+                        max {fmtNum(Math.min(maxBuy, tokensAvailable(p)))}
+                      </span>
                     </div>
                     <input
                       type="range"
@@ -222,13 +277,13 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
                       ))}
                     </div>
                   </>
-                )}
+                ) : null}
 
                 {!canBuy && !upcoming && (
                   <div className="rounded-xl border border-gold-200 bg-gold-50 p-3.5 text-[12.5px] leading-relaxed text-gold-700">
                     <strong>Fully funded.</strong> All {fmtNum(p.totalTokens)} tokens are held by
-                    investors and the asset is income-paying. Explore assets currently in the funding
-                    phase — secondary trading is on the Keja roadmap.
+                    investors and the asset is income-paying. Explore assets currently in the
+                    funding phase — secondary trading is on the Keja roadmap.
                   </div>
                 )}
 
@@ -242,9 +297,14 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
                     <span className="font-bold text-emerald-700">{fmtUsd(annualIncome, 2)}</span>
                   </div>
                   <div className="flex items-center justify-between text-[13px]">
-                    <span className="text-ink-muted">Per {p.distributionFreq === 'MONTHLY' ? 'month' : 'quarter'}</span>
+                    <span className="text-ink-muted">
+                      Per {p.distributionFreq === 'MONTHLY' ? 'month' : 'quarter'}
+                    </span>
                     <span className="font-semibold text-ink">
-                      {fmtUsd(p.distributionFreq === 'MONTHLY' ? annualIncome / 12 : annualIncome / 4, 2)}
+                      {fmtUsd(
+                        p.distributionFreq === 'MONTHLY' ? annualIncome / 12 : annualIncome / 4,
+                        2
+                      )}
                     </span>
                   </div>
                   <div className="border-t border-gold-100 pt-3">
@@ -263,14 +323,15 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
                   <button
                     className="mt-5 h-12 w-full rounded-lg border border-gold-300 bg-white text-[14px] font-semibold text-gold-700 transition hover:bg-gold-50"
                     onClick={() => {
-                      joinWaitlist(p.id)
+                      joinWaitlist(p.id);
                       toast({
                         title: onWaitlist ? 'Already on the waitlist' : 'Added to waitlist',
                         description: `You will be notified when ${p.tokenSymbol} opens for funding.`,
-                      })
+                      });
                     }}
                   >
-                    <BellRing className="mr-2 inline h-4 w-4" /> {onWaitlist ? 'You are on the waitlist' : 'Join waitlist'}
+                    <BellRing className="mr-2 inline h-4 w-4" />{' '}
+                    {onWaitlist ? 'You are on the waitlist' : 'Join waitlist'}
                   </button>
                 ) : !canBuy ? (
                   <button
@@ -284,10 +345,10 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
                     className="btn-gold mt-5 !h-12 w-full !text-[14px]"
                     onClick={() => {
                       if (!investor) {
-                        openInvest(p.id)
-                        openKyc('invest')
+                        openInvest(p.id);
+                        openKyc('invest');
                       } else {
-                        openInvest(p.id)
+                        openInvest(p.id);
                       }
                     }}
                   >
@@ -298,8 +359,8 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
                 <div className="mt-4 flex items-start gap-2 rounded-lg bg-gold-50 p-3 text-[11.5px] leading-relaxed text-gold-700">
                   <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                   Projections are illustrative, not guaranteed. Minimum {fmtNum(p.minTokens)} tokens
-                  ({fmtUsd(p.minTokens * p.tokenPriceUsd)}). Tokens represent economic rights in the SPV,
-                  subject to the offering documents.
+                  ({fmtUsd(p.minTokens * p.tokenPriceUsd)}). Tokens represent economic rights in the
+                  SPV, subject to the offering documents.
                 </div>
               </div>
             </div>
@@ -335,5 +396,5 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

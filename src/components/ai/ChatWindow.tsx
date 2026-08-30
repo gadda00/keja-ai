@@ -1,69 +1,91 @@
-import SmartImg from '@/components/ui/SmartImg'
-import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Send, Sparkles, ShieldCheck, Languages, Trash2 } from 'lucide-react'
-import { kejaAI, AIResponse } from '@/lib/ai/engine'
-import { useStore, KEYS, ChatMessage, type Lead } from '@/lib/store'
-import { useAuth } from '@/lib/auth'
-import Markdown from './Markdown'
-import { useAllProperties } from '@/lib/inventory'
-import { formatKES } from '@/lib/format'
-import { asset, whatsappLink } from '@/config'
-import { isRentalPrice } from '@/lib/finance'
+import { Languages, Send, ShieldCheck, Sparkles, Trash2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
-const uid = () => Math.random().toString(36).slice(2, 10)
+import SmartImg from '@/components/ui/SmartImg';
+import { asset, whatsappLink } from '@/config';
+import { kejaAI } from '@/lib/ai/engine';
+import { useAuth } from '@/lib/auth';
+import { isRentalPrice } from '@/lib/finance';
+import { formatKES } from '@/lib/format';
+import { useAllProperties } from '@/lib/inventory';
+import type { ChatMessage } from '@/lib/store';
+import { KEYS, type Lead, useStore } from '@/lib/store';
+
+import Markdown from './Markdown';
+
+const uid = () => Math.random().toString(36).slice(2, 10);
 
 const fmtTime = (iso: string) => {
   try {
-    return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   } catch {
-    return ''
+    return '';
   }
-}
+};
 
 export default function ChatWindow({ compact = false }: { compact?: boolean }) {
-  const [messages, setMessages] = useStore<ChatMessage[]>(KEYS.chat, [])
-  const [input, setInput] = useState('')
-  const [typing, setTyping] = useState(false)
-  const [lang, setLang] = useState(kejaAI.language)
-  const bottomRef = useRef<HTMLDivElement>(null)
-  const started = useRef(false)
-  const navigate = useNavigate()
-  const { setAuthModalOpen } = useAuth()
-  const allProperties = useAllProperties()
-  const [, setLeads] = useStore<Lead[]>(KEYS.leads, [])
+  const [messages, setMessages] = useStore<ChatMessage[]>(KEYS.chat, []);
+  const [input, setInput] = useState('');
+  const [typing, setTyping] = useState(false);
+  const [lang, setLang] = useState(kejaAI.language);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
+  const navigate = useNavigate();
+  const { setAuthModalOpen } = useAuth();
+  const allProperties = useAllProperties();
+  const [, setLeads] = useStore<Lead[]>(KEYS.leads, []);
 
   useEffect(() => {
     if (!started.current && messages.length === 0) {
-      started.current = true
-      const greeting: ChatMessage = { id: uid(), role: 'keja', text: '', ts: new Date().toISOString() }
-      const r = kejaAI.respond('hello')
-      greeting.text = r.text
-      greeting.quickReplies = r.quickReplies
-      setMessages([greeting])
+      started.current = true;
+      const greeting: ChatMessage = {
+        id: uid(),
+        role: 'keja',
+        text: '',
+        ts: new Date().toISOString(),
+      };
+      const r = kejaAI.respond('hello');
+      greeting.text = r.text;
+      greeting.quickReplies = r.quickReplies;
+      setMessages([greeting]);
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-  }, [messages, typing])
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages, typing]);
 
   const send = (text: string, force = false) => {
-    const clean = text.trim()
-    if (!clean || (typing && !force)) return
-    const userMsg: ChatMessage = { id: uid(), role: 'user', text: clean, ts: new Date().toISOString() }
-    setMessages([...messages, userMsg])
-    setInput('')
+    const clean = text.trim();
+    if (!clean || (typing && !force)) return;
+    const userMsg: ChatMessage = {
+      id: uid(),
+      role: 'user',
+      text: clean,
+      ts: new Date().toISOString(),
+    };
+    setMessages((prev: ChatMessage[]) => [...prev, userMsg]);
+    setInput('');
 
     // navigation shortcuts from quick replies
     const navShortcut: Record<string, { to: string; msg: string }> = {
-      'open keja tokenize': { to: '/tokenize', msg: 'Taking you to **Keja Tokenize** — our tokenized real-estate marketplace. 🪙' },
-      'explore the ecosystem': { to: '/ecosystem', msg: 'Opening the **KEJA ecosystem** — all eight products, one intelligence layer. ✨' },
-      'become a partner': { to: '/partners', msg: 'Heading to the **Partner Network** — five channels to get your inventory on Keja. 🤝' },
+      'open keja tokenize': {
+        to: '/tokenize',
+        msg: 'Taking you to **Keja Tokenize** — our tokenized real-estate marketplace. 🪙',
+      },
+      'explore the ecosystem': {
+        to: '/ecosystem',
+        msg: 'Opening the **KEJA ecosystem** — all eight products, one intelligence layer. ✨',
+      },
+      'become a partner': {
+        to: '/partners',
+        msg: 'Heading to the **Partner Network** — five channels to get your inventory on Keja. 🤝',
+      },
       'sign in now': { to: '', msg: '' }, // handled via auth modal below
       'sign in as admin': { to: '', msg: '' },
-    }
-    const shortcut = navShortcut[clean.toLowerCase()]
+    };
+    const shortcut = navShortcut[clean.toLowerCase()];
     if (shortcut) {
       if (clean.toLowerCase() === 'sign in now' || clean.toLowerCase() === 'sign in as admin') {
         const kejaMsg: ChatMessage = {
@@ -71,26 +93,26 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
           role: 'keja',
           text: 'Opening the **sign-in panel** for you now. Pick *Continue with Google* or use a demo account. 🔐',
           ts: new Date().toISOString(),
-        }
-        setMessages([...messages, userMsg, kejaMsg])
-        setTimeout(() => setAuthModalOpen(true), 500)
-        return
+        };
+        setMessages((prev: ChatMessage[]) => [...prev, userMsg, kejaMsg]);
+        setTimeout(() => setAuthModalOpen(true), 500);
+        return;
       }
       const kejaMsg: ChatMessage = {
         id: uid(),
         role: 'keja',
         text: shortcut.msg,
         ts: new Date().toISOString(),
-      }
-      setMessages([...messages, userMsg, kejaMsg])
-      setTimeout(() => navigate(shortcut.to), 600)
-      return
+      };
+      setMessages((prev: ChatMessage[]) => [...prev, userMsg, kejaMsg]);
+      setTimeout(() => void navigate(shortcut.to), 600);
+      return;
     }
 
-    setTyping(true)
+    setTyping(true);
 
-    const response = kejaAI.respond(clean)
-    const delay = Math.min(900 + clean.length * 12, 2200)
+    const response = kejaAI.respond(clean);
+    const delay = Math.min(900 + clean.length * 12, 2200);
     setTimeout(() => {
       const kejaMsg: ChatMessage = {
         id: uid(),
@@ -100,13 +122,13 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
         meta: response.meta?.map((m) => `${m.label}: ${m.text}`),
         quickReplies: response.quickReplies,
         propertyIds: response.propertyIds,
-      }
-      setMessages((prev: ChatMessage[]) => [...prev, kejaMsg])
-      setTyping(false)
+      };
+      setMessages((prev: ChatMessage[]) => [...prev, kejaMsg]);
+      setTyping(false);
       // Completed qualification → write the lead so the sales CRM (Admin →
       // Leads, agent Dashboard) actually receives what the bot promised.
       if (kejaAI.lastQualification && /lead rating:|your profile:/i.test(response.text)) {
-        const q = kejaAI.lastQualification
+        const q = kejaAI.lastQualification;
         const lead: Lead = {
           id: `lead-${Date.now()}`,
           name: q.name ?? 'AI qualification',
@@ -118,55 +140,75 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
           source: 'chat',
           note: 'Captured by the 4-question AI qualification flow',
           createdAt: new Date().toISOString(),
-        }
-        setLeads((prev: Lead[]) => [lead, ...prev])
-        kejaAI.lastQualification = null
+        };
+        setLeads((prev: Lead[]) => [lead, ...prev]);
+        kejaAI.lastQualification = null;
       }
       // Engine actions — the conversion moments (human handoff, calculator…)
       if (response.action === 'whatsapp') {
-        window.open(whatsappLink('Hello Keja — I was chatting with Keja AI and would like to talk to the client desk.'), '_blank', 'noopener')
+        window.open(
+          whatsappLink(
+            'Hello Keja — I was chatting with Keja AI and would like to talk to the client desk.'
+          ),
+          '_blank',
+          'noopener'
+        );
       } else if (response.action === 'open-calculator') {
-        setTimeout(() => navigate('/calculator'), 700)
+        setTimeout(() => navigate('/calculator'), 700);
       }
-    }, delay)
-  }
+    }, delay);
+  };
 
   const quickReplies = (() => {
-    const defaultQ = ['Find me a home', 'Show investment deals', 'How do you verify listings?']
-    if (typing) return []
+    const defaultQ = ['Find me a home', 'Show investment deals', 'How do you verify listings?'];
+    if (typing) return [];
     // Engine-authored chips take priority (persisted on the message)
-    const lastKeja = [...messages].reverse().find((m) => m.role === 'keja')
-    if (!lastKeja) return defaultQ
-    if (lastKeja.quickReplies) return lastKeja.quickReplies
+    const lastKeja = [...messages].reverse().find((m) => m.role === 'keja');
+    if (!lastKeja) return defaultQ;
+    if (lastKeja.quickReplies) return lastKeja.quickReplies;
     // Legacy fallback for history saved before quickReplies were persisted
-    if (/What are you looking for|Natafuta|recherchez/.test(lastKeja.text)) return ['Find me a home', 'Show investment deals', 'Land under 4M', 'I want to rent']
-    if (/Trust Score|trust is literally|Great question/.test(lastKeja.text)) return ['What is Ardhisasa?', 'Show me only verified listings', 'Show a flagged example']
-    if (/Keja Tokenize/.test(lastKeja.text)) return ['Open Keja Tokenize', 'What are the risks?', 'Show investment deals']
-    if (/question 1 of 4|Question 1 of 4/i.test(lastKeja.text)) return []
-    if (/Habari|Bonjour/.test(lastKeja.text)) return defaultQ
-    return []
-  })()
+    if (/What are you looking for|Natafuta|recherchez/.test(lastKeja.text))
+      return ['Find me a home', 'Show investment deals', 'Land under 4M', 'I want to rent'];
+    if (/Trust Score|trust is literally|Great question/.test(lastKeja.text))
+      return ['What is Ardhisasa?', 'Show me only verified listings', 'Show a flagged example'];
+    if (lastKeja.text.includes('Keja Tokenize'))
+      return ['Open Keja Tokenize', 'What are the risks?', 'Show investment deals'];
+    if (/question 1 of 4|Question 1 of 4/i.test(lastKeja.text)) return [];
+    if (/Habari|Bonjour/.test(lastKeja.text)) return defaultQ;
+    return [];
+  })();
 
   const clearChat = () => {
-    kejaAI.qualificationState = null
-    const greeting: ChatMessage = { id: uid(), role: 'keja', text: kejaAI.respond('hello').text, ts: new Date().toISOString(), quickReplies: ['Find me a home', 'Show investment deals', 'How do you verify listings?', 'I want to sell property'] }
-    setMessages([greeting])
-  }
+    kejaAI.qualificationState = null;
+    const greeting: ChatMessage = {
+      id: uid(),
+      role: 'keja',
+      text: kejaAI.respond('hello').text,
+      ts: new Date().toISOString(),
+      quickReplies: [
+        'Find me a home',
+        'Show investment deals',
+        'How do you verify listings?',
+        'I want to sell property',
+      ],
+    };
+    setMessages([greeting]);
+  };
 
   const changeLanguage = (code: 'en' | 'sw' | 'fr') => {
-    kejaAI.setLanguage(code)
-    setLang(code)
+    kejaAI.setLanguage(code);
+    setLang(code);
     const greeting = {
       en: 'Hello',
       sw: 'Habari',
       fr: 'Bonjour',
-    }[code]
-    send(greeting, true)
-  }
+    }[code];
+    send(greeting, true);
+  };
 
   const propertyCards = (ids?: string[]) => {
-    const props = allProperties.filter((p) => ids?.includes(p.id))
-    if (!props.length) return null
+    const props = allProperties.filter((p) => ids?.includes(p.id));
+    if (!props.length) return null;
     return (
       <div className={`mt-3 grid gap-3 ${compact ? '' : 'sm:grid-cols-2'}`}>
         {props.slice(0, compact ? 2 : 4).map((p) => (
@@ -175,10 +217,16 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
             to={`/properties/${p.id}`}
             className="card-luxe card-luxe-hover flex items-center gap-3 p-3"
           >
-            <SmartImg src={p.images[0]} alt={p.title} className="h-16 w-20 shrink-0 rounded-lg object-cover" />
+            <SmartImg
+              src={p.images[0]}
+              alt={p.title}
+              className="h-16 w-20 shrink-0 rounded-lg object-cover"
+            />
             <div className="min-w-0">
               <p className="truncate text-xs font-semibold text-ink">{p.title}</p>
-              <p className="mt-0.5 text-xs text-gold-700">{formatKES(p.price, { monthly: isRentalPrice(p.price) })}</p>
+              <p className="mt-0.5 text-xs text-gold-700">
+                {formatKES(p.price, { monthly: isRentalPrice(p.price) })}
+              </p>
               <p className="mt-0.5 text-[10px] uppercase tracking-wider text-ink-faint">
                 Trust {p.trustScore} · {p.area}
               </p>
@@ -186,38 +234,45 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
           </Link>
         ))}
       </div>
-    )
-  }
+    );
+  };
 
   const metaLabels = (meta?: string[]) => {
-    if (!meta?.length) return null
+    if (!meta?.length) return null;
     return (
       <div className="mt-3 flex flex-wrap gap-2">
         {meta.map((m, i) => {
-          const [label, ...rest] = m.split(': ')
+          const [label, ...rest] = m.split(': ');
           const tone =
             label === 'FACT'
               ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
               : label === 'ESTIMATE'
                 ? 'border-amber-200 bg-amber-50 text-amber-700'
-                : 'border-sky-200 bg-sky-50 text-sky-700'
+                : 'border-sky-200 bg-sky-50 text-sky-700';
           return (
-            <span key={i} className={`rounded-lg border px-2.5 py-1.5 text-[11px] leading-snug ${tone}`}>
+            <span
+              key={i}
+              className={`rounded-lg border px-2.5 py-1.5 text-[11px] leading-snug ${tone}`}
+            >
               <b className="mr-1">{label}</b>
               {rest.join(': ')}
             </span>
-          )
+          );
         })}
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-gold-100">
       {/* header */}
       <div className="flex items-center justify-between gap-3 border-b border-gold-100 bg-gradient-to-r from-gold-50 to-white px-5 py-4">
         <div className="flex items-center gap-3">
-          <img src={asset('/brand/keja-mascot.jpg')} alt="Keja" className="h-10 w-10 rounded-full object-cover ring-2 ring-gold-300" />
+          <img
+            src={asset('/brand/keja-mascot.jpg')}
+            alt="Keja"
+            className="h-10 w-10 rounded-full object-cover ring-2 ring-gold-300"
+          />
           <div>
             <p className="font-display text-base font-bold text-ink">Keja AI</p>
             <p className="flex items-center gap-1 text-[11px] text-ink-muted">
@@ -242,7 +297,9 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
               key={code}
               onClick={() => changeLanguage(code)}
               className={`rounded-md px-2 py-1 text-[11px] font-semibold uppercase transition ${
-                lang === code ? 'bg-gold-gradient text-white shadow-gold-sm' : 'text-ink-muted hover:bg-gold-50'
+                lang === code
+                  ? 'bg-gold-gradient text-white shadow-gold-sm'
+                  : 'text-ink-muted hover:bg-gold-50'
               }`}
             >
               {code}
@@ -252,12 +309,21 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
       </div>
 
       {/* messages */}
-      <div className="flex-1 space-y-4 overflow-y-auto bg-cream/40 px-4 py-5 sm:px-5" style={{ minHeight: compact ? 320 : 440 }} aria-live="polite" aria-label="Conversation with Keja AI">
+      <div
+        className="flex-1 space-y-4 overflow-y-auto bg-cream/40 px-4 py-5 sm:px-5"
+        style={{ minHeight: compact ? 320 : 440 }}
+        aria-live="polite"
+        aria-label="Conversation with Keja AI"
+      >
         {messages.map((m) => (
           <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[88%] sm:max-w-[78%] ${m.role === 'user' ? 'order-1' : ''}`}>
               {m.role === 'keja' && (
-                <img src={asset('/brand/keja-mascot.jpg')} alt="Keja" className="mb-1.5 h-7 w-7 rounded-full object-cover ring-1 ring-gold-200" />
+                <img
+                  src={asset('/brand/keja-mascot.jpg')}
+                  alt="Keja"
+                  className="mb-1.5 h-7 w-7 rounded-full object-cover ring-1 ring-gold-200"
+                />
               )}
               <div
                 className={
@@ -269,12 +335,16 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
                 {m.role === 'user' ? m.text : <Markdown content={m.text} />}
                 {m.role === 'keja' && metaLabels(m.meta)}
               </div>
-              <p className={`mt-1 text-[10px] text-ink-faint ${m.role === 'user' ? 'text-right' : ''}`}>{fmtTime(m.ts)}</p>
+              <p
+                className={`mt-1 text-[10px] text-ink-faint ${m.role === 'user' ? 'text-right' : ''}`}
+              >
+                {fmtTime(m.ts)}
+              </p>
             </div>
           </div>
         ))}
 
-        {typing && (
+        {typing ? (
           <div className="flex justify-start">
             <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-sm bg-white px-4 py-3 shadow-sm ring-1 ring-gold-100">
               <span className="typing-dot h-2 w-2 rounded-full bg-gold-400" />
@@ -282,18 +352,18 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
               <span className="typing-dot h-2 w-2 rounded-full bg-gold-400" />
             </div>
           </div>
-        )}
+        ) : null}
 
         {/* property cards from last keja message */}
         {!typing &&
           (() => {
-            const lastKeja = [...messages].reverse().find((m) => m.role === 'keja')
-            if (!lastKeja) return null
+            const lastKeja = [...messages].reverse().find((m) => m.role === 'keja');
+            if (!lastKeja) return null;
             const ids = lastKeja.propertyIds?.length
               ? lastKeja.propertyIds
-              : [...new Set([...lastKeja.text.matchAll(/KJA-(?:A?\d{3,4})/g)].map((m) => m[0]))]
-            if (ids.length === 0 || lastKeja.text.length > 2200) return null
-            return propertyCards(ids)
+              : [...new Set([...lastKeja.text.matchAll(/KJA-(?:A?\d{3,4})/g)].map((m) => m[0]))];
+            if (ids.length === 0 || lastKeja.text.length > 2200) return null;
+            return propertyCards(ids);
           })()}
 
         <div ref={bottomRef} />
@@ -317,8 +387,8 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
       {/* input */}
       <form
         onSubmit={(e) => {
-          e.preventDefault()
-          send(input)
+          e.preventDefault();
+          send(input);
         }}
         className="flex items-center gap-2 border-t border-gold-100 bg-white px-4 py-3"
       >
@@ -343,8 +413,9 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
 
       <div className="flex items-center gap-1.5 border-t border-gold-100 bg-gold-50/50 px-4 py-2 text-[10px] text-ink-faint">
         <ShieldCheck className="h-3 w-3 text-gold-600" />
-        Keja separates verified facts, AI estimates and assumptions — always shown, never blended. A Chacadom Investments venture.
+        Keja separates verified facts, AI estimates and assumptions — always shown, never blended. A
+        Chacadom Investments venture.
       </div>
     </div>
-  )
+  );
 }

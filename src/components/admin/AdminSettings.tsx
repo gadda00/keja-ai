@@ -1,18 +1,19 @@
 /** Admin Settings — platform operating parameters (demo-persisted). */
-import { useState } from 'react'
-import { Settings2, ShieldCheck, Save, RotateCcw } from 'lucide-react'
-import { useSettings, logAudit } from '@/lib/adminStore'
-import { useAuth as useAuthCtx } from '@/lib/auth'
+import { RotateCcw, Save, Settings2, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
+
+import { logAudit, useSettings } from '@/lib/adminStore';
+import { useAuth as useAuthCtx } from '@/lib/auth';
 
 export default function AdminSettings() {
-  const { user } = useAuthCtx()
-  const [settings, setSettings] = useSettings()
-  const [saved, setSaved] = useState(false)
-  const [threshold, setThreshold] = useState(settings.autoApproveThreshold)
-  const [sla, setSla] = useState(settings.listingReviewSLA)
-  const [phoneVerify, setPhoneVerify] = useState(settings.requirePhoneVerification)
-  const [globalFeeds, setGlobalFeeds] = useState(settings.enableGlobalFeeds)
-  const [maintenance, setMaintenance] = useState(settings.maintenanceMode)
+  const { user } = useAuthCtx();
+  const [settings, setSettings] = useSettings();
+  const [saved, setSaved] = useState(false);
+  const [threshold, setThreshold] = useState(settings.autoApproveThreshold);
+  const [sla, setSla] = useState(settings.listingReviewSLA);
+  const [phoneVerify, setPhoneVerify] = useState(settings.requirePhoneVerification);
+  const [globalFeeds, setGlobalFeeds] = useState(settings.enableGlobalFeeds);
+  const [maintenance, setMaintenance] = useState(settings.maintenanceMode);
 
   const save = () => {
     setSettings({
@@ -21,9 +22,9 @@ export default function AdminSettings() {
       requirePhoneVerification: phoneVerify,
       enableGlobalFeeds: globalFeeds,
       maintenanceMode: maintenance,
-    })
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2200)
+    });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2200);
     logAudit({
       actor: user?.name ?? 'admin',
       actorEmail: user?.email ?? '',
@@ -31,16 +32,16 @@ export default function AdminSettings() {
       target: 'platform',
       detail: `Settings updated — auto-approve ${threshold}%, SLA ${sla}h, phone-verify ${phoneVerify ? 'on' : 'off'}, global feeds ${globalFeeds ? 'on' : 'off'}, maintenance ${maintenance ? 'on' : 'off'}`,
       severity: 'warning',
-    })
-  }
+    });
+  };
 
   const reset = () => {
-    setThreshold(95)
-    setSla(24)
-    setPhoneVerify(false)
-    setGlobalFeeds(true)
-    setMaintenance(false)
-  }
+    setThreshold(95);
+    setSla(24);
+    setPhoneVerify(false);
+    setGlobalFeeds(true);
+    setMaintenance(false);
+  };
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -53,12 +54,13 @@ export default function AdminSettings() {
           <div className="mt-5 flex flex-col gap-6">
             <div>
               <div className="flex items-center justify-between">
-                <label className="label-luxe !mb-0">
+                <label htmlFor="as-auto-approve" className="label-luxe !mb-0">
                   Auto-approve threshold (completeness score)
                 </label>
                 <span className="font-display text-lg font-bold text-gold-700">{threshold}%</span>
               </div>
               <input
+                id="as-auto-approve"
                 type="range"
                 min={50}
                 max={100}
@@ -69,16 +71,19 @@ export default function AdminSettings() {
               />
               <p className="mt-1 text-[11px] text-ink-faint">
                 Submissions scoring above this with zero red flags are candidates for expedited
-                review. Human review is always required for high-stakes approvals (blueprint:
-                trust by design).
+                review. Human review is always required for high-stakes approvals (blueprint: trust
+                by design).
               </p>
             </div>
             <div>
               <div className="flex items-center justify-between">
-                <label className="label-luxe !mb-0">Review SLA (hours)</label>
+                <label htmlFor="as-sla" className="label-luxe !mb-0">
+                  Review SLA (hours)
+                </label>
                 <span className="font-display text-lg font-bold text-gold-700">{sla}h</span>
               </div>
               <input
+                id="as-sla"
                 type="range"
                 min={1}
                 max={72}
@@ -92,11 +97,9 @@ export default function AdminSettings() {
               </p>
             </div>
             <label className="flex items-center justify-between gap-4 rounded-xl bg-gold-50/60 p-4 ring-1 ring-gold-100">
-              <span>
-                <span className="block text-sm font-semibold text-ink">
-                  Require phone verification for submitters
-                </span>
-                <span className="mt-0.5 block text-[11px] text-ink-muted">
+              <span className="block text-sm font-semibold text-ink">
+                Require phone verification for submitters
+                <span className="mt-0.5 block text-[11px] font-normal leading-normal text-ink-muted">
                   OTP check on new partner accounts before listings go live.
                 </span>
               </span>
@@ -110,18 +113,16 @@ export default function AdminSettings() {
           </div>
         </section>
 
-        {/* global supply */}
+        {/* Global supply */}
         <section className="card-luxe p-6">
           <h3 className="heading-display flex items-center gap-2 text-lg">
             <Settings2 className="h-5 w-5 text-gold-600" /> Global supply network
           </h3>
           <div className="mt-5 flex flex-col gap-4">
             <label className="flex items-center justify-between gap-4 rounded-xl bg-gold-50/60 p-4 ring-1 ring-gold-100">
-              <span>
-                <span className="block text-sm font-semibold text-ink">
-                  Enable global feed ingestion
-                </span>
-                <span className="mt-0.5 block text-[11px] text-ink-muted">
+              <span className="block text-sm font-semibold text-ink">
+                Enable global feed ingestion
+                <span className="mt-0.5 block text-[11px] font-normal leading-normal text-ink-muted">
                   API, CSV, portal-syndication and WhatsApp feeds from partner networks worldwide.
                 </span>
               </span>
@@ -133,11 +134,9 @@ export default function AdminSettings() {
               />
             </label>
             <label className="flex items-center justify-between gap-4 rounded-xl bg-red-50/60 p-4 ring-1 ring-red-100">
-              <span>
-                <span className="block text-sm font-semibold text-red-900">
-                  Maintenance mode
-                </span>
-                <span className="mt-0.5 block text-[11px] text-red-700">
+              <span className="block text-sm font-semibold text-red-900">
+                Maintenance mode
+                <span className="mt-0.5 block text-[11px] font-normal leading-normal text-red-700">
                   Shows a maintenance banner site-wide; blocks new submissions.
                 </span>
               </span>
@@ -197,5 +196,5 @@ export default function AdminSettings() {
         </section>
       </div>
     </div>
-  )
+  );
 }

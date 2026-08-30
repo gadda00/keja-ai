@@ -1,21 +1,31 @@
-import { usePageMeta } from '@/lib/seo'
-import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { Target, Eye, HeartHandshake, ShieldCheck, Bot, Building2, ChevronRight, Globe2 } from 'lucide-react'
-import { asset } from '@/config'
+import { motion } from 'framer-motion';
+import {
+  Bot,
+  Building2,
+  ChevronRight,
+  Eye,
+  Globe2,
+  HeartHandshake,
+  ShieldCheck,
+  Target,
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+import { asset } from '@/config';
+import { usePageMeta } from '@/lib/seo';
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: '-60px' },
   transition: { duration: 0.6 },
-}
+};
 
 export default function About() {
   usePageMeta(
     'About — Keja.ai by Chacadom Investments',
-    'Keja.ai is the digital flagship of Chacadom Investments — intelligent real estate with verified trust.',
-  )
+    'Keja.ai is the digital flagship of Chacadom Investments — intelligent real estate with verified trust.'
+  );
   return (
     <div>
       <section className="bg-ink py-20 sm:py-24">
@@ -25,9 +35,9 @@ export default function About() {
             &ldquo;Keja&rdquo; is Swahili for <span className="gold-text">home</span>.
           </h1>
           <p className="mt-6 leading-relaxed text-white/65">
-            Keja.ai is Kenya’s AI real-estate advisor and cross-agency trust layer — built by Chacadom Investments
-            to help people discover, evaluate, buy, sell, rent and manage property with confidence, across multiple
-            agencies and developers, not just one.
+            Keja.ai is Kenya’s AI real-estate advisor and cross-agency trust layer — built by
+            Chacadom Investments to help people discover, evaluate, buy, sell, rent and manage
+            property with confidence, across multiple agencies and developers, not just one.
           </p>
         </div>
       </section>
@@ -72,29 +82,47 @@ export default function About() {
             </h2>
             <div className="mt-6 space-y-4 leading-relaxed text-ink-soft">
               <p>
-                Fraudulent listings, title disputes, recycled photos, &ldquo;urgent sale&rdquo; bait — these are daily
-                realities in Kenya’s property market, and they cost real families real money. Diaspora buyers,
-                who cannot walk the land themselves, carry the heaviest risk of all.
+                Fraudulent listings, title disputes, recycled photos, &ldquo;urgent sale&rdquo; bait
+                — these are daily realities in Kenya’s property market, and they cost real families
+                real money. Diaspora buyers, who cannot walk the land themselves, carry the heaviest
+                risk of all.
               </p>
               <p>
-                A chatbot owned by one developer can never solve this — it can’t warn you about its own
-                inventory. The only honest advisor sits above every seller: cross-checking titles, scoring agents,
-                catching duplicates, and telling you plainly which listings deserve your money.
+                A chatbot owned by one developer can never solve this — it can’t warn you about its
+                own inventory. The only honest advisor sits above every seller: cross-checking
+                titles, scoring agents, catching duplicates, and telling you plainly which listings
+                deserve your money.
               </p>
               <p>
-                That is Keja. An AI advisor with a spine — warm and professional, but never pushy; confident about
-                verified facts, explicit about assumptions; consistent across every partner agency, because Keja is
-                the constant and agencies are the inventory.
+                That is Keja. An AI advisor with a spine — warm and professional, but never pushy;
+                confident about verified facts, explicit about assumptions; consistent across every
+                partner agency, because Keja is the constant and agencies are the inventory.
               </p>
             </div>
           </motion.div>
 
           <motion.div {...fadeUp} className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             {[
-              { icon: Bot, title: 'AI-native', text: 'Conversational discovery, investment intelligence and verification — not a listings board with a chat bolted on.' },
-              { icon: ShieldCheck, title: 'Trust as product', text: 'The Verified by Keja badge is earned through checks, not paid placements. Fraud we catch is published.' },
-              { icon: Building2, title: 'Multi-agency', text: 'Neutral recommendations across agencies — the structural moat no single-brand advisor can replicate.' },
-              { icon: Globe2, title: 'East Africa first', text: 'Built for Kenya, designed for the region: Swahili from day one, French for regional expansion, diaspora-ready.' },
+              {
+                icon: Bot,
+                title: 'AI-native',
+                text: 'Conversational discovery, investment intelligence and verification — not a listings board with a chat bolted on.',
+              },
+              {
+                icon: ShieldCheck,
+                title: 'Trust as product',
+                text: 'The Verified by Keja badge is earned through checks, not paid placements. Fraud we catch is published.',
+              },
+              {
+                icon: Building2,
+                title: 'Multi-agency',
+                text: 'Neutral recommendations across agencies — the structural moat no single-brand advisor can replicate.',
+              },
+              {
+                icon: Globe2,
+                title: 'East Africa first',
+                text: 'Built for Kenya, designed for the region: Swahili from day one, French for regional expansion, diaspora-ready.',
+              },
             ].map((c) => (
               <div key={c.title} className="card-luxe p-6">
                 <c.icon className="h-6 w-6 text-gold-600" />
@@ -109,14 +137,21 @@ export default function About() {
       {/* parent company */}
       <section className="bg-ink">
         <div className="container-luxe flex flex-col items-center gap-8 py-16 lg:flex-row">
-          <img src={asset('/brand/chacadom-logo.jpg')} alt="Chacadom Investments" className="h-36 w-36 rounded-2xl object-cover shadow-gold-lg" />
+          <img
+            src={asset('/brand/chacadom-logo.jpg')}
+            alt="Chacadom Investments"
+            className="h-36 w-36 rounded-2xl object-cover shadow-gold-lg"
+          />
           <div className="max-w-2xl text-center lg:text-left">
             <p className="eyebrow !text-gold-400">A Chacadom Investments venture</p>
-            <h2 className="mt-2 font-display text-3xl font-bold text-white">Building wealth through real estate excellence</h2>
+            <h2 className="mt-2 font-display text-3xl font-bold text-white">
+              Building wealth through real estate excellence
+            </h2>
             <p className="mt-3 leading-relaxed text-white/60">
-              Chacadom Investments — Vision · Value · Growth · Legacy — develops, advises on and manages real estate
-              across Kenya. Keja.ai is its digital flagship: where Chacadom’s market knowledge meets AI-native
-              product craft. We don’t sell property; we help people make better property decisions.
+              Chacadom Investments — Vision · Value · Growth · Legacy — develops, advises on and
+              manages real estate across Kenya. Keja.ai is its digital flagship: where Chacadom’s
+              market knowledge meets AI-native product craft. We don’t sell property; we help people
+              make better property decisions.
             </p>
             <Link to="/contact" className="btn-gold mt-6">
               Partner with us <ChevronRight className="h-4 w-4" />
@@ -125,5 +160,5 @@ export default function About() {
         </div>
       </section>
     </div>
-  )
+  );
 }

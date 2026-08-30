@@ -3,47 +3,49 @@
  * overview KPIs, user management (RBAC), listing review with trust-by-design
  * anomaly flags, lead pipeline, partner & feed ops, audit trail, settings.
  */
-import { usePageMeta } from '@/lib/seo'
-import { useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
 import {
-  LayoutGrid,
-  Users,
+  Bot,
   Building2,
+  FileClock,
   Flame,
   Handshake,
-  FileClock,
+  LayoutGrid,
+  Lock,
+  RefreshCw,
   Settings2,
   ShieldCheck,
   TrendingUp,
-  Lock,
-  RefreshCw,
-  Bot,
-} from 'lucide-react'
-import { useAuth } from '@/lib/auth'
-import AdminOverview from '@/components/admin/AdminOverview'
-import AdminUsers from '@/components/admin/AdminUsers'
-import AdminListings from '@/components/admin/AdminListings'
-import AdminLeads from '@/components/admin/AdminLeads'
-import AdminPartners from '@/components/admin/AdminPartners'
-import AdminAudit from '@/components/admin/AdminAudit'
-import AdminSettings from '@/components/admin/AdminSettings'
-import AdminAutoPilot from '@/components/admin/AdminAutoPilot'
-import { autoPilotStats } from '@/lib/autoListings'
+  Users,
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+
+import AdminAudit from '@/components/admin/AdminAudit';
+import AdminAutoPilot from '@/components/admin/AdminAutoPilot';
+import AdminLeads from '@/components/admin/AdminLeads';
+import AdminListings from '@/components/admin/AdminListings';
+import AdminOverview from '@/components/admin/AdminOverview';
+import AdminPartners from '@/components/admin/AdminPartners';
+import AdminSettings from '@/components/admin/AdminSettings';
+import AdminUsers from '@/components/admin/AdminUsers';
+import { useAuth } from '@/lib/auth';
+import { autoPilotStats } from '@/lib/autoListings';
+import { usePageMeta } from '@/lib/seo';
 
 const timeAgoSafe = (iso: string) => {
   try {
-    const diff = Date.now() - +new Date(iso)
-    const hrs = Math.floor(diff / 3_600_000)
-    if (hrs < 1) return 'just now'
-    if (hrs < 24) return `${hrs}h ago`
-    return `${Math.floor(hrs / 24)}d ago`
+    const diff = Date.now() - +new Date(iso);
+    const hrs = Math.floor(diff / 3_600_000);
+    if (hrs < 1) return 'just now';
+    if (hrs < 24) return `${hrs}h ago`;
+    return `${Math.floor(hrs / 24)}d ago`;
   } catch {
-    return ''
+    return '';
   }
-}
+};
 
-type Tab = 'overview' | 'users' | 'listings' | 'leads' | 'partners' | 'autopilot' | 'audit' | 'settings'
+type Tab =
+  'overview' | 'users' | 'listings' | 'leads' | 'partners' | 'autopilot' | 'audit' | 'settings';
 
 const TABS: { id: Tab; label: string; icon: typeof LayoutGrid }[] = [
   { id: 'overview', label: 'Overview', icon: LayoutGrid },
@@ -54,30 +56,30 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid }[] = [
   { id: 'autopilot', label: 'Auto-Pilot', icon: Bot },
   { id: 'audit', label: 'Audit Trail', icon: FileClock },
   { id: 'settings', label: 'Settings', icon: Settings2 },
-]
+];
 
 export default function Admin() {
   usePageMeta(
     'Admin Console — Keja Platform Operations',
-    'Users, verification queue, leads, partners, audit trail and settings.',
-  )
-  const { isAdmin, isLoggedIn, setAuthModalOpen } = useAuth()
-  const [params, setParams] = useSearchParams()
-  const initialTab = (params.get('tab') as Tab) || 'overview'
+    'Users, verification queue, leads, partners, audit trail and settings.'
+  );
+  const { isAdmin, isLoggedIn, setAuthModalOpen } = useAuth();
+  const [params, setParams] = useSearchParams();
+  const initialTab = (params.get('tab') as Tab) || 'overview';
   const [tab, setTab] = useState<Tab>(
-    TABS.some((t) => t.id === initialTab) ? initialTab : 'overview',
-  )
+    TABS.some((t) => t.id === initialTab) ? initialTab : 'overview'
+  );
   const selectTab = (t: string) => {
-    setTab(t as Tab)
-    setParams(t === 'overview' ? {} : { tab: t }, { replace: true })
-  }
-  const stats = autoPilotStats()
+    setTab(t as Tab);
+    setParams(t === 'overview' ? {} : { tab: t }, { replace: true });
+  };
+  const stats = autoPilotStats();
 
   const guard = useMemo(() => {
-    if (!isLoggedIn) return 'auth'
-    if (!isAdmin) return 'role'
-    return null
-  }, [isLoggedIn, isAdmin])
+    if (!isLoggedIn) return 'auth';
+    if (!isAdmin) return 'role';
+    return null;
+  }, [isLoggedIn, isAdmin]);
 
   if (guard === 'auth') {
     return (
@@ -87,17 +89,17 @@ export default function Admin() {
         </span>
         <h1 className="heading-display text-3xl">Admin Console</h1>
         <p className="max-w-md text-sm leading-relaxed text-ink-muted">
-          Restricted area. Sign in with an administrator account to manage users, listings,
-          partners and platform operations.
+          Restricted area. Sign in with an administrator account to manage users, listings, partners
+          and platform operations.
         </p>
         <button onClick={() => setAuthModalOpen(true)} className="btn-gold mt-2">
           Sign in as administrator
         </button>
         <p className="text-xs text-ink-faint">
-          Demo: admin@keja.ai / admin123 — or continue with Google (Clive Mwangi)
+          Demo build — pick the administrator demo account from the sign-in dialog.
         </p>
       </div>
-    )
+    );
   }
 
   if (guard === 'role') {
@@ -116,7 +118,7 @@ export default function Admin() {
           Back to my account
         </Link>
       </div>
-    )
+    );
   }
 
   return (
@@ -143,18 +145,24 @@ export default function Admin() {
               stats.feedsDegraded ? 'bg-amber-500' : 'bg-green-500'
             }`}
           />
-          <span className={`text-xs font-semibold ${stats.feedsDegraded ? 'text-amber-800' : 'text-green-800'}`}>
+          <span
+            className={`text-xs font-semibold ${stats.feedsDegraded ? 'text-amber-800' : 'text-green-800'}`}
+          >
             {stats.feedsDegraded ? 'Feed attention required' : 'All systems operational'}
           </span>
           <span className="text-[10px] text-ink-faint">
-            · Auto-Pilot: {stats.feedHealth} · last run {stats.lastRunAt ? timeAgoSafe(stats.lastRunAt) : 'pending'}
+            · Auto-Pilot: {stats.feedHealth} · last run{' '}
+            {stats.lastRunAt ? timeAgoSafe(stats.lastRunAt) : 'pending'}
           </span>
           <RefreshCw className="ml-1 h-3.5 w-3.5 text-green-600" />
         </div>
       </div>
 
       {/* tabs */}
-      <div className="mt-8 flex gap-1 overflow-x-auto border-b border-gold-100 pb-px" role="tablist">
+      <div
+        className="mt-8 flex gap-1 overflow-x-auto border-b border-gold-100 pb-px"
+        role="tablist"
+      >
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -185,5 +193,5 @@ export default function Admin() {
         {tab === 'settings' && <AdminSettings />}
       </div>
     </div>
-  )
+  );
 }

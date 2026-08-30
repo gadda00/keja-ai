@@ -4,21 +4,21 @@
  * price/value, liquidity and risk. Scores are decision-support tools, never
  * guarantees — the engine separates verified inputs from estimates.
  */
-import { PROPERTIES, areaInsights, type Property } from '@/data/properties'
-import { isRentalPrice } from '@/lib/finance'
+import { areaInsights, type Property } from '@/data/properties';
+import { isRentalPrice } from '@/lib/finance';
 
 export interface ScoreFactor {
-  key: string
-  label: string
-  score: number // 0–10
-  basis: 'FACT' | 'ESTIMATE' | 'ASSUMPTION'
-  note: string
+  key: string;
+  label: string;
+  score: number; // 0–10
+  basis: 'FACT' | 'ESTIMATE' | 'ASSUMPTION';
+  note: string;
 }
 
 export interface InvestmentScore {
-  overall: number // 0–10, one decimal
-  band: 'Exceptional' | 'Strong' | 'Solid' | 'Moderate' | 'Speculative'
-  factors: ScoreFactor[]
+  overall: number; // 0–10, one decimal
+  band: 'Exceptional' | 'Strong' | 'Solid' | 'Moderate' | 'Speculative';
+  factors: ScoreFactor[];
 }
 
 /** Location demand bands (illustrative, Nairobi-centric, upgradeable to data). */
@@ -34,7 +34,7 @@ const LOCATION_SCORE: Record<string, number> = {
   Diani: 8.1,
   Runda: 8.5,
   default: 7.2,
-}
+};
 
 export function investmentScore(p: Property): InvestmentScore {
   // Rental listings are not sale assets — price/value per-sqm norm comparison
@@ -42,29 +42,27 @@ export function investmentScore(p: Property): InvestmentScore {
   // 1 — Rental potential. For rental listings (price = monthly rent) the
   // rentEstimate/price ratio is meaningless — use the listing's own yield
   // estimate or the area's typical yield band instead.
-  const isRental = isRentalPrice(p.price)
-  const areaYield = parseFloat(areaInsights[p.area]?.yield ?? '') || 0
+  const isRental = isRentalPrice(p.price);
+  const areaYield = parseFloat(areaInsights[p.area]?.yield ?? '') || 0;
   const grossYield = isRental
-    ? p.grossYieldEstimate ?? areaYield
+    ? (p.grossYieldEstimate ?? areaYield)
     : p.rentEstimate && p.price
       ? ((p.rentEstimate * 12) / p.price) * 100
-      : 0
-  const rental = grossYield > 0
-    ? Math.max(3, Math.min(10, (grossYield / 8) * 8.5))
-    : 5.5
+      : 0;
+  const rental = grossYield > 0 ? Math.max(3, Math.min(10, (grossYield / 8) * 8.5)) : 5.5;
 
   // 2 — Capital appreciation forecast (data-provided or 6% baseline)
-  const appreciation = p.appreciationForecast ?? 6
-  const growth = Math.max(3, Math.min(10, (appreciation / 9) * 9))
+  const appreciation = p.appreciationForecast ?? 6;
+  const growth = Math.max(3, Math.min(10, (appreciation / 9) * 9));
 
   // 3 — Location score from band table
-  const location = LOCATION_SCORE[p.area] ?? LOCATION_SCORE.default
+  const location = LOCATION_SCORE[p.area] ?? LOCATION_SCORE.default;
 
   // 4 — Demand proxy: views + trust score blend
-  const demand = Math.max(3, Math.min(10, 4 + p.views / 120 + (p.trustScore - 80) / 10))
+  const demand = Math.max(3, Math.min(10, 4 + p.views / 120 + (p.trustScore - 80) / 10));
 
   // 5 — Price/value: price per sqm vs type norms (sale listings only)
-  const perSqm = !isRental && p.sizeSqm > 0 ? p.price / p.sizeSqm : 0
+  const perSqm = !isRental && p.sizeSqm > 0 ? p.price / p.sizeSqm : 0;
   const typeNorm: Record<string, number> = {
     apartment: 120000,
     villa: 85000,
@@ -72,22 +70,22 @@ export function investmentScore(p: Property): InvestmentScore {
     bungalow: 80000,
     land: 8000,
     commercial: 160000,
-  }
-  const norm = typeNorm[p.type] ?? 100000
-  const value = perSqm > 0 ? Math.max(3, Math.min(10, 10 - Math.abs(perSqm / norm - 1) * 9)) : 6
+  };
+  const norm = typeNorm[p.type] ?? 100000;
+  const value = perSqm > 0 ? Math.max(3, Math.min(10, 10 - Math.abs(perSqm / norm - 1) * 9)) : 6;
 
   // 6 — Liquidity: apartments & hot areas turn over faster
   const liquidity =
     (p.type === 'apartment' ? 8.2 : p.type === 'villa' ? 6.8 : p.type === 'land' ? 5.2 : 7) *
-    (LOCATION_SCORE[p.area] ? 1.02 : 0.94)
+    (LOCATION_SCORE[p.area] ? 1.02 : 0.94);
 
   // 7 — Risk: verification status & listing signals
-  let risk = 8.5
-  if (p.verification.titleCheck !== 'verified') risk -= 2
-  if (p.verification.duplicateCheck !== 'clean') risk -= 1.5
-  if (p.verification.listingVelocity === 'suspicious') risk -= 2
-  if (p.offPlan) risk -= 1
-  risk = Math.max(2, Math.min(10, risk))
+  let risk = 8.5;
+  if (p.verification.titleCheck !== 'verified') risk -= 2;
+  if (p.verification.duplicateCheck !== 'clean') risk -= 1.5;
+  if (p.verification.listingVelocity === 'suspicious') risk -= 2;
+  if (p.offPlan) risk -= 1;
+  risk = Math.max(2, Math.min(10, risk));
 
   const factors: ScoreFactor[] = [
     {
@@ -127,7 +125,10 @@ export function investmentScore(p: Property): InvestmentScore {
       label: 'Price / Value',
       score: round1(value),
       basis: 'ESTIMATE',
-      note: perSqm > 0 ? `KES ${Math.round(perSqm / 1000)}k/sqm vs ${p.type} norm` : 'Size data unavailable',
+      note:
+        perSqm > 0
+          ? `KES ${Math.round(perSqm / 1000)}k/sqm vs ${p.type} norm`
+          : 'Size data unavailable',
     },
     {
       key: 'liquidity',
@@ -143,7 +144,7 @@ export function investmentScore(p: Property): InvestmentScore {
       basis: 'FACT',
       note: `Title ${p.verification.titleCheck}, duplicate check ${p.verification.duplicateCheck}`,
     },
-  ]
+  ];
 
   const weights: Record<string, number> = {
     rental: 0.22,
@@ -152,19 +153,25 @@ export function investmentScore(p: Property): InvestmentScore {
     demand: 0.12,
     value: 0.14,
     liquidity: 0.08,
-    risk: 0.10,
-  }
-  const overall = round1(
-    factors.reduce((acc, f) => acc + f.score * weights[f.key], 0),
-  )
+    risk: 0.1,
+  };
+  const overall = round1(factors.reduce((acc, f) => acc + f.score * weights[f.key], 0));
 
   const band: InvestmentScore['band'] =
-    overall >= 8.5 ? 'Exceptional' : overall >= 7.5 ? 'Strong' : overall >= 6.5 ? 'Solid' : overall >= 5.5 ? 'Moderate' : 'Speculative'
+    overall >= 8.5
+      ? 'Exceptional'
+      : overall >= 7.5
+        ? 'Strong'
+        : overall >= 6.5
+          ? 'Solid'
+          : overall >= 5.5
+            ? 'Moderate'
+            : 'Speculative';
 
-  return { overall, band, factors }
+  return { overall, band, factors };
 }
 
-const round1 = (n: number) => Math.round(n * 10) / 10
+const round1 = (n: number) => Math.round(n * 10) / 10;
 
 export const scoreTone = (score: number) =>
   score >= 8.5
@@ -175,4 +182,4 @@ export const scoreTone = (score: number) =>
         ? { chip: 'bg-gold-100 text-gold-800', bar: 'bg-gold-400' }
         : score >= 5.5
           ? { chip: 'bg-amber-100 text-amber-800', bar: 'bg-amber-500' }
-          : { chip: 'bg-red-100 text-red-700', bar: 'bg-red-500' }
+          : { chip: 'bg-red-100 text-red-700', bar: 'bg-red-500' };

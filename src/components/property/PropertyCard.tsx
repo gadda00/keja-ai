@@ -1,33 +1,45 @@
-import { Link } from 'react-router-dom'
-import SmartImg from '@/components/ui/SmartImg'
-import { MapPin, BedDouble, Bath, Ruler, Heart, TrendingUp, Eye, Building2, Gauge, GitCompareArrows } from 'lucide-react'
-import type { Property } from '@/data/properties'
-import { formatKES } from '@/lib/format'
-import { investmentScore, scoreTone } from '@/lib/investmentScore'
-import TrustBadge from './TrustBadge'
-import { useStore, KEYS } from '@/lib/store'
-import { isRentalPrice } from '@/lib/finance'
+import {
+  Bath,
+  BedDouble,
+  Building2,
+  Eye,
+  Gauge,
+  GitCompareArrows,
+  Heart,
+  Ruler,
+  TrendingUp,
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+import SmartImg from '@/components/ui/SmartImg';
+import type { Property } from '@/data/properties';
+import { isRentalPrice } from '@/lib/finance';
+import { formatKES } from '@/lib/format';
+import { investmentScore, scoreTone } from '@/lib/investmentScore';
+import { KEYS, useStore } from '@/lib/store';
+
+import TrustBadge from './TrustBadge';
 
 /** Auto-Pilot listings carry the KJA-A id prefix — labelled, never hidden. */
-const isAutoPilot = (id: string) => /^KJA-A/.test(id)
+const isAutoPilot = (id: string) => id.startsWith('KJA-A');
 
 /** Listed within the last 7 days. */
-const isNewArrival = (listedAt: string) => Date.now() - +new Date(listedAt) < 7 * 24 * 3600 * 1000
+const isNewArrival = (listedAt: string) => Date.now() - +new Date(listedAt) < 7 * 24 * 3600 * 1000;
 
 export default function PropertyCard({ property }: { property: Property }) {
-  const [favorites, setFavorites] = useStore<string[]>(KEYS.favorites, [])
-  const [compare, setCompare] = useStore<string[]>(KEYS.compare, [])
-  const isFav = favorites.includes(property.id)
-  const isRent = isRentalPrice(property.price)
-  const inCompare = compare.includes(property.id)
-  const score = investmentScore(property)
+  const [favorites, setFavorites] = useStore<string[]>(KEYS.favorites, []);
+  const [compare, setCompare] = useStore<string[]>(KEYS.compare, []);
+  const isFav = favorites.includes(property.id);
+  const isRent = isRentalPrice(property.price);
+  const inCompare = compare.includes(property.id);
+  const score = investmentScore(property);
   const toggleFav = () => {
-    setFavorites(isFav ? favorites.filter((f) => f !== property.id) : [...favorites, property.id])
-  }
+    setFavorites(isFav ? favorites.filter((f) => f !== property.id) : [...favorites, property.id]);
+  };
   const toggleCompare = () => {
-    if (inCompare) setCompare(compare.filter((c) => c !== property.id))
-    else setCompare([...compare, property.id].slice(-4))
-  }
+    if (inCompare) setCompare(compare.filter((c) => c !== property.id));
+    else setCompare([...compare, property.id].slice(-4));
+  };
 
   return (
     <div className="card-luxe card-luxe-hover group relative flex flex-col overflow-hidden">
@@ -51,11 +63,11 @@ export default function PropertyCard({ property }: { property: Property }) {
               Auto-Pilot
             </span>
           )}
-          {property.offPlan && (
+          {property.offPlan ? (
             <span className="rounded-full bg-ink/85 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gold-300">
               Off-Plan
             </span>
-          )}
+          ) : null}
           {property.availability === 'reserved' && (
             <span className="rounded-full bg-ink/85 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
               Reserved
@@ -64,7 +76,11 @@ export default function PropertyCard({ property }: { property: Property }) {
         </div>
         <button
           onClick={toggleFav}
-          aria-label={isFav ? `Remove ${property.title} from favourites` : `Save ${property.title} to favourites`}
+          aria-label={
+            isFav
+              ? `Remove ${property.title} from favourites`
+              : `Save ${property.title} to favourites`
+          }
           aria-pressed={isFav}
           className={`absolute right-3 top-3 rounded-full p-2 shadow-sm transition ${
             isFav ? 'bg-gold-500 text-white' : 'bg-white/90 text-ink-muted hover:text-gold-600'
@@ -74,7 +90,11 @@ export default function PropertyCard({ property }: { property: Property }) {
         </button>
         <button
           onClick={toggleCompare}
-          aria-label={inCompare ? `Remove ${property.title} from comparison` : `Add ${property.title} to comparison`}
+          aria-label={
+            inCompare
+              ? `Remove ${property.title} from comparison`
+              : `Add ${property.title} to comparison`
+          }
           aria-pressed={inCompare}
           className={`absolute right-14 top-3 rounded-full p-2 shadow-sm transition ${
             inCompare ? 'bg-ink text-gold-300' : 'bg-white/90 text-ink-muted hover:text-gold-700'
@@ -120,11 +140,11 @@ export default function PropertyCard({ property }: { property: Property }) {
           </span>
         </div>
 
-        {property.grossYieldEstimate && (
+        {property.grossYieldEstimate ? (
           <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
             <TrendingUp className="h-4 w-4" /> Est. gross yield ~{property.grossYieldEstimate}% p.a.
           </p>
-        )}
+        ) : null}
 
         {/* KEJA Investment Score™ */}
         <div className="mt-3 flex items-center justify-between rounded-xl bg-ink px-3.5 py-2.5">
@@ -132,7 +152,9 @@ export default function PropertyCard({ property }: { property: Property }) {
             <Gauge className="h-3.5 w-3.5" /> Investment Score™
           </span>
           <span className="flex items-baseline gap-1.5">
-            <span className={`rounded-md px-2 py-0.5 font-display text-sm font-bold ${scoreTone(score.overall).chip}`}>
+            <span
+              className={`rounded-md px-2 py-0.5 font-display text-sm font-bold ${scoreTone(score.overall).chip}`}
+            >
               {score.overall.toFixed(1)}
             </span>
             <span className="text-[10px] text-white/60">/ 10 · {score.band}</span>
@@ -144,9 +166,11 @@ export default function PropertyCard({ property }: { property: Property }) {
             <p className="font-display text-xl font-bold text-ink">
               {formatKES(property.price, { monthly: isRent })}
             </p>
-            {property.rentEstimate && !isRent && (
-              <p className="text-xs text-ink-faint">Est. rent {formatKES(property.rentEstimate, { monthly: true })}</p>
-            )}
+            {property.rentEstimate && !isRent ? (
+              <p className="text-xs text-ink-faint">
+                Est. rent {formatKES(property.rentEstimate, { monthly: true })}
+              </p>
+            ) : null}
           </div>
           <Link
             to={`/properties/${property.id}`}
@@ -157,5 +181,5 @@ export default function PropertyCard({ property }: { property: Property }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

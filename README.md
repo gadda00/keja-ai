@@ -5,29 +5,33 @@ Live at **https://gadda00.github.io/keja-ai/**
 
 ## What's inside
 
-| Area | Highlights |
-|---|---|
-| **Marketplace** | 35+ verified listings (seed + auto-ingested), trust scores, Investment Score™ (7 weighted factors, FACT/ESTIMATE/ASSUMPTION labels), SVG Kenya map view, saved searches + alert matching, 4-property comparison |
-| **AI advisor** | Conversational engine (EN/SW/FR) covering search, yields, mortgages, buying costs, process timelines, affordability, area guides, qualification |
-| **Calculators** | Rental ROI + 5/10-yr projections, mortgage (extra-payment savings, amortization schedule), affordability (CBK 33% DTI), Kenyan buying-cost stack |
-| **Keja Tokenize** | Fractional ownership demo (SPV framing, KYC/AML gating, simulated ledger, secondary market with order books, distributions calendar) — clearly labelled simulation |
-| **Accounts** | Google Sign-In (demo picker until `GOOGLE_CLIENT_ID` is set) + email/password, 12h/30d sliding sessions, RBAC (user/agent/admin), brute-force throttle |
-| **Admin console** | Users, verification queue with trust-by-design anomaly flags, bulk approve/reject, CSV exports, partner applications + global feed connections, audit trail, settings |
-| **Auto-Pilot** | AI automatic listing engine — market scanner + partner feed adapters (JSON/CSV/XML) → enrichment → dedupe → quality gate → publish, on a 6-hour cron. Admin "Auto-Pilot" tab shows run log, feed health and per-listing machine screens |
-| **Supply** | 4-step listing wizard (draft auto-save, purpose validation) with live anomaly detection, 5-channel global listing acquisition strategy |
-| **Content** | Six long-form market guides (`/insights`), Trust Center methodology, ecosystem map (8 products) |
-| **Platform** | PWA (installable, offline shell), per-route SEO meta + JSON-LD (RealEstateListing/Article/FAQPage/BreadcrumbList) + auto-generated sitemap, reduced-motion support, WCAG-AA focus management, error boundary + real 404, 27 unit tests + CI gates |
+| Area              | Highlights                                                                                                                                                                                                                                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Marketplace**   | 35+ verified listings (seed + auto-ingested), trust scores, Investment Score™ (7 weighted factors, FACT/ESTIMATE/ASSUMPTION labels), SVG Kenya map view, saved searches + alert matching, 4-property comparison                                                                                   |
+| **AI advisor**    | Conversational engine (EN/SW/FR) covering search, yields, mortgages, buying costs, process timelines, affordability, area guides, qualification                                                                                                                                                   |
+| **Calculators**   | Rental ROI + 5/10-yr projections, mortgage (extra-payment savings, amortization schedule), affordability (CBK 33% DTI), Kenyan buying-cost stack                                                                                                                                                  |
+| **Keja Tokenize** | Fractional ownership demo (SPV framing, KYC/AML gating, simulated ledger, secondary market with order books, distributions calendar) — clearly labelled simulation                                                                                                                                |
+| **Accounts**      | Google Sign-In (demo picker until `GOOGLE_CLIENT_ID` is set) + email/password, 12h/30d sliding sessions, RBAC (user/agent/admin), brute-force throttle                                                                                                                                            |
+| **Admin console** | Users, verification queue with trust-by-design anomaly flags, bulk approve/reject, CSV exports, partner applications + global feed connections, audit trail, settings                                                                                                                             |
+| **Auto-Pilot**    | AI automatic listing engine — market scanner + partner feed adapters (JSON/CSV/XML) → enrichment → dedupe → quality gate → publish, on a 6-hour cron. Admin "Auto-Pilot" tab shows run log, feed health and per-listing machine screens                                                           |
+| **Supply**        | 4-step listing wizard (draft auto-save, purpose validation) with live anomaly detection, 5-channel global listing acquisition strategy                                                                                                                                                            |
+| **Content**       | Six long-form market guides (`/insights`), Trust Center methodology, ecosystem map (8 products)                                                                                                                                                                                                   |
+| **Platform**      | PWA (installable, offline shell), per-route SEO meta + JSON-LD (RealEstateListing/Article/FAQPage/BreadcrumbList) + auto-generated sitemap, reduced-motion support, WCAG-AA focus management, error boundary + real 404, 45 unit tests + CI gates (typecheck, eslint flat config, vitest, oxlint) |
 
 ## Stack
 
-React 19 · Vite 8 · TypeScript (strict, zero `any`) · Tailwind 3.4 · React Router 7 · Zustand-free local stores (localStorage, backend-upgradeable) · recharts (lazy) · vitest.
+React 19 · Vite 8 · TypeScript (strict, zero `any`) · Tailwind 3.4 · React Router 7 · local stores (localStorage, backend-upgradeable) · recharts (lazy) · vitest (+ jsdom for React-level tests).
 
 ## Develop
 
 ```bash
 npm install
 npm run dev        # local dev server
-npm test           # unit tests (finance, scoring, search, AI engine, Auto-Pilot adapter)
+npm test           # unit tests (finance, scoring, search, AI engine, tokenize ledger, anomaly gate)
+npm run typecheck  # tsc -b (same gate as CI)
+npm run lint:eslint  # ESLint 9 flat config (same gate as CI)
+npm run lint       # oxlint (fast pass)
+npm run verify     # typecheck + eslint + tests + build — the full CI pipeline locally
 npm run build      # production build (base /keja-ai/ baked into vite.config)
 ```
 
@@ -59,7 +63,8 @@ The marketplace grows itself, end to end, fully automated by code:
        │                              price/acre vs acreage band, completeness, content)
        │                              → publish (Q≥80) / review (60–79) / reject (<60)
        └─ publish.mjs                 src/data/auto-listings.json (capped, run log)
-  → git commit by keja-autopilot[bot] → triggers deploy → live marketplace grows
+  → git commit by keja-autopilot[bot] → gated deploy job (same workflow, only
+    when listings actually changed) → live marketplace grows
 ```
 
 Runtime: `src/lib/autoListings.ts` adapts entries into the marketplace — IDs `KJA-A0001+`,
@@ -77,8 +82,14 @@ node scripts/generate-sitemap.mjs                    # regenerate sitemap
 
 ## Demo accounts
 
-`admin@keja.ai / admin123` · `agent@keja.ai / agent123` · `investor@keja.ai / investor123` · Google demo picker (Amina / Victor / Clive).
+Google demo picker (Amina / Victor / Clive) from the sign-in dialog, or the seeded email accounts (`admin@`, `agent@`, `investor@keja.ai`).
 All data is client-side demo data — no production backend, no real securities.
+
+> **Security note:** this is the MVP auth layer for a static demo deployment —
+> roles, sessions and password hashes live in the visitor's own browser
+> (localStorage) and are therefore client-trust only. Before any real launch,
+> the admin console and account layer MUST move to server-side verification
+> (see `src/lib/auth.tsx` header). No real user data should ever be entered.
 
 ## Deployment
 

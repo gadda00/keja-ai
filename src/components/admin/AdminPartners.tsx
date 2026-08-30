@@ -3,24 +3,26 @@
  * (agencies, developers, portals, diaspora agents) and automated listing
  * feed connections (API, CSV, portal syndication, WhatsApp bot).
  */
-import { useState } from 'react'
 import {
-  Handshake,
-  Globe2,
-  Check,
-  X,
-  RefreshCw,
-  Plus,
-  Link2,
-  Database,
-  MessageCircle,
-  FileSpreadsheet,
-  Webhook,
-  PauseCircle,
   AlertTriangle,
-} from 'lucide-react'
-import { useAuth } from '@/lib/auth'
-import { usePartners, useFeeds, PartnerApplication, FeedConnection, logAudit } from '@/lib/adminStore'
+  Check,
+  Database,
+  FileSpreadsheet,
+  Globe2,
+  Handshake,
+  Link2,
+  MessageCircle,
+  PauseCircle,
+  Plus,
+  RefreshCw,
+  Webhook,
+  X,
+} from 'lucide-react';
+import { useState } from 'react';
+
+import type { FeedConnection, PartnerApplication } from '@/lib/adminStore';
+import { logAudit, useFeeds, usePartners } from '@/lib/adminStore';
+import { useAuth } from '@/lib/auth';
 
 const TYPE_META: Record<string, { label: string; tone: string }> = {
   agency: { label: 'Agency', tone: 'bg-gold-100 text-gold-800' },
@@ -29,7 +31,7 @@ const TYPE_META: Record<string, { label: string; tone: string }> = {
   portal: { label: 'Portal', tone: 'bg-sky-100 text-sky-800' },
   'data-partner': { label: 'Data partner', tone: 'bg-purple-100 text-purple-800' },
   'diaspora-agent': { label: 'Diaspora agent', tone: 'bg-amber-100 text-amber-800' },
-}
+};
 
 const FEED_ICON: Record<string, typeof Globe2> = {
   api: Webhook,
@@ -37,25 +39,25 @@ const FEED_ICON: Record<string, typeof Globe2> = {
   'portal-syndication': Globe2,
   whatsapp: MessageCircle,
   manual: Database,
-}
+};
 
 const STATUS_TONE: Record<string, string> = {
   healthy: 'bg-green-100 text-green-800 ring-green-200',
   degraded: 'bg-amber-100 text-amber-800 ring-amber-200',
   paused: 'bg-ink/10 text-ink-muted ring-ink/10',
   error: 'bg-red-100 text-red-700 ring-red-200',
-}
+};
 
 export default function AdminPartners() {
-  const { user } = useAuth()
-  const [partners, setPartners] = usePartners()
-  const [feeds, setFeeds] = useFeeds()
-  const [syncing, setSyncing] = useState<string | null>(null)
-  const [addFeed, setAddFeed] = useState(false)
-  const [form, setForm] = useState({ name: '', type: 'api', url: '', market: 'Nairobi' })
+  const { user } = useAuth();
+  const [partners, setPartners] = usePartners();
+  const [feeds, setFeeds] = useFeeds();
+  const [syncing, setSyncing] = useState<string | null>(null);
+  const [addFeed, setAddFeed] = useState(false);
+  const [form, setForm] = useState({ name: '', type: 'api', url: '', market: 'Nairobi' });
 
   const decide = (p: PartnerApplication, status: 'approved' | 'rejected') => {
-    setPartners(partners.map((x) => (x.id === p.id ? { ...x, status } : x)))
+    setPartners(partners.map((x) => (x.id === p.id ? { ...x, status } : x)));
     logAudit({
       actor: user?.name ?? 'admin',
       actorEmail: user?.email ?? '',
@@ -63,14 +65,14 @@ export default function AdminPartners() {
       target: p.orgName,
       detail: `${p.orgName} (${p.type}, ${p.market}) ${status} — ${p.listingsCount} listings offered`,
       severity: status === 'rejected' ? 'warning' : 'info',
-    })
-  }
+    });
+  };
 
   const runSync = (f: FeedConnection) => {
-    setSyncing(f.id)
+    setSyncing(f.id);
     setTimeout(() => {
-      const imported = Math.floor(Math.random() * 5)
-      const dupes = Math.floor(Math.random() * 3)
+      const imported = Math.floor(Math.random() * 5);
+      const dupes = Math.floor(Math.random() * 3);
       setFeeds(
         feeds.map((x) =>
           x.id === f.id
@@ -79,12 +81,13 @@ export default function AdminPartners() {
                 lastSync: new Date().toISOString(),
                 listingsImported: x.listingsImported + imported,
                 duplicatesBlocked: x.duplicatesBlocked + dupes,
-                status: x.status === 'paused' ? 'paused' : x.status === 'degraded' ? 'healthy' : x.status,
+                status:
+                  x.status === 'paused' ? 'paused' : x.status === 'degraded' ? 'healthy' : x.status,
               }
-            : x,
-        ),
-      )
-      setSyncing(null)
+            : x
+        )
+      );
+      setSyncing(null);
       logAudit({
         actor: user?.name ?? 'admin',
         actorEmail: user?.email ?? '',
@@ -92,13 +95,13 @@ export default function AdminPartners() {
         target: f.name,
         detail: `Manual sync: ${imported} listings imported, ${dupes} duplicates blocked`,
         severity: 'info',
-      })
-    }, 1200)
-  }
+      });
+    }, 1200);
+  };
 
   const togglePause = (f: FeedConnection) => {
-    const next = f.status === 'paused' ? 'healthy' : 'paused'
-    setFeeds(feeds.map((x) => (x.id === f.id ? { ...x, status: next } : x)))
+    const next = f.status === 'paused' ? 'healthy' : 'paused';
+    setFeeds(feeds.map((x) => (x.id === f.id ? { ...x, status: next } : x)));
     logAudit({
       actor: user?.name ?? 'admin',
       actorEmail: user?.email ?? '',
@@ -106,11 +109,11 @@ export default function AdminPartners() {
       target: f.name,
       detail: `${f.name} → ${next}`,
       severity: 'warning',
-    })
-  }
+    });
+  };
 
   const createFeed = () => {
-    if (!form.name.trim()) return
+    if (!form.name.trim()) return;
     const feed: FeedConnection = {
       id: `feed-${Date.now().toString().slice(-5)}`,
       name: form.name,
@@ -122,10 +125,10 @@ export default function AdminPartners() {
       status: 'healthy',
       listingsImported: 0,
       duplicatesBlocked: 0,
-    }
-    setFeeds([feed, ...feeds])
-    setForm({ name: '', type: 'api', url: '', market: 'Nairobi' })
-    setAddFeed(false)
+    };
+    setFeeds([feed, ...feeds]);
+    setForm({ name: '', type: 'api', url: '', market: 'Nairobi' });
+    setAddFeed(false);
     logAudit({
       actor: user?.name ?? 'admin',
       actorEmail: user?.email ?? '',
@@ -133,10 +136,10 @@ export default function AdminPartners() {
       target: feed.name,
       detail: `New ${feed.type} feed connected for ${feed.market}`,
       severity: 'info',
-    })
-  }
+    });
+  };
 
-  const pending = partners.filter((p) => p.status === 'pending')
+  const pending = partners.filter((p) => p.status === 'pending');
 
   return (
     <div className="flex flex-col gap-8">
@@ -183,11 +186,11 @@ export default function AdminPartners() {
                   <p className="mt-1 text-xs font-medium text-ink-soft">
                     Market: {p.market} · ~{p.listingsCount} listings
                   </p>
-                  {p.message && (
+                  {p.message ? (
                     <p className="mt-2 rounded-lg bg-gold-50 px-3 py-2 text-[11px] leading-relaxed text-ink-muted ring-1 ring-gold-100">
                       “{p.message}”
                     </p>
-                  )}
+                  ) : null}
                 </div>
                 {p.status === 'pending' && (
                   <div className="flex shrink-0 flex-col gap-1.5">
@@ -224,7 +227,7 @@ export default function AdminPartners() {
 
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
           {feeds.map((f) => {
-            const Icon = FEED_ICON[f.type] ?? Globe2
+            const Icon = FEED_ICON[f.type] ?? Globe2;
             return (
               <div key={f.id} className="card-luxe p-5">
                 <div className="flex items-start justify-between gap-3">
@@ -234,7 +237,9 @@ export default function AdminPartners() {
                     </span>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <h4 className="truncate font-display text-sm font-bold text-ink">{f.name}</h4>
+                        <h4 className="truncate font-display text-sm font-bold text-ink">
+                          {f.name}
+                        </h4>
                         <span
                           className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ring-1 ${STATUS_TONE[f.status]}`}
                         >
@@ -242,13 +247,14 @@ export default function AdminPartners() {
                         </span>
                       </div>
                       <p className="mt-0.5 text-[11px] text-ink-muted">
-                        {f.market} · {f.type} · every {f.intervalHours === 0 ? 'real-time' : `${f.intervalHours}h`}
+                        {f.market} · {f.type} · every{' '}
+                        {f.intervalHours === 0 ? 'real-time' : `${f.intervalHours}h`}
                       </p>
-                      {f.url && (
+                      {f.url ? (
                         <p className="mt-0.5 flex items-center gap-1 truncate text-[11px] text-gold-700">
                           <Link2 className="h-3 w-3 shrink-0" /> {f.url.replace(/^https?:\/\//, '')}
                         </p>
-                      )}
+                      ) : null}
                     </div>
                   </div>
                 </div>
@@ -297,7 +303,7 @@ export default function AdminPartners() {
                   </button>
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       </section>
@@ -310,11 +316,31 @@ export default function AdminPartners() {
         </h3>
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { n: '01', t: 'Agent & agency partnerships', d: 'Free KEJA PRO tools (CRM, lead engine, analytics) in exchange for exclusive verified inventory — the supply-first flywheel.' },
-            { n: '02', t: 'Developer direct deals', d: 'Off-plan and new-development inventory uploaded once, syndicated everywhere, with payment plans and completion tracking.' },
-            { n: '03', t: 'Owner/landlord self-service', d: 'Free listings with guided wizard, WhatsApp capture and QR-code funnels — lowest-friction supply channel.' },
-            { n: '04', t: 'Cross-portal syndication', d: 'ListGlobally-style network: import partner portals (diaspora corridors: UK, US, UAE) via XML/JSON feeds with dedupe.' },
-            { n: '05', t: 'Data partnerships & APIs', d: 'Institutional feeds, MLS-equivalent data-sharing agreements and bank/insurer inventory integrations.' },
+            {
+              n: '01',
+              t: 'Agent & agency partnerships',
+              d: 'Free KEJA PRO tools (CRM, lead engine, analytics) in exchange for exclusive verified inventory — the supply-first flywheel.',
+            },
+            {
+              n: '02',
+              t: 'Developer direct deals',
+              d: 'Off-plan and new-development inventory uploaded once, syndicated everywhere, with payment plans and completion tracking.',
+            },
+            {
+              n: '03',
+              t: 'Owner/landlord self-service',
+              d: 'Free listings with guided wizard, WhatsApp capture and QR-code funnels — lowest-friction supply channel.',
+            },
+            {
+              n: '04',
+              t: 'Cross-portal syndication',
+              d: 'ListGlobally-style network: import partner portals (diaspora corridors: UK, US, UAE) via XML/JSON feeds with dedupe.',
+            },
+            {
+              n: '05',
+              t: 'Data partnerships & APIs',
+              d: 'Institutional feeds, MLS-equivalent data-sharing agreements and bank/insurer inventory integrations.',
+            },
           ].map((c) => (
             <div key={c.n} className="rounded-xl bg-white/5 p-4 ring-1 ring-white/10">
               <p className="font-display text-xl font-bold text-gold-400">{c.n}</p>
@@ -335,9 +361,21 @@ export default function AdminPartners() {
       </section>
 
       {/* add feed dialog */}
-      {addFeed && (
+      {addFeed ? (
         <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm" onClick={() => setAddFeed(false)} />
+          <div
+            role="button"
+            tabIndex={0}
+            aria-label="Close dialog"
+            className="absolute inset-0 bg-ink/60 backdrop-blur-sm"
+            onClick={() => setAddFeed(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setAddFeed(false);
+              }
+            }}
+          />
           <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-gold-200">
             <h3 className="heading-display text-lg">Connect a new feed</h3>
             <p className="mt-1 text-xs text-ink-muted">
@@ -379,7 +417,7 @@ export default function AdminPartners() {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
-  )
+  );
 }

@@ -1,48 +1,49 @@
-import { useEffect } from 'react'
-import { SITE, asset } from '@/config'
+import { useEffect } from 'react';
+
+import { asset, SITE, SITE_URL } from '@/config';
 
 function upsertMeta(attr: 'name' | 'property', key: string, content: string) {
-  let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`)
+  let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
   if (!el) {
-    el = document.createElement('meta')
-    el.setAttribute(attr, key)
-    document.head.appendChild(el)
+    el = document.createElement('meta');
+    el.setAttribute(attr, key);
+    document.head.appendChild(el);
   }
-  el.setAttribute('content', content)
+  el.setAttribute('content', content);
 }
 
 function upsertLink(rel: string, href: string) {
-  let el = document.head.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`)
+  let el = document.head.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`);
   if (!el) {
-    el = document.createElement('link')
-    el.setAttribute('rel', rel)
-    document.head.appendChild(el)
+    el = document.createElement('link');
+    el.setAttribute('rel', rel);
+    document.head.appendChild(el);
   }
-  el.setAttribute('href', href)
+  el.setAttribute('href', href);
 }
 
-const JSONLD_ID = 'keja-route-jsonld'
+const JSONLD_ID = 'keja-route-jsonld';
 
 /** Replace (or remove) the per-route JSON-LD structured-data block. */
 function setRouteJsonLd(data: object | object[] | null) {
-  document.getElementById(JSONLD_ID)?.remove()
-  if (!data) return
-  const script = document.createElement('script')
-  script.type = 'application/ld+json'
-  script.id = JSONLD_ID
-  script.textContent = JSON.stringify(data)
-  document.head.appendChild(script)
+  document.getElementById(JSONLD_ID)?.remove();
+  if (!data) return;
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.id = JSONLD_ID;
+  script.textContent = JSON.stringify(data);
+  document.head.appendChild(script);
 }
 
 export interface PageMetaOptions {
-  title: string
-  description?: string
+  title: string;
+  description?: string;
   /** Route-specific OG image (absolute or asset() path). */
-  image?: string
+  image?: string;
   /** robots override — e.g. 'noindex' for soft-404 / private pages. */
-  robots?: string
+  robots?: string;
   /** One structured-data object (or array) for this route. */
-  jsonLd?: object | object[] | null
+  jsonLd?: object | object[] | null;
 }
 
 /**
@@ -50,31 +51,40 @@ export interface PageMetaOptions {
  * + optional route-scoped JSON-LD structured data. Keeps social shares and
  * search snippets accurate on every route of the SPA.
  */
-export function usePageMeta(title: string, description?: string, options?: Omit<PageMetaOptions, 'title' | 'description'>) {
+export function usePageMeta(
+  title: string,
+  description?: string,
+  options?: Omit<PageMetaOptions, 'title' | 'description'>
+) {
   useEffect(() => {
-    const full = title.includes(SITE.name) ? title : `${title} — ${SITE.name}`
-    document.title = full
+    const full = title.includes(SITE.name) ? title : `${title} — ${SITE.name}`;
+    document.title = full;
     if (description) {
-      upsertMeta('name', 'description', description)
-      upsertMeta('property', 'og:description', description)
-      upsertMeta('name', 'twitter:description', description)
+      upsertMeta('name', 'description', description);
+      upsertMeta('property', 'og:description', description);
+      upsertMeta('name', 'twitter:description', description);
     }
-    upsertMeta('property', 'og:title', full)
-    upsertMeta('name', 'twitter:title', full)
+    upsertMeta('property', 'og:title', full);
+    upsertMeta('name', 'twitter:title', full);
     if (options?.image) {
-      const img = options.image.startsWith('http') ? options.image : `${window.location.origin}${asset(options.image.replace(/^\//, ''))}`
-      upsertMeta('property', 'og:image', img)
-      upsertMeta('name', 'twitter:image', img)
-      upsertMeta('property', 'og:image:width', '1200')
-      upsertMeta('property', 'og:image:height', '630')
+      const img = options.image.startsWith('http')
+        ? options.image
+        : `${window.location.origin}${asset(options.image.replace(/^\//, ''))}`;
+      upsertMeta('property', 'og:image', img);
+      upsertMeta('name', 'twitter:image', img);
+      upsertMeta('property', 'og:image:width', '1200');
+      upsertMeta('property', 'og:image:height', '630');
     }
-    if (options?.robots) upsertMeta('name', 'robots', options.robots)
-    else document.head.querySelector<HTMLMetaElement>('meta[name="robots"]')?.remove()
-    const canonical = `${window.location.origin}${window.location.pathname}`
-    upsertLink('canonical', canonical)
-    upsertMeta('property', 'og:url', canonical)
-    setRouteJsonLd(options?.jsonLd ?? null)
-  }, [title, description, options?.image, options?.robots, options?.jsonLd])
+    if (options?.robots) upsertMeta('name', 'robots', options.robots);
+    else document.head.querySelector<HTMLMetaElement>('meta[name="robots"]')?.remove();
+    // Canonical must match the sitemap/JSON-LD origin (SITE_URL), not
+    // window.location — otherwise dual hosts (Pages + Netlify) emit
+    // conflicting signals to crawlers.
+    const canonical = `${SITE_URL}${window.location.pathname}`;
+    upsertLink('canonical', canonical);
+    upsertMeta('property', 'og:url', canonical);
+    setRouteJsonLd(options?.jsonLd ?? null);
+  }, [title, description, options?.image, options?.robots, options?.jsonLd]);
 }
 
 /* ------------------------- structured data builders ------------------------ */
@@ -87,34 +97,38 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
       '@type': 'ListItem',
       position: i + 1,
       name: it.name,
-      item: `https://gadda00.github.io${it.path}`,
+      item: `${SITE_URL}${it.path}`,
     })),
-  }
+  };
 }
 
 export function realEstateListingJsonLd(p: {
-  id: string
-  title: string
-  description: string
-  price: number
-  images: string[]
-  area: string
-  county: string
-  bedrooms?: number
-  bathrooms?: number
-  sizeSqm: number
-  agency: string
-  listedAt: string
-  monthly?: boolean
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  images: string[];
+  area: string;
+  county: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  sizeSqm: number;
+  agency: string;
+  listedAt: string;
+  monthly?: boolean;
 }) {
   return {
     '@context': 'https://schema.org',
     '@type': 'RealEstateListing',
     name: p.title,
     description: p.description,
-    url: `https://gadda00.github.io/keja-ai/properties/${p.id}`,
+    url: `${SITE_URL}${import.meta.env.BASE_URL}properties/${p.id}`,
     datePosted: p.listedAt,
-    image: p.images.map((img) => (img.startsWith('http') ? img : `https://gadda00.github.io/keja-ai${img.replace('/keja-ai', '')}`)),
+    image: p.images.map((img) =>
+      img.startsWith('http')
+        ? img
+        : `${SITE_URL}${import.meta.env.BASE_URL}${img.replace(/^\//, '')}`
+    ),
     offers: {
       '@type': 'Offer',
       price: p.price,
@@ -131,10 +145,17 @@ export function realEstateListingJsonLd(p: {
       addressRegion: p.county,
       addressCountry: 'KE',
     },
-  }
+  };
 }
 
-export function articleJsonLd(a: { title: string; description: string; slug: string; publishedAt: string; author: string; image?: string }) {
+export function articleJsonLd(a: {
+  title: string;
+  description: string;
+  slug: string;
+  publishedAt: string;
+  author: string;
+  image?: string;
+}) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -143,8 +164,8 @@ export function articleJsonLd(a: { title: string; description: string; slug: str
     datePublished: a.publishedAt,
     author: { '@type': 'Organization', name: a.author },
     publisher: { '@type': 'Organization', name: SITE.parent },
-    mainEntityOfPage: `https://gadda00.github.io/keja-ai/insights/${a.slug}`,
-  }
+    mainEntityOfPage: `${SITE_URL}${import.meta.env.BASE_URL}insights/${a.slug}`,
+  };
 }
 
 export function faqJsonLd(faqs: { q: string; a: string }[]) {
@@ -156,5 +177,5 @@ export function faqJsonLd(faqs: { q: string; a: string }[]) {
       name: f.q,
       acceptedAnswer: { '@type': 'Answer', text: f.a },
     })),
-  }
+  };
 }

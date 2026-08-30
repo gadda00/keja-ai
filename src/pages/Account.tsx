@@ -2,37 +2,38 @@
  * Account — signed-in user home: profile, session details, role, activity.
  * Blueprint Ch.14: role-based access, privacy by design, session control.
  */
-import { usePageMeta } from '@/lib/seo'
-import { Link } from 'react-router-dom'
 import {
-  UserCircle2,
-  ShieldCheck,
-  LogOut,
-  KeyRound,
   Activity,
-  Heart,
+  Building2,
   Clock,
-  Sparkles,
-  Settings2,
+  Heart,
+  KeyRound,
+  LogOut,
   Mail,
   Phone,
-  Building2,
-} from 'lucide-react'
-import { useAuth, initials } from '@/lib/auth'
-import { useStore, KEYS } from '@/lib/store'
-import { useAllProperties } from '@/lib/inventory'
-import PropertyCard from '@/components/property/PropertyCard'
+  Settings2,
+  ShieldCheck,
+  Sparkles,
+  UserCircle2,
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+import PropertyCard from '@/components/property/PropertyCard';
+import { initials, useAuth } from '@/lib/auth';
+import { useAllProperties } from '@/lib/inventory';
+import { usePageMeta } from '@/lib/seo';
+import { KEYS, useStore } from '@/lib/store';
 
 export default function Account() {
   usePageMeta(
     'My Account — Keja.ai',
-    'Your saved properties, portfolio, sessions and preferences.',
-  )
-  const { user, session, logout, isAdmin, setAuthModalOpen } = useAuth()
-  const [favorites] = useStore<string[]>(KEYS.favorites, [])
-  const [viewed] = useStore<string[]>(KEYS.viewed, [])
-  const [chat] = useStore<{ id: string; role: string; text: string; ts: string }[]>(KEYS.chat, [])
-  const allProperties = useAllProperties()
+    'Your saved properties, portfolio, sessions and preferences.'
+  );
+  const { user, session, logout, isAdmin, setAuthModalOpen } = useAuth();
+  const [favorites] = useStore<string[]>(KEYS.favorites, []);
+  const [viewed] = useStore<string[]>(KEYS.viewed, []);
+  const [chat] = useStore<{ id: string; role: string; text: string; ts: string }[]>(KEYS.chat, []);
+  const allProperties = useAllProperties();
 
   if (!user) {
     return (
@@ -49,10 +50,10 @@ export default function Account() {
           Sign in with Google or email
         </button>
       </div>
-    )
+    );
   }
 
-  const favProperties = allProperties.filter((p) => favorites.includes(p.id)).slice(0, 3)
+  const favProperties = allProperties.filter((p) => favorites.includes(p.id)).slice(0, 3);
   const sessionExpires = session
     ? new Date(session.expiresAt).toLocaleString('en-GB', {
         day: 'numeric',
@@ -60,7 +61,7 @@ export default function Account() {
         hour: '2-digit',
         minute: '2-digit',
       })
-    : '—'
+    : '—';
 
   return (
     <div className="container-luxe py-12">
@@ -84,19 +85,19 @@ export default function Account() {
               <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-white/80">
                 {user.provider === 'google' ? 'Google account' : 'Email account'}
               </span>
-              {user.company && (
+              {user.company ? (
                 <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-white/80">
                   {user.company}
                 </span>
-              )}
+              ) : null}
             </div>
           </div>
           <div className="flex shrink-0 flex-col gap-2">
-            {isAdmin && (
+            {isAdmin ? (
               <Link to="/admin" className="btn-gold !py-2.5 !text-xs">
                 <Settings2 className="h-4 w-4" /> Admin Console
               </Link>
-            )}
+            ) : null}
             <button
               onClick={() => logout()}
               className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/25 px-4 py-2.5 text-xs font-semibold text-white/90 transition hover:bg-white/10"
@@ -109,7 +110,14 @@ export default function Account() {
         {/* meta strip */}
         <div className="grid grid-cols-2 divide-gold-100 border-t border-gold-100 sm:grid-cols-4 sm:divide-x">
           {[
-            { label: 'Member since', value: new Date(user.createdAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }), icon: Clock },
+            {
+              label: 'Member since',
+              value: new Date(user.createdAt).toLocaleDateString('en-GB', {
+                month: 'short',
+                year: 'numeric',
+              }),
+              icon: Clock,
+            },
             { label: 'Sign-ins', value: String(user.loginCount), icon: Activity },
             { label: 'Saved properties', value: String(favorites.length), icon: Heart },
             { label: 'AI conversations', value: String(chat.length), icon: Sparkles },
@@ -157,15 +165,15 @@ export default function Account() {
                     <li key={m.id} className="flex items-start gap-3 rounded-xl bg-gold-50/60 p-3">
                       <span
                         className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
-                          m.role === 'user'
-                            ? 'bg-ink text-gold-200'
-                            : 'bg-gold-gradient text-white'
+                          m.role === 'user' ? 'bg-ink text-gold-200' : 'bg-gold-gradient text-white'
                         }`}
                       >
                         {m.role === 'user' ? 'You' : 'AI'}
                       </span>
                       <div className="min-w-0">
-                        <p className="line-clamp-2 text-xs leading-relaxed text-ink-soft">{m.text}</p>
+                        <p className="line-clamp-2 text-xs leading-relaxed text-ink-soft">
+                          {m.text}
+                        </p>
                         <p className="mt-1 text-[10px] text-ink-faint">
                           {new Date(m.ts).toLocaleString('en-GB', {
                             day: 'numeric',
@@ -193,18 +201,21 @@ export default function Account() {
             <section className="card-luxe p-6">
               <h2 className="heading-display mb-4 text-lg">Recently viewed</h2>
               <div className="flex flex-wrap gap-2">
-                {[...viewed].reverse().slice(0, 8).map((vid) => {
-                  const prop = allProperties.find((p) => p.id === vid)
-                  return (
-                    <Link
-                      key={vid}
-                      to={`/properties/${vid}`}
-                      className="rounded-lg bg-gold-50 px-3 py-1.5 text-xs font-medium text-ink-soft ring-1 ring-gold-100 transition hover:bg-gold-100"
-                    >
-                      {prop ? prop.title.slice(0, 34) + (prop.title.length > 34 ? '…' : '') : vid}
-                    </Link>
-                  )
-                })}
+                {[...viewed]
+                  .reverse()
+                  .slice(0, 8)
+                  .map((vid) => {
+                    const prop = allProperties.find((p) => p.id === vid);
+                    return (
+                      <Link
+                        key={vid}
+                        to={`/properties/${vid}`}
+                        className="rounded-lg bg-gold-50 px-3 py-1.5 text-xs font-medium text-ink-soft ring-1 ring-gold-100 transition hover:bg-gold-100"
+                      >
+                        {prop ? prop.title.slice(0, 34) + (prop.title.length > 34 ? '…' : '') : vid}
+                      </Link>
+                    );
+                  })}
               </div>
             </section>
           )}
@@ -284,5 +295,5 @@ export default function Account() {
         </div>
       </div>
     </div>
-  )
+  );
 }

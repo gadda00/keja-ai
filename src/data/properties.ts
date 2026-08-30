@@ -1,57 +1,57 @@
-import { asset } from '@/config'
-export type PropertyType = 'apartment' | 'villa' | 'townhouse' | 'bungalow' | 'land' | 'commercial'
-export type Purpose = 'buy' | 'rent' | 'invest'
-export type Availability = 'available' | 'reserved' | 'sold'
-export type TitleStatus = 'verified' | 'pending' | 'flagged'
+import { asset } from '@/config';
+export type PropertyType = 'apartment' | 'villa' | 'townhouse' | 'bungalow' | 'land' | 'commercial';
+export type Purpose = 'buy' | 'rent' | 'invest';
+export type Availability = 'available' | 'reserved' | 'sold';
+export type TitleStatus = 'verified' | 'pending' | 'flagged';
 
 export interface Verification {
-  titleCheck: TitleStatus
-  ardhisasaMatch: boolean
-  photosVerified: boolean
-  duplicateCheck: 'clean' | 'similar-found' | 'flagged'
-  listingVelocity: 'normal' | 'high' | 'suspicious'
-  lastChecked: string
+  titleCheck: TitleStatus;
+  ardhisasaMatch: boolean;
+  photosVerified: boolean;
+  duplicateCheck: 'clean' | 'similar-found' | 'flagged';
+  listingVelocity: 'normal' | 'high' | 'suspicious';
+  lastChecked: string;
 }
 
 export interface TrustSignal {
-  label: string
-  status: 'pass' | 'warn' | 'fail'
-  detail: string
+  label: string;
+  status: 'pass' | 'warn' | 'fail';
+  detail: string;
 }
 
 export interface Property {
-  id: string
-  title: string
-  type: PropertyType
-  purpose: Purpose[]
-  area: string
-  county: string
-  price: number
-  rentEstimate?: number
-  bedrooms?: number
-  bathrooms?: number
-  sizeSqm: number
-  amenities: string[]
-  images: string[]
-  description: string
-  agency: string
-  agent: { name: string; phone: string }
-  trustScore: number
-  verification: Verification
-  trustSignals: TrustSignal[]
-  availability: Availability
-  completionDate?: string
-  paymentPlan?: string
-  grossYieldEstimate?: number
-  appreciationForecast?: number
-  listedAt: string
-  views: number
-  offPlan?: boolean
-  furnished?: boolean
-  highlights: string[]
+  id: string;
+  title: string;
+  type: PropertyType;
+  purpose: Purpose[];
+  area: string;
+  county: string;
+  price: number;
+  rentEstimate?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  sizeSqm: number;
+  amenities: string[];
+  images: string[];
+  description: string;
+  agency: string;
+  agent: { name: string; phone: string };
+  trustScore: number;
+  verification: Verification;
+  trustSignals: TrustSignal[];
+  availability: Availability;
+  completionDate?: string;
+  paymentPlan?: string;
+  grossYieldEstimate?: number;
+  appreciationForecast?: number;
+  listedAt: string;
+  views: number;
+  offPlan?: boolean;
+  furnished?: boolean;
+  highlights: string[];
 }
 
-const IMG = (n: string) => asset(`/images/props/${n}.jpg`)
+const IMG = (n: string) => asset(`/images/props/${n}.jpg`);
 
 export const AGENCIES = [
   { name: 'Chacadom Premier Properties', listings: 6, rating: 4.9, verifiedSince: '2024' },
@@ -59,7 +59,7 @@ export const AGENCIES = [
   { name: 'Savanna Heights Realty', listings: 4, rating: 4.6, verifiedSince: '2025' },
   { name: 'Pwani Beach Homes', listings: 3, rating: 4.8, verifiedSince: '2025' },
   { name: 'Rift Valley Land & Homes', listings: 3, rating: 4.5, verifiedSince: '2024' },
-]
+];
 
 export const PROPERTIES: Property[] = [
   {
@@ -74,26 +74,63 @@ export const PROPERTIES: Property[] = [
     bedrooms: 3,
     bathrooms: 2,
     sizeSqm: 145,
-    amenities: ['Balcony', 'Gym', 'Pool', '24/7 Security', 'Lift', 'Borehole', 'CCTV', 'Visitor Parking'],
+    amenities: [
+      'Balcony',
+      'Gym',
+      'Pool',
+      '24/7 Security',
+      'Lift',
+      'Borehole',
+      'CCTV',
+      'Visitor Parking',
+    ],
     images: [IMG('apartment_1'), IMG('interior_0'), IMG('bedroom_0'), IMG('interior_1')],
     description:
       'A beautifully finished 3-bedroom apartment in the heart of Kilimani, one of Nairobi\u2019s most in-demand rental corridors. The unit features an open-plan living area flowing onto a wide balcony with sweeping city views, a fitted kitchen with granite worktops, and master ensuite. The development offers a rooftop pool, modern gym, and full backup water and power. Walking distance to Yaya Centre and Prestige Plaza — a strong, liquid rental market for both young professionals and the expatriate community.',
     agency: 'Chacadom Premier Properties',
     agent: { name: 'Mercy Wanjiru', phone: '+254 712 000 001' },
     trustScore: 96,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-20' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-20',
+    },
     trustSignals: [
-      { label: 'Title search', status: 'pass', detail: 'Title deed verified against Ardhisasa records — free of encumbrances.' },
-      { label: 'Photo authenticity', status: 'pass', detail: 'All 4 photos uniquely matched to this listing. No cross-listing reuse detected.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'Asking price is within 3% of the Kilimani 3BR market band (KES 13.8M–15.2M).' },
-      { label: 'Agent history', status: 'pass', detail: 'Chacadom Premier Properties: 6 active listings, 4.9 rating, zero fraud reports.' },
+      {
+        label: 'Title search',
+        status: 'pass',
+        detail: 'Title deed verified against Ardhisasa records — free of encumbrances.',
+      },
+      {
+        label: 'Photo authenticity',
+        status: 'pass',
+        detail: 'All 4 photos uniquely matched to this listing. No cross-listing reuse detected.',
+      },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'Asking price is within 3% of the Kilimani 3BR market band (KES 13.8M–15.2M).',
+      },
+      {
+        label: 'Agent history',
+        status: 'pass',
+        detail: 'Chacadom Premier Properties: 6 active listings, 4.9 rating, zero fraud reports.',
+      },
     ],
     availability: 'available',
     grossYieldEstimate: 9.1,
     appreciationForecast: 7.5,
     listedAt: '2026-07-28',
     views: 482,
-    highlights: ['Rooftop pool & gym', 'Walk to Yaya Centre', 'Backup water & power', 'Strong expat rental demand'],
+    highlights: [
+      'Rooftop pool & gym',
+      'Walk to Yaya Centre',
+      'Backup water & power',
+      'Strong expat rental demand',
+    ],
   },
   {
     id: 'KJA-002',
@@ -107,26 +144,63 @@ export const PROPERTIES: Property[] = [
     bedrooms: 5,
     bathrooms: 4,
     sizeSqm: 420,
-    amenities: ['Swimming Pool', 'Manicured Garden', 'DSQ', 'Solar Water Heating', 'Electric Fence', 'Alarm System', 'Gated Entry', 'Pet Friendly'],
+    amenities: [
+      'Swimming Pool',
+      'Manicured Garden',
+      'DSQ',
+      'Solar Water Heating',
+      'Electric Fence',
+      'Alarm System',
+      'Gated Entry',
+      'Pet Friendly',
+    ],
     images: [IMG('villa_0'), IMG('villa_1'), IMG('bedroom_1'), IMG('villa_2')],
     description:
       'An exceptional family residence set on half an acre of manicured gardens in Old Karen. This five-bedroom villa balances classic elegance with modern comfort: double-height reception rooms, a chef\u2019s kitchen, ensuite bedrooms, and a sparkling pool framed by mature trees. Karen remains Nairobi\u2019s premier low-density suburb, beloved by diplomatic families and executives. The property includes staff quarters, ample parking, and a private gated entrance.',
     agency: 'Chacadom Premier Properties',
     agent: { name: 'James Otieno', phone: '+254 712 000 002' },
     trustScore: 94,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-18' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-18',
+    },
     trustSignals: [
-      { label: 'Title search', status: 'pass', detail: 'Freehold title confirmed. Search certificate dated within 90 days.' },
-      { label: 'Photo authenticity', status: 'pass', detail: 'Photos uniquely verified; no recycled images across agencies.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'Aligned with Karen villa comparables (KES 165k–195k per sqm for premium stock).' },
-      { label: 'Agent history', status: 'pass', detail: 'Verified agency with consistent closing record.' },
+      {
+        label: 'Title search',
+        status: 'pass',
+        detail: 'Freehold title confirmed. Search certificate dated within 90 days.',
+      },
+      {
+        label: 'Photo authenticity',
+        status: 'pass',
+        detail: 'Photos uniquely verified; no recycled images across agencies.',
+      },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'Aligned with Karen villa comparables (KES 165k–195k per sqm for premium stock).',
+      },
+      {
+        label: 'Agent history',
+        status: 'pass',
+        detail: 'Verified agency with consistent closing record.',
+      },
     ],
     availability: 'available',
     grossYieldEstimate: 5.6,
     appreciationForecast: 8.0,
     listedAt: '2026-08-02',
     views: 631,
-    highlights: ['Half-acre garden', 'Private pool', 'Old Karen address', 'Diplomatic family favourite'],
+    highlights: [
+      'Half-acre garden',
+      'Private pool',
+      'Old Karen address',
+      'Diplomatic family favourite',
+    ],
   },
   {
     id: 'KJA-003',
@@ -140,26 +214,62 @@ export const PROPERTIES: Property[] = [
     bedrooms: 2,
     bathrooms: 2,
     sizeSqm: 105,
-    amenities: ['Balcony', 'Gym', 'Lift', 'Borehole', 'Backup Generator', '24/7 Security', 'Secure Parking'],
+    amenities: [
+      'Balcony',
+      'Gym',
+      'Lift',
+      'Borehole',
+      'Backup Generator',
+      '24/7 Security',
+      'Secure Parking',
+    ],
     images: [IMG('apartment_2'), IMG('interior_2'), IMG('apartment_0')],
     description:
       'Sleek two-bedroom apartment in a contemporary Westlands tower, minutes from Sarit Centre and Westgate. Open-plan living with floor-to-ceiling windows, fitted kitchen, and a covered balcony. The building runs a full-service operation — gym, lift access, borehole water, and standby generator. Westlands is Nairobi\u2019s most liquid rental sub-market: quality 2BR units here rarely stay vacant beyond three weeks.',
     agency: 'Nairobi Habitat Realtors',
     agent: { name: 'Faith Njeri', phone: '+254 712 000 003' },
     trustScore: 91,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-15' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-15',
+    },
     trustSignals: [
-      { label: 'Title search', status: 'pass', detail: 'Sectional title verified; management company in good standing.' },
-      { label: 'Photo authenticity', status: 'pass', detail: 'Photos verified unique to this listing.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'Fairly priced against the Westlands 2BR band (KES 10.2M–12M).' },
-      { label: 'Agent history', status: 'pass', detail: 'Nairobi Habitat Realtors: 4 active listings, 4.7 rating.' },
+      {
+        label: 'Title search',
+        status: 'pass',
+        detail: 'Sectional title verified; management company in good standing.',
+      },
+      {
+        label: 'Photo authenticity',
+        status: 'pass',
+        detail: 'Photos verified unique to this listing.',
+      },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'Fairly priced against the Westlands 2BR band (KES 10.2M–12M).',
+      },
+      {
+        label: 'Agent history',
+        status: 'pass',
+        detail: 'Nairobi Habitat Realtors: 4 active listings, 4.7 rating.',
+      },
     ],
     availability: 'available',
     grossYieldEstimate: 9.3,
     appreciationForecast: 7.0,
     listedAt: '2026-08-05',
     views: 397,
-    highlights: ['Most liquid rental submarket', 'Full-service building', 'Walk to Sarit & Westgate', 'High expat demand'],
+    highlights: [
+      'Most liquid rental submarket',
+      'Full-service building',
+      'Walk to Sarit & Westgate',
+      'High expat demand',
+    ],
   },
   {
     id: 'KJA-004',
@@ -173,18 +283,42 @@ export const PROPERTIES: Property[] = [
     bedrooms: 4,
     bathrooms: 3,
     sizeSqm: 260,
-    amenities: ['Gated Community', 'Clubhouse', 'Children Play Area', 'Gym', 'Solar Heating', 'Borehole', 'Perimeter Wall', 'CCTV'],
+    amenities: [
+      'Gated Community',
+      'Clubhouse',
+      'Children Play Area',
+      'Gym',
+      'Solar Heating',
+      'Borehole',
+      'Perimeter Wall',
+      'CCTV',
+    ],
     images: [IMG('townhouse_0'), IMG('interior_1'), IMG('bedroom_0')],
     description:
       'A charming four-bedroom townhouse in one of Lavington\u2019s best-run gated communities of just 12 units. Private garden, attached garage, and a warm family layout with a sunken lounge and stone fireplace. The estate offers a clubhouse, gym, and children\u2019s play area. Lavington continues to attract upper-middle-class families seeking proximity to international schools — a rental segment known for long tenancies and reliable payment.',
     agency: 'Chacadom Premier Properties',
     agent: { name: 'Mercy Wanjiru', phone: '+254 712 000 001' },
     trustScore: 93,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-19' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-19',
+    },
     trustSignals: [
-      { label: 'Title search', status: 'pass', detail: 'Title verified; no caveats or encumbrances on record.' },
+      {
+        label: 'Title search',
+        status: 'pass',
+        detail: 'Title verified; no caveats or encumbrances on record.',
+      },
       { label: 'Photo authenticity', status: 'pass', detail: 'Unique photos, verified on-site.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'Within Lavington townhouse comparables (KES 118k–128k per sqm).' },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'Within Lavington townhouse comparables (KES 118k–128k per sqm).',
+      },
       { label: 'Agent history', status: 'pass', detail: 'Premium agency, strong record.' },
     ],
     availability: 'available',
@@ -192,7 +326,12 @@ export const PROPERTIES: Property[] = [
     appreciationForecast: 7.2,
     listedAt: '2026-07-20',
     views: 354,
-    highlights: ['Only 12 units in estate', 'International school catchment', 'Private garden', 'Long-tenancy family segment'],
+    highlights: [
+      'Only 12 units in estate',
+      'International school catchment',
+      'Private garden',
+      'Long-tenancy family segment',
+    ],
   },
   {
     id: 'KJA-005',
@@ -213,11 +352,22 @@ export const PROPERTIES: Property[] = [
     agency: 'Nairobi Habitat Realtors',
     agent: { name: 'Faith Njeri', phone: '+254 712 000 003' },
     trustScore: 88,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-10' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-10',
+    },
     trustSignals: [
       { label: 'Title search', status: 'pass', detail: 'Sectional title verified.' },
       { label: 'Photo authenticity', status: 'pass', detail: 'Photos verified unique.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'Entry-level pricing consistent with Madaraka studios (KES 4.5M–5.2M).' },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'Entry-level pricing consistent with Madaraka studios (KES 4.5M–5.2M).',
+      },
       { label: 'Agent history', status: 'pass', detail: 'Established mid-market agency.' },
     ],
     availability: 'available',
@@ -225,7 +375,12 @@ export const PROPERTIES: Property[] = [
     appreciationForecast: 6.5,
     listedAt: '2026-08-01',
     views: 289,
-    highlights: ['Entry-level price point', 'Near Strathmore University', 'Near-full occupancy segment', 'Low service charges'],
+    highlights: [
+      'Entry-level price point',
+      'Near Strathmore University',
+      'Near-full occupancy segment',
+      'Low service charges',
+    ],
   },
   {
     id: 'KJA-006',
@@ -238,19 +393,50 @@ export const PROPERTIES: Property[] = [
     bedrooms: 3,
     bathrooms: 2,
     sizeSqm: 120,
-    amenities: ['Balcony', 'Gated Community', 'Children Play Area', 'Borehole', 'CCTV', 'Ample Parking'],
+    amenities: [
+      'Balcony',
+      'Gated Community',
+      'Children Play Area',
+      'Borehole',
+      'CCTV',
+      'Ample Parking',
+    ],
     images: [IMG('apartment_1'), IMG('townhouse_0')],
     description:
       'Off-plan 3-bedroom apartment in a growing Syokimau development, 8 minutes from the SGR terminus and the Eastern Bypass. Payment plan: 40% deposit, balance in comfortable installments over 12 months. Off-plan buying here locks in 2025 pricing in a corridor that has seen consistent infrastructure-driven appreciation — the Standard Gauge Railway, expressway links, and the upcoming Konza spill-over effect.',
     agency: 'Savanna Heights Realty',
     agent: { name: 'Peter Kariuki', phone: '+254 712 000 004' },
     trustScore: 84,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'similar-found', listingVelocity: 'normal', lastChecked: '2026-08-12' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'similar-found',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-12',
+    },
     trustSignals: [
-      { label: 'Title search', status: 'pass', detail: 'Mother title verified; sectional titles on completion.' },
-      { label: 'Photo authenticity', status: 'pass', detail: 'Architect renders clearly labelled as off-plan.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'Below comparable completed stock — typical off-plan discount.' },
-      { label: 'Duplicate scan', status: 'warn', detail: 'One similar listing found with another agency (same development, different unit). Review both.' },
+      {
+        label: 'Title search',
+        status: 'pass',
+        detail: 'Mother title verified; sectional titles on completion.',
+      },
+      {
+        label: 'Photo authenticity',
+        status: 'pass',
+        detail: 'Architect renders clearly labelled as off-plan.',
+      },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'Below comparable completed stock — typical off-plan discount.',
+      },
+      {
+        label: 'Duplicate scan',
+        status: 'warn',
+        detail:
+          'One similar listing found with another agency (same development, different unit). Review both.',
+      },
     ],
     availability: 'available',
     completionDate: 'December 2026',
@@ -260,7 +446,12 @@ export const PROPERTIES: Property[] = [
     listedAt: '2026-07-15',
     views: 518,
     offPlan: true,
-    highlights: ['Off-plan pricing advantage', 'SGR & bypass access', 'Installment payment plan', 'High appreciation corridor'],
+    highlights: [
+      'Off-plan pricing advantage',
+      'SGR & bypass access',
+      'Installment payment plan',
+      'High appreciation corridor',
+    ],
   },
   {
     id: 'KJA-007',
@@ -272,26 +463,62 @@ export const PROPERTIES: Property[] = [
     price: 65000000,
     rentEstimate: 480000,
     sizeSqm: 480,
-    amenities: ['Central AC', 'Lift Bank', 'Backup Generator', 'Fibre Internet', 'Secure Parking', 'Conference Facility', '24/7 Security'],
+    amenities: [
+      'Central AC',
+      'Lift Bank',
+      'Backup Generator',
+      'Fibre Internet',
+      'Secure Parking',
+      'Conference Facility',
+      '24/7 Security',
+    ],
     images: [IMG('office_0'), IMG('office_1')],
     description:
       'A full office floor (480 sqm) in a Grade-A Westlands office tower, currently tenanted by a regional tech firm on a 6-year lease at KES 480,000 per month. Fitted with raised flooring, partitioned offices, a boardroom, and server room. Investing in income-producing commercial space shifts the yield profile: this asset delivers a documented 8.9% gross yield with a corporate covenant tenant in place — ideal for investors prioritising income over appreciation.',
     agency: 'Chacadom Premier Properties',
     agent: { name: 'James Otieno', phone: '+254 712 000 002' },
     trustScore: 92,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-16' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-16',
+    },
     trustSignals: [
-      { label: 'Title search', status: 'pass', detail: 'Commercial title verified; registered lease documented.' },
-      { label: 'Photo authenticity', status: 'pass', detail: 'Current office photos verified on-site visit.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'KES 135k per sqm — in line with Grade-A Westlands office stock.' },
-      { label: 'Agent history', status: 'pass', detail: 'Premium agency, commercial desk verified.' },
+      {
+        label: 'Title search',
+        status: 'pass',
+        detail: 'Commercial title verified; registered lease documented.',
+      },
+      {
+        label: 'Photo authenticity',
+        status: 'pass',
+        detail: 'Current office photos verified on-site visit.',
+      },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'KES 135k per sqm — in line with Grade-A Westlands office stock.',
+      },
+      {
+        label: 'Agent history',
+        status: 'pass',
+        detail: 'Premium agency, commercial desk verified.',
+      },
     ],
     availability: 'available',
     grossYieldEstimate: 8.9,
     appreciationForecast: 6.0,
     listedAt: '2026-06-25',
     views: 276,
-    highlights: ['Tenanted — income from day one', 'Grade-A building', '6-year corporate lease', '8.9% gross yield documented'],
+    highlights: [
+      'Tenanted — income from day one',
+      'Grade-A building',
+      '6-year corporate lease',
+      '8.9% gross yield documented',
+    ],
   },
   {
     id: 'KJA-008',
@@ -302,25 +529,59 @@ export const PROPERTIES: Property[] = [
     county: 'Machakos',
     price: 3500000,
     sizeSqm: 1012,
-    amenities: ['Ready Title Deed', 'Graded Access Roads', 'Electricity Nearby', 'Water Nearby', 'Beaconed'],
+    amenities: [
+      'Ready Title Deed',
+      'Graded Access Roads',
+      'Electricity Nearby',
+      'Water Nearby',
+      'Beaconed',
+    ],
     images: [IMG('land_0'), IMG('land_1')],
     description:
       'A quarter-acre plot with a clean, ready title in a fast-developing Athi River neighbourhood, minutes from the Export Processing Zone and Daystar University. The area is on a clear growth trajectory: new estate developments, tarmacking of access roads, and industrial expansion all push land values upward. Ready title deeds mean you can transact immediately — no waiting for sub-division approvals.',
     agency: 'Rift Valley Land & Homes',
     agent: { name: 'Samuel Kiprop', phone: '+254 712 000 005' },
     trustScore: 89,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-14' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-14',
+    },
     trustSignals: [
-      { label: 'Title search', status: 'pass', detail: 'Freehold title ready for immediate transfer.' },
-      { label: 'Photo authenticity', status: 'pass', detail: 'Beacon photos and site visit verified.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'KES 3.5M is within the Athi River 1/4-acre band (KES 3.2M–3.9M).' },
-      { label: 'Agent history', status: 'pass', detail: 'Land specialist agency, verified since 2024.' },
+      {
+        label: 'Title search',
+        status: 'pass',
+        detail: 'Freehold title ready for immediate transfer.',
+      },
+      {
+        label: 'Photo authenticity',
+        status: 'pass',
+        detail: 'Beacon photos and site visit verified.',
+      },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'KES 3.5M is within the Athi River 1/4-acre band (KES 3.2M–3.9M).',
+      },
+      {
+        label: 'Agent history',
+        status: 'pass',
+        detail: 'Land specialist agency, verified since 2024.',
+      },
     ],
     availability: 'available',
     appreciationForecast: 12.0,
     listedAt: '2026-07-30',
     views: 441,
-    highlights: ['Ready title deed', 'EPZ & Daystar proximity', '12% forecast appreciation', 'Immediate transfer possible'],
+    highlights: [
+      'Ready title deed',
+      'EPZ & Daystar proximity',
+      '12% forecast appreciation',
+      'Immediate transfer possible',
+    ],
   },
   {
     id: 'KJA-009',
@@ -334,18 +595,46 @@ export const PROPERTIES: Property[] = [
     bedrooms: 4,
     bathrooms: 3,
     sizeSqm: 180,
-    amenities: ['Sea View Balcony', 'Pool', 'Gym', 'Lift', 'Backup Generator', 'Borehole', 'Gated Security', 'Walk to Beach'],
+    amenities: [
+      'Sea View Balcony',
+      'Pool',
+      'Gym',
+      'Lift',
+      'Backup Generator',
+      'Borehole',
+      'Gated Security',
+      'Walk to Beach',
+    ],
     images: [IMG('apartment_2'), IMG('villa_1'), IMG('interior_0')],
     description:
       'A spacious four-bedroom apartment in a serviced Nyali block, a short walk from Nyali Beach and seconds from City Mall. Sea-view balcony, air-conditioned bedrooms, and resort-style common areas including pool and gym. Nyali serves two rental markets: corporate tenants (banks, logistics, hospitality) and the growing Airbnb holiday segment — dual demand that keeps occupancy resilient year-round.',
     agency: 'Pwani Beach Homes',
     agent: { name: 'Aisha Mwangi', phone: '+254 712 000 006' },
     trustScore: 90,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-17' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-17',
+    },
     trustSignals: [
-      { label: 'Title search', status: 'pass', detail: 'Sectional title verified; no encumbrances.' },
-      { label: 'Photo authenticity', status: 'pass', detail: 'Photos verified unique to this unit.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'Consistent with Nyali premium 4BR stock (KES 85k–92k per sqm).' },
+      {
+        label: 'Title search',
+        status: 'pass',
+        detail: 'Sectional title verified; no encumbrances.',
+      },
+      {
+        label: 'Photo authenticity',
+        status: 'pass',
+        detail: 'Photos verified unique to this unit.',
+      },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'Consistent with Nyali premium 4BR stock (KES 85k–92k per sqm).',
+      },
       { label: 'Agent history', status: 'pass', detail: 'Coast specialist agency, 4.8 rating.' },
     ],
     availability: 'available',
@@ -354,7 +643,12 @@ export const PROPERTIES: Property[] = [
     listedAt: '2026-07-22',
     views: 368,
     furnished: true,
-    highlights: ['Walk to Nyali Beach', 'Dual rental markets', 'Resort-style amenities', 'Furnished option available'],
+    highlights: [
+      'Walk to Nyali Beach',
+      'Dual rental markets',
+      'Resort-style amenities',
+      'Furnished option available',
+    ],
   },
   {
     id: 'KJA-010',
@@ -368,18 +662,46 @@ export const PROPERTIES: Property[] = [
     bedrooms: 5,
     bathrooms: 5,
     sizeSqm: 460,
-    amenities: ['Swimming Pool', 'Garden', 'DSQ', 'Gated Estate', 'Electric Fence', 'Fireplace', 'Solar Heating', '2-Car Garage'],
+    amenities: [
+      'Swimming Pool',
+      'Garden',
+      'DSQ',
+      'Gated Estate',
+      'Electric Fence',
+      'Fireplace',
+      'Solar Heating',
+      '2-Car Garage',
+    ],
     images: [IMG('villa_1'), IMG('villa_0'), IMG('bedroom_1')],
     description:
       'A statement residence in gated Runda, Nairobi\u2019s premier diplomatic address. Five ensuite bedrooms, formal living and dining rooms, a family room opening to the pool terrace, and a landscaped half-acre plot. Runda\u2019s controlled development rules protect long-term value, and its proximity to the UN complex, Village Market, and international schools sustains deep expatriate demand for premium rentals.',
     agency: 'Chacadom Premier Properties',
     agent: { name: 'James Otieno', phone: '+254 712 000 002' },
     trustScore: 95,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-21' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-21',
+    },
     trustSignals: [
-      { label: 'Title search', status: 'pass', detail: 'Freehold title verified, search certificate current.' },
-      { label: 'Photo authenticity', status: 'pass', detail: 'All photos verified unique and on-site.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'In line with premium Runda stock (KES 180k–190k per sqm).' },
+      {
+        label: 'Title search',
+        status: 'pass',
+        detail: 'Freehold title verified, search certificate current.',
+      },
+      {
+        label: 'Photo authenticity',
+        status: 'pass',
+        detail: 'All photos verified unique and on-site.',
+      },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'In line with premium Runda stock (KES 180k–190k per sqm).',
+      },
       { label: 'Agent history', status: 'pass', detail: 'Top-rated premium agency.' },
     ],
     availability: 'reserved',
@@ -387,7 +709,12 @@ export const PROPERTIES: Property[] = [
     appreciationForecast: 7.8,
     listedAt: '2026-06-18',
     views: 712,
-    highlights: ['Premier diplomatic address', 'Controlled development', 'UN & international school proximity', 'Currently reserved'],
+    highlights: [
+      'Premier diplomatic address',
+      'Controlled development',
+      'UN & international school proximity',
+      'Currently reserved',
+    ],
   },
   {
     id: 'KJA-011',
@@ -408,11 +735,22 @@ export const PROPERTIES: Property[] = [
     agency: 'Savanna Heights Realty',
     agent: { name: 'Peter Kariuki', phone: '+254 712 000 004' },
     trustScore: 87,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-08' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-08',
+    },
     trustSignals: [
       { label: 'Title search', status: 'pass', detail: 'Title verified, ready for transfer.' },
       { label: 'Photo authenticity', status: 'pass', detail: 'Unique photos verified.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'Fair for Kitengela own-compound stock (KES 78k–84k per sqm).' },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'Fair for Kitengela own-compound stock (KES 78k–84k per sqm).',
+      },
       { label: 'Agent history', status: 'pass', detail: 'Verified agency, 4.6 rating.' },
     ],
     availability: 'available',
@@ -420,7 +758,12 @@ export const PROPERTIES: Property[] = [
     appreciationForecast: 9.5,
     listedAt: '2026-07-25',
     views: 402,
-    highlights: ['Own compound', 'Expressway spillover corridor', 'Fast-growing satellite town', 'Family layout'],
+    highlights: [
+      'Own compound',
+      'Expressway spillover corridor',
+      'Fast-growing satellite town',
+      'Family layout',
+    ],
   },
   {
     id: 'KJA-012',
@@ -434,18 +777,46 @@ export const PROPERTIES: Property[] = [
     bedrooms: 1,
     bathrooms: 1,
     sizeSqm: 58,
-    amenities: ['Fully Furnished', 'Wi-Fi Ready', 'DSTV', 'Balcony', 'Lift', 'Gym', '24/7 Security', 'Borehole'],
+    amenities: [
+      'Fully Furnished',
+      'Wi-Fi Ready',
+      'DSTV',
+      'Balcony',
+      'Lift',
+      'Gym',
+      '24/7 Security',
+      'Borehole',
+    ],
     images: [IMG('interior_0'), IMG('apartment_0'), IMG('bedroom_0')],
     description:
       'A tastefully furnished one-bedroom apartment in Kileleshwa, available to rent at KES 65,000 monthly or as a short-stay unit. Contemporary furniture, fast Wi-Fi, and a well-equipped kitchen make it corporate-tenant and Airbnb ready from day one. Kileleshwa\u2019s leafy streets sit between Westlands and Kilimani — quiet enough for residents, central enough for everything.',
     agency: 'Nairobi Habitat Realtors',
     agent: { name: 'Faith Njeri', phone: '+254 712 000 003' },
     trustScore: 92,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-20' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-20',
+    },
     trustSignals: [
-      { label: 'Landlord verification', status: 'pass', detail: 'Landlord identity and ownership documents verified.' },
-      { label: 'Photo authenticity', status: 'pass', detail: 'Interior photos verified against actual unit.' },
-      { label: 'Rent analysis', status: 'pass', detail: 'KES 65k matches furnished Kileleshwa 1BR market (KES 60k–70k).' },
+      {
+        label: 'Landlord verification',
+        status: 'pass',
+        detail: 'Landlord identity and ownership documents verified.',
+      },
+      {
+        label: 'Photo authenticity',
+        status: 'pass',
+        detail: 'Interior photos verified against actual unit.',
+      },
+      {
+        label: 'Rent analysis',
+        status: 'pass',
+        detail: 'KES 65k matches furnished Kileleshwa 1BR market (KES 60k–70k).',
+      },
       { label: 'Agent history', status: 'pass', detail: 'Verified agency, no dispute history.' },
     ],
     availability: 'available',
@@ -454,7 +825,12 @@ export const PROPERTIES: Property[] = [
     listedAt: '2026-08-10',
     views: 519,
     furnished: true,
-    highlights: ['Rent KES 65,000/month', 'Fully furnished', 'Airbnb-ready', 'Corporate tenant demand'],
+    highlights: [
+      'Rent KES 65,000/month',
+      'Fully furnished',
+      'Airbnb-ready',
+      'Corporate tenant demand',
+    ],
   },
   {
     id: 'KJA-013',
@@ -465,25 +841,51 @@ export const PROPERTIES: Property[] = [
     county: 'Laikipia',
     price: 18000000,
     sizeSqm: 40469,
-    amenities: ['Freehold Title', 'Borehole Potential', 'Graded Road Access', 'River Frontage (Seasonal)', 'Fenced Sides'],
+    amenities: [
+      'Freehold Title',
+      'Borehole Potential',
+      'Graded Road Access',
+      'River Frontage (Seasonal)',
+      'Fenced Sides',
+    ],
     images: [IMG('land_1'), IMG('land_0')],
     description:
       'Ten acres of gently rolling land with seasonal river frontage in the Nanyuki growth corridor. Freehold title, graded road access, and deep soils suitable for horticulture, paddocks, or subdivision into lifestyle smallholdings. The Nanyuki region is one of Kenya\u2019s strongest land-appreciation stories of the past five years — driven by the dual-carriageway, tourism recovery, and a wave of Nairobi buyers seeking weekend and retirement properties.',
     agency: 'Rift Valley Land & Homes',
     agent: { name: 'Samuel Kiprop', phone: '+254 712 000 005' },
     trustScore: 90,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-11' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-11',
+    },
     trustSignals: [
-      { label: 'Title search', status: 'pass', detail: 'Freehold title verified; land search clean.' },
+      {
+        label: 'Title search',
+        status: 'pass',
+        detail: 'Freehold title verified; land search clean.',
+      },
       { label: 'Photo authenticity', status: 'pass', detail: 'Site photos and beacons verified.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'KES 1.8M/acre — below the Nanyuki corridor average (KES 2.0M–2.5M).' },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'KES 1.8M/acre — below the Nanyuki corridor average (KES 2.0M–2.5M).',
+      },
       { label: 'Agent history', status: 'pass', detail: 'Land specialist, consistent record.' },
     ],
     availability: 'available',
     appreciationForecast: 11.0,
     listedAt: '2026-07-12',
     views: 385,
-    highlights: ['Freehold title', '10 acres at below-average price/acre', 'Dual-carriageway corridor', 'Lifestyle & agri potential'],
+    highlights: [
+      'Freehold title',
+      '10 acres at below-average price/acre',
+      'Dual-carriageway corridor',
+      'Lifestyle & agri potential',
+    ],
   },
   {
     id: 'KJA-014',
@@ -504,11 +906,22 @@ export const PROPERTIES: Property[] = [
     agency: 'Savanna Heights Realty',
     agent: { name: 'Peter Kariuki', phone: '+254 712 000 004' },
     trustScore: 86,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-06' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-06',
+    },
     trustSignals: [
       { label: 'Title search', status: 'pass', detail: 'Sectional title verified.' },
       { label: 'Photo authenticity', status: 'pass', detail: 'Photos verified unique.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'Competitive for Ruaka (KES 88k–96k per sqm).' },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'Competitive for Ruaka (KES 88k–96k per sqm).',
+      },
       { label: 'Agent history', status: 'pass', detail: 'Verified agency in good standing.' },
     ],
     availability: 'available',
@@ -516,7 +929,12 @@ export const PROPERTIES: Property[] = [
     appreciationForecast: 8.5,
     listedAt: '2026-08-03',
     views: 467,
-    highlights: ['Affordable entry point', 'Two Valley Mall proximity', 'Strong young-professional tenant pool', '9%+ gross yield'],
+    highlights: [
+      'Affordable entry point',
+      'Two Valley Mall proximity',
+      'Strong young-professional tenant pool',
+      '9%+ gross yield',
+    ],
   },
   {
     id: 'KJA-015',
@@ -537,19 +955,39 @@ export const PROPERTIES: Property[] = [
     agency: 'Rift Valley Land & Homes',
     agent: { name: 'Samuel Kiprop', phone: '+254 712 000 005' },
     trustScore: 85,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-05' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-05',
+    },
     trustSignals: [
       { label: 'Title search', status: 'pass', detail: 'Title verified; no encumbrances.' },
       { label: 'Photo authenticity', status: 'pass', detail: 'Unique photos verified.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'Consistent with Milimani maisonettes (KES 9M–10.5M).' },
-      { label: 'Agent history', status: 'pass', detail: 'Regional agency with verified track record.' },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'Consistent with Milimani maisonettes (KES 9M–10.5M).',
+      },
+      {
+        label: 'Agent history',
+        status: 'pass',
+        detail: 'Regional agency with verified track record.',
+      },
     ],
     availability: 'available',
     grossYieldEstimate: 6.1,
     appreciationForecast: 8.0,
     listedAt: '2026-07-18',
     views: 243,
-    highlights: ['Nakuru city growth story', 'Most stable address in town', 'Own compound', 'Regional diversification'],
+    highlights: [
+      'Nakuru city growth story',
+      'Most stable address in town',
+      'Own compound',
+      'Regional diversification',
+    ],
   },
   {
     id: 'KJA-016',
@@ -563,18 +1001,37 @@ export const PROPERTIES: Property[] = [
     bedrooms: 3,
     bathrooms: 2,
     sizeSqm: 100,
-    amenities: ['Balcony', 'Borehole', 'Lift', 'Gym', 'Children Play Area', '24/7 Security', 'Parking'],
+    amenities: [
+      'Balcony',
+      'Borehole',
+      'Lift',
+      'Gym',
+      'Children Play Area',
+      '24/7 Security',
+      'Parking',
+    ],
     images: [IMG('apartment_1'), IMG('interior_1')],
     description:
       'A practical three-bedroom apartment in a well-managed Kasarani development off Thika Road (Superhighway). With the expressway and the completed Northern Bypass improvements, commute times into the CBD and Westlands have fallen sharply — and rental demand along Thika Road has followed. The unit is in a building with lift access, borehole water, and a residents\u2019 gym.',
     agency: 'Nairobi Habitat Realtors',
     agent: { name: 'Faith Njeri', phone: '+254 712 000 003' },
     trustScore: 83,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-02' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-02',
+    },
     trustSignals: [
       { label: 'Title search', status: 'pass', detail: 'Sectional title verified.' },
       { label: 'Photo authenticity', status: 'pass', detail: 'Photos verified unique.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'Slightly below the Thika Road 3BR band — fair value.' },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'Slightly below the Thika Road 3BR band — fair value.',
+      },
       { label: 'Agent history', status: 'pass', detail: 'Verified agency in good standing.' },
     ],
     availability: 'available',
@@ -582,7 +1039,12 @@ export const PROPERTIES: Property[] = [
     appreciationForecast: 7.5,
     listedAt: '2026-07-08',
     views: 358,
-    highlights: ['Expressway commute benefit', 'Lift + gym building', 'Below-band pricing', 'Solid rental demand'],
+    highlights: [
+      'Expressway commute benefit',
+      'Lift + gym building',
+      'Below-band pricing',
+      'Solid rental demand',
+    ],
   },
   {
     id: 'KJA-017',
@@ -594,26 +1056,58 @@ export const PROPERTIES: Property[] = [
     price: 85000000,
     rentEstimate: 620000,
     sizeSqm: 750,
-    amenities: ['Lift', 'Backup Generator', '24/7 Security', 'Retail Ground Floor', 'Office Floors', 'Parking Bays', 'CCTV'],
+    amenities: [
+      'Lift',
+      'Backup Generator',
+      '24/7 Security',
+      'Retail Ground Floor',
+      'Office Floors',
+      'Parking Bays',
+      'CCTV',
+    ],
     images: [IMG('office_1'), IMG('office_0')],
     description:
       'A mixed-use commercial building in the heart of the Nairobi CBD: retail spaces on the ground and first floors, offices above, and income already flowing from 14 tenancies. The building delivers approximately KES 620,000 in monthly rent — a documented 8.7% gross yield with diversified tenant risk across retail, professional services, and a government-adjacent anchor. Full structural survey and tenancy schedules available to qualified buyers.',
     agency: 'Chacadom Premier Properties',
     agent: { name: 'James Otieno', phone: '+254 712 000 002' },
     trustScore: 91,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-13' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-13',
+    },
     trustSignals: [
-      { label: 'Title search', status: 'pass', detail: 'Commercial title verified; rates and rent accounts current.' },
+      {
+        label: 'Title search',
+        status: 'pass',
+        detail: 'Commercial title verified; rates and rent accounts current.',
+      },
       { label: 'Photo authenticity', status: 'pass', detail: 'Building photos verified on-site.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'KES 113k per sqm for CBD mixed-use — within market band.' },
-      { label: 'Agent history', status: 'pass', detail: 'Premium agency, commercial desk verified.' },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'KES 113k per sqm for CBD mixed-use — within market band.',
+      },
+      {
+        label: 'Agent history',
+        status: 'pass',
+        detail: 'Premium agency, commercial desk verified.',
+      },
     ],
     availability: 'available',
     grossYieldEstimate: 8.7,
     appreciationForecast: 5.5,
     listedAt: '2026-06-20',
     views: 298,
-    highlights: ['14 tenancies — diversified income', 'Documented 8.7% yield', 'Retail + office mix', 'Full records available'],
+    highlights: [
+      '14 tenancies — diversified income',
+      'Documented 8.7% yield',
+      'Retail + office mix',
+      'Full records available',
+    ],
   },
   {
     id: 'KJA-018',
@@ -634,11 +1128,22 @@ export const PROPERTIES: Property[] = [
     agency: 'Pwani Beach Homes',
     agent: { name: 'Aisha Mwangi', phone: '+254 712 000 006' },
     trustScore: 87,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-07' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-07',
+    },
     trustSignals: [
       { label: 'Title search', status: 'pass', detail: 'Title verified and current.' },
       { label: 'Photo authenticity', status: 'pass', detail: 'Photos verified against unit.' },
-      { label: 'Rent analysis', status: 'pass', detail: 'Furnished Milimani 3BR market: KES 58k–68k — mid-band.' },
+      {
+        label: 'Rent analysis',
+        status: 'pass',
+        detail: 'Furnished Milimani 3BR market: KES 58k–68k — mid-band.',
+      },
       { label: 'Agent history', status: 'pass', detail: 'Regional specialist agency, verified.' },
     ],
     availability: 'available',
@@ -647,7 +1152,12 @@ export const PROPERTIES: Property[] = [
     listedAt: '2026-07-16',
     views: 231,
     furnished: true,
-    highlights: ['Lake views', 'Furnished — corporate ready', 'Kisumu growth story', 'Hands-off investment setup'],
+    highlights: [
+      'Lake views',
+      'Furnished — corporate ready',
+      'Kisumu growth story',
+      'Hands-off investment setup',
+    ],
   },
   {
     id: 'KJA-019',
@@ -658,25 +1168,48 @@ export const PROPERTIES: Property[] = [
     county: 'Kajiado',
     price: 2800000,
     sizeSqm: 506,
-    amenities: ['Ready Title Deed', 'Graded Roads', 'Electricity on Site', 'Water Nearby', 'Beaconed', 'Residential Zoning'],
+    amenities: [
+      'Ready Title Deed',
+      'Graded Roads',
+      'Electricity on Site',
+      'Water Nearby',
+      'Beaconed',
+      'Residential Zoning',
+    ],
     images: [IMG('land_0'), IMG('land_1')],
     description:
       'An eighth-acre residential plot in Kitengela Milimani with a ready title deed — electricity on site, graded access roads, and a fully residential zoning. Kitengela\u2019s Milimani area has moved from speculative land play to genuine suburbia: schools, hospitals, and malls are all within a short drive. For buyers who want land with clean papers at an accessible price, this is the textbook entry.',
     agency: 'Rift Valley Land & Homes',
     agent: { name: 'Samuel Kiprop', phone: '+254 712 000 005' },
     trustScore: 88,
-    verification: { titleCheck: 'verified', ardhisasaMatch: true, photosVerified: true, duplicateCheck: 'clean', listingVelocity: 'normal', lastChecked: '2026-08-09' },
+    verification: {
+      titleCheck: 'verified',
+      ardhisasaMatch: true,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-08-09',
+    },
     trustSignals: [
       { label: 'Title search', status: 'pass', detail: 'Ready title; land search clean.' },
       { label: 'Photo authenticity', status: 'pass', detail: 'Beacons and site verified.' },
-      { label: 'Pricing analysis', status: 'pass', detail: 'At the Kitengela Milimani market rate for ready-title 1/8 acres.' },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail: 'At the Kitengela Milimani market rate for ready-title 1/8 acres.',
+      },
       { label: 'Agent history', status: 'pass', detail: 'Land specialist, verified.' },
     ],
     availability: 'available',
     appreciationForecast: 10.5,
     listedAt: '2026-08-01',
     views: 512,
-    highlights: ['Ready title deed', 'Electricity on site', 'Genuine suburbia growth', 'Accessible price point'],
+    highlights: [
+      'Ready title deed',
+      'Electricity on site',
+      'Genuine suburbia growth',
+      'Accessible price point',
+    ],
   },
   {
     id: 'KJA-020',
@@ -697,48 +1230,182 @@ export const PROPERTIES: Property[] = [
     agency: 'Unverified Listing',
     agent: { name: 'Name withheld', phone: '+254 712 000 000' },
     trustScore: 41,
-    verification: { titleCheck: 'flagged', ardhisasaMatch: false, photosVerified: false, duplicateCheck: 'flagged', listingVelocity: 'suspicious', lastChecked: '2026-08-22' },
+    verification: {
+      titleCheck: 'flagged',
+      ardhisasaMatch: false,
+      photosVerified: false,
+      duplicateCheck: 'flagged',
+      listingVelocity: 'suspicious',
+      lastChecked: '2026-08-22',
+    },
     trustSignals: [
-      { label: 'Pricing analysis', status: 'fail', detail: 'Price is 34% below the Eastleigh 3BR band — a classic urgency-scam pattern.' },
-      { label: 'Duplicate scan', status: 'fail', detail: '2 photos match listings from a different building under other agencies.' },
-      { label: 'Listing velocity', status: 'fail', detail: 'Re-posted 3 times in 6 weeks under different agent names.' },
-      { label: 'Title search', status: 'warn', detail: 'Seller documents inconsistent — official search still pending.' },
+      {
+        label: 'Pricing analysis',
+        status: 'fail',
+        detail: 'Price is 34% below the Eastleigh 3BR band — a classic urgency-scam pattern.',
+      },
+      {
+        label: 'Duplicate scan',
+        status: 'fail',
+        detail: '2 photos match listings from a different building under other agencies.',
+      },
+      {
+        label: 'Listing velocity',
+        status: 'fail',
+        detail: 'Re-posted 3 times in 6 weeks under different agent names.',
+      },
+      {
+        label: 'Title search',
+        status: 'warn',
+        detail: 'Seller documents inconsistent — official search still pending.',
+      },
     ],
     availability: 'available',
     grossYieldEstimate: 12.8,
     appreciationForecast: 5.0,
     listedAt: '2026-08-14',
     views: 894,
-    highlights: ['FLAGGED BY KEJA TRUST LAYER', 'Price anomaly detected', 'Photo reuse detected', 'Verification withheld'],
+    highlights: [
+      'FLAGGED BY KEJA TRUST LAYER',
+      'Price anomaly detected',
+      'Photo reuse detected',
+      'Verification withheld',
+    ],
   },
-]
+];
 
-export const AREAS = [...new Set(PROPERTIES.map((p) => p.area)), 'Kasarani', 'Madaraka', 'CBD', 'Eastleigh', 'Diani', 'Milimani', 'Nanyuki', 'Nakuru', 'Riverside'].sort()
+/**
+ * Areas with live inventory plus curated expansion zones. Deduplicated via a
+ * single Set over the union (the old spread duplicated 6 areas that existed
+ * both in PROPERTIES and the expansion list, rendering duplicate options in
+ * the filter dropdown).
+ */
+export const AREAS = [
+  ...new Set<string>([
+    ...PROPERTIES.map((p) => p.area),
+    'Kasarani',
+    'Madaraka',
+    'CBD',
+    'Eastleigh',
+    'Diani',
+    'Milimani',
+    'Nanyuki',
+    'Nakuru',
+    'Riverside',
+  ]),
+].sort();
 
-export const getProperty = (id: string) => PROPERTIES.find((p) => p.id === id)
+export const getProperty = (id: string) => PROPERTIES.find((p) => p.id === id);
 
-export const featuredProperties = PROPERTIES.filter((p) => p.trustScore >= 90 && p.availability !== 'sold').slice(0, 6)
+export const featuredProperties = PROPERTIES.filter(
+  (p) => p.trustScore >= 90 && p.availability !== 'sold'
+).slice(0, 6);
 
-export const areaInsights: Record<string, { avgPricePerSqm: string; yield: string; note: string }> = {
-  Kasarani: { avgPricePerSqm: 'KES 45k–65k', yield: '8.6–9.5%', note: 'Thika Road corridor growth — student and young-professional rentals near TRM and Garden City.' },
-  Madaraka: { avgPricePerSqm: 'KES 70k–95k', yield: '8.8–9.6%', note: 'Compact, walkable and near Strathmore; one of the highest studio rental yields in Nairobi.' },
-  CBD: { avgPricePerSqm: 'KES 80k–110k', yield: '8.0–9.0%', note: 'Commercial heart; office-to-residential conversions drive downtown rental demand.' },
-  Eastleigh: { avgPricePerSqm: 'KES 60k–85k', yield: '8.2–9.0%', note: 'Dense trade hub with insatiable rental demand; mixed-use conversions dominate.' },
-  Nanyuki: { avgPricePerSqm: 'KES 20k–40k', yield: '6.0–7.2%', note: 'Ranching and conservancy country; land plays and holiday lets beat pure rental yield.' },
-  Milimani: { avgPricePerSqm: 'KES 40k–65k', yield: '7.2–8.4%', note: 'Premium Kisumu address near the lakefront; steady civil-servant and NGO tenant demand.' },
-  Riverside: { avgPricePerSqm: 'KES 95k–130k', yield: '7.2–8.0%', note: 'Riverside Drive offices and embassies; corporate tenancies with longer leases.' },
-  Ruaka: { avgPricePerSqm: 'KES 65k–90k', yield: '8.0–9.0%', note: 'Two Rivers catalyst; fastest-growing family suburb on Nairobi’s north-west edge.' },
-  Runda: { avgPricePerSqm: 'KES 60k–90k', yield: '6.0–7.0%', note: 'Gigiri diplomatic belt; large family homes on half-acre plots, quiet resale market.' },
-  'Athi River': { avgPricePerSqm: 'KES 25k–45k', yield: '7.0–8.0%', note: 'EPZ and industrial logistics belt; land banking with genuine employment drivers.' },
-  Diani: { avgPricePerSqm: 'KES 45k–80k', yield: '6.8–8.0%', note: 'Coastal holiday-let market; December–March occupancy drives annual returns.' },
-  Kilimani: { avgPricePerSqm: 'KES 95k–110k', yield: '8.5–9.5%', note: 'Nairobi\u2019s densest premium rental corridor; strong expat demand.' },
-  Westlands: { avgPricePerSqm: 'KES 100k–120k', yield: '8.5–9.5%', note: 'Most liquid submarket; commercial + residential mix.' },
-  Karen: { avgPricePerSqm: 'KES 165k–195k', yield: '5–6%', note: 'Low-density premium suburb; capital growth over income.' },
-  Lavington: { avgPricePerSqm: 'KES 115k–130k', yield: '7.5–8.5%', note: 'Family suburb near international schools; long tenancies.' },
-  Kileleshwa: { avgPricePerSqm: 'KES 105k–120k', yield: '8–9%', note: 'Leafy, central; popular with young professionals.' },
-  Syokimau: { avgPricePerSqm: 'KES 65k–80k', yield: '8–9%', note: 'SGR + bypass corridor; fast appreciating.' },
-  Kitengela: { avgPricePerSqm: 'KES 75k–90k', yield: '6–7%', note: 'Satellite town growth story; expressway spillover.' },
-  Nyali: { avgPricePerSqm: 'KES 85k–92k', yield: '8–9.5%', note: 'Coast premium; corporate + holiday rental dual demand.' },
-  Nakuru: { avgPricePerSqm: 'KES 55k–65k', yield: '6–7%', note: 'Fourth city; regional diversification play.' },
-  Kisumu: { avgPricePerSqm: 'KES 75k–85k', yield: '8–9%', note: 'Lake-region hub; corporate furnished-housing demand.' },
-}
+export const areaInsights: Record<string, { avgPricePerSqm: string; yield: string; note: string }> =
+  {
+    Kasarani: {
+      avgPricePerSqm: 'KES 45k–65k',
+      yield: '8.6–9.5%',
+      note: 'Thika Road corridor growth — student and young-professional rentals near TRM and Garden City.',
+    },
+    Madaraka: {
+      avgPricePerSqm: 'KES 70k–95k',
+      yield: '8.8–9.6%',
+      note: 'Compact, walkable and near Strathmore; one of the highest studio rental yields in Nairobi.',
+    },
+    CBD: {
+      avgPricePerSqm: 'KES 80k–110k',
+      yield: '8.0–9.0%',
+      note: 'Commercial heart; office-to-residential conversions drive downtown rental demand.',
+    },
+    Eastleigh: {
+      avgPricePerSqm: 'KES 60k–85k',
+      yield: '8.2–9.0%',
+      note: 'Dense trade hub with insatiable rental demand; mixed-use conversions dominate.',
+    },
+    Nanyuki: {
+      avgPricePerSqm: 'KES 20k–40k',
+      yield: '6.0–7.2%',
+      note: 'Ranching and conservancy country; land plays and holiday lets beat pure rental yield.',
+    },
+    Milimani: {
+      avgPricePerSqm: 'KES 40k–65k',
+      yield: '7.2–8.4%',
+      note: 'Premium Kisumu address near the lakefront; steady civil-servant and NGO tenant demand.',
+    },
+    Riverside: {
+      avgPricePerSqm: 'KES 95k–130k',
+      yield: '7.2–8.0%',
+      note: 'Riverside Drive offices and embassies; corporate tenancies with longer leases.',
+    },
+    Ruaka: {
+      avgPricePerSqm: 'KES 65k–90k',
+      yield: '8.0–9.0%',
+      note: 'Two Rivers catalyst; fastest-growing family suburb on Nairobi’s north-west edge.',
+    },
+    Runda: {
+      avgPricePerSqm: 'KES 60k–90k',
+      yield: '6.0–7.0%',
+      note: 'Gigiri diplomatic belt; large family homes on half-acre plots, quiet resale market.',
+    },
+    'Athi River': {
+      avgPricePerSqm: 'KES 25k–45k',
+      yield: '7.0–8.0%',
+      note: 'EPZ and industrial logistics belt; land banking with genuine employment drivers.',
+    },
+    Diani: {
+      avgPricePerSqm: 'KES 45k–80k',
+      yield: '6.8–8.0%',
+      note: 'Coastal holiday-let market; December–March occupancy drives annual returns.',
+    },
+    Kilimani: {
+      avgPricePerSqm: 'KES 95k–110k',
+      yield: '8.5–9.5%',
+      note: 'Nairobi\u2019s densest premium rental corridor; strong expat demand.',
+    },
+    Westlands: {
+      avgPricePerSqm: 'KES 100k–120k',
+      yield: '8.5–9.5%',
+      note: 'Most liquid submarket; commercial + residential mix.',
+    },
+    Karen: {
+      avgPricePerSqm: 'KES 165k–195k',
+      yield: '5–6%',
+      note: 'Low-density premium suburb; capital growth over income.',
+    },
+    Lavington: {
+      avgPricePerSqm: 'KES 115k–130k',
+      yield: '7.5–8.5%',
+      note: 'Family suburb near international schools; long tenancies.',
+    },
+    Kileleshwa: {
+      avgPricePerSqm: 'KES 105k–120k',
+      yield: '8–9%',
+      note: 'Leafy, central; popular with young professionals.',
+    },
+    Syokimau: {
+      avgPricePerSqm: 'KES 65k–80k',
+      yield: '8–9%',
+      note: 'SGR + bypass corridor; fast appreciating.',
+    },
+    Kitengela: {
+      avgPricePerSqm: 'KES 75k–90k',
+      yield: '6–7%',
+      note: 'Satellite town growth story; expressway spillover.',
+    },
+    Nyali: {
+      avgPricePerSqm: 'KES 85k–92k',
+      yield: '8–9.5%',
+      note: 'Coast premium; corporate + holiday rental dual demand.',
+    },
+    Nakuru: {
+      avgPricePerSqm: 'KES 55k–65k',
+      yield: '6–7%',
+      note: 'Fourth city; regional diversification play.',
+    },
+    Kisumu: {
+      avgPricePerSqm: 'KES 75k–85k',
+      yield: '8–9%',
+      note: 'Lake-region hub; corporate furnished-housing demand.',
+    },
+  };

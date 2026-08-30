@@ -73,12 +73,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://gadda00.github.io/keja-ai/dashboard</loc>
-    <lastmod>2026-08-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
     <loc>https://gadda00.github.io/keja-ai/manage</loc>
     <lastmod>2026-08-30</lastmod>
     <changefreq>weekly</changefreq>
@@ -89,12 +83,6 @@
     <lastmod>2026-08-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://gadda00.github.io/keja-ai/account</loc>
-    <lastmod>2026-08-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.3</priority>
   </url>
   <url>
     <loc>https://gadda00.github.io/keja-ai/legal</loc>
@@ -181,13 +169,31 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://gadda00.github.io/keja-ai/properties/KJA-A0033</loc>
+    <lastmod>2026-08-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://gadda00.github.io/keja-ai/properties/KJA-A0017</loc>
     <lastmod>2026-08-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://gadda00.github.io/keja-ai/properties/KJA-A0029</loc>
+    <lastmod>2026-08-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://gadda00.github.io/keja-ai/properties/KJA-A0021</loc>
+    <lastmod>2026-08-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://gadda00.github.io/keja-ai/properties/KJA-A0034</loc>
     <lastmod>2026-08-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -259,7 +265,25 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://gadda00.github.io/keja-ai/properties/KJA-A0030</loc>
+    <lastmod>2026-08-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://gadda00.github.io/keja-ai/properties/KJA-A0019</loc>
+    <lastmod>2026-08-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://gadda00.github.io/keja-ai/properties/KJA-A0032</loc>
+    <lastmod>2026-08-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://gadda00.github.io/keja-ai/properties/KJA-A0031</loc>
     <lastmod>2026-08-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>

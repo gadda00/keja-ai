@@ -4,27 +4,28 @@
  * cross-portal networks, agent/developer partnerships, self-service + feeds).
  * Includes the partner application form and the listing-submission wizard.
  */
-import { usePageMeta } from '@/lib/seo'
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import {
+  ArrowRight,
+  Building2,
+  Check,
+  Database,
+  FileSpreadsheet,
   Globe2,
   Handshake,
-  Building2,
-  Upload,
-  Check,
-  ArrowRight,
-  Webhook,
-  FileSpreadsheet,
   MessageCircle,
-  Database,
   ShieldCheck,
-  TrendingUp,
-  Users,
   Sparkles,
-} from 'lucide-react'
-import { useAuth } from '@/lib/auth'
-import { usePartners, logAudit } from '@/lib/adminStore'
+  TrendingUp,
+  Upload,
+  Users,
+  Webhook,
+} from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+
+import { logAudit, usePartners } from '@/lib/adminStore';
+import { useAuth } from '@/lib/auth';
+import { usePageMeta } from '@/lib/seo';
 
 const CHANNELS = [
   {
@@ -62,24 +63,28 @@ const CHANNELS = [
     desc: 'MLS-equivalent data-sharing agreements, bank and insurer inventory integrations, and enterprise API access for institutional partners.',
     metrics: ['REST ingestion API', 'Bank integrations', 'Enterprise SLAs'],
   },
-]
+];
 
 const FEED_FORMATS = [
   { icon: Webhook, name: 'REST API', detail: 'JSON · OAuth2 · webhooks on new listings' },
-  { icon: FileSpreadsheet, name: 'CSV / XLSX', detail: 'Scheduled drops · Google Drive / S3 / email' },
+  {
+    icon: FileSpreadsheet,
+    name: 'CSV / XLSX',
+    detail: 'Scheduled drops · Google Drive / S3 / email',
+  },
   { icon: Globe2, name: 'XML Syndication', detail: 'ListHub / ListGlobally-compatible schemas' },
   { icon: MessageCircle, name: 'WhatsApp Bot', detail: 'Send photos + details · auto-structured' },
   { icon: Database, name: 'Manual Upload', detail: 'Guided wizard with anomaly detection' },
-]
+];
 
 export default function Partners() {
   usePageMeta(
     'Partners — Global Listing Supply',
-    'Agencies, developers, landlords and portals: five channels to put your inventory in front of qualified African property demand.',
-  )
-  const { user, isLoggedIn } = useAuth()
-  const [partners, setPartners] = usePartners()
-  const [applied, setApplied] = useState(false)
+    'Agencies, developers, landlords and portals: five channels to put your inventory in front of qualified African property demand.'
+  );
+  const { user, isLoggedIn } = useAuth();
+  const [partners, setPartners] = usePartners();
+  const [applied, setApplied] = useState(false);
   const [form, setForm] = useState({
     orgName: '',
     contactName: '',
@@ -89,10 +94,10 @@ export default function Partners() {
     market: '',
     listingsCount: '',
     message: '',
-  })
+  });
 
   const submitPartner = () => {
-    if (!form.orgName.trim() || !form.contactName.trim() || !form.email.trim()) return
+    if (!form.orgName.trim() || !form.contactName.trim() || !form.email.trim()) return;
     setPartners([
       {
         id: `prt-${Date.now().toString().slice(-5)}`,
@@ -108,8 +113,8 @@ export default function Partners() {
         createdAt: new Date().toISOString(),
       },
       ...partners,
-    ])
-    setApplied(true)
+    ]);
+    setApplied(true);
     logAudit({
       actor: user?.name ?? 'guest',
       actorEmail: user?.email ?? 'guest',
@@ -117,8 +122,8 @@ export default function Partners() {
       target: form.orgName,
       detail: `Partner application submitted — ${form.type} (${form.market})`,
       severity: 'info',
-    })
-  }
+    });
+  };
 
   return (
     <div className="container-luxe py-14">
@@ -170,8 +175,8 @@ export default function Partners() {
         </h2>
         <p className="mx-auto mt-2 max-w-2xl text-center text-sm text-ink-muted">
           Researched from the world&apos;s best-performing marketplaces — MLS/IDX syndication,
-          ListGlobally-style portal networks and African supply-first strategies — adapted to
-          how African real estate actually trades.
+          ListGlobally-style portal networks and African supply-first strategies — adapted to how
+          African real estate actually trades.
         </p>
         <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
           {CHANNELS.map((c, i) => (
@@ -210,8 +215,8 @@ export default function Partners() {
             </h3>
             <p className="mt-2 flex-1 text-xs leading-relaxed text-white/70">
               Before any inventory goes live, Keja runs duplicate detection, price-anomaly
-              screening, document completeness checks and provenance tracking. Verified inventory
-              is the product — not a nice-to-have.
+              screening, document completeness checks and provenance tracking. Verified inventory is
+              the product — not a nice-to-have.
             </p>
             <Link
               to="/trust"
@@ -307,7 +312,7 @@ export default function Partners() {
                   </Link>
                   <button
                     onClick={() => {
-                      setApplied(false)
+                      setApplied(false);
                       setForm({
                         orgName: '',
                         contactName: '',
@@ -317,7 +322,7 @@ export default function Partners() {
                         market: '',
                         listingsCount: '',
                         message: '',
-                      })
+                      });
                     }}
                     className="btn-outline !py-2.5 !text-xs"
                   >
@@ -328,8 +333,8 @@ export default function Partners() {
             ) : (
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  submitPartner()
+                  e.preventDefault();
+                  submitPartner();
                 }}
                 className="flex flex-col gap-4"
               >
@@ -461,5 +466,5 @@ export default function Partners() {
         </div>
       </section>
     </div>
-  )
+  );
 }

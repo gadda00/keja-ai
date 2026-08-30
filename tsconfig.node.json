@@ -9,7 +9,9 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "types": ["node", "vitest/globals"]
+    "types": ["node", "vitest/globals"],
+    "outDir": "./node_modules/.tsc-node",
+    "tsBuildInfoFile": "./node_modules/.tsc-node/tsconfig.node.tsbuildinfo"
   },
   "include": ["vite.config.ts", "vitest.config.ts"]
 }

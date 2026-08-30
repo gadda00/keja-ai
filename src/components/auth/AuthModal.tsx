@@ -1,19 +1,20 @@
 /**
  * Auth Modal — Google Sign-In + email registration/login.
- * Real Google Identity Services renders when GOOGLE_CLIENT_ID is configured;
- * otherwise the demo account picker keeps the full journey working on
- * static hosting (GitHub Pages) — clearly labelled as demo mode.
+ * Google Identity Services arrives with the Phase-2 backend; until then the
+ * demo account picker keeps the full journey working on static hosting
+ * (GitHub Pages) — clearly labelled as demo mode.
  */
-import React, { useEffect, useRef, useState } from 'react'
-import { X, Lock, Mail, User as UserIcon, ShieldCheck, Sparkles, ChevronLeft } from 'lucide-react'
-import { useAuth, DEMO_GOOGLE_ACCOUNTS, initials } from '@/lib/auth'
-import { useFocusTrap } from '@/lib/useFocusTrap'
-import { Link } from 'react-router-dom'
+import { ChevronLeft, Lock, Mail, ShieldCheck, Sparkles, User as UserIcon, X } from 'lucide-react';
+import { type FC, type FormEvent, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
-type Mode = 'choose' | 'login' | 'register'
+import { DEMO_GOOGLE_ACCOUNTS, initials, useAuth } from '@/lib/auth';
+import { useFocusTrap } from '@/lib/useFocusTrap';
+
+type Mode = 'choose' | 'login' | 'register';
 
 /* Official Google "G" mark (brand-compliant, drawn inline) */
-const GoogleMark: React.FC<{ className?: string }> = ({ className }) => (
+const GoogleMark: FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 48 48" className={className} aria-hidden="true">
     <path
       fill="#EA4335"
@@ -32,7 +33,7 @@ const GoogleMark: React.FC<{ className?: string }> = ({ className }) => (
       d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
     />
   </svg>
-)
+);
 
 export default function AuthModal() {
   const {
@@ -45,63 +46,63 @@ export default function AuthModal() {
     register,
     loading,
     user,
-  } = useAuth()
+  } = useAuth();
 
-  const [mode, setMode] = useState<Mode>('choose')
-  const [demoPicker, setDemoPicker] = useState(false)
-  const [error, setError] = useState('')
-  const [form, setForm] = useState({ name: '', email: '', password: '', phone: '' })
-  const [remember, setRemember] = useState(true)
-  const dialogRef = useRef<HTMLDivElement>(null)
+  const [mode, setMode] = useState<Mode>('choose');
+  const [demoPicker, setDemoPicker] = useState(false);
+  const [error, setError] = useState('');
+  const [form, setForm] = useState({ name: '', email: '', password: '', phone: '' });
+  const [remember, setRemember] = useState(true);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   const close = () => {
-    setAuthModalOpen(false)
-    clearIntent()
-    setError('')
-    setMode('choose')
-    setDemoPicker(false)
-  }
+    setAuthModalOpen(false);
+    clearIntent();
+    setError('');
+    setMode('choose');
+    setDemoPicker(false);
+  };
 
-  useFocusTrap(dialogRef, authModalOpen, close)
+  useFocusTrap(dialogRef, authModalOpen, close);
 
   // close intent once signed in
   useEffect(() => {
     if (user && authModalOpen) {
-      const done = pendingIntent?.onDone
-      close()
-      done?.()
+      const done = pendingIntent?.onDone;
+      close();
+      done?.();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user])
+  }, [user]);
 
   // lock scroll while open
   useEffect(() => {
-    if (!authModalOpen) return
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+    if (!authModalOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     return () => {
-      document.body.style.overflow = prev
-    }
-  }, [authModalOpen])
+      document.body.style.overflow = prev;
+    };
+  }, [authModalOpen]);
 
-  if (!authModalOpen) return null
+  if (!authModalOpen) return null;
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError('');
     try {
-      if (mode === 'login') await loginWithEmail(form.email, form.password, remember)
+      if (mode === 'login') await loginWithEmail(form.email, form.password, remember);
       else
         await register({
           name: form.name,
           email: form.email,
           password: form.password,
           phone: form.phone,
-        })
+        });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Try again.')
+      setError(err instanceof Error ? err.message : 'Something went wrong. Try again.');
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
@@ -129,8 +130,8 @@ export default function AuthModal() {
           {mode !== 'choose' && !demoPicker && (
             <button
               onClick={() => {
-                setMode('choose')
-                setError('')
+                setMode('choose');
+                setError('');
               }}
               className="absolute left-4 top-4 rounded-lg p-1.5 text-white/70 transition hover:bg-white/10 hover:text-white"
               aria-label="Back"
@@ -147,9 +148,7 @@ export default function AuthModal() {
                 {mode === 'register' ? 'Create your Keja account' : 'Welcome to Keja.ai'}
               </h2>
               <p className="text-xs text-white/60">
-                {pendingIntent?.reason
-                  ? pendingIntent.reason
-                  : 'Discover. Analyse. Invest. Transact. Manage.'}
+                {pendingIntent?.reason ?? 'Discover. Analyse. Invest. Transact. Manage.'}
               </p>
             </div>
           </div>
@@ -208,12 +207,18 @@ export default function AuthModal() {
                 <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold-600" />
                 Protected by KEJA Trust infrastructure. Sessions expire automatically; role-based
                 access controls apply. By continuing you accept the{' '}
-                <Link to="/legal" className="font-semibold text-gold-700 underline decoration-gold-400 underline-offset-2">Terms &amp; Privacy Policy</Link>.
+                <Link
+                  to="/legal"
+                  className="font-semibold text-gold-700 underline decoration-gold-400 underline-offset-2"
+                >
+                  Terms &amp; Privacy Policy
+                </Link>
+                .
               </p>
             </div>
           )}
 
-          {demoPicker && (
+          {demoPicker ? (
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => setDemoPicker(false)}
@@ -222,9 +227,8 @@ export default function AuthModal() {
                 ← Back
               </button>
               <p className="text-xs leading-relaxed text-ink-muted">
-                Google Identity Services activates when a{' '}
-                <code className="font-mono text-[11px]">GOOGLE_CLIENT_ID</code> is configured for
-                the domain. In this static demo build, pick a demo Google account to continue:
+                Real Google Sign-In ships with the Phase-2 backend (verified credential JWTs). In
+                this static demo build, pick a demo Google account to continue:
               </p>
               {DEMO_GOOGLE_ACCOUNTS.map((acc) => (
                 <button
@@ -250,7 +254,7 @@ export default function AuthModal() {
                 </button>
               ))}
             </div>
-          )}
+          ) : null}
 
           {(mode === 'login' || mode === 'register') && (
             <form onSubmit={submit} className="flex flex-col gap-4">
@@ -286,8 +290,7 @@ export default function AuthModal() {
               {mode === 'register' && (
                 <div>
                   <label className="label-luxe" htmlFor="auth-phone">
-                    Phone{' '}
-                    <span className="font-normal normal-case text-ink-faint">(optional)</span>
+                    Phone <span className="font-normal normal-case text-ink-faint">(optional)</span>
                   </label>
                   <input
                     id="auth-phone"
@@ -326,14 +329,18 @@ export default function AuthModal() {
                 </label>
               )}
 
-              {error && (
+              {error ? (
                 <p className="rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-700 ring-1 ring-red-100">
                   {error}
                 </p>
-              )}
+              ) : null}
 
               <button type="submit" className="btn-gold w-full !py-3" disabled={loading}>
-                {loading ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account & sign in'}
+                {loading
+                  ? 'Please wait…'
+                  : mode === 'login'
+                    ? 'Sign in'
+                    : 'Create account & sign in'}
               </button>
 
               <p className="text-center text-xs text-ink-muted">
@@ -366,5 +373,5 @@ export default function AuthModal() {
         </div>
       </div>
     </div>
-  )
+  );
 }

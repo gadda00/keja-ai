@@ -7,13 +7,14 @@
  *  - user-submitted images breaking under the /keja-ai/ base path
  *  - fabricated trust scores (description length ≠ verification)
  */
-import { useMemo } from 'react'
-import { store } from '@/lib/store'
-import type { Property } from '@/data/properties'
-import { PROPERTIES } from '@/data/properties'
-import { useUserListings, type UserListing } from '@/lib/adminStore'
-import { AUTO_PROPERTIES } from '@/lib/autoListings'
-import { asset } from '@/config'
+import { useMemo } from 'react';
+
+import { asset } from '@/config';
+import type { Property } from '@/data/properties';
+import { PROPERTIES } from '@/data/properties';
+import { type UserListing, useUserListings } from '@/lib/adminStore';
+import { AUTO_PROPERTIES } from '@/lib/autoListings';
+import { store } from '@/lib/store';
 
 /**
  * Trust score derived from what the verification desk can actually attest to:
@@ -21,12 +22,12 @@ import { asset } from '@/config'
  * elite band) because partner listings lack on-platform transaction history.
  */
 export function partnerTrustScore(u: UserListing): number {
-  let score = 78 // human-reviewed & approved by the verification desk
-  if (u.images.length >= 2) score += 4
-  if (u.description.length >= 120) score += 3
-  if (u.amenities.length >= 3) score += 3
-  if (u.rentEstimate && u.rentEstimate > 0) score += 2
-  return Math.min(94, score)
+  let score = 78; // human-reviewed & approved by the verification desk
+  if (u.images.length >= 2) score += 4;
+  if (u.description.length >= 120) score += 3;
+  if (u.amenities.length >= 3) score += 3;
+  if (u.rentEstimate && u.rentEstimate > 0) score += 2;
+  return Math.min(94, score);
 }
 
 /** Adapt an approved user submission into a full marketplace Property. */
@@ -59,37 +60,46 @@ export function userListingToProperty(u: UserListing): Property {
       },
       {
         label: 'Completeness',
-        status: u.images.length >= 2 && u.description.length >= 120 ? ('pass' as const) : ('warn' as const),
+        status:
+          u.images.length >= 2 && u.description.length >= 120
+            ? ('pass' as const)
+            : ('warn' as const),
         detail: `${u.images.length} photo${u.images.length === 1 ? '' : 's'}, ${u.amenities.length} amenities declared`,
       },
     ],
     highlights: ['Recently approved', 'Partner supply'],
-  }
+  };
 }
 
 /** Merged inventory hook — auto-published Auto-Pilot listings, approved
  * partner submissions, then seed stock. (Auto listings are machine-screened
  * and trust-capped — see lib/autoListings.) */
 export function useAllProperties(): Property[] {
-  const [userListings] = useUserListings()
+  const [userListings] = useUserListings();
   return useMemo(
     () => [...userListings.map(userListingToProperty), ...AUTO_PROPERTIES, ...PROPERTIES],
-    [userListings],
-  )
+    [userListings]
+  );
 }
 
 /**
- * Static merged inventory (no hooks) — for the AI engine and non-React code.
- * Reads approved user listings synchronously from the store so the AI, the
- * Home stats and the marketplace all see the same world.
+ * Fresh merged inventory (no hooks) — for the AI engine and non-React code.
+ *
+ * Called as a function instead of a frozen module-level constant: the old
+ * `MARKET_INVENTORY` was computed once at import time, so listings approved
+ * mid-session never reached the AI engine or Home stats until a full reload
+ * (two sources of truth drifting apart). Callers now always see the current
+ * store state.
  */
-export const MARKET_INVENTORY: Property[] = [
-  ...store.get<UserListing[]>('user-listings', []).map(userListingToProperty),
-  ...AUTO_PROPERTIES,
-  ...PROPERTIES,
-]
+export function marketInventory(): Property[] {
+  return [
+    ...store.get<UserListing[]>('user-listings', []).map(userListingToProperty),
+    ...AUTO_PROPERTIES,
+    ...PROPERTIES,
+  ];
+}
 
 /** Resolve one property from the merged inventory by id. */
 export function findProperty(all: Property[], id: string): Property | undefined {
-  return all.find((p) => p.id === id)
+  return all.find((p) => p.id === id);
 }

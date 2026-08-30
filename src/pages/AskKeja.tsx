@@ -1,12 +1,13 @@
-import { usePageMeta } from '@/lib/seo'
-import { Bot, ShieldCheck, Languages, Zap } from 'lucide-react'
-import ChatWindow from '@/components/ai/ChatWindow'
+import { Bot, Languages, ShieldCheck, Zap } from 'lucide-react';
+
+import ChatWindow from '@/components/ai/ChatWindow';
+import { usePageMeta } from '@/lib/seo';
 
 export default function AskKeja() {
   usePageMeta(
     'Ask Keja AI — Conversational Property Advisor',
-    "Chat with Kenya's real-estate AI: search verified listings, compare yields, check titles and get honest investment math.",
-  )
+    "Chat with Kenya's real-estate AI: search verified listings, compare yields, check titles and get honest investment math."
+  );
   return (
     <div className="bg-cream/60">
       <div className="container-luxe py-10 sm:py-14">
@@ -16,13 +17,20 @@ export default function AskKeja() {
             Ask <span className="gold-text">Keja</span> anything
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-ink-muted sm:text-base">
-            Kenya’s AI real-estate advisor. Property search, investment math, trust checks and buying guidance —
-            in English, Kiswahili and Français. Facts, estimates and assumptions always labelled.
+            Kenya’s AI real-estate advisor. Property search, investment math, trust checks and
+            buying guidance — in English, Kiswahili and Français. Facts, estimates and assumptions
+            always labelled.
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs text-ink-muted">
-            <span className="chip"><Zap className="h-3.5 w-3.5" /> Instant replies</span>
-            <span className="chip"><Languages className="h-3.5 w-3.5" /> EN · SW · FR</span>
-            <span className="chip"><ShieldCheck className="h-3.5 w-3.5" /> Verified answers only</span>
+            <span className="chip">
+              <Zap className="h-3.5 w-3.5" /> Instant replies
+            </span>
+            <span className="chip">
+              <Languages className="h-3.5 w-3.5" /> EN · SW · FR
+            </span>
+            <span className="chip">
+              <ShieldCheck className="h-3.5 w-3.5" /> Verified answers only
+            </span>
           </div>
         </div>
 
@@ -59,5 +67,5 @@ export default function AskKeja() {
         </div>
       </div>
     </div>
-  )
+  );
 }

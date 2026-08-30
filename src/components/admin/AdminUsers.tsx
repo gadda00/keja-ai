@@ -1,39 +1,41 @@
 /** Admin Users — RBAC management: roles, status, sign-in history. */
-import { Download } from 'lucide-react'
-import { exportCSV } from '@/lib/csv'
-import { useState } from 'react'
-import { Search, ShieldCheck, UserX, UserCheck, Trash2, Ban, Users, Mail } from 'lucide-react'
-import { useAuth, UserAccount, Role, initials } from '@/lib/auth'
-import { logAudit } from '@/lib/adminStore'
-import { store } from '@/lib/store'
+import { Download } from 'lucide-react';
+import { Ban, Mail, Search, ShieldCheck, Trash2, UserCheck, Users, UserX } from 'lucide-react';
+import { useState } from 'react';
+
+import { logAudit } from '@/lib/adminStore';
+import type { Role, UserAccount } from '@/lib/auth';
+import { initials, useAuth } from '@/lib/auth';
+import { exportCSV } from '@/lib/csv';
+import { store } from '@/lib/store';
 
 const ROLE_BADGE: Record<Role, string> = {
   admin: 'bg-gold-gradient text-white',
   agent: 'bg-ink text-gold-200',
   user: 'bg-gold-100 text-gold-800',
-}
+};
 
 export default function AdminUsers() {
-  const { users, user: me } = useAuth()
-  const [query, setQuery] = useState('')
-  const [roleFilter, setRoleFilter] = useState<'all' | Role>('all')
+  const { users, user: me } = useAuth();
+  const [query, setQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState<'all' | Role>('all');
 
   const filtered = users.filter((u) => {
-    const q = query.trim().toLowerCase()
+    const q = query.trim().toLowerCase();
     const matchQ =
       !q ||
       u.name.toLowerCase().includes(q) ||
       u.email.toLowerCase().includes(q) ||
-      (u.company ?? '').toLowerCase().includes(q)
-    const matchRole = roleFilter === 'all' || u.role === roleFilter
-    return matchQ && matchRole
-  })
+      (u.company ?? '').toLowerCase().includes(q);
+    const matchRole = roleFilter === 'all' || u.role === roleFilter;
+    return matchQ && matchRole;
+  });
 
   const patchUser = (target: UserAccount, patch: Partial<UserAccount>, detail: string) => {
-    const next = store.get<UserAccount[]>('users', users).map((u) =>
-      u.id === target.id ? { ...u, ...patch } : u,
-    )
-    store.set('users', next)
+    const next = store
+      .get<UserAccount[]>('users', users)
+      .map((u) => (u.id === target.id ? { ...u, ...patch } : u));
+    store.set('users', next);
     logAudit({
       actor: me?.name ?? 'admin',
       actorEmail: me?.email ?? '',
@@ -41,8 +43,8 @@ export default function AdminUsers() {
       target: target.email,
       detail,
       severity: patch.status === 'suspended' ? 'warning' : 'info',
-    })
-  }
+    });
+  };
 
   return (
     <div className="flex flex-col gap-5">
@@ -78,16 +80,18 @@ export default function AdminUsers() {
       <div className="card-luxe overflow-hidden">
         <div className="overflow-x-auto">
           <button
-          onClick={() =>
-            exportCSV(`keja-users-${new Date().toISOString().slice(0, 10)}.csv`,
-              ['Name', 'Email', 'Role', 'Status', 'Sign-ins', 'Last active'],
-              filtered.map((u) => [u.name, u.email, u.role, u.status, 0, u.createdAt ?? '']))
-          }
-          className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-ink px-3.5 py-1.5 text-xs font-semibold text-gold-300 hover:bg-ink-soft"
-        >
-          <Download className="h-3.5 w-3.5" /> Export CSV
-        </button>
-        <table className="w-full min-w-[760px] text-left text-sm">
+            onClick={() =>
+              exportCSV(
+                `keja-users-${new Date().toISOString().slice(0, 10)}.csv`,
+                ['Name', 'Email', 'Role', 'Status', 'Sign-ins', 'Last active'],
+                filtered.map((u) => [u.name, u.email, u.role, u.status, 0, u.createdAt ?? ''])
+              )
+            }
+            className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-ink px-3.5 py-1.5 text-xs font-semibold text-gold-300 hover:bg-ink-soft"
+          >
+            <Download className="h-3.5 w-3.5" /> Export CSV
+          </button>
+          <table className="w-full min-w-[760px] text-left text-sm">
             <thead>
               <tr className="border-b border-gold-100 bg-gold-50/60 text-[11px] uppercase tracking-wider text-ink-muted">
                 <th className="px-5 py-3 font-semibold">User</th>
@@ -173,7 +177,7 @@ export default function AdminUsers() {
                           patchUser(
                             u,
                             { status: u.status === 'active' ? 'suspended' : 'active' },
-                            u.status === 'active' ? 'Account suspended' : 'Account reinstated',
+                            u.status === 'active' ? 'Account suspended' : 'Account reinstated'
                           )
                         }
                         disabled={u.id === me?.id}
@@ -189,7 +193,11 @@ export default function AdminUsers() {
                       <button
                         onClick={() => {
                           if (confirm(`Delete ${u.name}? This cannot be undone.`)) {
-                            patchUser(u, { status: 'suspended' }, 'User flagged for deletion (demo)')
+                            patchUser(
+                              u,
+                              { status: 'suspended' },
+                              'User flagged for deletion (demo)'
+                            );
                           }
                         }}
                         disabled={u.id === me?.id}
@@ -229,5 +237,5 @@ export default function AdminUsers() {
         realism
       </div>
     </div>
-  )
+  );
 }
