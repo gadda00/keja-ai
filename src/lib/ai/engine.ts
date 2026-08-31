@@ -273,6 +273,63 @@ export class KejaAI {
     // Qualification flow (if active)
     if (this.qualificationState) return this.continueQualification(input);
 
+    /* ------------------------------------------------------------------
+     * Professional-advice guard — runs BEFORE every topical intent.
+     *
+     * Review feedback: the engine needs explicit refusal and escalation
+     * behaviour for legal, tax, valuation, lending, fraud-accusation and
+     * investment-suitability questions. A property-search assistant that
+     * improvises answers to those does more harm than one that declines.
+     * Only questions *asking for advice/judgement* escalate; factual
+     * process questions ("what is stamp duty") still route to processAnswer.
+     * ------------------------------------------------------------------ */
+    const escalations: { re: RegExp; reply: string }[] = [
+      {
+        re: /(should i (buy|invest|sell|sign)|is (this|that|it) (a )?(good|safe|bad) (deal|investment|price)|is (he|she|they|the agent) (a )?(scammer|fraud|cheat)|(is|seems|looks|sounds) (this|that|it)[a-z ]{0,26}(scam|suspicious|fake|fraudulent|bait)|worth buying|advise me|what would you do)/,
+        reply:
+          'That judgement call is exactly where I should **stop and hand you to a human**. 🤝\n\nI can show you evidence — trust scores, market bands, verification dates — but whether *you* should buy is a personal decision that deserves an advocate\u2019s due diligence and, for investment questions, a licensed adviser. Keja never automates that call.\n\nWhat I can do right now:\n• Run the **full investment math** on any listing (yield, payback, projections)\n• Show you the **verification evidence** behind a trust score\n• Connect you to a **human advisor** on WhatsApp\n\nWhich would help most?',
+      },
+      {
+        re: /(draft|write|review|check) (my|the|a) (contract|agreement|lease|tenancy|offer letter)|is (this|that) contract (legal|valid|enforceable)|can (you|i) (break|terminate|void) (a |the |my )?(lease|contract)|my legal (rights|obligations)|rightful owner|dispute|succession|inheritance|beneficiary/,
+        reply:
+          'That\u2019s a **legal question**, and I won\u2019t improvise an answer — property law is exactly where a wrong answer costs real money. ⚖️\n\nWhat I *can* tell you is factual and general: every serious Kenyan transaction should go through an **advocate** — official land search, rates clearance, stamp duty, and registered transfer. Our buying-process guide covers the standard steps.\n\nFor your specific situation, speak to a licensed advocate (the Law Society of Kenya directory lists them) or let me connect you to the Keja human desk, which works with vetted advocates.',
+      },
+      {
+        re: /(capital gains|withholding tax|tax (on|for|implications|liabilit)|krashould|krapay|how much tax|tax (rate|bill)|vat on (rent|sale)|file my tax)/,
+        reply:
+          '**Tax questions deserve a tax professional**, not a search engine. 🧾\n\nI deliberately don\u2019t quote tax rates or liabilities — they change with Finance Acts, depend on residency and entity type, and getting them wrong is expensive. What I can do is show the **pre-tax economics** of any listing clearly labelled as pre-tax, so your accountant can layer the tax view on top.\n\nWant me to run the pre-tax investment math on a specific property, or shall I hand you to a human advisor who can bring in a tax practitioner?',
+      },
+      {
+        re: /(which (bank|lender) (should|will) |best (bank|lender|mortgage)|will i (be )?(approved|qualify)|pre-?approve|how much will (the )?bank (lend|approve)|my credit)/,
+        reply:
+          '**Lending decisions belong to lenders.** 🏦\n\nI can\u2019t predict approval or recommend a specific bank — offers depend on your income profile, credit history and the property itself, and only the lender can decide. What I *can* do honestly:\n• Run **affordability scenarios** (income vs repayments at current indicative rates)\n• Show the **mortgage calculator** with full amortisation\n• Point you to the standard documentation lenders ask for\n\nWant the affordability calculator?',
+      },
+      {
+        re: /(what('| i)?s (the )?(market |fair )?(value|price) of |how much is (my|our|the) (house|home|land|plot|property|flat|apartment)[a-z ]{0,26}worth|value my (house|home|property|land|plot|flat|apartment)|valuation report|valuer)/,
+        reply:
+          'A proper **valuation needs a licensed valuer physically inspecting the property** — anything I could quote would be a guess dressed up as data. 📏\n\nWhat I can give you honestly: the **market band** for the area and property type from our listed inventory, clearly labelled as an ESTIMATE based on asking prices, not a valuation. It\u2019s a starting point for a conversation, never a number to transact on.\n\nShall I show the current market bands for your area?',
+      },
+    ];
+    for (const esc of escalations) {
+      if (esc.re.test(t)) {
+        return {
+          text: esc.reply,
+          meta: [
+            {
+              label: 'FACT',
+              text: 'Keja AI escalates professional-advice questions instead of improvising answers.',
+            },
+          ],
+          quickReplies: [
+            'Talk to a human',
+            'Run the investment math',
+            'How does verification work?',
+          ],
+          action: 'whatsapp',
+        };
+      }
+    }
+
     // Start lead qualification — the 4-question matcher.
     // Deliberately narrow: "help me find a mortgage/land…" must keep routing
     // to their own intents, and "book me a viewing" belongs to the viewing
@@ -420,7 +477,7 @@ export class KejaAI {
     // Admin console
     if (/(admin|console|back ?office|moderation|review queue|who reviews)/.test(t)) {
       return {
-        text: 'The **Admin Console** is the operating layer of the platform — restricted to administrator accounts:\n\n• **Overview** — KPIs, funnel, supply health\n• **Users** — role-based access management (admin / agent / user)\n• **Listings** — verification queue with anomaly flags & completeness scores\n• **Leads** — HOT/WARM/COLD CRM pipeline\n• **Partners & Feeds** — applications, feed connections, sync operations\n• **Audit Trail** — every critical action, recorded\n• **Settings** — review SLA, auto-approve thresholds, maintenance mode\n\nTry it: sign in as `admin@keja.ai` / `admin123` (demo credentials).',
+        text: 'The **Admin Console** is the operating layer of the platform — restricted to administrator accounts:\n\n• **Overview** — KPIs, funnel, supply health\n• **Users** — role-based access management (admin / agent / user)\n• **Listings** — verification queue with anomaly flags, completeness scores and user issue reports\n• **Leads** — HOT/WARM/COLD CRM pipeline\n• **Partners & Feeds** — applications, feed connections, sync operations\n• **Audit Trail** — every critical action, recorded\n• **Settings** — review SLA, auto-approve thresholds, maintenance mode\n\nIt opens from the sign-in modal — the demo credentials are listed right there on the dialog.',
         meta: [
           { label: 'FACT', text: 'RBAC-gated console; audit trail per security architecture' },
         ],
@@ -468,7 +525,7 @@ export class KejaAI {
     // Viewing request
     if (/(view|viewing|visit|site visit|onja|open house|tour)/.test(t)) {
       return {
-        text: 'I can arrange that for you. 🏡\n\nEvery viewing booked through Keja is escorted by a **verified agent**, and viewing fees (if any) can be held in **M-Pesa escrow** — released only after the viewing is confirmed. That\u2019s how we protect both sides.\n\nShall I start your viewing request? I\u2019ll just need your name and phone number.',
+        text: 'I can arrange that for you. 🏡\n\nEvery viewing booked through Keja would be escorted by a **verified agent**, and in production viewing fees would sit in escrow, released only after the viewing is confirmed. (M-Pesa escrow is roadmap, not live in this demo — in the meantime, never pay "holding fees" to personal wallets.)\n\nShall I start your viewing request? I\u2019ll just need your name and phone number.',
         quickReplies: ['Yes, book me a viewing', 'Which properties are available to view?'],
       };
     }

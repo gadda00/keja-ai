@@ -22,7 +22,9 @@ import { useMemo, useRef, useState } from 'react';
 
 import type { ListingSubmission } from '@/lib/adminStore';
 import {
+  setReportStatus,
   submissionToListing,
+  useListingReports,
   useSettings,
   useSubmissions,
   useUserListings,
@@ -81,6 +83,105 @@ const FLAG_META: Record<string, { label: string; icon: typeof AlertTriangle; ton
 };
 
 type Filter = 'pending' | 'approved' | 'rejected' | 'flagged' | 'all';
+
+/**
+ * User issue reports — the other side of the listing-correction workflow.
+ * Visitors report stale/wrong listings from the property evidence panel
+ * (lib/verification + EvidencePanel); those reports land here for
+ * adjudication with an audit trail.
+ */
+function UserReportsPanel() {
+  const { user } = useAuth();
+  const [reports] = useListingReports();
+  const open = reports.filter((r) => r.status === 'open');
+
+  const resolve = (id: string, status: 'resolved' | 'dismissed') => {
+    setReportStatus(id, status);
+    const report = reports.find((r) => r.id === id);
+    logAudit({
+      actor: user?.name ?? 'admin',
+      actorEmail: user?.email ?? '',
+      action: `report.${status}`,
+      target: report?.propertyId ?? id,
+      detail: `User report ${status} — ${report?.reason}${report?.detail ? `: ${report.detail}` : ''}`,
+      severity: status === 'resolved' ? 'info' : 'warning',
+    });
+  };
+
+  return (
+    <div className="rounded-xl bg-white p-5 ring-1 ring-gold-100">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="flex items-center gap-2 font-display text-sm font-bold text-ink">
+          <Flag className="h-4 w-4 text-gold-600" />
+          User issue reports
+          {open.length > 0 && (
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800 ring-1 ring-amber-200">
+              {open.length} open
+            </span>
+          )}
+        </h3>
+        <span className="text-[11px] text-ink-faint">
+          Submitted from the evidence panel on listing pages
+        </span>
+      </div>
+
+      {reports.length === 0 ? (
+        <p className="mt-4 rounded-lg bg-cream/70 px-4 py-3 text-xs text-ink-muted ring-1 ring-gold-100">
+          No reports yet. When visitors flag a listing (sold, wrong price, outdated photos,
+          unreachable agent, suspected fraud), it lands here with an SLA for adjudication.
+        </p>
+      ) : (
+        <ul className="mt-4 space-y-2.5">
+          {reports.slice(0, 8).map((r) => (
+            <li
+              key={r.id}
+              className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-cream/70 px-4 py-3 ring-1 ring-gold-100"
+            >
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-ink">
+                  {r.propertyId} — {REPORT_REASON_LABELS[r.reason] ?? r.reason}
+                  {r.status !== 'open' && (
+                    <span className="ml-2 text-[10px] font-bold uppercase text-ink-faint">
+                      {r.status}
+                    </span>
+                  )}
+                </p>
+                {r.detail ? (
+                  <p className="mt-0.5 text-[11px] text-ink-muted">“{r.detail}”</p>
+                ) : null}
+              </div>
+              {r.status === 'open' && (
+                <span className="flex shrink-0 gap-1.5">
+                  <button
+                    onClick={() => resolve(r.id, 'resolved')}
+                    className="rounded-lg bg-green-600 px-2.5 py-1.5 text-[11px] font-semibold text-white transition hover:bg-green-700"
+                  >
+                    Resolve
+                  </button>
+                  <button
+                    onClick={() => resolve(r.id, 'dismissed')}
+                    className="rounded-lg bg-ink/10 px-2.5 py-1.5 text-[11px] font-semibold text-ink-soft transition hover:bg-ink/20"
+                  >
+                    Dismiss
+                  </button>
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+const REPORT_REASON_LABELS: Record<string, string> = {
+  'sold-or-let': 'Already sold or let',
+  'price-wrong': 'Price wrong or outdated',
+  'photos-outdated': 'Photos outdated',
+  'contact-unreachable': 'Contact unreachable',
+  'suspected-fraud': 'Suspected fraud',
+  other: 'Other',
+};
 
 export default function AdminListings() {
   const { user } = useAuth();
@@ -462,6 +563,9 @@ export default function AdminListings() {
           </div>
         )}
       </div>
+
+      {/* user issue reports — the listing-correction adjudication queue */}
+      <UserReportsPanel />
 
       {/* published listings count */}
       <div className="flex items-center justify-between rounded-xl bg-ink px-5 py-3.5 text-white">

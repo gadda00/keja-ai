@@ -16,6 +16,7 @@ import { useSearchParams } from 'react-router-dom';
 import MapView from '@/components/property/MapView';
 import PropertyCard from '@/components/property/PropertyCard';
 import { AREAS, type Property } from '@/data/properties';
+import { track } from '@/lib/analytics';
 import { isRentalPrice } from '@/lib/finance';
 import { useAllProperties } from '@/lib/inventory';
 import { PRICE_CEILING, RENT_CEILING, VERIFIED_TRUST_FLOOR } from '@/lib/searchStore';
@@ -125,6 +126,16 @@ export default function Properties() {
     }
     return list;
   }, [allProperties, query, type, purpose, area, maxPrice, minBeds, verifiedOnly, sort]);
+
+  // Local-only analytics: log completed searches (debounced) with their result
+  // counts. Never leaves the device — see lib/analytics.ts.
+  useEffect(() => {
+    if (!query.trim()) return;
+    const t = window.setTimeout(() => {
+      track({ event: 'search', query: query.trim().slice(0, 80), results: filtered.length });
+    }, 800);
+    return () => window.clearTimeout(t);
+  }, [query, filtered.length]);
 
   const clearAll = () => {
     setQuery('');

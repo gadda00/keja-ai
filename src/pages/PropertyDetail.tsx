@@ -10,9 +10,6 @@ import {
   Calendar,
   CheckCircle2,
   ChevronLeft,
-  Clock,
-  Eye,
-  FileText,
   Gauge,
   Heart,
   MapPin,
@@ -26,11 +23,13 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
+import EvidencePanel from '@/components/property/EvidencePanel';
 import PropertyCard from '@/components/property/PropertyCard';
 import TrustBadge from '@/components/property/TrustBadge';
 import SmartImg from '@/components/ui/SmartImg';
 import { whatsappLink } from '@/config';
 import { areaInsights } from '@/data/properties';
+import { track } from '@/lib/analytics';
 import { analyzeInvestment, calculateMortgage, estimateMonthlyExpenses } from '@/lib/finance';
 import { isRentalPrice } from '@/lib/finance';
 import { formatKES, timeAgo } from '@/lib/format';
@@ -39,6 +38,7 @@ import { investmentScore, scoreTone } from '@/lib/investmentScore';
 import { notify } from '@/lib/searchStore';
 import { breadcrumbJsonLd, realEstateListingJsonLd, usePageMeta } from '@/lib/seo';
 import { KEYS, type Lead, useStore } from '@/lib/store';
+import { FRESHNESS_COPY, listingFreshness } from '@/lib/verification';
 
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>();
@@ -96,6 +96,7 @@ export default function PropertyDetail() {
     setSubmitted(false);
     if (property && !viewed.includes(property.id)) {
       setViewed([...viewed.slice(-7), property.id]);
+      track({ event: 'result_view', propertyId: property.id });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -175,6 +176,18 @@ export default function PropertyDetail() {
           <div>
             <div className="flex flex-wrap items-center gap-2.5">
               <TrustBadge score={property.trustScore} />
+              <span
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset ${
+                  listingFreshness(property).state === 'fresh'
+                    ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
+                    : listingFreshness(property).state === 'recheck-due'
+                      ? 'bg-amber-50 text-amber-700 ring-amber-200'
+                      : 'bg-red-50 text-red-700 ring-red-200'
+                }`}
+                title={`Evidence checked ${property.verification.lastChecked} · valid ${listingFreshness(property).expiresAt}`}
+              >
+                {FRESHNESS_COPY[listingFreshness(property).state]}
+              </span>
               {property.id.startsWith('KJA-A') && (
                 <span
                   className="inline-flex items-center gap-1 rounded-full bg-sky-600 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white"
@@ -232,11 +245,12 @@ export default function PropertyDetail() {
             </div>
             <div className="absolute bottom-4 right-4 flex gap-2">
               <button
-                onClick={() =>
+                onClick={() => {
                   setFavorites(
                     isFav ? favorites.filter((f) => f !== property.id) : [...favorites, property.id]
-                  )
-                }
+                  );
+                  if (!isFav) track({ event: 'save', propertyId: property.id });
+                }}
                 className={`rounded-full p-3 shadow-md transition ${isFav ? 'bg-gold-500 text-white' : 'bg-white/95 text-ink hover:text-gold-600'}`}
                 aria-label={isFav ? 'Remove from favourites' : 'Save to favourites'}
                 aria-pressed={isFav}
@@ -341,7 +355,7 @@ export default function PropertyDetail() {
               </div>
             </section>
 
-            {/* verification panel — the trust layer showcase */}
+            {/* score summary — headline number + weighting disclosure */}
             <section className="mt-10 rounded-2xl border border-gold-200 bg-gradient-to-b from-gold-50/80 to-white p-6">
               <div className="flex items-center justify-between gap-3">
                 <h2 className="flex items-center gap-2 font-display text-xl font-bold text-ink">
@@ -350,7 +364,7 @@ export default function PropertyDetail() {
                   ) : (
                     <ShieldCheck className="h-5 w-5 text-gold-600" />
                   )}
-                  Keja Verification Report
+                  Trust score
                 </h2>
                 <span
                   className={`font-display text-3xl font-bold ${flagged ? 'text-red-600' : 'text-gold-600'}`}
@@ -360,7 +374,7 @@ export default function PropertyDetail() {
                 </span>
               </div>
 
-              <div className="mt-5 space-y-3">
+              <div className="mt-4 space-y-2.5">
                 {(showAllSignals ? property.trustSignals : property.trustSignals.slice(0, 3)).map(
                   (s) => (
                     <div
@@ -394,33 +408,17 @@ export default function PropertyDetail() {
                 </button>
               )}
 
-              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-gold-100 pt-4 text-xs text-ink-muted">
-                <span className="inline-flex items-center gap-1.5">
-                  <FileText className="h-3.5 w-3.5 text-gold-600" />
-                  Title:{' '}
-                  {property.verification.titleCheck === 'verified'
-                    ? 'Verified'
-                    : property.verification.titleCheck}
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5 text-gold-600" />
-                  Ardhisasa: {property.verification.ardhisasaMatch ? 'Matched' : 'Not matched'}
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <Eye className="h-3.5 w-3.5 text-gold-600" />
-                  Last checked {property.verification.lastChecked}
-                </span>
-              </div>
-
               <p className="mt-4 text-[11px] leading-relaxed text-ink-faint">
-                FACT: checks above reflect documented verification runs. Trust scores weigh title
-                status (35%), photo authenticity (20%), duplicate scan (15%), pricing analysis (15%)
-                and agent history (15%).
+                Trust scores weigh title status (35%), photo authenticity (20%), duplicate scan
+                (15%), pricing analysis (15%) and agent history (15%).
                 <Link to="/trust" className="ml-1 font-semibold text-gold-700">
                   How scoring works →
                 </Link>
               </p>
             </section>
+
+            {/* verification evidence — scope, dates, expiry, report & review paths */}
+            <EvidencePanel property={property} />
 
             {/* KEJA Investment Score™ */}
             {score ? (
@@ -587,12 +585,18 @@ export default function PropertyDetail() {
               </div>
 
               <div className="mt-4 rounded-xl bg-gold-50 p-3 text-xs leading-relaxed text-ink-soft">
-                <b>Keja note:</b> this agency is part of our verified network. Viewings can be
-                escrow-protected via M-Pesa — viewing fees are only released after the viewing is
-                confirmed.
+                <b>Keja note:</b> this agency is part of our verified network (demo dataset). In
+                production, viewing fees would be escrow-protected and released only after the
+                viewing is confirmed — M-Pesa escrow is on the roadmap, not live in this demo.
               </div>
 
-              <button onClick={() => setViewingOpen(true)} className="btn-gold mt-5 w-full">
+              <button
+                onClick={() => {
+                  setViewingOpen(true);
+                  track({ event: 'viewing_request', propertyId: property.id });
+                }}
+                className="btn-gold mt-5 w-full"
+              >
                 <Calendar className="h-4 w-4" /> Request viewing
               </button>
               {/^\+?[\d\s()-]{7,}$/.test(property.agent.phone) ? (

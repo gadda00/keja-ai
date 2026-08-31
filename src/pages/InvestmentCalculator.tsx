@@ -1,5 +1,5 @@
 import { Bot, Calculator, Globe2, Info, Landmark, TrendingUp, Wallet } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Area,
@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 
 import { PROPERTIES } from '@/data/properties';
+import { track } from '@/lib/analytics';
 import {
   analyzeInvestment,
   calculateAffordability,
@@ -91,6 +92,17 @@ export default function InvestmentCalculator() {
       }),
     [income, obligations, rate, term, depositPct]
   );
+
+  // Local-only analytics: a settled ROI input set counts as a completed
+  // calculator run (debounced so dragging sliders doesn't spam events).
+  const roiKey = `${price}|${rent}|${occupancy}|${expenses}|${appreciation}|${rentGrowth}`;
+  useEffect(() => {
+    const t = window.setTimeout(
+      () => track({ event: 'calculator_complete', calculator: 'roi' }),
+      1500
+    );
+    return () => window.clearTimeout(t);
+  }, [roiKey]);
 
   const chartData = result[`year${horizon}`].map((p) => ({
     year: `Y${p.year}`,

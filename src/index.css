@@ -130,3 +130,20 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Demo banner layout shift — when the fixed demo banner is visible,  */
+/* the fixed navbar and main content move down by the banner height.  */
+/* ------------------------------------------------------------------ */
+html.demo-banner header {
+  top: 2.25rem; /* 36px — banner height */
+}
+html.demo-banner main {
+  padding-top: 6.25rem; /* 64px navbar + 36px banner */
+}
+
+/* Anchor targets should not hide under the shifted fixed header */
+#claims,
+#score {
+  scroll-margin-top: 6rem;
+}

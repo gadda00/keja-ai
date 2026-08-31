@@ -27,6 +27,7 @@ import { featuredProperties } from '@/data/properties';
 import { autoPilotStats } from '@/lib/autoListings';
 import { formatKES } from '@/lib/format';
 import { useAllProperties } from '@/lib/inventory';
+import { ROLES, useRole } from '@/lib/roleStore';
 import { usePageMeta } from '@/lib/seo';
 
 const fadeUp = {
@@ -37,6 +38,8 @@ const fadeUp = {
 };
 
 export default function Home() {
+  const role = useRole();
+  const roleMeta = ROLES.find((r) => r.value === role);
   usePageMeta(
     'Keja.ai — Intelligent Real Estate. Verified Trust.',
     "Kenya's AI real-estate advisor: verified listings, trust scores, investment intelligence and tokenized fractional ownership."
@@ -107,6 +110,33 @@ export default function Home() {
             yields and honest investment math.
           </motion.p>
 
+          {/* role-aware strip — the first session gets one job, not eleven */}
+          {role && roleMeta ? (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mt-7 flex flex-wrap items-center justify-center gap-3"
+            >
+              <span className="inline-flex items-center gap-2 rounded-full bg-gold-400/15 px-4 py-2 text-sm font-semibold text-gold-200 ring-1 ring-gold-400/40">
+                <span aria-hidden>{roleMeta.emoji}</span>
+                Tailored for you: {roleMeta.label.toLowerCase()}
+              </span>
+              <Link
+                to={roleMeta.to}
+                className="rounded-full bg-white px-4 py-2 text-sm font-bold text-ink transition hover:bg-gold-100"
+              >
+                {roleMeta.cta} →
+              </Link>
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('keja-open-role-gate'))}
+                className="text-xs font-semibold text-white/60 underline decoration-white/30 underline-offset-4 transition hover:text-gold-300"
+              >
+                change
+              </button>
+            </motion.div>
+          ) : null}
+
           {/* Search bar */}
           <motion.form
             initial={{ opacity: 0, y: 24 }}
@@ -165,7 +195,7 @@ export default function Home() {
               to="/tokenize"
               className="inline-flex items-center gap-2 border border-gold-400/50 px-6 py-3 text-sm font-semibold tracking-wide text-gold-300 transition hover:bg-gold-400/10"
             >
-              <Coins className="h-4 w-4" /> Tokenize — invest from $100
+              <Coins className="h-4 w-4" /> Tokenize — explore the demo
             </Link>
             <Link
               to="/trust"
@@ -420,23 +450,34 @@ export default function Home() {
               Own a fraction of Nairobi’s <span className="gold-text">finest</span> real estate
             </h2>
             <p className="mt-5 leading-relaxed text-ink-soft">
-              Keja Tokenize converts institutional-grade property into digital tokens — a $10M tower
-              becomes 1,000,000 tokens at $10 each. From $100, KYC-verified investors buy fractions
-              and earn monthly or quarterly rental income, recorded on-chain. Compliance-first:
-              every asset sits in its own SPV, is Ardhisasa title-verified and is informed by
-              Kenya’s CMA sandbox.
+              Keja Tokenize demonstrates how institutional-grade property could convert into digital
+              tokens — a $10M tower becoming 1,000,000 tokens at $10 each. It is an education-first
+              walkthrough: explore simulated offerings, run the economics, and learn how SPV
+              structures, title verification and KYC/AML would work in a compliant production build.
+            </p>
+            <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-xs leading-relaxed text-amber-800 ring-1 ring-amber-200">
+              <b>Simulation notice:</b> tokens, yields and distributions on Keja Tokenize are
+              simulated. Nothing here is an offer of securities, no money is accepted, and a token
+              is not a land title. See the{' '}
+              <Link to="/trust#claims" className="font-semibold underline underline-offset-2">
+                claims register
+              </Link>
+              .
             </p>
             <ul className="mt-6 space-y-3.5">
               {[
-                { icon: Coins, text: 'Fractional ownership from $100 — no $100K minimums' },
+                {
+                  icon: Coins,
+                  text: 'Simulated fractional ownership from $100 — explore the model',
+                },
                 {
                   icon: CalendarClock,
-                  text: 'Rental income distributed monthly or quarterly, pro-rata',
+                  text: 'How pro-rata rental distributions would flow, monthly or quarterly',
                 },
-                { icon: Link2, text: 'Blockchain-verified ownership record — the Keja Ledger' },
+                { icon: Link2, text: 'A transparent ownership record — the simulated Keja Ledger' },
                 {
                   icon: ShieldCheck,
-                  text: 'KYC/AML-gated, SPV-wrapped, independently valued assets',
+                  text: 'How KYC/AML gating, SPV wrappers and independent valuations would work',
                 },
               ].map((f) => (
                 <li key={f.text} className="flex gap-3">
@@ -449,7 +490,7 @@ export default function Home() {
             </ul>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link to="/tokenize" className="btn-gold">
-                Explore tokenized offerings <ChevronRight className="h-4 w-4" />
+                Explore the tokenization demo <ChevronRight className="h-4 w-4" />
               </Link>
               <Link to="/tokenize?view=learn" className="btn-outline">
                 How tokenization works
@@ -470,16 +511,16 @@ export default function Home() {
               <div className="absolute inset-x-6 bottom-6 flex flex-wrap items-end justify-between gap-4 text-white">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wide2 text-gold-300">
-                    Live offering · KJ-WST1
+                    Simulated offering · demo
                   </p>
                   <p className="font-display text-2xl font-bold">Westlands Tower One</p>
                   <p className="mt-0.5 text-[13px] text-white/70">
-                    $12M Grade-A offices · from $100
+                    $12M Grade-A offices · simulated, from $100
                   </p>
                 </div>
                 <div className="rounded-2xl bg-white/95 px-4 py-3 text-ink shadow-gold-md">
                   <p className="text-[10px] font-bold uppercase tracking-wide text-gold-700">
-                    Net yield
+                    Net yield (sim.)
                   </p>
                   <p className="text-xl font-bold text-emerald-700">7.0%</p>
                 </div>

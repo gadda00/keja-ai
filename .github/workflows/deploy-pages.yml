@@ -31,6 +31,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install Chromium for prerendering
+        run: npx playwright install chromium --with-deps
+
       - name: Typecheck
         run: npx tsc -b
 
@@ -48,6 +51,9 @@ jobs:
 
       - name: Build (with GitHub Pages base path)
         run: npm run build -- --base=/keja-ai/
+
+      - name: Prerender all routes (status-200 HTML for crawlers + social unfurls)
+        run: node scripts/prerender.mjs --base /keja-ai/
 
       - name: SPA fallback (404 page)
         run: cp dist/index.html dist/404.html

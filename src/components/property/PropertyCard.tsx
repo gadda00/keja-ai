@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 
 import SmartImg from '@/components/ui/SmartImg';
 import type { Property } from '@/data/properties';
+import { track } from '@/lib/analytics';
 import { isRentalPrice } from '@/lib/finance';
 import { formatKES } from '@/lib/format';
 import { investmentScore, scoreTone } from '@/lib/investmentScore';
@@ -38,7 +39,10 @@ export default function PropertyCard({ property }: { property: Property }) {
   };
   const toggleCompare = () => {
     if (inCompare) setCompare(compare.filter((c) => c !== property.id));
-    else setCompare([...compare, property.id].slice(-4));
+    else {
+      setCompare([...compare, property.id].slice(-4));
+      track({ event: 'compare_add', propertyId: property.id });
+    }
   };
 
   return (

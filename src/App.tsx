@@ -3,10 +3,12 @@ import { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
 import AuthModal from '@/components/auth/AuthModal';
+import DemoBanner from '@/components/layout/DemoBanner';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import Footer from '@/components/layout/Footer';
 import Navbar from '@/components/layout/Navbar';
 import WhatsAppFloat from '@/components/layout/WhatsAppFloat';
+import RoleGate from '@/components/onboarding/RoleGate';
 import CompareBar from '@/components/property/CompareBar';
 import Home from '@/pages/Home';
 import Properties from '@/pages/Properties';
@@ -74,6 +76,7 @@ export default function App() {
         Skip to main content
       </a>
       <Navbar />
+      <DemoBanner />
       <main id="main-content" className="flex-1 pt-16">
         <ErrorBoundary>
           <Suspense fallback={<LazyFallback />}>
@@ -109,6 +112,7 @@ export default function App() {
       <WhatsAppFloat />
       <CompareBar />
       <AuthModal />
+      <RoleGate />
     </div>
   );
 }

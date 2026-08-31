@@ -2,6 +2,7 @@ import { MessageCircle, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { whatsappLink } from '@/config';
+import { track } from '@/lib/analytics';
 import { KEYS, useStore } from '@/lib/store';
 
 export default function WhatsAppFloat() {
@@ -46,6 +47,7 @@ export default function WhatsAppFloat() {
         target="_blank"
         rel="noreferrer"
         aria-label="Chat with Keja on WhatsApp"
+        onClick={() => track({ event: 'human_handoff', channel: 'whatsapp', context: 'float' })}
         className="group flex h-14 w-14 items-center justify-center rounded-full bg-emerald-600 shadow-lg transition-all hover:scale-105 hover:bg-emerald-500"
       >
         <MessageCircle className="h-7 w-7 text-white" fill="currentColor" />

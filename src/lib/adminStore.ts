@@ -573,3 +573,70 @@ export function submissionToListing(s: ListingSubmission): UserListing {
     views: 0,
   };
 }
+
+/* ------------------------------------------------------------------ */
+/* Listing issue reports — user-side correction workflow               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Review feedback: "listing freshness and correction workflows" — users need
+ * a way to report stale or wrong listings, and the platform needs an
+ * adjudication queue. Reports land here (client-side in this build; maps to
+ * a `listing_reports` table in the Phase-2 backend) and surface in the Admin
+ * Console listings tab.
+ */
+
+export type ReportReason =
+  | 'sold-or-let'
+  | 'price-wrong'
+  | 'photos-outdated'
+  | 'contact-unreachable'
+  | 'suspected-fraud'
+  | 'other';
+
+export const REPORT_REASONS: { value: ReportReason; label: string }[] = [
+  { value: 'sold-or-let', label: 'Already sold or let' },
+  { value: 'price-wrong', label: 'Price is wrong or outdated' },
+  { value: 'photos-outdated', label: 'Photos are outdated or not of this unit' },
+  { value: 'contact-unreachable', label: 'Agent contact unreachable' },
+  { value: 'suspected-fraud', label: 'Suspected fraud or misrepresentation' },
+  { value: 'other', label: 'Something else' },
+];
+
+export interface ListingReport {
+  id: string;
+  propertyId: string;
+  propertyTitle: string;
+  reason: ReportReason;
+  detail?: string;
+  status: 'open' | 'resolved' | 'dismissed';
+  createdAt: string;
+}
+
+const REPORTS_KEY = 'listing-reports';
+const MAX_REPORTS = 200;
+
+export function reportListing(
+  r: Omit<ListingReport, 'id' | 'status' | 'createdAt'>
+): ListingReport {
+  const reports = store.get<ListingReport[]>(REPORTS_KEY, []);
+  const report: ListingReport = {
+    ...r,
+    id: `RPT-${uid()}`,
+    status: 'open',
+    createdAt: new Date().toISOString(),
+  };
+  reports.unshift(report);
+  store.set(REPORTS_KEY, reports.slice(0, MAX_REPORTS));
+  window.dispatchEvent(new CustomEvent('keja-store-change', { detail: REPORTS_KEY }));
+  return report;
+}
+
+export const useListingReports = () => useStore<ListingReport[]>(REPORTS_KEY, []);
+
+export function setReportStatus(id: string, status: ListingReport['status']) {
+  const reports = store.get<ListingReport[]>(REPORTS_KEY, []);
+  const next = reports.map((r) => (r.id === id ? { ...r, status } : r));
+  store.set(REPORTS_KEY, next);
+  window.dispatchEvent(new CustomEvent('keja-store-change', { detail: REPORTS_KEY }));
+}

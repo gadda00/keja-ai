@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+import { CAPABILITY_CLAIMS, CLAIM_STATUS_META, claimsByStatus } from '@/data/claims';
 import { faqJsonLd, usePageMeta } from '@/lib/seo';
 
 const fadeUp = {
@@ -106,6 +107,17 @@ export default function TrustCenter() {
 
       {/* the five pillars */}
       <section className="section-pad bg-white">
+        <div className="container-luxe">
+          <p className="mx-auto mb-8 max-w-3xl rounded-xl bg-amber-50 px-4 py-3 text-center text-xs leading-relaxed text-amber-800 ring-1 ring-amber-200">
+            <b>Read this first.</b> The pillars below describe the full verification model. In the
+            current public build some checks run on demo data only — the{' '}
+            <a href="#claims" className="font-semibold underline underline-offset-2">
+              claims register
+            </a>{' '}
+            below states exactly which are live, which are simulated, and which are planned. We
+            would rather show you the blueprint with its status than blur the line.
+          </p>
+        </div>
         <div className="container-luxe grid gap-6 grid-cols-1 lg:grid-cols-2">
           {PILLARS.map((p, i) => (
             <motion.div
@@ -183,8 +195,104 @@ export default function TrustCenter() {
         </div>
       </section>
 
+      {/* claims register — what is real, simulated, partner-dependent or planned */}
+      <section className="section-pad bg-cream" id="claims">
+        <div className="container-luxe">
+          <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center">
+            <p className="eyebrow">The claims register</p>
+            <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
+              What is real, and what is a demo
+            </h2>
+            <p className="mt-5 leading-relaxed text-ink-soft">
+              Most property platforms ask you to take their word for it. We publish the register
+              below instead: every capability this product claims, its honest status, what actually
+              backs it today, and what has to happen before it can be called live. If a claim is not
+              here, we don&rsquo;t make it.
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              {(Object.keys(CLAIM_STATUS_META) as (keyof typeof CLAIM_STATUS_META)[]).map((s) => (
+                <span
+                  key={s}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider ${
+                    s === 'live'
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : s === 'simulated'
+                        ? 'bg-amber-100 text-amber-800'
+                        : s === 'partner-dependent'
+                          ? 'bg-sky-100 text-sky-800'
+                          : 'bg-zinc-200 text-zinc-700'
+                  }`}
+                >
+                  {CLAIM_STATUS_META[s].label} · {claimsByStatus(s).length}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+
+          <div className="mx-auto mt-10 max-w-4xl overflow-x-auto">
+            <table className="w-full min-w-[720px] border-collapse bg-white text-left text-sm shadow-sm ring-1 ring-gold-100">
+              <thead>
+                <tr className="border-b border-gold-200 bg-gold-50/60 text-[11px] uppercase tracking-wider text-ink-faint">
+                  <th className="px-4 py-3 font-semibold">Claim</th>
+                  <th className="px-4 py-3 font-semibold">Status</th>
+                  <th className="px-4 py-3 font-semibold">What backs it today</th>
+                </tr>
+              </thead>
+              <tbody>
+                {CAPABILITY_CLAIMS.map((c) => {
+                  const meta = CLAIM_STATUS_META[c.status];
+                  return (
+                    <tr key={c.id} className="border-b border-gold-100 last:border-0 align-top">
+                      <td className="px-4 py-3.5">
+                        <p className="font-semibold leading-snug text-ink">{c.claim}</p>
+                        <p className="mt-1 text-[11px] text-ink-faint">
+                          {c.surface} · reviewed {c.lastReviewed}
+                        </p>
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <span
+                          className={`inline-block whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${
+                            c.status === 'live'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : c.status === 'simulated'
+                                ? 'bg-amber-100 text-amber-800'
+                                : c.status === 'partner-dependent'
+                                  ? 'bg-sky-100 text-sky-800'
+                                  : 'bg-zinc-200 text-zinc-700'
+                          }`}
+                          title={meta.description}
+                        >
+                          {meta.label}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <p className="text-xs leading-relaxed text-ink-muted">{c.evidence}</p>
+                        {c.pathToLive ? (
+                          <p className="mt-1.5 text-[11px] leading-relaxed text-ink-faint">
+                            <b className="font-semibold text-ink-soft">Path to live:</b>{' '}
+                            {c.pathToLive}
+                          </p>
+                        ) : null}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className="mx-auto mt-4 max-w-4xl text-[11px] leading-relaxed text-ink-faint">
+            This register is generated from{' '}
+            <code className="rounded bg-white px-1 py-0.5 font-mono text-[10px]">
+              src/data/claims.ts
+            </code>{' '}
+            and rendered verbatim — the site cannot claim a capability that is not declared here,
+            and each entry carries the date it was last reviewed against the implementation.
+          </p>
+        </div>
+      </section>
+
       {/* why cross-agency matters */}
-      <section className="section-pad bg-cream" id="score">
+      <section className="section-pad bg-white" id="score">
         <div className="container-luxe grid items-center gap-12 lg:grid-cols-2">
           <motion.div {...fadeUp}>
             <p className="eyebrow">The structural moat</p>
@@ -210,7 +318,7 @@ export default function TrustCenter() {
         </div>
       </section>
 
-      <section className="section-pad bg-white">
+      <section className="section-pad bg-cream">
         <div className="container-luxe mx-auto max-w-3xl">
           <motion.div {...fadeUp} className="text-center">
             <p className="eyebrow">Trust questions, answered</p>

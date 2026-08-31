@@ -205,15 +205,19 @@ export default function AuthModal() {
 
               <p className="flex items-start gap-2 text-[11px] leading-relaxed text-ink-faint">
                 <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold-600" />
-                Protected by KEJA Trust infrastructure. Sessions expire automatically; role-based
-                access controls apply. By continuing you accept the{' '}
-                <Link
-                  to="/legal"
-                  className="font-semibold text-gold-700 underline decoration-gold-400 underline-offset-2"
-                >
-                  Terms &amp; Privacy Policy
-                </Link>
-                .
+                <span>
+                  <b>Demo accounts:</b> roles, sessions and password hashes live in your own browser
+                  in this demo build — no server, no real security. A production launch replaces
+                  this with server-side identity before any real account. By continuing you accept
+                  the{' '}
+                  <Link
+                    to="/legal"
+                    className="font-semibold text-gold-700 underline decoration-gold-400 underline-offset-2"
+                  >
+                    Terms &amp; Privacy Policy
+                  </Link>
+                  .
+                </span>
               </p>
             </div>
           )}

@@ -4,7 +4,7 @@
    - images: cache-first (only 200s), versioned cache
    - navigations: network-first -> cached page -> cached shell -> offline page
 */
-const VERSION = 'v3'
+const VERSION = 'v4'
 const ASSET_CACHE = `${VERSION}-assets`
 const IMG_CACHE = `${VERSION}-images`
 const PAGE_CACHE = `${VERSION}-pages`
