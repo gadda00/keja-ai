@@ -4,7 +4,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { usePageMeta } from '@/lib/seo';
 
 export default function NotFound() {
-  usePageMeta('Page Not Found', 'The page you requested does not exist.');
+  // noindex: this page is also prerendered as the static 404.html that
+  // GitHub Pages serves for unknown URLs — it must never be indexed.
+  usePageMeta('Page Not Found', 'The page you requested does not exist.', {
+    robots: 'noindex, follow',
+  });
   const { pathname } = useLocation();
   return (
     <div className="container-luxe flex min-h-[70vh] flex-col items-center justify-center py-20 text-center">

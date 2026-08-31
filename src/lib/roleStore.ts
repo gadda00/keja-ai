@@ -67,10 +67,16 @@ export const ROLES: {
   },
 ];
 
+const VALID_ROLES: readonly VisitorRole[] = ['buy', 'rent', 'invest', 'list', 'manage'];
+
 export function getRole(): VisitorRole | null {
   try {
     const raw = localStorage.getItem(ROLE_STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as VisitorRole) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as VisitorRole;
+    // validate: a corrupted or tampered slot must never feed an unknown
+    // role into role-aware UI (hero CTA strip, analytics taxonomy)
+    return VALID_ROLES.includes(parsed) ? parsed : null;
   } catch {
     return null;
   }

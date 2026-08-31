@@ -3,6 +3,11 @@ import { useLocation } from 'react-router-dom';
 
 import { asset, SITE, SITE_URL } from '@/config';
 
+/** Default social image — matches the static tag shipped in index.html so a
+ *  route without its own image resets to the site default instead of sharing
+ *  the previous route's image (or dropping the card entirely). */
+const DEFAULT_OG_IMAGE = asset('og-image.jpg');
+
 function upsertMeta(attr: 'name' | 'property', key: string, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
   if (!el) {
@@ -74,6 +79,13 @@ export function usePageMeta(
         : `${window.location.origin}${asset(options.image.replace(/^\//, ''))}`;
       upsertMeta('property', 'og:image', img);
       upsertMeta('name', 'twitter:image', img);
+      upsertMeta('property', 'og:image:width', '1200');
+      upsertMeta('property', 'og:image:height', '630');
+    } else {
+      // Reset to the site default so a route without its own image neither
+      // keeps the previous route's image (stale unfurls) nor loses the card.
+      upsertMeta('property', 'og:image', DEFAULT_OG_IMAGE);
+      upsertMeta('name', 'twitter:image', DEFAULT_OG_IMAGE);
       upsertMeta('property', 'og:image:width', '1200');
       upsertMeta('property', 'og:image:height', '630');
     }

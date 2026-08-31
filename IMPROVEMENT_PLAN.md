@@ -1,333 +1,84 @@
-# Keja.ai - Comprehensive Improvement Plan
-
-## 🎯 Executive Summary
-
-Keja.ai is a sophisticated, production-ready real estate platform with AI capabilities, trust scoring, and automated listing ingestion. This document outlines strategic improvements to elevate the codebase to enterprise-grade quality while maintaining its innovative features.
-
-## 📈 Current State Analysis
-
-### Architecture Strengths
-
-- ✅ Clean separation of concerns (lib/, data/, components/, pages/)
-- ✅ Comprehensive feature set (AI, tokenization, investment tools)
-- ✅ Modern tech stack (React 19, TypeScript, Vite, Tailwind)
-- ✅ Robust testing (45 unit tests incl. jsdom React-level tests)
-- ✅ Excellent SEO implementation
-- ✅ PWA capabilities
-- ✅ CI/CD pipeline with quality gates
-
-### Key Metrics
-
-- **Lines of Code**: ~18,000 TypeScript/TSX
-- **Test Coverage**: Core engines (finance, AI, search, autopilot)
-- **Bundle Size**: Optimized with code splitting
-- **Performance**: Lazy loading for heavy pages
-- **Accessibility**: WCAG-AA compliant features
-
----
-
-## 🚀 Phase 1: Code Quality & Maintainability (Priority: HIGH)
-
-### 1.1 TypeScript Enhancements
-
-- [ ] Add stricter TypeScript configuration
-- [ ] Implement custom type guards for runtime validation
-- [ ] Create comprehensive type definitions for all external data
-- [ ] Add JSDoc comments for all exported functions
-
-### 1.2 Linting & Formatting
-
-- [ ] Configure ESLint with TypeScript-specific rules
-- [ ] Add Prettier for consistent code formatting
-- [ ] Set up lint-staged for pre-commit hooks
-- [ ] Add editorconfig for cross-IDE consistency
-
-### 1.3 Testing Improvements
-
-- [ ] Expand test coverage to 80%+
-- [ ] Add integration tests for critical user flows
-- [ ] Implement visual regression testing
-- [ ] Add performance testing
-- [ ] Set up test coverage reporting
-
-### 1.4 Code Organization
-
-- [ ] Implement barrel exports for cleaner imports
-- [ ] Create utility type library
-- [ ] Standardize component props interfaces
-- [ ] Implement consistent error handling patterns
-
----
-
-## 🎨 Phase 2: Architecture & Performance (Priority: HIGH)
-
-### 2.1 State Management
-
-- [ ] Migrate from localStorage-based stores to Zustand
-- [ ] Implement proper state hydration
-- [ ] Add state persistence with sync/async support
-- [ ] Create devtools integration for state inspection
-
-### 2.2 Performance Optimization
-
-- [ ] Implement React.memo and useMemo strategically
-- [ ] Add React.Profiler for performance monitoring
-- [ ] Optimize image loading (lazy, placeholder, webp)
-- [ ] Implement virtual scrolling for large lists
-- [ ] Add service worker caching strategies
-
-### 2.3 API Layer
-
-- [ ] Create API service layer for backend integration
-- [ ] Implement request/response interceptors
-- [ ] Add error handling and retry logic
-- [ ] Create mock API for development
-- [ ] Implement API caching strategies
-
-### 2.4 Component Library
-
-- [ ] Create reusable UI component library
-- [ ] Implement design system tokens
-- [ ] Add Storybook for component documentation
-- [ ] Create consistent prop validation
-
----
-
-## 🌐 Phase 3: Advanced Features & UX (Priority: MEDIUM)
-
-### 3.1 Enhanced AI Capabilities
-
-- [ ] Add conversation history persistence
-- [ ] Implement context-aware responses
-- [ ] Add multi-turn conversation support
-- [ ] Enhance language detection and switching
-
-### 3.2 Advanced Search & Filtering
-
-- [ ] Implement full-text search across listings
-- [ ] Add faceted filtering (price ranges, amenities, etc.)
-- [ ] Create saved search alerts
-- [ ] Implement search analytics
-
-### 3.3 User Experience
-
-- [ ] Add progressive web app enhancements
-- [ ] Implement offline-first capabilities
-- [ ] Add dark mode support
-- [ ] Create customizable dashboards
-
-### 3.4 Tokenization Enhancements
-
-- [ ] Implement real blockchain integration (demo)
-- [ ] Add wallet connection support
-- [ ] Create transaction history tracking
-- [ ] Implement KYC/AML workflows
-
----
-
-## 🔒 Phase 4: Security & Compliance (Priority: HIGH)
-
-### 4.1 Security Enhancements
-
-- [ ] Implement proper authentication flows
-- [ ] Add session management with JWT
-- [ ] Create role-based access control (RBAC)
-- [ ] Implement CSRF protection
-- [ ] Add input validation and sanitization
-
-### 4.2 Data Protection
-
-- [ ] Implement sensitive data encryption
-- [ ] Add audit logging for all mutations
-- [ ] Create data retention policies
-- [ ] Implement backup and recovery procedures
-
-### 4.3 Compliance
-
-- [ ] Add GDPR compliance features
-- [ ] Implement accessibility audit tools
-- [ ] Create privacy policy management
-- [ ] Add cookie consent management
-
----
-
-## 📊 Phase 5: DevOps & Monitoring (Priority: MEDIUM)
-
-### 5.1 CI/CD Enhancements
-
-- [ ] Add automated deployments to multiple environments
-- [ ] Implement canary deployments
-- [ ] Add rollback capabilities
-- [ ] Create deployment notifications
-
-### 5.2 Monitoring & Analytics
-
-- [ ] Implement error tracking (Sentry/Error Boundary)
-- [ ] Add performance monitoring
-- [ ] Create user analytics dashboard
-- [ ] Implement logging infrastructure
-
-### 5.3 Infrastructure
-
-- [ ] Add Docker support for consistent environments
-- [ ] Implement database migrations
-- [ ] Create environment configuration management
-- [ ] Add feature flags for gradual rollouts
-
----
-
-## 📚 Phase 6: Documentation & Developer Experience (Priority: MEDIUM)
-
-### 6.1 Documentation
-
-- [ ] Create comprehensive API documentation
-- [ ] Add architecture decision records (ADRs)
-- [ ] Implement component documentation (Storybook)
-- [ ] Create onboarding guides for new developers
-
-### 6.2 Developer Tools
-
-- [ ] Add VS Code workspace configuration
-- [ ] Create debug configurations
-- [ ] Implement code generation scripts
-- [ ] Add development environment setup guides
-
----
-
-## 🎯 Implementation Priority Matrix
-
-### Critical (Must Have)
-
-1. TypeScript strict mode enhancements
-2. State management migration (Zustand)
-3. API service layer
-4. Enhanced error handling
-5. Security improvements
-
-### High Priority
-
-1. ESLint + Prettier setup
-2. Expanded test coverage
-3. Performance optimizations
-4. Component library
-5. Monitoring and analytics
-
-### Medium Priority
-
-1. Advanced AI features
-2. Enhanced search capabilities
-3. PWA enhancements
-4. Documentation improvements
-
-### Nice to Have
-
-1. Dark mode support
-2. Blockchain integration (demo)
-3. Storybook implementation
-4. Canary deployments
-
----
-
-## 📅 Estimated Timeline
-
-### Week 1-2: Foundation
-
-- TypeScript improvements
-- ESLint/Prettier setup
-- State management migration
-- API service layer
-
-### Week 3-4: Quality
-
-- Expanded test coverage
-- Performance optimizations
-- Error handling improvements
-- Security enhancements
-
-### Week 5-6: Features
-
-- Advanced AI capabilities
-- Enhanced search
-- UX improvements
-- Monitoring setup
-
-### Week 7-8: Polish
-
-- Documentation
-- Developer tools
-- Final optimizations
-- Deployment enhancements
-
----
-
-## 💰 Resource Requirements
-
-### Tools & Services
-
-- **Free/Open Source**: ESLint, Prettier, TypeScript, Vitest
-- **Optional Paid**: Sentry (error tracking), Vercel/Netlify (hosting)
-- **Infrastructure**: GitHub Actions (existing)
-
-### Team Skills
-
-- React/TypeScript expertise
-- DevOps experience
-- UI/UX design knowledge
-- Testing strategies
-
----
-
-## ✅ Success Metrics
-
-### Code Quality
-
-- [ ] TypeScript strict mode: 100% compliance
-- [ ] Test coverage: 80%+
-- [ ] Lint errors: 0
-- [ ] Build time: < 2 minutes
-- [ ] Bundle size: < 500KB (compressed)
-
-### Performance
-
-- [ ] Lighthouse score: > 90
-- [ ] Time to Interactive: < 2s
-- [ ] First Contentful Paint: < 1s
-- [ ] Cumulative Layout Shift: < 0.1
-
-### User Experience
-
-- [ ] Error rate: < 1%
-- [ ] Session duration: > 5 minutes
-- [ ] Conversion rate: Track and improve
-- [ ] User satisfaction: > 4.5/5
-
-### Development
-
-- [ ] PR review time: < 24 hours
-- [ ] Deployment frequency: Daily
-- [ ] Mean time to recovery: < 1 hour
-- [ ] Developer satisfaction: > 4.5/5
-
----
-
-## 📝 Next Steps
-
-1. **Immediate (Today)**: Set up development environment
-2. **This Week**: Implement TypeScript and linting improvements
-3. **Next Week**: Migrate state management and add API layer
-4. **Following Week**: Expand testing and add monitoring
-
----
-
-## 🔗 Related Documents
-
-- [README.md](./README.md) - Project overview
-- [CONTRIBUTING.md] - Contribution guidelines (to be created)
-- [ARCHITECTURE.md] - Technical architecture (to be created)
-- [API.md] - API documentation (to be created)
-
----
-
-_Document Version: 1.0.0_  
-_Last Updated: $(date)_  
-_Author: Vibe Code (Mistral AI)_
+# Keja.ai — Improvement Status & Roadmap
+
+> This document replaced the original improvement plan after an internal audit
+> found it stale and partly inaccurate: it claimed 45 unit tests (the suite was
+> 85 at the time, 108 after this wave), left a literal `$(date)` placeholder in
+> its footer, and listed already-shipped work (ESLint, Prettier, lint-staged,
+> husky) as future TODOs. It also recommended migrations (Zustand, a live API
+> layer, server auth) that contradict the demo's deliberately client-side,
+> static-hosted architecture. This version states verified facts, records what
+> each improvement wave actually changed, and keeps a realistic roadmap.
+
+## Current state (verified, not aspirational)
+
+| Dimension    | Status                                                                                                                                                  |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Typecheck    | strict `tsc -b` — 0 errors                                                                                                                              |
+| Tests        | 108 passing (14 files: finance, search, scoring, autopilot, escalation, claims, verification, analytics, anomaly, stores, markdown renderer, role gate) |
+| Lint         | oxlint + ESLint (flat config, `--max-warnings 0`) + Prettier — all clean                                                                                |
+| Build        | Vite 8 production build, route-level code splitting, recharts isolated to a lazy chunk                                                                  |
+| Static-first | every sitemap route prerendered to status-200 HTML incl. a real 404 page                                                                                |
+| CI           | deploy on main + PR-check workflow (full verification incl. prerender)                                                                                  |
+| Auto-Pilot   | scheduled ingestion pipeline, quality-gated, Prettier-formatted commits                                                                                 |
+
+## Wave 5 (this audit) — what changed and why
+
+1. **Auto-Pilot Prettier drift eliminated.** The publisher wrote raw
+   `JSON.stringify` output while Prettier collapses short arrays, so
+   `lint:prettier` failed on `src/data/auto-listings.json` and the drift
+   compounded with every scheduled ingest. `saveState()` now formats through
+   Prettier when it is importable; the zero-dependency CI ingest job formats
+   via the exact locked `prettier` version before committing; the data file
+   was reformatted once to reset the baseline.
+2. **Mechanical service-worker cache versioning.** `scripts/sw-version.mjs`
+   stamps the SW cache version from a content hash of `dist/` in the deploy
+   pipeline — the v3→v4→v4 hand-edits could not be relied on forever. SW
+   robustness fixes: asset-cache writes now survive SW termination
+   (`event.waitUntil`), and navigations race an 8s timeout so lie-fi
+   connections fall back to cache instead of hanging.
+3. **Real 404 page.** The deploy used to copy Home's HTML as `404.html`, so
+   dead links flashed Home's content and meta. Prerender now captures the
+   router's NotFound page (noindex, neutral copy).
+4. **Prerendered HTML is visible to no-JS clients.** Framer-motion initial
+   states (`opacity: 0` + `translateY`) were baked into the static HTML,
+   hiding ~33 below-fold elements on Home from crawlers and no-JS visitors;
+   the capture step now strips exactly that inline-style pair.
+5. **Meta hygiene.** `og:image`/`twitter:image` reset to the site default on
+   routes without their own image (previously a stale leak); `index.html`
+   loads Google Fonts non-blockingly (print-media swap + `noscript`).
+6. **Quality gates widened.** Both deploy workflows and the new
+   `pr-check.yml` (PRs and non-main pushes) run the full pipeline —
+   typecheck, tests, oxlint, ESLint, Prettier, sitemap, build, prerender,
+   SW stamping.
+7. **Robustness + coverage.** `getRole()` validates the persisted role
+   against the taxonomy; 23 new tests (format/investment-score/inventory
+   engines, roleStore incl. corrupted-storage cases, Markdown renderer with
+   an XSS pin). Netlify config brought to parity (Node 22 + prerender).
+
+## Deliberate non-goals (same reasoning as the claims register)
+
+- **Zustand / API service layer / server auth / JWT** — these assume a hosted
+  backend. The demo is intentionally client-side; the honest boundary (demo
+  auth, simulated payments) is disclosed in-app, in the claims register and in
+  the README launch blockers. Introducing a fake "real-looking" backend would
+  _reduce_ trust, not increase it.
+- **Dark mode, Storybook, canary deploys** — polish, not substance, for a
+  static demo at this stage.
+
+## Remaining roadmap (ordered)
+
+1. **Bundle:** the eager index chunk is ~558 kB raw / 159 kB gzipped because
+   `Home` (42 `motion.` usages) and `MotionConfig` load framer-motion
+   eagerly. A `LazyMotion` + `m` migration across 15 files would cut roughly
+   a third of that, but touches every animated component — deferred until it
+   can be verified visually, not just by build size.
+2. **Admin console breadth:** `adminStore`/`seo.ts`/`auth.tsx` still lack
+   direct unit tests (they are exercised indirectly through app tests).
+3. **Insights library provenance:** article front-matter (author, reviewed-at,
+   sources) is a content task for the owner; the data layer renders whatever
+   is provided.
+4. **Analytics egress:** the privacy-first local event bus is complete; any
+   dashboard/CRM export waits for the Phase-2 backend.
+
+Document version: 2.0.0 — maintained in-repo; update with every improvement
+wave (see `docs/REVIEW_ACTIONS.md` for the external-review tracker).

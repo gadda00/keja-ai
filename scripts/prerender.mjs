@@ -153,6 +153,23 @@ async function main() {
         await page.waitForTimeout(route.startsWith('/properties/') ? 600 : 350)
 
         let html = await page.evaluate(() => {
+          // Framer-motion initial states hide below-fold content from
+          // no-JS clients and crawlers (inline `opacity: 0` +
+          // `transform: translateY(...)` on whileInView elements). Static
+          // HTML must actually show the content — the SPA re-applies its
+          // own initial states once it boots. Only elements carrying BOTH
+          // properties are touched, so intentional CSS hides are safe.
+          document.querySelectorAll('[style]').forEach((el) => {
+            const s = el.getAttribute('style') || ''
+            if (s.includes('opacity: 0') && /transform:\s*translate/.test(s)) {
+              el.setAttribute(
+                'style',
+                s
+                  .replace(/opacity:\s*0(?:\.0+)?;?\s*/g, '')
+                  .replace(/transform:\s*[^;]*;?\s*/g, ''),
+              )
+            }
+          })
           // strip dev-only artifacts so they never leak into static files
           document.querySelectorAll('script[src*="@vite"]').forEach((s) => s.remove())
           return '<!DOCTYPE html>\n' + document.documentElement.outerHTML
@@ -183,6 +200,33 @@ async function main() {
         failures++
         console.error(`[prerender] FAILED ${route}: ${err.message}`)
       }
+    }
+
+    // Capture the router's NotFound page (path="*") as the real 404.html.
+    // GitHub Pages serves it for unknown URLs with status 404 — previously
+    // workflows copied the Home page here, which flashed Home's content and
+    // meta tags on every dead link. The fake path echoed in the copy
+    // ("We couldn't find /404-preview") is rewritten to a neutral phrase.
+    try {
+      const url = origin + BASE + '/404-preview'
+      await page.goto(url, { waitUntil: 'networkidle' })
+      await page.waitForFunction(() => document.readyState === 'complete')
+      await page.waitForTimeout(350)
+      let html = await page.evaluate(() => {
+        document.querySelectorAll('script[src*="@vite"]').forEach((s) => s.remove())
+        return '<!DOCTYPE html>\n' + document.documentElement.outerHTML
+      })
+      html = html
+        .replaceAll(PREVIEW_ORIGIN, PROD_ORIGIN)
+        .replaceAll('/404-preview', 'this page')
+      if (html.includes('localhost:')) {
+        throw new Error('localhost URL survived the rewrite — check canonical/meta/modulepreload')
+      }
+      writeFileSync(resolve(DIST, '404.html'), html)
+      console.log('[prerender] 404 page      -> dist/404.html (real NotFound, noindex)')
+    } catch (err) {
+      failures++
+      console.error(`[prerender] FAILED 404 capture: ${err.message}`)
     }
 
     await browser.close()

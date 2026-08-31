@@ -1,11 +1,18 @@
 [build]
-  command = "npm run build"
+  # Full parity with the GitHub Pages deploy: build + prerender every route
+  # (status-200 HTML, real 404 page) instead of shipping a bare SPA shell.
+  # PRERENDER_ORIGIN picks up Netlify's own URL so canonicals/og:url are right.
+  command = "npm run build && PRERENDER_ORIGIN=$URL node scripts/prerender.mjs --base /"
   publish = "dist"
 
 [[redirects]]
+  # SPA fallback for unknown paths — Netlify serves 404.html first when it
+  # exists, so dead links get the real NotFound page, not a Home shell.
   from = "/*"
   to = "/index.html"
   status = 200
 
 [build.environment]
-  NODE_VERSION = "20"
+  # jsdom 30 / undici 8 (test + toolchain) require Node >= 22, matching
+  # .nvmrc, package.json engines and the GitHub Actions workflows.
+  NODE_VERSION = "22"

@@ -1,24 +1,26 @@
-name: Deploy to GitHub Pages
+# PR / branch quality gate — the deploy workflow only runs on main, so a
+# change that breaks typecheck, tests, lint, formatting, the build, the
+# sitemap or the prerender pipeline would otherwise surface only at deploy
+# time. This workflow runs the full verification locally on every pull
+# request (and every push to a non-main branch), including the headless
+# prerender pass that catches blank/failed renders before production.
+name: PR check
 
 on:
+  pull_request:
   push:
-    branches: [main]
-  # Auto-Pilot no longer triggers this workflow: its own auto-listings.yml
-  # gates a self-contained deploy job on `changed == true`, which avoids
-  # rebuilding production on no-op ingestion runs.
+    branches-ignore: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: pr-check-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -55,27 +57,8 @@ jobs:
       - name: Build (with GitHub Pages base path)
         run: npm run build -- --base=/keja-ai/
 
-      - name: Prerender all routes (status-200 HTML, real 404 page, visible no-JS content)
+      - name: Prerender all routes (status-200 HTML, real 404 page)
         run: node scripts/prerender.mjs --base /keja-ai/
 
-      # prerender.mjs emits dist/404.html (the real NotFound page) — no more
-      # cp dist/index.html which flashed Home on dead links.
-
-      - name: Stamp service-worker cache version from deployed content
+      - name: Stamp service-worker cache version (dry validation)
         run: node scripts/sw-version.mjs
-
-      - uses: actions/configure-pages@v5
-
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4

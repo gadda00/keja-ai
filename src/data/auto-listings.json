@@ -272,9 +272,7 @@
       "id": "KJA-A0040",
       "title": "Contemporary 2-Bedroom Bungalow in Nyali",
       "type": "bungalow",
-      "purpose": [
-        "buy"
-      ],
+      "purpose": ["buy"],
       "area": "Nyali",
       "county": "Mombasa",
       "price": 9350000,
@@ -283,15 +281,8 @@
       "bedrooms": 2,
       "bathrooms": 2,
       "sizeSqm": 100,
-      "amenities": [
-        "Car porch",
-        "Water storage tanks",
-        "Quiet cul-de-sac"
-      ],
-      "images": [
-        "/images/props/townhouse_0.jpg",
-        "/images/props/apartment_1.jpg"
-      ],
+      "amenities": ["Car porch", "Water storage tanks", "Quiet cul-de-sac"],
+      "images": ["/images/props/townhouse_0.jpg", "/images/props/apartment_1.jpg"],
       "description": "Rarely available: a bungalow in Nyali combining space (100 sqm), light and a convenient address. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. At KES 94k/sqm the pricing sits above the Nyali band, and the area yield band of 6.8% supports a solid income case.",
       "agency": "Skyline Agents Kenya",
       "agent": {
@@ -315,14 +306,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "above",
         "areaYieldBand": 6.8,
-        "areaPpsmBand": [
-          60000,
-          100000
-        ],
-        "areaAcreBand": [
-          8,
-          25
-        ],
+        "areaPpsmBand": [60000, 100000],
+        "areaAcreBand": [8, 25],
         "qualityScore": 90,
         "route": "publish",
         "checks": [
@@ -353,10 +338,7 @@
       "id": "KJA-A0041",
       "title": "Spacious 3-Bedroom Garden Bungalow in Kilimani",
       "type": "bungalow",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Kilimani",
       "county": "Nairobi",
       "price": 15000000,
@@ -365,15 +347,8 @@
       "bedrooms": 3,
       "bathrooms": 2,
       "sizeSqm": 143,
-      "amenities": [
-        "Quiet cul-de-sac",
-        "Car porch",
-        "Mature garden"
-      ],
-      "images": [
-        "/images/props/interior_1.jpg",
-        "/images/props/apartment_1.jpg"
-      ],
+      "amenities": ["Quiet cul-de-sac", "Car porch", "Mature garden"],
+      "images": ["/images/props/interior_1.jpg", "/images/props/apartment_1.jpg"],
       "description": "A well-presented bungalow in Kilimani, Nairobi, offering 143 sqm of bright, efficiently planned space. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. The Kilimani market band and 8.2% yield environment make this a disciplined income or appreciation play.",
       "agency": "Diaspora Property Group",
       "agent": {
@@ -397,14 +372,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 8.2,
-        "areaPpsmBand": [
-          95000,
-          145000
-        ],
-        "areaAcreBand": [
-          80,
-          160
-        ],
+        "areaPpsmBand": [95000, 145000],
+        "areaAcreBand": [80, 160],
         "qualityScore": 87,
         "route": "publish",
         "checks": [
@@ -435,9 +404,7 @@
       "id": "KJA-A0042",
       "title": "Bright Acreage in Ruaka",
       "type": "land",
-      "purpose": [
-        "buy"
-      ],
+      "purpose": ["buy"],
       "area": "Ruaka",
       "county": "Nairobi",
       "price": 160950000,
@@ -448,9 +415,7 @@
         "Near tarmac road",
         "Clean freehold title"
       ],
-      "images": [
-        "/images/props/land_1.jpg"
-      ],
+      "images": ["/images/props/land_1.jpg"],
       "description": "This 28300 sqm land parcel in Ruaka has been finished to a practical standard and priced with discipline. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Ruaka at this price point rarely lingers.",
       "agency": "Prestige Homes KE",
       "agent": {
@@ -475,14 +440,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 8,
-        "areaPpsmBand": [
-          65000,
-          95000
-        ],
-        "areaAcreBand": [
-          10,
-          28
-        ],
+        "areaPpsmBand": [65000, 95000],
+        "areaAcreBand": [10, 28],
         "qualityScore": 86,
         "route": "publish",
         "checks": [
@@ -513,10 +472,7 @@
       "id": "KJA-A0039",
       "title": "Sunny 3-Bedroom Garden Bungalow in Athi River",
       "type": "bungalow",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Athi River",
       "county": "Machakos",
       "price": 3700000,
@@ -525,15 +481,8 @@
       "bedrooms": 3,
       "bathrooms": 1,
       "sizeSqm": 98,
-      "amenities": [
-        "Mature garden",
-        "Car porch",
-        "Solar water heating"
-      ],
-      "images": [
-        "/images/props/interior_1.jpg",
-        "/images/props/townhouse_0.jpg"
-      ],
+      "amenities": ["Mature garden", "Car porch", "Solar water heating"],
+      "images": ["/images/props/interior_1.jpg", "/images/props/townhouse_0.jpg"],
       "description": "Rarely available: a bungalow in Athi River combining space (98 sqm), light and a convenient address. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. The Athi River market band and 7.2% yield environment make this a disciplined income or appreciation play.",
       "agency": "Diaspora Property Group",
       "agent": {
@@ -557,14 +506,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "within",
         "areaYieldBand": 7.2,
-        "areaPpsmBand": [
-          25000,
-          45000
-        ],
-        "areaAcreBand": [
-          2,
-          6
-        ],
+        "areaPpsmBand": [25000, 45000],
+        "areaAcreBand": [2, 6],
         "qualityScore": 87,
         "route": "publish",
         "checks": [
@@ -595,10 +538,7 @@
       "id": "KJA-A0006",
       "title": "Diaspora Property Group — Karen Executive Villa",
       "type": "villa",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Karen",
       "county": "Nairobi",
       "price": 58500000,
@@ -607,16 +547,8 @@
       "bedrooms": 5,
       "bathrooms": 4,
       "sizeSqm": 380,
-      "amenities": [
-        "Borehole + storage tanks",
-        "Guest wing",
-        "Half-acre garden",
-        "Solar backup"
-      ],
-      "images": [
-        "/images/props/interior_0.jpg",
-        "/images/props/villa_1.jpg"
-      ],
+      "amenities": ["Borehole + storage tanks", "Guest wing", "Half-acre garden", "Solar backup"],
+      "images": ["/images/props/interior_0.jpg", "/images/props/villa_1.jpg"],
       "description": "Rarely available: a villa in Karen combining space (380 sqm), light and a convenient address. Living areas open onto a private garden, and the bedrooms are all generously proportioned. Viewings are recommended — honest stock in Karen at this price point rarely lingers.",
       "agency": "Keja Verified Partner",
       "agent": {
@@ -640,14 +572,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "above",
         "areaYieldBand": 5.8,
-        "areaPpsmBand": [
-          55000,
-          90000
-        ],
-        "areaAcreBand": [
-          2,
-          15
-        ],
+        "areaPpsmBand": [55000, 90000],
+        "areaAcreBand": [2, 15],
         "qualityScore": 80,
         "route": "publish",
         "checks": [
@@ -678,10 +604,7 @@
       "id": "KJA-A0007",
       "title": "Diaspora Property Group — Nyali Sea-Breeze 3-Bed",
       "type": "apartment",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Nyali",
       "county": "Mombasa",
       "price": 14500000,
@@ -690,13 +613,7 @@
       "bedrooms": 3,
       "bathrooms": 2,
       "sizeSqm": 150,
-      "amenities": [
-        "Lift access",
-        "Borehole water",
-        "Rooftop terrace",
-        "Gym",
-        "Backup generator"
-      ],
+      "amenities": ["Lift access", "Borehole water", "Rooftop terrace", "Gym", "Backup generator"],
       "images": [
         "/images/props/bedroom_0.jpg",
         "/images/props/interior_0.jpg",
@@ -725,14 +642,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "above",
         "areaYieldBand": 6.8,
-        "areaPpsmBand": [
-          60000,
-          100000
-        ],
-        "areaAcreBand": [
-          2,
-          15
-        ],
+        "areaPpsmBand": [60000, 100000],
+        "areaAcreBand": [2, 15],
         "qualityScore": 100,
         "route": "publish",
         "checks": [
@@ -763,10 +674,7 @@
       "id": "KJA-A0008",
       "title": "Diaspora Property Group — Nakuru Milimani 2-Bed",
       "type": "apartment",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Nakuru",
       "county": "Nakuru",
       "price": 6500000,
@@ -811,14 +719,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "above",
         "areaYieldBand": 7.8,
-        "areaPpsmBand": [
-          30000,
-          55000
-        ],
-        "areaAcreBand": [
-          2,
-          15
-        ],
+        "areaPpsmBand": [30000, 55000],
+        "areaAcreBand": [2, 15],
         "qualityScore": 85,
         "route": "publish",
         "checks": [
@@ -849,26 +751,15 @@
       "id": "KJA-A0009",
       "title": "Horizon Realtors — Westlands Office Suite",
       "type": "commercial",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Westlands",
       "county": "Nairobi",
       "price": 22000000,
       "rentEstimate": 139000,
       "grossYieldEstimate": 7.6,
       "sizeSqm": 260,
-      "amenities": [
-        "Grade-A finishes",
-        "Raised floors",
-        "Central A/C",
-        "Ample parking bays"
-      ],
-      "images": [
-        "/images/props/office_0.jpg",
-        "/images/props/interior_2.jpg"
-      ],
+      "amenities": ["Grade-A finishes", "Raised floors", "Central A/C", "Ample parking bays"],
+      "images": ["/images/props/office_0.jpg", "/images/props/interior_2.jpg"],
       "description": "A well-presented commercial unit in Westlands, Nairobi, offering 260 sqm of bright, efficiently planned space. The floor plate is flexible for office, retail or clinic use, with parking and services in place. Benchmarked against comparable stock in Westlands, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -892,14 +783,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 7.6,
-        "areaPpsmBand": [
-          100000,
-          150000
-        ],
-        "areaAcreBand": [
-          2,
-          15
-        ],
+        "areaPpsmBand": [100000, 150000],
+        "areaAcreBand": [2, 15],
         "qualityScore": 95,
         "route": "publish",
         "checks": [
@@ -930,10 +815,7 @@
       "id": "KJA-A0010",
       "title": "Horizon Realtors — Kileleshwa 2-Bed Apartment",
       "type": "apartment",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Kileleshwa",
       "county": "Nairobi",
       "price": 9800000,
@@ -977,14 +859,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "within",
         "areaYieldBand": 8.4,
-        "areaPpsmBand": [
-          85000,
-          125000
-        ],
-        "areaAcreBand": [
-          2,
-          15
-        ],
+        "areaPpsmBand": [85000, 125000],
+        "areaAcreBand": [2, 15],
         "qualityScore": 100,
         "route": "publish",
         "checks": [
@@ -1015,10 +891,7 @@
       "id": "KJA-A0011",
       "title": "Horizon Realtors — Syokimau 1/8 Acre Plot",
       "type": "land",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Syokimau",
       "county": "Machakos",
       "price": 2200000,
@@ -1029,9 +902,7 @@
         "Electricity on site",
         "Water on site"
       ],
-      "images": [
-        "/images/props/land_1.jpg"
-      ],
+      "images": ["/images/props/land_1.jpg"],
       "description": "Set in the heart of Syokimau, this land parcel delivers 506 sqm of comfortable living with genuine character. Documentation is available for inspection; the holding is clean and transfer-ready. A practical choice for anyone seeking a genuine Syokimau address without overpaying.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -1057,14 +928,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 7.8,
-        "areaPpsmBand": [
-          35000,
-          60000
-        ],
-        "areaAcreBand": [
-          2,
-          15
-        ],
+        "areaPpsmBand": [35000, 60000],
+        "areaAcreBand": [2, 15],
         "qualityScore": 91,
         "route": "publish",
         "checks": [
@@ -1095,10 +960,7 @@
       "id": "KJA-A0012",
       "title": "Skyline Agents Kenya — Kilimani 3-Bed with City Views",
       "type": "apartment",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Kilimani",
       "county": "Nairobi",
       "price": 13500000,
@@ -1107,12 +969,7 @@
       "bedrooms": 3,
       "bathrooms": 2,
       "sizeSqm": 138,
-      "amenities": [
-        "Backup generator",
-        "Secure parking",
-        "Lift access",
-        "Rooftop terrace"
-      ],
+      "amenities": ["Backup generator", "Secure parking", "Lift access", "Rooftop terrace"],
       "images": [
         "/images/props/apartment_1.jpg",
         "/images/props/interior_1.jpg",
@@ -1141,14 +998,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 8.2,
-        "areaPpsmBand": [
-          95000,
-          145000
-        ],
-        "areaAcreBand": [
-          2,
-          15
-        ],
+        "areaPpsmBand": [95000, 145000],
+        "areaAcreBand": [2, 15],
         "qualityScore": 100,
         "route": "publish",
         "checks": [
@@ -1179,10 +1030,7 @@
       "id": "KJA-A0013",
       "title": "Skyline Agents Kenya — Ruaka Family Townhouse",
       "type": "townhouse",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Ruaka",
       "county": "Nairobi",
       "price": 15500000,
@@ -1191,16 +1039,8 @@
       "bedrooms": 4,
       "bathrooms": 3,
       "sizeSqm": 190,
-      "amenities": [
-        "Private garden",
-        "Solar water heating",
-        "Clubhouse access",
-        "Borehole water"
-      ],
-      "images": [
-        "/images/props/townhouse_1.jpg",
-        "/images/props/interior_2.jpg"
-      ],
+      "amenities": ["Private garden", "Solar water heating", "Clubhouse access", "Borehole water"],
+      "images": ["/images/props/townhouse_1.jpg", "/images/props/interior_2.jpg"],
       "description": "An honest, well-maintained townhouse in Ruaka — 190 sqm of sensible layout for owners and investors alike. The property sits on a mature, well-kept compound with room for family life and entertaining. Benchmarked against comparable stock in Ruaka, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Skyline Agents Kenya",
       "agent": {
@@ -1224,14 +1064,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "within",
         "areaYieldBand": 8,
-        "areaPpsmBand": [
-          65000,
-          95000
-        ],
-        "areaAcreBand": [
-          2,
-          15
-        ],
+        "areaPpsmBand": [65000, 95000],
+        "areaAcreBand": [2, 15],
         "qualityScore": 95,
         "route": "publish",
         "checks": [
@@ -1262,10 +1096,7 @@
       "id": "KJA-A0014",
       "title": "Skyline Agents Kenya — Kitengela 0.5 Acre Commercial Plot",
       "type": "land",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Kitengela",
       "county": "Kajiado",
       "price": 6500000,
@@ -1276,9 +1107,7 @@
         "Beaconed boundaries",
         "Near tarmac road"
       ],
-      "images": [
-        "/images/props/land_0.jpg"
-      ],
+      "images": ["/images/props/land_0.jpg"],
       "description": "Set in the heart of Kitengela, this land parcel delivers 2023 sqm of comfortable living with genuine character. A level, dry parcel suitable for immediate development or a medium-term hold. Convenient, well-connected and realistically priced for the current market.",
       "agency": "Skyline Agents Kenya",
       "agent": {
@@ -1303,14 +1132,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 7.6,
-        "areaPpsmBand": [
-          30000,
-          55000
-        ],
-        "areaAcreBand": [
-          2,
-          15
-        ],
+        "areaPpsmBand": [30000, 55000],
+        "areaAcreBand": [2, 15],
         "qualityScore": 91,
         "route": "publish",
         "checks": [
@@ -1341,21 +1164,14 @@
       "id": "KJA-A0015",
       "title": "Spacious 2-Bedroom City Apartment in Milimani",
       "type": "apartment",
-      "purpose": [
-        "rent"
-      ],
+      "purpose": ["rent"],
       "area": "Milimani",
       "county": "Kisumu",
       "price": 25000,
       "bedrooms": 2,
       "bathrooms": 2,
       "sizeSqm": 94,
-      "amenities": [
-        "Fibre internet ready",
-        "Lift access",
-        "Balcony",
-        "Secure parking"
-      ],
+      "amenities": ["Fibre internet ready", "Lift access", "Balcony", "Secure parking"],
       "images": [
         "/images/props/interior_1.jpg",
         "/images/props/apartment_0.jpg",
@@ -1384,14 +1200,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "n/a",
         "areaYieldBand": 7.4,
-        "areaPpsmBand": [
-          40000,
-          70000
-        ],
-        "areaAcreBand": [
-          4,
-          12
-        ],
+        "areaPpsmBand": [40000, 70000],
+        "areaAcreBand": [4, 12],
         "qualityScore": 92,
         "route": "publish",
         "checks": [
@@ -1422,9 +1232,7 @@
       "id": "KJA-A0004",
       "title": "Classic 4-Bedroom Garden Bungalow in Runda",
       "type": "bungalow",
-      "purpose": [
-        "buy"
-      ],
+      "purpose": ["buy"],
       "area": "Runda",
       "county": "Nairobi",
       "price": 9550000,
@@ -1433,15 +1241,8 @@
       "bedrooms": 4,
       "bathrooms": 2,
       "sizeSqm": 105,
-      "amenities": [
-        "Car porch",
-        "Solar water heating",
-        "Quiet cul-de-sac"
-      ],
-      "images": [
-        "/images/props/townhouse_0.jpg",
-        "/images/props/apartment_1.jpg"
-      ],
+      "amenities": ["Car porch", "Solar water heating", "Quiet cul-de-sac"],
+      "images": ["/images/props/townhouse_0.jpg", "/images/props/apartment_1.jpg"],
       "description": "This 105 sqm bungalow in Runda has been finished to a practical standard and priced with discipline. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. The Runda market band and 6% yield environment make this a disciplined income or appreciation play.",
       "agency": "Prestige Homes KE",
       "agent": {
@@ -1465,14 +1266,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "above",
         "areaYieldBand": 6,
-        "areaPpsmBand": [
-          60000,
-          95000
-        ],
-        "areaAcreBand": [
-          15,
-          40
-        ],
+        "areaPpsmBand": [60000, 95000],
+        "areaAcreBand": [15, 40],
         "qualityScore": 87,
         "route": "publish",
         "checks": [
@@ -1503,10 +1298,7 @@
       "id": "KJA-A0002",
       "title": "Bright 1-Bedroom Residence in Kitengela",
       "type": "apartment",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Kitengela",
       "county": "Kajiado",
       "price": 2100000,
@@ -1515,12 +1307,7 @@
       "bedrooms": 1,
       "bathrooms": 2,
       "sizeSqm": 59,
-      "amenities": [
-        "Fibre internet ready",
-        "Gym",
-        "Rooftop terrace",
-        "Secure parking"
-      ],
+      "amenities": ["Fibre internet ready", "Gym", "Rooftop terrace", "Secure parking"],
       "images": [
         "/images/props/apartment_0.jpg",
         "/images/props/apartment_2.jpg",
@@ -1549,14 +1336,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 7.6,
-        "areaPpsmBand": [
-          30000,
-          55000
-        ],
-        "areaAcreBand": [
-          2.5,
-          8
-        ],
+        "areaPpsmBand": [30000, 55000],
+        "areaAcreBand": [2.5, 8],
         "qualityScore": 92,
         "route": "publish",
         "checks": [
@@ -1587,9 +1368,7 @@
       "id": "KJA-A0038",
       "title": "Elegant 5-Bedroom Villa in Kilimani",
       "type": "villa",
-      "purpose": [
-        "buy"
-      ],
+      "purpose": ["buy"],
       "area": "Kilimani",
       "county": "Nairobi",
       "price": 47450000,
@@ -1598,16 +1377,8 @@
       "bedrooms": 5,
       "bathrooms": 3,
       "sizeSqm": 449,
-      "amenities": [
-        "Guest wing",
-        "Half-acre garden",
-        "EV charger ready",
-        "Staff quarters"
-      ],
-      "images": [
-        "/images/props/interior_0.jpg",
-        "/images/props/townhouse_1.jpg"
-      ],
+      "amenities": ["Guest wing", "Half-acre garden", "EV charger ready", "Staff quarters"],
+      "images": ["/images/props/interior_0.jpg", "/images/props/townhouse_1.jpg"],
       "description": "A well-presented villa in Kilimani, Nairobi, offering 449 sqm of bright, efficiently planned space. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 106k/sqm the pricing sits within the Kilimani band, and the area yield band of 8.2% supports a solid income case.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -1631,14 +1402,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "within",
         "areaYieldBand": 8.2,
-        "areaPpsmBand": [
-          95000,
-          145000
-        ],
-        "areaAcreBand": [
-          80,
-          160
-        ],
+        "areaPpsmBand": [95000, 145000],
+        "areaAcreBand": [80, 160],
         "qualityScore": 93,
         "route": "publish",
         "checks": [
@@ -1669,9 +1434,7 @@
       "id": "KJA-A0026",
       "title": "Refined Building Plot in Runda",
       "type": "land",
-      "purpose": [
-        "buy"
-      ],
+      "purpose": ["buy"],
       "area": "Runda",
       "county": "Nairobi",
       "price": 53800000,
@@ -1682,9 +1445,7 @@
         "Electricity on site",
         "Clean freehold title"
       ],
-      "images": [
-        "/images/props/land_1.jpg"
-      ],
+      "images": ["/images/props/land_1.jpg"],
       "description": "Set in the heart of Runda, this land parcel delivers 5966 sqm of comfortable living with genuine character. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Runda at this price point rarely lingers.",
       "agency": "Diaspora Property Group",
       "agent": {
@@ -1710,14 +1471,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 6,
-        "areaPpsmBand": [
-          60000,
-          95000
-        ],
-        "areaAcreBand": [
-          15,
-          40
-        ],
+        "areaPpsmBand": [60000, 95000],
+        "areaAcreBand": [15, 40],
         "qualityScore": 86,
         "route": "publish",
         "checks": [
@@ -1748,10 +1503,7 @@
       "id": "KJA-A0033",
       "title": "Well-kept 5-Bedroom Townhouse in Runda",
       "type": "townhouse",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Runda",
       "county": "Nairobi",
       "price": 21800000,
@@ -1760,16 +1512,8 @@
       "bedrooms": 5,
       "bathrooms": 2,
       "sizeSqm": 230,
-      "amenities": [
-        "Staff quarters",
-        "Perimeter wall",
-        "Double garage",
-        "Gated compound"
-      ],
-      "images": [
-        "/images/props/interior_2.jpg",
-        "/images/props/apartment_2.jpg"
-      ],
+      "amenities": ["Staff quarters", "Perimeter wall", "Double garage", "Gated compound"],
+      "images": ["/images/props/interior_2.jpg", "/images/props/apartment_2.jpg"],
       "description": "Set in the heart of Runda, this townhouse delivers 230 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. The Runda market band and 6% yield environment make this a disciplined income or appreciation play.",
       "agency": "Diaspora Property Group",
       "agent": {
@@ -1793,14 +1537,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "above",
         "areaYieldBand": 6,
-        "areaPpsmBand": [
-          60000,
-          95000
-        ],
-        "areaAcreBand": [
-          15,
-          40
-        ],
+        "areaPpsmBand": [60000, 95000],
+        "areaAcreBand": [15, 40],
         "qualityScore": 90,
         "route": "publish",
         "checks": [
@@ -1831,9 +1569,7 @@
       "id": "KJA-A0017",
       "title": "Charming 5-Bedroom Villa in Riverside",
       "type": "villa",
-      "purpose": [
-        "buy"
-      ],
+      "purpose": ["buy"],
       "area": "Riverside",
       "county": "Nairobi",
       "price": 24150000,
@@ -1842,16 +1578,8 @@
       "bedrooms": 5,
       "bathrooms": 3,
       "sizeSqm": 207,
-      "amenities": [
-        "Gated community",
-        "Borehole + storage tanks",
-        "Guest wing",
-        "Solar backup"
-      ],
-      "images": [
-        "/images/props/interior_0.jpg",
-        "/images/props/villa_0.jpg"
-      ],
+      "amenities": ["Gated community", "Borehole + storage tanks", "Guest wing", "Solar backup"],
+      "images": ["/images/props/interior_0.jpg", "/images/props/villa_0.jpg"],
       "description": "Set in the heart of Riverside, this villa delivers 207 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. The Riverside market band and 7.2% yield environment make this a disciplined income or appreciation play.",
       "agency": "Diaspora Property Group",
       "agent": {
@@ -1875,14 +1603,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "within",
         "areaYieldBand": 7.2,
-        "areaPpsmBand": [
-          95000,
-          140000
-        ],
-        "areaAcreBand": [
-          85,
-          170
-        ],
+        "areaPpsmBand": [95000, 140000],
+        "areaAcreBand": [85, 170],
         "qualityScore": 90,
         "route": "publish",
         "checks": [
@@ -1913,9 +1635,7 @@
       "id": "KJA-A0029",
       "title": "Sunny 4-Bedroom Residence in Westlands",
       "type": "apartment",
-      "purpose": [
-        "buy"
-      ],
+      "purpose": ["buy"],
       "area": "Westlands",
       "county": "Nairobi",
       "price": 20500000,
@@ -1959,14 +1679,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "within",
         "areaYieldBand": 7.6,
-        "areaPpsmBand": [
-          100000,
-          150000
-        ],
-        "areaAcreBand": [
-          90,
-          180
-        ],
+        "areaPpsmBand": [100000, 150000],
+        "areaAcreBand": [90, 180],
         "qualityScore": 92,
         "route": "publish",
         "checks": [
@@ -1997,9 +1711,7 @@
       "id": "KJA-A0036",
       "title": "Charming 2-Bedroom Garden Bungalow in Athi River",
       "type": "bungalow",
-      "purpose": [
-        "buy"
-      ],
+      "purpose": ["buy"],
       "area": "Athi River",
       "county": "Machakos",
       "price": 2400000,
@@ -2008,15 +1720,8 @@
       "bedrooms": 2,
       "bathrooms": 2,
       "sizeSqm": 72,
-      "amenities": [
-        "Car porch",
-        "Mature garden",
-        "Water storage tanks"
-      ],
-      "images": [
-        "/images/props/townhouse_0.jpg",
-        "/images/props/interior_1.jpg"
-      ],
+      "amenities": ["Car porch", "Mature garden", "Water storage tanks"],
+      "images": ["/images/props/townhouse_0.jpg", "/images/props/interior_1.jpg"],
       "description": "Rarely available: a bungalow in Athi River combining space (72 sqm), light and a convenient address. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. Benchmarked against comparable stock in Athi River, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Coastal Living Estates",
       "agent": {
@@ -2040,14 +1745,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "within",
         "areaYieldBand": 7.2,
-        "areaPpsmBand": [
-          25000,
-          45000
-        ],
-        "areaAcreBand": [
-          2,
-          6
-        ],
+        "areaPpsmBand": [25000, 45000],
+        "areaAcreBand": [2, 6],
         "qualityScore": 87,
         "route": "publish",
         "checks": [
@@ -2078,9 +1777,7 @@
       "id": "KJA-A0021",
       "title": "Charming Land Parcel in Nyali",
       "type": "land",
-      "purpose": [
-        "buy"
-      ],
+      "purpose": ["buy"],
       "area": "Nyali",
       "county": "Mombasa",
       "price": 9900000,
@@ -2091,9 +1788,7 @@
         "Beaconed boundaries",
         "Graded access road"
       ],
-      "images": [
-        "/images/props/land_0.jpg"
-      ],
+      "images": ["/images/props/land_0.jpg"],
       "description": "Rarely available: a land parcel in Nyali combining space (3846 sqm), light and a convenient address. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Nyali at this price point rarely lingers.",
       "agency": "Prestige Homes KE",
       "agent": {
@@ -2118,14 +1813,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 6.8,
-        "areaPpsmBand": [
-          60000,
-          100000
-        ],
-        "areaAcreBand": [
-          8,
-          25
-        ],
+        "areaPpsmBand": [60000, 100000],
+        "areaAcreBand": [8, 25],
         "qualityScore": 86,
         "route": "publish",
         "checks": [
@@ -2156,9 +1845,7 @@
       "id": "KJA-A0034",
       "title": "Modern Land Parcel in Kilimani",
       "type": "land",
-      "purpose": [
-        "buy"
-      ],
+      "purpose": ["buy"],
       "area": "Kilimani",
       "county": "Nairobi",
       "price": 1108250000,
@@ -2169,9 +1856,7 @@
         "Graded access road",
         "Ready title deed"
       ],
-      "images": [
-        "/images/props/land_0.jpg"
-      ],
+      "images": ["/images/props/land_0.jpg"],
       "description": "A well-presented land parcel in Kilimani, Nairobi, offering 40178 sqm of bright, efficiently planned space. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Kilimani at this price point rarely lingers.",
       "agency": "Diaspora Property Group",
       "agent": {
@@ -2196,14 +1881,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 8.2,
-        "areaPpsmBand": [
-          95000,
-          145000
-        ],
-        "areaAcreBand": [
-          80,
-          160
-        ],
+        "areaPpsmBand": [95000, 145000],
+        "areaAcreBand": [80, 160],
         "qualityScore": 86,
         "route": "publish",
         "checks": [
@@ -2234,9 +1913,7 @@
       "id": "KJA-A0020",
       "title": "Well-kept 2-Bedroom Bungalow in Kitengela",
       "type": "bungalow",
-      "purpose": [
-        "buy"
-      ],
+      "purpose": ["buy"],
       "area": "Kitengela",
       "county": "Kajiado",
       "price": 4500000,
@@ -2245,15 +1922,8 @@
       "bedrooms": 2,
       "bathrooms": 2,
       "sizeSqm": 96,
-      "amenities": [
-        "Quiet cul-de-sac",
-        "Water storage tanks",
-        "Mature garden"
-      ],
-      "images": [
-        "/images/props/townhouse_0.jpg",
-        "/images/props/apartment_1.jpg"
-      ],
+      "amenities": ["Quiet cul-de-sac", "Water storage tanks", "Mature garden"],
+      "images": ["/images/props/townhouse_0.jpg", "/images/props/apartment_1.jpg"],
       "description": "Rarely available: a bungalow in Kitengela combining space (96 sqm), light and a convenient address. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. At KES 47k/sqm the pricing sits within the Kitengela band, and the area yield band of 7.6% supports a solid income case.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -2277,14 +1947,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "within",
         "areaYieldBand": 7.6,
-        "areaPpsmBand": [
-          30000,
-          55000
-        ],
-        "areaAcreBand": [
-          2.5,
-          8
-        ],
+        "areaPpsmBand": [30000, 55000],
+        "areaAcreBand": [2.5, 8],
         "qualityScore": 90,
         "route": "publish",
         "checks": [
@@ -2315,9 +1979,7 @@
       "id": "KJA-A0027",
       "title": "Well-kept 4-Bedroom Bungalow in Karen",
       "type": "bungalow",
-      "purpose": [
-        "buy"
-      ],
+      "purpose": ["buy"],
       "area": "Karen",
       "county": "Nairobi",
       "price": 16100000,
@@ -2326,15 +1988,8 @@
       "bedrooms": 4,
       "bathrooms": 2,
       "sizeSqm": 183,
-      "amenities": [
-        "Car porch",
-        "Mature garden",
-        "Fenced compound"
-      ],
-      "images": [
-        "/images/props/apartment_1.jpg",
-        "/images/props/interior_1.jpg"
-      ],
+      "amenities": ["Car porch", "Mature garden", "Fenced compound"],
+      "images": ["/images/props/apartment_1.jpg", "/images/props/interior_1.jpg"],
       "description": "Set in the heart of Karen, this bungalow delivers 183 sqm of comfortable living with genuine character. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. A practical choice for anyone seeking a genuine Karen address without overpaying.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -2358,14 +2013,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "above",
         "areaYieldBand": 5.8,
-        "areaPpsmBand": [
-          55000,
-          90000
-        ],
-        "areaAcreBand": [
-          18,
-          45
-        ],
+        "areaPpsmBand": [55000, 90000],
+        "areaAcreBand": [18, 45],
         "qualityScore": 87,
         "route": "publish",
         "checks": [
@@ -2396,9 +2045,7 @@
       "id": "KJA-A0005",
       "title": "Bright 3-Bedroom Garden Bungalow in Kitengela",
       "type": "bungalow",
-      "purpose": [
-        "buy"
-      ],
+      "purpose": ["buy"],
       "area": "Kitengela",
       "county": "Kajiado",
       "price": 5250000,
@@ -2407,15 +2054,8 @@
       "bedrooms": 3,
       "bathrooms": 1,
       "sizeSqm": 124,
-      "amenities": [
-        "Quiet cul-de-sac",
-        "Mature garden",
-        "Fenced compound"
-      ],
-      "images": [
-        "/images/props/townhouse_0.jpg",
-        "/images/props/apartment_1.jpg"
-      ],
+      "amenities": ["Quiet cul-de-sac", "Mature garden", "Fenced compound"],
+      "images": ["/images/props/townhouse_0.jpg", "/images/props/apartment_1.jpg"],
       "description": "Rarely available: a bungalow in Kitengela combining space (124 sqm), light and a convenient address. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. At KES 42k/sqm the pricing sits within the Kitengela band, and the area yield band of 7.6% supports a solid income case.",
       "agency": "Skyline Agents Kenya",
       "agent": {
@@ -2439,14 +2079,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "within",
         "areaYieldBand": 7.6,
-        "areaPpsmBand": [
-          30000,
-          55000
-        ],
-        "areaAcreBand": [
-          2.5,
-          8
-        ],
+        "areaPpsmBand": [30000, 55000],
+        "areaAcreBand": [2.5, 8],
         "qualityScore": 90,
         "route": "publish",
         "checks": [
@@ -2477,10 +2111,7 @@
       "id": "KJA-A0016",
       "title": "Spacious 4-Bedroom Apartment in Diani",
       "type": "apartment",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Diani",
       "county": "Kwale",
       "price": 11900000,
@@ -2489,12 +2120,7 @@
       "bedrooms": 4,
       "bathrooms": 1,
       "sizeSqm": 150,
-      "amenities": [
-        "Borehole water",
-        "Backup generator",
-        "24/7 security",
-        "CCTV surveillance"
-      ],
+      "amenities": ["Borehole water", "Backup generator", "24/7 security", "CCTV surveillance"],
       "images": [
         "/images/props/bedroom_0.jpg",
         "/images/props/apartment_0.jpg",
@@ -2523,14 +2149,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "above",
         "areaYieldBand": 7,
-        "areaPpsmBand": [
-          45000,
-          85000
-        ],
-        "areaAcreBand": [
-          3,
-          12
-        ],
+        "areaPpsmBand": [45000, 85000],
+        "areaAcreBand": [3, 12],
         "qualityScore": 95,
         "route": "publish",
         "checks": [
@@ -2561,10 +2181,7 @@
       "id": "KJA-A0035",
       "title": "Well-kept 1-Bedroom Residence in Westlands",
       "type": "apartment",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Westlands",
       "county": "Nairobi",
       "price": 6500000,
@@ -2573,12 +2190,7 @@
       "bedrooms": 1,
       "bathrooms": 2,
       "sizeSqm": 62,
-      "amenities": [
-        "CCTV surveillance",
-        "Lift access",
-        "Backup generator",
-        "24/7 security"
-      ],
+      "amenities": ["CCTV surveillance", "Lift access", "Backup generator", "24/7 security"],
       "images": [
         "/images/props/apartment_0.jpg",
         "/images/props/interior_1.jpg",
@@ -2608,14 +2220,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 7.6,
-        "areaPpsmBand": [
-          100000,
-          150000
-        ],
-        "areaAcreBand": [
-          90,
-          180
-        ],
+        "areaPpsmBand": [100000, 150000],
+        "areaAcreBand": [90, 180],
         "qualityScore": 92,
         "route": "publish",
         "checks": [
@@ -2646,9 +2252,7 @@
       "id": "KJA-A0022",
       "title": "Elegant 2-Bedroom Apartment in Madaraka",
       "type": "apartment",
-      "purpose": [
-        "rent"
-      ],
+      "purpose": ["rent"],
       "area": "Madaraka",
       "county": "Nairobi",
       "price": 35000,
@@ -2690,14 +2294,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "n/a",
         "areaYieldBand": 8.8,
-        "areaPpsmBand": [
-          70000,
-          100000
-        ],
-        "areaAcreBand": [
-          8,
-          20
-        ],
+        "areaPpsmBand": [70000, 100000],
+        "areaAcreBand": [8, 20],
         "qualityScore": 92,
         "route": "publish",
         "checks": [
@@ -2728,10 +2326,7 @@
       "id": "KJA-A0037",
       "title": "Sunny Commercial Unit in Lavington",
       "type": "commercial",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Lavington",
       "county": "Nairobi",
       "price": 55400000,
@@ -2739,16 +2334,8 @@
       "grossYieldEstimate": 7.4,
       "bathrooms": 0,
       "sizeSqm": 591,
-      "amenities": [
-        "Raised floors",
-        "Central A/C",
-        "Fibre backbone",
-        "Ample parking bays"
-      ],
-      "images": [
-        "/images/props/office_1.jpg",
-        "/images/props/office_0.jpg"
-      ],
+      "amenities": ["Raised floors", "Central A/C", "Fibre backbone", "Ample parking bays"],
+      "images": ["/images/props/office_1.jpg", "/images/props/office_0.jpg"],
       "description": "Set in the heart of Lavington, this commercial unit delivers 591 sqm of comfortable living with genuine character. Infrastructure — power backup, connectivity and parking — supports immediate occupation. At KES 94k/sqm the pricing sits below the Lavington band, and the area yield band of 7.4% supports a solid income case.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -2772,14 +2359,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 7.4,
-        "areaPpsmBand": [
-          90000,
-          135000
-        ],
-        "areaAcreBand": [
-          80,
-          160
-        ],
+        "areaPpsmBand": [90000, 135000],
+        "areaAcreBand": [80, 160],
         "qualityScore": 93,
         "route": "publish",
         "checks": [
@@ -2810,10 +2391,7 @@
       "id": "KJA-A0001",
       "title": "Elegant Acreage in Nakuru",
       "type": "land",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Nakuru",
       "county": "Nakuru",
       "price": 40950000,
@@ -2824,9 +2402,7 @@
         "Beaconed boundaries",
         "Water on site"
       ],
-      "images": [
-        "/images/props/land_1.jpg"
-      ],
+      "images": ["/images/props/land_1.jpg"],
       "description": "An honest, well-maintained land parcel in Nakuru — 29160 sqm of sensible layout for owners and investors alike. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Nakuru at this price point rarely lingers.",
       "agency": "Prestige Homes KE",
       "agent": {
@@ -2852,14 +2428,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 7.8,
-        "areaPpsmBand": [
-          30000,
-          55000
-        ],
-        "areaAcreBand": [
-          1.5,
-          6
-        ],
+        "areaPpsmBand": [30000, 55000],
+        "areaAcreBand": [1.5, 6],
         "qualityScore": 86,
         "route": "publish",
         "checks": [
@@ -2890,9 +2460,7 @@
       "id": "KJA-A0003",
       "title": "Charming 2-Bedroom Bungalow in Kileleshwa",
       "type": "bungalow",
-      "purpose": [
-        "buy"
-      ],
+      "purpose": ["buy"],
       "area": "Kileleshwa",
       "county": "Nairobi",
       "price": 15000000,
@@ -2901,15 +2469,8 @@
       "bedrooms": 2,
       "bathrooms": 2,
       "sizeSqm": 141,
-      "amenities": [
-        "Water storage tanks",
-        "Solar water heating",
-        "Fenced compound"
-      ],
-      "images": [
-        "/images/props/interior_1.jpg",
-        "/images/props/apartment_1.jpg"
-      ],
+      "amenities": ["Water storage tanks", "Solar water heating", "Fenced compound"],
+      "images": ["/images/props/interior_1.jpg", "/images/props/apartment_1.jpg"],
       "description": "A well-presented bungalow in Kileleshwa, Nairobi, offering 141 sqm of bright, efficiently planned space. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. At KES 106k/sqm the pricing sits within the Kileleshwa band, and the area yield band of 8.4% supports a solid income case.",
       "agency": "Skyline Agents Kenya",
       "agent": {
@@ -2933,14 +2494,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "within",
         "areaYieldBand": 8.4,
-        "areaPpsmBand": [
-          85000,
-          125000
-        ],
-        "areaAcreBand": [
-          70,
-          140
-        ],
+        "areaPpsmBand": [85000, 125000],
+        "areaAcreBand": [70, 140],
         "qualityScore": 90,
         "route": "publish",
         "checks": [
@@ -2971,10 +2526,7 @@
       "id": "KJA-A0025",
       "title": "Bright 5-Bedroom Family Villa in Kilimani",
       "type": "villa",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Kilimani",
       "county": "Nairobi",
       "price": 26750000,
@@ -2983,16 +2535,8 @@
       "bedrooms": 5,
       "bathrooms": 3,
       "sizeSqm": 275,
-      "amenities": [
-        "Staff quarters",
-        "Solar backup",
-        "Swimming pool",
-        "Gated community"
-      ],
-      "images": [
-        "/images/props/villa_1.jpg",
-        "/images/props/interior_0.jpg"
-      ],
+      "amenities": ["Staff quarters", "Solar backup", "Swimming pool", "Gated community"],
+      "images": ["/images/props/villa_1.jpg", "/images/props/interior_0.jpg"],
       "description": "A well-presented villa in Kilimani, Nairobi, offering 275 sqm of bright, efficiently planned space. The property sits on a mature, well-kept compound with room for family life and entertaining. The Kilimani market band and 8.2% yield environment make this a disciplined income or appreciation play.",
       "agency": "Prestige Homes KE",
       "agent": {
@@ -3016,14 +2560,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 8.2,
-        "areaPpsmBand": [
-          95000,
-          145000
-        ],
-        "areaAcreBand": [
-          80,
-          160
-        ],
+        "areaPpsmBand": [95000, 145000],
+        "areaAcreBand": [80, 160],
         "qualityScore": 90,
         "route": "publish",
         "checks": [
@@ -3054,10 +2592,7 @@
       "id": "KJA-A0023",
       "title": "Contemporary 3-Bedroom Cluster Home in Riverside",
       "type": "townhouse",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Riverside",
       "county": "Nairobi",
       "price": 17350000,
@@ -3066,16 +2601,8 @@
       "bedrooms": 3,
       "bathrooms": 2,
       "sizeSqm": 129,
-      "amenities": [
-        "Clubhouse access",
-        "Double garage",
-        "Private garden",
-        "Gated compound"
-      ],
-      "images": [
-        "/images/props/townhouse_0.jpg",
-        "/images/props/interior_2.jpg"
-      ],
+      "amenities": ["Clubhouse access", "Double garage", "Private garden", "Gated compound"],
+      "images": ["/images/props/townhouse_0.jpg", "/images/props/interior_2.jpg"],
       "description": "Set in the heart of Riverside, this townhouse delivers 129 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. The Riverside market band and 7.2% yield environment make this a disciplined income or appreciation play.",
       "agency": "Diaspora Property Group",
       "agent": {
@@ -3099,14 +2626,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "above",
         "areaYieldBand": 7.2,
-        "areaPpsmBand": [
-          95000,
-          140000
-        ],
-        "areaAcreBand": [
-          85,
-          170
-        ],
+        "areaPpsmBand": [95000, 140000],
+        "areaAcreBand": [85, 170],
         "qualityScore": 90,
         "route": "publish",
         "checks": [
@@ -3137,9 +2658,7 @@
       "id": "KJA-A0018",
       "title": "Sunny 3-Bedroom City Apartment in Syokimau",
       "type": "apartment",
-      "purpose": [
-        "buy"
-      ],
+      "purpose": ["buy"],
       "area": "Syokimau",
       "county": "Machakos",
       "price": 4700000,
@@ -3148,12 +2667,7 @@
       "bedrooms": 3,
       "bathrooms": 1,
       "sizeSqm": 115,
-      "amenities": [
-        "Gym",
-        "Secure parking",
-        "Borehole water",
-        "Lift access"
-      ],
+      "amenities": ["Gym", "Secure parking", "Borehole water", "Lift access"],
       "images": [
         "/images/props/interior_1.jpg",
         "/images/props/apartment_1.jpg",
@@ -3182,14 +2696,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 7.8,
-        "areaPpsmBand": [
-          35000,
-          60000
-        ],
-        "areaAcreBand": [
-          3,
-          9
-        ],
+        "areaPpsmBand": [35000, 60000],
+        "areaAcreBand": [3, 9],
         "qualityScore": 92,
         "route": "publish",
         "checks": [
@@ -3220,10 +2728,7 @@
       "id": "KJA-A0024",
       "title": "Elegant 1-Bedroom City Apartment in Riverside",
       "type": "apartment",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Riverside",
       "county": "Nairobi",
       "price": 4850000,
@@ -3232,12 +2737,7 @@
       "bedrooms": 1,
       "bathrooms": 2,
       "sizeSqm": 48,
-      "amenities": [
-        "Fibre internet ready",
-        "24/7 security",
-        "Gym",
-        "Lift access"
-      ],
+      "amenities": ["Fibre internet ready", "24/7 security", "Gym", "Lift access"],
       "images": [
         "/images/props/apartment_0.jpg",
         "/images/props/apartment_2.jpg",
@@ -3266,14 +2766,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 7.2,
-        "areaPpsmBand": [
-          95000,
-          140000
-        ],
-        "areaAcreBand": [
-          85,
-          170
-        ],
+        "areaPpsmBand": [95000, 140000],
+        "areaAcreBand": [85, 170],
         "qualityScore": 92,
         "route": "publish",
         "checks": [
@@ -3304,10 +2798,7 @@
       "id": "KJA-A0030",
       "title": "Modern 2-Bedroom Residence in Riverside",
       "type": "apartment",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Riverside",
       "county": "Nairobi",
       "price": 10500000,
@@ -3351,14 +2842,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 7.2,
-        "areaPpsmBand": [
-          95000,
-          140000
-        ],
-        "areaAcreBand": [
-          85,
-          170
-        ],
+        "areaPpsmBand": [95000, 140000],
+        "areaAcreBand": [85, 170],
         "qualityScore": 95,
         "route": "publish",
         "checks": [
@@ -3389,10 +2874,7 @@
       "id": "KJA-A0019",
       "title": "Bright 5-Bedroom Cluster Home in Madaraka",
       "type": "townhouse",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Madaraka",
       "county": "Nairobi",
       "price": 10800000,
@@ -3401,16 +2883,8 @@
       "bedrooms": 5,
       "bathrooms": 2,
       "sizeSqm": 152,
-      "amenities": [
-        "Clubhouse access",
-        "Borehole water",
-        "Gated compound",
-        "Staff quarters"
-      ],
-      "images": [
-        "/images/props/interior_2.jpg",
-        "/images/props/townhouse_0.jpg"
-      ],
+      "amenities": ["Clubhouse access", "Borehole water", "Gated compound", "Staff quarters"],
+      "images": ["/images/props/interior_2.jpg", "/images/props/townhouse_0.jpg"],
       "description": "This 152 sqm townhouse in Madaraka has been finished to a practical standard and priced with discipline. The property sits on a mature, well-kept compound with room for family life and entertaining. Benchmarked against comparable stock in Madaraka, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Nairobi Prime Properties",
       "agent": {
@@ -3434,14 +2908,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 8.8,
-        "areaPpsmBand": [
-          70000,
-          100000
-        ],
-        "areaAcreBand": [
-          8,
-          20
-        ],
+        "areaPpsmBand": [70000, 100000],
+        "areaAcreBand": [8, 20],
         "qualityScore": 90,
         "route": "publish",
         "checks": [
@@ -3472,10 +2940,7 @@
       "id": "KJA-A0032",
       "title": "Bright 4-Bedroom Cluster Home in Nanyuki",
       "type": "townhouse",
-      "purpose": [
-        "buy",
-        "invest"
-      ],
+      "purpose": ["buy", "invest"],
       "area": "Nanyuki",
       "county": "Laikipia",
       "price": 4650000,
@@ -3484,16 +2949,8 @@
       "bedrooms": 4,
       "bathrooms": 2,
       "sizeSqm": 208,
-      "amenities": [
-        "Solar water heating",
-        "Double garage",
-        "Gated compound",
-        "Staff quarters"
-      ],
-      "images": [
-        "/images/props/townhouse_1.jpg",
-        "/images/props/interior_2.jpg"
-      ],
+      "amenities": ["Solar water heating", "Double garage", "Gated compound", "Staff quarters"],
+      "images": ["/images/props/townhouse_1.jpg", "/images/props/interior_2.jpg"],
       "description": "An honest, well-maintained townhouse in Nanyuki — 208 sqm of sensible layout for owners and investors alike. The property sits on a mature, well-kept compound with room for family life and entertaining. The Nanyuki market band and 6.4% yield environment make this a disciplined income or appreciation play.",
       "agency": "Diaspora Property Group",
       "agent": {
@@ -3517,14 +2974,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "below",
         "areaYieldBand": 6.4,
-        "areaPpsmBand": [
-          20000,
-          45000
-        ],
-        "areaAcreBand": [
-          0.8,
-          4
-        ],
+        "areaPpsmBand": [20000, 45000],
+        "areaAcreBand": [0.8, 4],
         "qualityScore": 90,
         "route": "publish",
         "checks": [
@@ -3555,22 +3006,14 @@
       "id": "KJA-A0031",
       "title": "Elegant 1-Bedroom Residence in Lavington",
       "type": "apartment",
-      "purpose": [
-        "rent"
-      ],
+      "purpose": ["rent"],
       "area": "Lavington",
       "county": "Nairobi",
       "price": 45000,
       "bedrooms": 1,
       "bathrooms": 2,
       "sizeSqm": 61,
-      "amenities": [
-        "Lift access",
-        "Borehole water",
-        "Gym",
-        "Backup generator",
-        "Balcony"
-      ],
+      "amenities": ["Lift access", "Borehole water", "Gym", "Backup generator", "Balcony"],
       "images": [
         "/images/props/interior_0.jpg",
         "/images/props/interior_1.jpg",
@@ -3599,14 +3042,8 @@
         "enrichedBy": "keja-autopilot/enrich@1",
         "priceGrade": "n/a",
         "areaYieldBand": 7.4,
-        "areaPpsmBand": [
-          90000,
-          135000
-        ],
-        "areaAcreBand": [
-          80,
-          160
-        ],
+        "areaPpsmBand": [90000, 135000],
+        "areaAcreBand": [80, 160],
         "qualityScore": 92,
         "route": "publish",
         "checks": [

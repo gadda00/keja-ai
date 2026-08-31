@@ -70,7 +70,7 @@ if (dry) {
   process.exit(0)
 }
 
-const path = saveState(result.nextState)
+const path = await saveState(result.nextState)
 console.log(`[autopilot] wrote ${path}`)
 console.log(`[autopilot] run ${runId}: ingested ${result.run.ingested} · published ${result.run.published} · queued ${result.run.queued} · rejected ${result.run.rejected} · deduped ${result.run.deduped}`)
 console.log(`[autopilot] inventory: ${result.nextState.listings.length} live auto-listings (cap 60) · ${result.nextState.pending.length} pending review`)

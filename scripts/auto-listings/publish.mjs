@@ -7,6 +7,12 @@
  *   • logs rejected items in run metadata (cap: 24) for the admin console
  *   • records every run (id, counts, sources, feed health) for Auto-Pilot tab
  * Ids are stable and monotonic: nextSeq continues from the existing file.
+ *
+ * The data file is Prettier-formatted when prettier is importable (local dev,
+ * any environment with node_modules). In the zero-dependency CI ingest job
+ * the raw JSON is written instead and the workflow runs `npx prettier`
+ * before committing — either path produces byte-identical output, which is
+ * what keeps `npm run lint:prettier` green.
  */
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs'
 import { signature } from './dedupe.mjs'
@@ -100,9 +106,16 @@ export function publish({ state, screened, feedStatus, runId }) {
   return { nextState, run, published, pending, rejected }
 }
 
-export function saveState(state) {
+export async function saveState(state) {
   mkdirSync(dirname(DATA_PATH), { recursive: true })
-  writeFileSync(DATA_PATH, JSON.stringify(state, null, 2) + '\n', 'utf8')
+  let code = JSON.stringify(state, null, 2) + '\n'
+  try {
+    const { format } = await import('prettier')
+    code = await format(code, { parser: 'json' })
+  } catch {
+    // zero-dep environment (CI ingest job): the workflow formats via npx prettier
+  }
+  writeFileSync(DATA_PATH, code, 'utf8')
   return DATA_PATH
 }
 

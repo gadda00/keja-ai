@@ -56,6 +56,11 @@ jobs:
       - name: Commit new listings
         if: steps.pipeline.outputs.changed == 'true'
         run: |
+          # The pipeline runs zero-npm-deps, so it writes raw (multi-line)
+          # JSON. Format with the exact locked Prettier version before
+          # committing — otherwise every ingest breaks `npm run
+          # lint:prettier` and the drift compounds.
+          npx --yes prettier@3.9.6 --write src/data/auto-listings.json
           git config user.name "keja-autopilot[bot]"
           git config user.email "autopilot@keja.ai"
           git add src/data/auto-listings.json
@@ -125,17 +130,20 @@ jobs:
       - name: Lint (ESLint flat config, blocking)
         run: npm run lint:eslint
 
+      - name: Formatting (Prettier, blocking)
+        run: npm run lint:prettier
+
       - name: Generate sitemap (properties + articles + routes)
         run: node scripts/generate-sitemap.mjs
 
       - name: Build (with GitHub Pages base path)
         run: npm run build -- --base=/keja-ai/
 
-      - name: Prerender all routes (status-200 HTML for crawlers + social unfurls)
+      - name: Prerender all routes (status-200 HTML, real 404 page, visible no-JS content)
         run: node scripts/prerender.mjs --base /keja-ai/
 
-      - name: SPA fallback (404 page)
-        run: cp dist/index.html dist/404.html
+      - name: Stamp service-worker cache version from deployed content
+        run: node scripts/sw-version.mjs
 
       - uses: actions/configure-pages@v5
 
