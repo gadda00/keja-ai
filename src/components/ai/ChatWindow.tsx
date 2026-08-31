@@ -154,7 +154,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
           'noopener'
         );
       } else if (response.action === 'open-calculator') {
-        setTimeout(() => navigate('/calculator'), 700);
+        setTimeout(() => void navigate('/calculator'), 700);
       }
     }, delay);
   };

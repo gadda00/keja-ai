@@ -40,8 +40,14 @@ const args = process.argv.slice(2)
 const baseArgIdx = args.indexOf('--base')
 const BASE = (baseArgIdx !== -1 ? args[baseArgIdx + 1] : '/keja-ai/').replace(/\/$/, '')
 
-/** Cap dynamic pages so CI stays fast as the inventory grows. */
-const MAX_DYNAMIC = 40
+/**
+ * Cap dynamic pages so CI stays bounded. Auto-Pilot caps its own inventory at
+ * 60 listings and the seed stock is 20, so 100 covers the full sitemap surface
+ * with headroom. If truncation ever kicks in, the run FAILS loudly — a
+ * sitemap URL that is not prerendered is exactly the soft-404 this script
+ * exists to prevent.
+ */
+const MAX_DYNAMIC = 100
 
 /* --------------------------- route enumeration ----------------------------- */
 
@@ -81,12 +87,16 @@ function extractAutoIds(path) {
 }
 
 // trust order: Auto-Pilot first (freshest stock), then seed properties
-const propertyRoutes = [
-  ...extractAutoIds('src/data/auto-listings.json'),
-  ...extractIds('src/data/properties.ts'),
-]
-  .slice(0, MAX_DYNAMIC)
-  .map((id) => `/properties/${id}`)
+const autoIds = extractAutoIds('src/data/auto-listings.json')
+const seedIds = extractIds('src/data/properties.ts')
+const propertyRoutes = [...autoIds, ...seedIds].slice(0, MAX_DYNAMIC).map((id) => `/properties/${id}`)
+if (autoIds.length + seedIds.length > MAX_DYNAMIC) {
+  console.error(
+    `[prerender] ABORT: ${autoIds.length + seedIds.length} property routes exceed the ${MAX_DYNAMIC} cap — ` +
+      'the sitemap would contain soft-404 URLs. Raise MAX_DYNAMIC or cap inventory.',
+  )
+  process.exit(3)
+}
 
 const articleRoutes = extractArticleSlugs('src/data/articles.ts')
   .slice(0, MAX_DYNAMIC)
