@@ -32,6 +32,7 @@ const Admin = lazy(() => import('@/pages/Admin'));
 const Partners = lazy(() => import('@/pages/Partners'));
 const Compare = lazy(() => import('@/pages/Compare'));
 const ArticleDetail = lazy(() => import('@/pages/ArticleDetail'));
+const AreaGuide = lazy(() => import('@/pages/AreaGuide'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 function ScrollManager() {
@@ -94,6 +95,7 @@ export default function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/insights" element={<Insights />} />
                 <Route path="/insights/:slug" element={<ArticleDetail />} />
+                <Route path="/areas/:slug" element={<AreaGuide />} />
                 <Route path="/sell" element={<ListProperty />} />
                 <Route path="/manage" element={<Manage />} />
                 <Route path="/account" element={<Account />} />

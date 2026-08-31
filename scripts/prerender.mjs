@@ -102,7 +102,9 @@ const articleRoutes = extractArticleSlugs('src/data/articles.ts')
   .slice(0, MAX_DYNAMIC)
   .map((slug) => `/insights/${slug}`)
 
-const ROUTES = [...STATIC_ROUTES, ...propertyRoutes, ...articleRoutes]
+const guideRoutes = extractArticleSlugs('src/data/neighborhoods.ts').map((slug) => `/areas/${slug}`)
+
+const ROUTES = [...STATIC_ROUTES, ...propertyRoutes, ...articleRoutes, ...guideRoutes]
 
 /* --------------------------------- runner ---------------------------------- */
 

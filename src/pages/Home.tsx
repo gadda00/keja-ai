@@ -23,6 +23,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import PropertyCard from '@/components/property/PropertyCard';
 import { whatsappLink } from '@/config';
 import { asset } from '@/config';
+import { WATERFRONT_KAREN } from '@/data/neighborhoods';
 import { featuredProperties } from '@/data/properties';
 import { autoPilotStats } from '@/lib/autoListings';
 import { formatKES } from '@/lib/format';
@@ -51,6 +52,7 @@ export default function Home() {
   const avgTrust = Math.round(MARKET.reduce((s, p) => s + p.trustScore, 0) / MARKET.length);
   const verifiedCount = MARKET.filter((p) => p.trustScore >= 75).length;
   const flaggedCount = MARKET.filter((p) => p.trustScore < 60).length;
+  const karenCount = MARKET.filter((p) => p.area === WATERFRONT_KAREN.area).length;
   const freshThisWeek = [...MARKET]
     .sort((a, b) => b.listedAt.localeCompare(a.listedAt))
     .filter((p) => Date.now() - +new Date(p.listedAt) < 7 * 24 * 3600 * 1000)
@@ -228,6 +230,97 @@ export default function Home() {
               </p>
             </motion.div>
           ))}
+        </div>
+      </section>
+
+      {/* ============================== WATERFRONT KAREN SPOTLIGHT ============================== */}
+      <section className="relative overflow-hidden bg-ink">
+        <div className="absolute inset-0 bg-gold-shimmer opacity-[0.05]" aria-hidden="true" />
+        <div className="container-luxe relative grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-2">
+          <motion.div {...fadeUp}>
+            <span className="inline-flex items-center gap-2 rounded-full border border-gold-400/40 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide2 text-gold-300 backdrop-blur">
+              <MapPin className="h-3.5 w-3.5" /> Flagship location spotlight
+            </span>
+            <h2 className="mt-4 font-display text-3xl font-bold leading-tight text-white sm:text-4xl">
+              The Waterfront Karen — <span className="gold-text">lifestyle with weight</span>
+            </h2>
+            <p className="mt-5 leading-relaxed text-white/70">
+              A world-class lakeside town centre in Nairobi&rsquo;s premier suburb: Naivas-anchored
+              shopping, the Maji Magic aqua park, dining, health and banking — minutes from
+              half-acre Karen gardens. And with a reported KES 9B institutional transaction plus a
+              50.6-acre expansion plan, the corridor around it is the one Nairobi investors are
+              watching.
+            </p>
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {[
+                'Naivas anchor',
+                'Maji Magic Aqua Park',
+                'Dining & cafés',
+                'Health & fitness',
+                'Lakeside walks',
+                'Pet-friendly',
+              ].map((chip) => (
+                <li
+                  key={chip}
+                  className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white/75"
+                >
+                  {chip}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Link to="/areas/waterfront-karen" className="btn-gold">
+                Explore the Waterfront guide <ChevronRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to={`/properties?area=${encodeURIComponent(WATERFRONT_KAREN.area)}`}
+                className="btn-outline"
+              >
+                Karen listings
+                {karenCount > 0 && ` (${karenCount})`}
+              </Link>
+            </div>
+          </motion.div>
+
+          <motion.div {...fadeUp} className="relative">
+            <div className="absolute -inset-4 -z-10 rounded-[2.5rem] bg-gold-500/10 blur-2xl" />
+            <div className="overflow-hidden rounded-3xl shadow-card-hover ring-1 ring-gold-300/30">
+              <picture>
+                <source
+                  srcSet={asset('/images/waterfront/waterfront-hero.webp')}
+                  type="image/webp"
+                />
+                <img
+                  src={asset('/images/waterfront/waterfront-hero.jpg')}
+                  alt="The Waterfront Karen town centre — courtyard architecture with clock tower"
+                  width={1280}
+                  height={720}
+                  loading="lazy"
+                  className="h-[340px] w-full object-cover sm:h-[380px]"
+                />
+              </picture>
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+            </div>
+            <div className="absolute -bottom-6 -left-2 hidden w-52 overflow-hidden rounded-2xl shadow-card-hover ring-1 ring-gold-200 sm:block lg:-left-6">
+              <img
+                src={asset('/images/waterfront/waterfront-jump.jpg')}
+                alt="Family fun at the Maji Magic aqua park at The Waterfront Karen"
+                width={1200}
+                height={800}
+                loading="lazy"
+                className="h-32 w-full object-cover"
+              />
+            </div>
+            <div className="absolute -top-5 right-2 rounded-2xl bg-white p-4 shadow-card-hover ring-1 ring-gold-100 sm:right-4">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-ink-muted">
+                Reported 2026
+              </p>
+              <p className="font-display text-xl font-bold text-ink">KES 9B</p>
+              <p className="text-[11px] leading-tight text-ink-muted">
+                incl. 50.6-acre expansion site
+              </p>
+            </div>
+          </motion.div>
         </div>
       </section>
 

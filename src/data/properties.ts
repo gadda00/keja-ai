@@ -1371,7 +1371,7 @@ export const areaInsights: Record<string, { avgPricePerSqm: string; yield: strin
     Karen: {
       avgPricePerSqm: 'KES 165k–195k',
       yield: '5–6%',
-      note: 'Low-density premium suburb; capital growth over income.',
+      note: 'Low-density premium suburb anchored by The Waterfront Karen town centre; capital growth over income — the reported 50.6-acre expansion is the corridor catalyst.',
     },
     Lavington: {
       avgPricePerSqm: 'KES 115k–130k',

@@ -8,10 +8,12 @@ import {
   Heart,
   Ruler,
   TrendingUp,
+  Waves,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import SmartImg from '@/components/ui/SmartImg';
+import { isNearWaterfront } from '@/data/neighborhoods';
 import type { Property } from '@/data/properties';
 import { track } from '@/lib/analytics';
 import { isRentalPrice } from '@/lib/finance';
@@ -57,6 +59,15 @@ export default function PropertyCard({ property }: { property: Property }) {
         </Link>
         <div className="absolute left-3 top-3 flex flex-col gap-1.5">
           <TrustBadge score={property.trustScore} size="sm" />
+          {isNearWaterfront(property) && (
+            <Link
+              to="/areas/waterfront-karen"
+              className="inline-flex items-center gap-1 rounded-full bg-gold-gradient px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-gold-sm"
+              title="This listing is near The Waterfront Karen — see the neighbourhood guide"
+            >
+              <Waves className="h-3 w-3" aria-hidden="true" /> Waterfront
+            </Link>
+          )}
           {isNewArrival(property.listedAt) && (
             <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
               Fresh

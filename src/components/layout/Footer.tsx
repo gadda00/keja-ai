@@ -37,6 +37,11 @@ export default function Footer() {
               </Link>
             </li>
             <li>
+              <Link to="/areas/waterfront-karen" className="hover:text-gold-300">
+                The Waterfront Karen — Guide
+              </Link>
+            </li>
+            <li>
               <Link to="/properties?purpose=rent" className="hover:text-gold-300">
                 Rent Property
               </Link>

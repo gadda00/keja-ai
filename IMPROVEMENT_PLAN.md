@@ -82,3 +82,13 @@
 
 Document version: 2.0.0 — maintained in-repo; update with every improvement
 wave (see `docs/REVIEW_ACTIONS.md` for the external-review tracker).
+
+## Wave 6 — The Waterfront Karen flagship location
+
+The client's major selling point now carries its weight across the site:
+`/areas/waterfront-karen` neighbourhood guide (photos, click-to-load sandboxed
+YouTube tour, FACT/REPORTED/ESTIMATE-labelled investment thesis, live Karen
+inventory join, Place JSON-LD), homepage spotlight section, Waterfront badge
+on Karen listing cards, Ask-Keja engine intent with area aliases, sitemap
+entry and 8 new tests. Reported media figures (KES 9B transaction, 50.6-acre
+expansion) are labelled REPORTED — distinct from verified listing facts.

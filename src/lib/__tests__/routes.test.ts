@@ -84,3 +84,19 @@ describe('sitemap ↔ prerender coverage', () => {
     expect(PRERENDER).toContain('...autoIds, ...seedIds');
   });
 });
+
+describe('neighbourhood guide coverage', () => {
+  it('every guide slug is in the sitemap AND the prerender list', () => {
+    const NEIGHBORHOODS_TS = readFileSync(resolve(ROOT, 'src/data/neighborhoods.ts'), 'utf8');
+    const guideSlugs = [...NEIGHBORHOODS_TS.matchAll(/slug:\s*'([a-z0-9-]+)'/g)].map((m) => m[1]);
+    expect(guideSlugs.length).toBeGreaterThanOrEqual(1);
+    expect(PRERENDER).toContain('guideRoutes');
+    for (const slug of guideSlugs) {
+      expect(SITEMAP, `sitemap missing /areas/${slug}`).toContain(`/areas/${slug}`);
+      expect(PRERENDER).toContain('guideRoutes');
+    }
+    // the prerenderer builds guide routes from the same source file
+    expect(PRERENDER).toContain("extractArticleSlugs('src/data/neighborhoods.ts')");
+    expect(SITEMAP).toContain('/areas/waterfront-karen');
+  });
+});

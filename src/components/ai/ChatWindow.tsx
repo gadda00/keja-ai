@@ -154,7 +154,9 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
           'noopener'
         );
       } else if (response.action === 'open-calculator') {
-        setTimeout(() => void navigate('/calculator'), 700);
+        setTimeout(() => {
+          void navigate('/calculator');
+        }, 700);
       }
     }, delay);
   };
@@ -248,7 +250,9 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
               ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
               : label === 'ESTIMATE'
                 ? 'border-amber-200 bg-amber-50 text-amber-700'
-                : 'border-sky-200 bg-sky-50 text-sky-700';
+                : label === 'REPORTED'
+                  ? 'border-violet-200 bg-violet-50 text-violet-700'
+                  : 'border-sky-200 bg-sky-50 text-sky-700';
           return (
             <span
               key={i}

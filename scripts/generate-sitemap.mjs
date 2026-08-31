@@ -27,6 +27,12 @@ function extractArticleSlugs(path) {
   return [...src.matchAll(/slug:\s*'([a-z0-9-]+)'/g)].map((m) => m[1])
 }
 
+function extractGuideSlugs(path) {
+  if (!existsSync(resolve(ROOT, path))) return []
+  const src = readFileSync(resolve(ROOT, path), 'utf8')
+  return [...src.matchAll(/slug:\s*'([a-z0-9-]+)'/g)].map((m) => m[1])
+}
+
 function extractAutoIds(path) {
   if (!existsSync(resolve(ROOT, path))) return []
   const data = JSON.parse(readFileSync(resolve(ROOT, path), 'utf8'))
@@ -56,11 +62,13 @@ const propertyIds = [
   ...extractIds('src/data/properties.ts'),
 ]
 const articleSlugs = existsSync(resolve(ROOT, 'src/data/articles.ts')) ? extractArticleSlugs('src/data/articles.ts') : []
+const guideSlugs = extractGuideSlugs('src/data/neighborhoods.ts')
 
 const urls = [
   ...STATIC_ROUTES.map((r) => ({ ...r, lastmod: today })),
   ...propertyIds.map((id) => ({ loc: `/properties/${id}`, priority: '0.7', changefreq: 'weekly', lastmod: today })),
   ...articleSlugs.map((slug) => ({ loc: `/insights/${slug}`, priority: '0.7', changefreq: 'monthly', lastmod: today })),
+  ...guideSlugs.map((slug) => ({ loc: `/areas/${slug}`, priority: '0.8', changefreq: 'weekly', lastmod: today })),
 ]
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -79,4 +87,4 @@ ${urls
 `
 
 writeFileSync(resolve(ROOT, 'public/sitemap.xml'), xml + '\n', 'utf8')
-console.log(`[sitemap] wrote ${urls.length} URLs (${propertyIds.length} properties · ${articleSlugs.length} articles · ${STATIC_ROUTES.length} static)`)
+console.log(`[sitemap] wrote ${urls.length} URLs (${propertyIds.length} properties · ${articleSlugs.length} articles · ${guideSlugs.length} area guides · ${STATIC_ROUTES.length} static)`)

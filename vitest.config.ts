@@ -1,11 +1,9 @@
 import { defineConfig } from 'vitest/config'
-import path from 'path'
+import { fileURLToPath } from 'node:url'
 
 export default defineConfig({
   // Default node env keeps lib tests fast; React tests opt into jsdom
   // per-file with `// @vitest-environment jsdom`.
   test: { environment: 'node' },
-  // import.meta.dirname avoids the deprecated __dirname escape that forces
-  // Vite's legacy config loader (warning under Vite 8).
-  resolve: { alias: { '@': path.resolve(import.meta.dirname, './src') } },
+  resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
 })

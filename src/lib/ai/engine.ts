@@ -19,7 +19,7 @@ import { marketInventory } from '@/lib/inventory';
 export interface AIResponse {
   text: string;
   propertyIds?: string[];
-  meta?: { label: 'FACT' | 'ESTIMATE' | 'ASSUMPTION'; text: string }[];
+  meta?: { label: 'FACT' | 'ESTIMATE' | 'ASSUMPTION' | 'REPORTED'; text: string }[];
   quickReplies?: string[];
   action?: 'start-qualification' | 'open-calculator' | 'whatsapp';
 }
@@ -41,6 +41,14 @@ const AREA_ALIASES: Record<string, string> = {
   runda: 'Runda',
   gigiri: 'Runda',
   'un gigiri': 'Runda',
+  'the waterfront': 'Karen',
+  'waterfront karen': 'Karen',
+  waterfront: 'Karen',
+  'maji magic': 'Karen',
+  'aqua park': 'Karen',
+  aquapark: 'Karen',
+  'karen mall': 'Karen',
+  'karen town centre': 'Karen',
   syokimau: 'Syokimau',
   mlolongo: 'Syokimau',
   sgr: 'Syokimau',
@@ -197,7 +205,7 @@ const L = {
     greeting:
       'Habari! 👋 I\u2019m **Keja** — your AI real estate assistant, by Chacadom Investments.\n\nI can help you **find property**, **verify listings**, **analyse investments** (yields, ROI, projections) and connect you to trusted agents — across multiple agencies, so my recommendations are neutral.\n\nWhat are you looking for today?',
     fallback:
-      'I want to get this right. You can ask me things like:\n\n• "2 bedroom apartments in Kilimani under 15M"\n• "Is buying in Kitengela a good investment?"\n• "How do you verify listings?"\n• "What yield can I expect in Westlands?"\n• "I want to view the Karen villa"',
+      'I want to get this right. You can ask me things like:\n\n• "2 bedroom apartments in Kilimani under 15M"\n• "Is buying in Kitengela a good investment?"\n• "How do you verify listings?"\n• "What yield can I expect in Westlands?"\n• "Tell me about the Waterfront Karen"\n• "I want to view the Karen villa"',
   },
   sw: {
     greeting:
@@ -489,6 +497,20 @@ export class KejaAI {
       };
     }
 
+    // The Waterfront Karen — flagship neighbourhood guide. Informational
+    // queries get the deep answer; criteria-bearing searches (budget, beds,
+    // rent) fall through to the search flow, which resolves "waterfront" to
+    // live Karen inventory via the area aliases above.
+    if (/(waterfront|maji magic|aqua ?park|karen town centre)/.test(t)) {
+      const hasSearchCriteria = /\d|under|below|budget|kodi|rent\b/.test(t);
+      const wantsInfo =
+        t === 'waterfront' ||
+        /(tell me|what|where|why|how|about|guide|lifestyle|know|see|visit|waterfront karen|maji magic|aqua ?park|karen town centre)/.test(
+          t
+        );
+      if (wantsInfo && !hasSearchCriteria) return this.waterfrontAnswer();
+    }
+
     // Compare areas — MUST run before the invest intent so "Kilimani vs
     // Westlands as an investment" answers the comparison, not a Kilimani brief.
     if (/(compare|vs|versus|better area|which area|difference between)/.test(t)) {
@@ -581,6 +603,33 @@ export class KejaAI {
   }
 
   /* ------------------------------- sub-answers ------------------------------ */
+
+  /** The Waterfront Karen — flagship neighbourhood guide answer. */
+  private waterfrontAnswer(): AIResponse {
+    const karen = marketInventory()
+      .filter((p) => p.area === 'Karen')
+      .sort((a, b) => b.trustScore - a.trustScore)
+      .slice(0, 3);
+    return {
+      text: `**The Waterfront Karen** is the lifestyle anchor of the Karen corridor — and our flagship location spotlight. 🌊\n\n**FACT — what is there today:**\n• A lakeside mixed-use town centre opened in 2018 — about 200,000 sq ft on 13 acres\n• Naivas-anchored shopping, dining, banking, health & fitness\n• **Maji Magic Aqua Park** — Nairobi's best-known aqua park, 40+ water obstacles on the lake\n• Pet-friendly lakeside walking track — the "waterfront" is literal\n\n**REPORTED — the investment signal (Kenyan business media, 2026):**\n• A **KES 9 billion** transaction involving the town centre\n• A **50.6-acre flagship expansion site** — planned residential, offices/business park and a hotel\n\n**ESTIMATE — what it means for buyers:** institutional conviction plus a mixed-use catalyst has historically led prices in quiet premium suburbs. Karen fundamentals: low density, half-acre plots, KES 165k\u2013195k/sqm for verified stock, capital growth over income.\n${karen.length ? `\nLive verified Karen inventory right now:\n${karen.map(propLine).join('\n')}\n` : ''}\nI wrote a full guide — photos, a video walk-through, the lifestyle and the numbers: **/areas/waterfront-karen**`,
+      propertyIds: karen.map((p) => p.id),
+      meta: [
+        {
+          label: 'FACT',
+          text: 'On-site amenities cross-checked against the official Waterfront Karen directory.',
+        },
+        {
+          label: 'REPORTED',
+          text: 'Transaction and expansion figures as reported by Business Daily Africa and Construction Kenya (July\u2013August 2026).',
+        },
+        {
+          label: 'ESTIMATE',
+          text: 'Corridor effects on prices are reasoned estimates, not guarantees.',
+        },
+      ],
+      quickReplies: ['Browse Karen listings', 'Is Karen a good investment?', 'Book a viewing'],
+    };
+  }
 
   private searchAnswer(q: ParsedQuery, matches: Property[]): AIResponse {
     const criteria: string[] = [];
