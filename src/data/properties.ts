@@ -54,7 +54,7 @@ export interface Property {
 const IMG = (n: string) => asset(`/images/props/${n}.jpg`);
 
 export const AGENCIES = [
-  { name: 'Chacadom Premier Properties', listings: 6, rating: 4.9, verifiedSince: '2024' },
+  { name: 'Chacadom Premier Properties', listings: 9, rating: 4.9, verifiedSince: '2024' },
   { name: 'Nairobi Habitat Realtors', listings: 4, rating: 4.7, verifiedSince: '2024' },
   { name: 'Savanna Heights Realty', listings: 4, rating: 4.6, verifiedSince: '2025' },
   { name: 'Pwani Beach Homes', listings: 3, rating: 4.8, verifiedSince: '2025' },
@@ -1270,6 +1270,220 @@ export const PROPERTIES: Property[] = [
       'Price anomaly detected',
       'Photo reuse detected',
       'Verification withheld',
+    ],
+  },
+  {
+    id: 'KJA-021',
+    title: '3BR Ensuite Duplex with DSQ — Barini Apartments',
+    type: 'apartment',
+    purpose: ['buy', 'invest'],
+    area: 'Kilimani',
+    county: 'Nairobi',
+    price: 30000000,
+    rentEstimate: 200000,
+    bedrooms: 3,
+    bathrooms: 4,
+    sizeSqm: 251,
+    amenities: [
+      'DSQ',
+      'Heated Swimming Pool',
+      'Gym',
+      '2 Saunas',
+      'Solar-Heated Water',
+      'Borehole',
+      '24/7 Security',
+      'Power Backup',
+      '2 Parking + Guest',
+      'CCTV',
+    ],
+    images: [IMG('listing_barini')],
+    description:
+      'Vendor stock from Chacadom\u2019s live WhatsApp catalogue: an ultra-modern 3-bedroom ensuite duplex with DSQ in the Kings Barini complex on Argwings Kodhek Road (opposite UTR), one of only 48 units. 251 sqm plinth with two elegant living rooms, Indian-built finishes and solar-heated water throughout. 1.2 km from Yaya Centre and 1.1 km from Valley Arcade. The complex runs a heated pool, gym and dual saunas on a KES 20,000/month service charge; comparable units rent at about KES 200,000 per month. Keja\u2019s verification desk has the vendor\u2019s original photos on file and the title search is in progress — the badge below reflects that honest, in-progress state.',
+    agency: 'Chacadom Premier Properties',
+    agent: { name: 'Chacadom listings desk', phone: '+254 108 611 387' },
+    trustScore: 78,
+    verification: {
+      titleCheck: 'pending',
+      ardhisasaMatch: false,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-09-01',
+    },
+    trustSignals: [
+      {
+        label: 'Photo authenticity',
+        status: 'pass',
+        detail:
+          'Vendor-supplied originals from the live catalogue — no cross-listing reuse detected.',
+      },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail:
+          'KES 119k per sqm sits inside the Kilimani band (KES 105k–120k) for stock of this finish level.',
+      },
+      {
+        label: 'Title search',
+        status: 'warn',
+        detail:
+          'Official Ardhisasa search in progress — \u2018Verified\u2019 badge withheld until it clears.',
+      },
+      {
+        label: 'Agent history',
+        status: 'pass',
+        detail:
+          'Chacadom Premier Properties: live catalogue, direct WhatsApp line to the listings desk.',
+      },
+    ],
+    availability: 'available',
+    grossYieldEstimate: 8.0,
+    listedAt: '2026-09-01',
+    views: 118,
+    highlights: [
+      '48-unit boutique complex',
+      'KES 200k/mo rental comparables',
+      'Walk to Yaya Centre',
+      'Solar-heated water',
+    ],
+  },
+  {
+    id: 'KJA-022',
+    title: '5BR All-Ensuite Family Home on Half an Acre — Runda',
+    type: 'villa',
+    purpose: ['buy'],
+    area: 'Runda',
+    county: 'Nairobi',
+    price: 300000000,
+    bedrooms: 5,
+    bathrooms: 5,
+    sizeSqm: 2023,
+    amenities: [
+      'Private Heated Pool',
+      'Garden Water Feature',
+      '2 DSQ',
+      '2 Lockable Garages',
+      'Ample Visitor Parking',
+      'Gated Community',
+    ],
+    images: [IMG('listing_runda')],
+    description:
+      'Vendor stock from Chacadom\u2019s live WhatsApp catalogue: a substantial five-bedroom residence in Runda, all bedrooms ensuite with two domestic staff quarters, set on a half-acre mature plot. The grounds carry a private heated swimming pool and a landscaped garden with a water fountain; parking covers two lockable garages plus ample visitor space. Runda remains Nairobi\u2019s classic diplomatic-family suburb — minutes from Village Market, the UN Gigiri complex and the international schools corridor. The vendor\u2019s garden photo is on file at the verification desk; the title search and a full photo set are being assembled, and the listing is published now in that honest in-progress state.',
+    agency: 'Chacadom Premier Properties',
+    agent: { name: 'Chacadom listings desk', phone: '+254 108 611 387' },
+    trustScore: 76,
+    verification: {
+      titleCheck: 'pending',
+      ardhisasaMatch: false,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-09-01',
+    },
+    trustSignals: [
+      {
+        label: 'Photo authenticity',
+        status: 'pass',
+        detail:
+          'Vendor-supplied originals from the live catalogue; full photo set requested for the record.',
+      },
+      {
+        label: 'Title search',
+        status: 'warn',
+        detail: 'Half-acre Runda title search in progress — badge withheld until it clears.',
+      },
+      {
+        label: 'Pricing analysis',
+        status: 'warn',
+        detail:
+          'KES 300M is a vendor asking figure for an all-ensuite pool home; per-sqm banding pending the survey.',
+      },
+      {
+        label: 'Agent history',
+        status: 'pass',
+        detail:
+          'Chacadom Premier Properties: live catalogue, direct WhatsApp line to the listings desk.',
+      },
+    ],
+    availability: 'available',
+    listedAt: '2026-09-01',
+    views: 94,
+    highlights: [
+      'Half-acre mature plot',
+      'All ensuite + 2 DSQ',
+      'Private heated pool',
+      'Diplomatic-suburb location',
+    ],
+  },
+  {
+    id: 'KJA-023',
+    title: 'Executive 4BR Mansion — Kijani, Tatu City',
+    type: 'villa',
+    purpose: ['buy'],
+    area: 'Tatu City',
+    county: 'Kiambu',
+    price: 100000000,
+    bedrooms: 4,
+    bathrooms: 4,
+    sizeSqm: 380,
+    amenities: [
+      'Master Jacuzzi & Steam Shower',
+      'Dedicated Gym',
+      'Office Area',
+      'Modern Kitchen with Pantry',
+      'Laundry Room',
+      '24-hr CCTV',
+      'Automated Gate',
+      'Gated Estate',
+      'Green Area',
+    ],
+    images: [IMG('listing_tatu')],
+    description:
+      'Vendor stock from Chacadom\u2019s live WhatsApp catalogue: a prestigious executive mansion in Kijani, the residential quarter of Tatu City, inside a secure gated estate. All four bedrooms are ensuite; the plan carries a dedicated gym and office area, a modern kitchen with pantry, laundry room and current-generation interior finishes. The master suite adds a jacuzzi and steam shower. Estate security runs 24-hour CCTV with an automated gate, and wide-format windows open onto generous green space. Tatu City\u2019s master-planned infrastructure — schools, business park and the new dual carriageway links — underpins the corridor\u2019s growth story. Vendor\u2019s interior photo on file; title search in progress, badge honestly withheld.',
+    agency: 'Chacadom Premier Properties',
+    agent: { name: 'Chacadom listings desk', phone: '+254 108 611 387' },
+    trustScore: 77,
+    verification: {
+      titleCheck: 'pending',
+      ardhisasaMatch: false,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-09-01',
+    },
+    trustSignals: [
+      {
+        label: 'Photo authenticity',
+        status: 'pass',
+        detail:
+          'Vendor-supplied originals from the live catalogue; full photo set requested for the record.',
+      },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail:
+          'KES 100M for an all-ensuite Kijani mansion sits within the estate\u2019s executive band.',
+      },
+      {
+        label: 'Title search',
+        status: 'warn',
+        detail: 'Tatu City leasehold search in progress — badge withheld until it clears.',
+      },
+      {
+        label: 'Agent history',
+        status: 'pass',
+        detail:
+          'Chacadom Premier Properties: live catalogue, direct WhatsApp line to the listings desk.',
+      },
+    ],
+    availability: 'available',
+    listedAt: '2026-09-01',
+    views: 102,
+    highlights: [
+      'Gated Kijani estate',
+      'Jacuzzi & steam shower',
+      'Gym + office area',
+      'Master-planned corridor',
     ],
   },
 ];

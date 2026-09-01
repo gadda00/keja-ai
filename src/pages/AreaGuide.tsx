@@ -416,6 +416,7 @@ export default function AreaGuide() {
           <p className="mt-4 text-xs text-ink-muted">
             Guide reviewed {guide.lastReviewed}. Independent of The Waterfront Karen — this page is
             editorial context, not an advertisement.
+            {guide.photoNote ? ` ${guide.photoNote}` : ''}
           </p>
         </div>
       </section>

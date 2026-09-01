@@ -66,6 +66,8 @@ export interface NeighborhoodGuide {
   gallery: GalleryImage[];
   video: NeighborhoodVideo;
   sources: { label: string; url: string }[];
+  /** Provenance note for the photography shown on the guide. */
+  photoNote?: string;
   lastReviewed: string;
 }
 
@@ -86,10 +88,10 @@ export const WATERFRONT_KAREN: NeighborhoodGuide = {
   summary:
     'The Waterfront Karen is Karen’s world-class mixed-use town centre — shopping, dining, family play and wellness arranged around a lakeside setting, minutes from the suburb’s leafy lanes. Since opening in 2018 it has become the lifestyle anchor of the Karen corridor, and reported 2026 plans to expand onto a 50.6-acre flagship site with homes, offices and a hotel make the surrounding neighbourhood one of the most closely watched addresses in Nairobi.',
   hero: img(
-    '/images/waterfront/waterfront-hero',
-    'The Waterfront Karen — courtyard architecture with arched walkways and clock tower',
-    1280,
-    720
+    '/images/waterfront/wf-entrance',
+    'The Waterfront Karen — main entrance and signature blue signage on Karen Road',
+    1200,
+    665
   ),
   stats: [
     { value: '2018', label: 'Opened' },
@@ -159,28 +161,52 @@ export const WATERFRONT_KAREN: NeighborhoodGuide = {
   ],
   gallery: [
     img(
-      '/images/waterfront/waterfront-plaza',
-      'Open-air plaza at The Waterfront Karen on a busy weekend',
-      1200,
-      983
+      '/images/waterfront/wf-promenade',
+      'The lakeside promenade at The Waterfront Karen — brick paving, palms and open water',
+      1000,
+      750
     ),
     img(
-      '/images/waterfront/waterfront-aqua',
-      'Maji Magic Aqua Park — inflatable water obstacles on the lake',
+      '/images/waterfront/wf-lake',
+      'The calm lake at The Waterfront Karen — the “waterfront” is literal, not marketing',
+      1000,
+      750
+    ),
+    img(
+      '/images/waterfront/wf-dining',
+      'Outdoor dining terraces under the town centre’s geometric facades',
+      1000,
+      750
+    ),
+    img(
+      '/images/waterfront/wf-restaurant',
+      'Glass-fronted restaurant with a view over the lake',
+      1000,
+      750
+    ),
+    img(
+      '/images/waterfront/wf-lounge',
+      'Lounge terraces with palms — the suburb’s living room',
+      1000,
+      750
+    ),
+    img(
+      '/images/waterfront/wf-sunset-lake',
+      'Maji Magic Aqua Park on the lake at dusk — the weekend family ritual',
       1200,
-      800
+      675
+    ),
+    img(
+      '/images/waterfront/wf-complex',
+      'The Waterfront Karen’s white terraces and glass balconies above the lawns',
+      1000,
+      750
     ),
     img(
       '/images/waterfront/karen-villa-pool',
       'A Karen home with pool and mature garden, minutes from The Waterfront',
       1600,
       575
-    ),
-    img(
-      '/images/waterfront/karen-villa-aerial',
-      'Aerial view of a forested Karen property — the suburb’s signature half-acre lifestyle',
-      1200,
-      782
     ),
   ],
   video: {
@@ -199,6 +225,9 @@ export const WATERFRONT_KAREN: NeighborhoodGuide = {
       url: 'https://www.constructionkenya.com/13483/waterfront-karen-mall',
     },
   ],
+  /** Campus photos captured on the ground; lifestyle shots representative. */
+  photoNote:
+    'Campus photographs taken at The Waterfront Karen (2026); lifestyle images representative of the Karen market.',
   lastReviewed: '2026-09-01',
 };
 

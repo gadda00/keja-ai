@@ -155,7 +155,7 @@ const seedUsers = (): UserAccount[] => {
       role: 'admin',
       provider: 'email',
       status: 'active',
-      phone: '+254 700 123 456',
+      phone: '+254 108 611 387',
       company: 'Chacadom Investments',
       createdAt: '2026-06-01T08:00:00Z',
       lastLoginAt: now,

@@ -286,15 +286,12 @@ export default function Home() {
             <div className="absolute -inset-4 -z-10 rounded-[2.5rem] bg-gold-500/10 blur-2xl" />
             <div className="overflow-hidden rounded-3xl shadow-card-hover ring-1 ring-gold-300/30">
               <picture>
-                <source
-                  srcSet={asset('/images/waterfront/waterfront-hero.webp')}
-                  type="image/webp"
-                />
+                <source srcSet={asset('/images/waterfront/wf-entrance.webp')} type="image/webp" />
                 <img
-                  src={asset('/images/waterfront/waterfront-hero.jpg')}
-                  alt="The Waterfront Karen town centre — courtyard architecture with clock tower"
-                  width={1280}
-                  height={720}
+                  src={asset('/images/waterfront/wf-entrance.jpg')}
+                  alt="The Waterfront Karen — main entrance with the centre’s signature blue signage"
+                  width={1200}
+                  height={665}
                   loading="lazy"
                   className="h-[340px] w-full object-cover sm:h-[380px]"
                 />
@@ -303,10 +300,10 @@ export default function Home() {
             </div>
             <div className="absolute -bottom-6 -left-2 hidden w-52 overflow-hidden rounded-2xl shadow-card-hover ring-1 ring-gold-200 sm:block lg:-left-6">
               <img
-                src={asset('/images/waterfront/waterfront-jump.jpg')}
-                alt="Family fun at the Maji Magic aqua park at The Waterfront Karen"
+                src={asset('/images/waterfront/wf-sunset-lake.jpg')}
+                alt="Maji Magic Aqua Park on the lake at The Waterfront Karen, at dusk"
                 width={1200}
-                height={800}
+                height={675}
                 loading="lazy"
                 className="h-32 w-full object-cover"
               />

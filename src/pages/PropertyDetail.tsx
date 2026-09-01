@@ -228,7 +228,11 @@ export default function PropertyDetail() {
         </div>
 
         {/* gallery */}
-        <div className="mt-6 grid gap-3 grid-cols-1 lg:grid-cols-[2fr_1fr]">
+        <div
+          className={`mt-6 grid gap-3 grid-cols-1 ${
+            property.images.length > 1 ? 'lg:grid-cols-[2fr_1fr]' : ''
+          }`}
+        >
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -240,9 +244,11 @@ export default function PropertyDetail() {
               loading="eager"
               className="h-[300px] w-full object-cover sm:h-[460px]"
             />
-            <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-ink">
-              {activeImg + 1} / {property.images.length}
-            </div>
+            {property.images.length > 1 && (
+              <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-ink">
+                {activeImg + 1} / {property.images.length}
+              </div>
+            )}
             <div className="absolute bottom-4 right-4 flex gap-2">
               <button
                 onClick={() => {
@@ -275,21 +281,23 @@ export default function PropertyDetail() {
               </button>
             </div>
           </motion.div>
-          <div className="grid grid-cols-3 gap-3 lg:grid-cols-1">
-            {property.images.slice(0, 3).map((img, i) => (
-              <button
-                key={img + i}
-                onClick={() => setActiveImg(i)}
-                className={`overflow-hidden rounded-xl ring-2 transition ${activeImg === i ? 'ring-gold-500' : 'ring-transparent hover:ring-gold-200'}`}
-              >
-                <SmartImg
-                  src={img}
-                  alt={`${property.title} photo`}
-                  className="h-24 w-full object-cover sm:h-[145px]"
-                />
-              </button>
-            ))}
-          </div>
+          {property.images.length > 1 && (
+            <div className="grid grid-cols-3 gap-3 lg:grid-cols-1">
+              {property.images.slice(0, 3).map((img, i) => (
+                <button
+                  key={img + i}
+                  onClick={() => setActiveImg(i)}
+                  className={`overflow-hidden rounded-xl ring-2 transition ${activeImg === i ? 'ring-gold-500' : 'ring-transparent hover:ring-gold-200'}`}
+                >
+                  <SmartImg
+                    src={img}
+                    alt={`${property.title} photo`}
+                    className="h-24 w-full object-cover sm:h-[145px]"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* main grid */}

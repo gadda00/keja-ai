@@ -4,10 +4,12 @@ export const SITE = {
   tagline: 'Intelligent Real Estate. Verified Trust.',
   secondaryTagline: 'Smarter Investments.',
   parent: 'Chacadom Investments',
-  // digits-only international format; overridable via VITE_WHATSAPP
-  whatsapp: import.meta.env.VITE_WHATSAPP ?? '254700123456',
+  // digits-only international format; overridable via VITE_WHATSAPP.
+  // Default is the client's live line (same number that backs the
+  // Chacadom vendor catalogue — see src/data/properties.ts agent entries).
+  whatsapp: import.meta.env.VITE_WHATSAPP ?? '254108611387',
   email: 'hello@keja.ai',
-  phone: '+254 700 123 456',
+  phone: '+254 108 611 387',
   offices: 'Westlands, Nairobi · Kenya',
   founded: '2026',
   swahiliNote: '"Keja" is Swahili for home.',
