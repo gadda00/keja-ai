@@ -1,8 +1,7 @@
-import { MotionConfig } from 'framer-motion';
+import { LazyMotion, MotionConfig } from 'framer-motion';
 import { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
-import AuthModal from '@/components/auth/AuthModal';
 import DemoBanner from '@/components/layout/DemoBanner';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import Footer from '@/components/layout/Footer';
@@ -11,9 +10,10 @@ import WhatsAppFloat from '@/components/layout/WhatsAppFloat';
 import RoleGate from '@/components/onboarding/RoleGate';
 import CompareBar from '@/components/property/CompareBar';
 import Home from '@/pages/Home';
-import Properties from '@/pages/Properties';
 
 // Route-level code splitting — heavy pages load on demand
+const AuthModal = lazy(() => import('@/components/auth/AuthModal'));
+const Properties = lazy(() => import('@/pages/Properties'));
 const PropertyDetail = lazy(() => import('@/pages/PropertyDetail'));
 const AskKeja = lazy(() => import('@/pages/AskKeja'));
 const TrustCenter = lazy(() => import('@/pages/TrustCenter'));
@@ -34,6 +34,9 @@ const Compare = lazy(() => import('@/pages/Compare'));
 const ArticleDetail = lazy(() => import('@/pages/ArticleDetail'));
 const AreaGuide = lazy(() => import('@/pages/AreaGuide'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
+
+/** Async framer-motion feature loader (keeps the entry bundle lean). */
+const loadMotionFeatures = () => import('@/lib/motionFeatures').then((m) => m.default);
 
 function ScrollManager() {
   const { pathname, hash } = useLocation();
@@ -82,30 +85,35 @@ export default function App() {
         <ErrorBoundary>
           <Suspense fallback={<LazyFallback />}>
             <MotionConfig reducedMotion="user">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/properties" element={<Properties />} />
-                <Route path="/properties/:id" element={<PropertyDetail />} />
-                <Route path="/ask" element={<AskKeja />} />
-                <Route path="/invest" element={<InvestmentCalculator />} />
-                <Route path="/tokenize" element={<Tokenize />} />
-                <Route path="/trust" element={<TrustCenter />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/insights" element={<Insights />} />
-                <Route path="/insights/:slug" element={<ArticleDetail />} />
-                <Route path="/areas/:slug" element={<AreaGuide />} />
-                <Route path="/sell" element={<ListProperty />} />
-                <Route path="/manage" element={<Manage />} />
-                <Route path="/account" element={<Account />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/ecosystem" element={<Ecosystem />} />
-                <Route path="/partners" element={<Partners />} />
-                <Route path="/compare" element={<Compare />} />
-                <Route path="/legal" element={<TermsPrivacy />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              {/* Deferred animation engine: the ~90KB feature runtime loads
+                  async after first paint; `strict` guarantees no component
+                  accidentally imports the full `motion` bundle. */}
+              <LazyMotion features={loadMotionFeatures} strict>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/properties" element={<Properties />} />
+                  <Route path="/properties/:id" element={<PropertyDetail />} />
+                  <Route path="/ask" element={<AskKeja />} />
+                  <Route path="/invest" element={<InvestmentCalculator />} />
+                  <Route path="/tokenize" element={<Tokenize />} />
+                  <Route path="/trust" element={<TrustCenter />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/insights" element={<Insights />} />
+                  <Route path="/insights/:slug" element={<ArticleDetail />} />
+                  <Route path="/areas/:slug" element={<AreaGuide />} />
+                  <Route path="/sell" element={<ListProperty />} />
+                  <Route path="/manage" element={<Manage />} />
+                  <Route path="/account" element={<Account />} />
+                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/ecosystem" element={<Ecosystem />} />
+                  <Route path="/partners" element={<Partners />} />
+                  <Route path="/compare" element={<Compare />} />
+                  <Route path="/legal" element={<TermsPrivacy />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </LazyMotion>
             </MotionConfig>
           </Suspense>
         </ErrorBoundary>

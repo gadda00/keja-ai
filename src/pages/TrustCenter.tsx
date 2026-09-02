@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   BadgeCheck,
   ChevronRight,
@@ -89,7 +89,7 @@ export default function TrustCenter() {
       {/* hero */}
       <section className="bg-ink py-20 sm:py-28">
         <div className="container-luxe text-center">
-          <motion.div {...fadeUp}>
+          <m.div {...fadeUp}>
             <span className="inline-flex items-center gap-2 rounded-full border border-gold-400/40 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide2 text-gold-300">
               <ShieldCheck className="h-3.5 w-3.5" /> The Keja Trust Layer
             </span>
@@ -101,7 +101,7 @@ export default function TrustCenter() {
               it, and why a cross-agency platform can be honest in a way single-agency sites
               structurally cannot.
             </p>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
@@ -120,7 +120,7 @@ export default function TrustCenter() {
         </div>
         <div className="container-luxe grid gap-6 grid-cols-1 lg:grid-cols-2">
           {PILLARS.map((p, i) => (
-            <motion.div
+            <m.div
               key={p.title}
               {...fadeUp}
               transition={{ ...fadeUp.transition, delay: i * 0.06 }}
@@ -136,10 +136,10 @@ export default function TrustCenter() {
               </div>
               <h3 className="mt-4 font-display text-xl font-semibold text-ink">{p.title}</h3>
               <p className="mt-2.5 text-sm leading-relaxed text-ink-muted">{p.text}</p>
-            </motion.div>
+            </m.div>
           ))}
 
-          <motion.div {...fadeUp} className="rounded-2xl bg-ink p-7 sm:col-span-2 lg:col-span-2">
+          <m.div {...fadeUp} className="rounded-2xl bg-ink p-7 sm:col-span-2 lg:col-span-2">
             <div className="flex items-center gap-3">
               <Scale className="h-6 w-6 text-gold-400" />
               <h3 className="font-display text-xl font-semibold text-white">
@@ -191,14 +191,14 @@ export default function TrustCenter() {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
       {/* claims register — what is real, simulated, partner-dependent or planned */}
       <section className="section-pad bg-cream" id="claims">
         <div className="container-luxe">
-          <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center">
+          <m.div {...fadeUp} className="mx-auto max-w-3xl text-center">
             <p className="eyebrow">The claims register</p>
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
               What is real, and what is a demo
@@ -227,7 +227,7 @@ export default function TrustCenter() {
                 </span>
               ))}
             </div>
-          </motion.div>
+          </m.div>
 
           <div className="mx-auto mt-10 max-w-4xl overflow-x-auto">
             <table className="w-full min-w-[720px] border-collapse bg-white text-left text-sm shadow-sm ring-1 ring-gold-100">
@@ -294,7 +294,7 @@ export default function TrustCenter() {
       {/* why cross-agency matters */}
       <section className="section-pad bg-white" id="score">
         <div className="container-luxe grid items-center gap-12 lg:grid-cols-2">
-          <motion.div {...fadeUp}>
+          <m.div {...fadeUp}>
             <p className="eyebrow">The structural moat</p>
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
               Why a single-agency AI can never do this
@@ -314,19 +314,19 @@ export default function TrustCenter() {
             <Link to="/properties" className="btn-outline">
               Browse verified listings
             </Link>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
       <section className="section-pad bg-cream">
         <div className="container-luxe mx-auto max-w-3xl">
-          <motion.div {...fadeUp} className="text-center">
+          <m.div {...fadeUp} className="text-center">
             <p className="eyebrow">Trust questions, answered</p>
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">Straight answers</h2>
-          </motion.div>
+          </m.div>
           <div className="mt-10 space-y-4">
             {TRUST_FAQS.map((f) => (
-              <motion.details key={f.q} {...fadeUp} className="group card-luxe overflow-hidden">
+              <m.details key={f.q} {...fadeUp} className="group card-luxe overflow-hidden">
                 <summary className="flex cursor-pointer items-center justify-between gap-4 p-5 font-display text-base font-semibold text-ink marker:content-none">
                   {f.q}
                   <ChevronRight className="h-5 w-5 shrink-0 text-gold-600 transition-transform group-open:rotate-90" />
@@ -334,11 +334,11 @@ export default function TrustCenter() {
                 <p className="border-t border-gold-100 px-5 py-4 text-sm leading-relaxed text-ink-soft">
                   {f.a}
                 </p>
-              </motion.details>
+              </m.details>
             ))}
           </div>
 
-          <motion.div
+          <m.div
             {...fadeUp}
             className="mt-12 rounded-2xl bg-gradient-to-r from-gold-100 to-gold-50 p-8 text-center"
           >
@@ -350,7 +350,7 @@ export default function TrustCenter() {
             <Link to="/ask" className="btn-gold mt-6">
               Ask Keja to verify a listing
             </Link>
-          </motion.div>
+          </m.div>
         </div>
       </section>
     </div>

@@ -2,7 +2,7 @@
  * Keja Tokenize — portfolio dashboard: holdings, income history,
  * the Keja Ledger explorer, and demo login.
  */
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   ArrowRight,
   Banknote,
@@ -120,7 +120,7 @@ function StatCard({
   delay: number;
 }) {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.4 }}
@@ -138,7 +138,7 @@ function StatCard({
       {sub ? (
         <p className={`mt-1 text-[12px] ${accent ? 'text-white/60' : 'text-ink-muted'}`}>{sub}</p>
       ) : null}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -290,7 +290,7 @@ function PortfolioInner({
               </div>
             )}
             {holdings.map((h, i) => (
-              <motion.div
+              <m.div
                 key={h.property.id}
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -352,7 +352,7 @@ function PortfolioInner({
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>

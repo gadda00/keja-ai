@@ -2,7 +2,7 @@
  * Keja Tokenize — marketplace view: hero, live stats, property cards,
  * how-it-works and the issuer console CTA.
  */
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   ArrowRight,
   Building2,
@@ -44,7 +44,7 @@ export function Marketplace() {
         <div className="absolute inset-x-0 top-0 h-1 bg-gold-gradient" />
         <div className="container-luxe py-14 lg:py-20">
           <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
@@ -93,9 +93,9 @@ export function Marketplace() {
                   <Link2 className="h-4 w-4 text-gold-600" /> On-chain ownership record
                 </span>
               </div>
-            </motion.div>
+            </m.div>
 
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.7, delay: 0.15 }}
@@ -119,7 +119,7 @@ export function Marketplace() {
                   </div>
                 </div>
               </div>
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.5 }}
@@ -136,8 +136,8 @@ export function Marketplace() {
                     </p>
                   </div>
                 </div>
-              </motion.div>
-              <motion.div
+              </m.div>
+              <m.div
                 initial={{ opacity: 0, y: -12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.65, duration: 0.5 }}
@@ -145,8 +145,8 @@ export function Marketplace() {
               >
                 <p className="text-[11px] font-medium text-ink-muted">Tokens issued</p>
                 <p className="text-lg font-bold leading-none text-ink">{fmtNum(tokensIssued)}</p>
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
           </div>
         </div>
       </section>
@@ -202,7 +202,7 @@ export function Marketplace() {
                 body: 'Net rent flows to your wallet monthly or quarterly, proportional to your tokens — with statements in your portfolio dashboard.',
               },
             ].map((s) => (
-              <motion.div
+              <m.div
                 key={s.step}
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -218,7 +218,7 @@ export function Marketplace() {
                 </div>
                 <h3 className="mt-4 text-[15px] font-bold text-ink">{s.title}</h3>
                 <p className="mt-2 text-[13.5px] leading-relaxed text-ink-muted">{s.body}</p>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -261,7 +261,7 @@ function PropertyCard({ p, index }: { p: TokenizedProperty; index: number }) {
   const funded = fundedPct(p);
 
   return (
-    <motion.article
+    <m.article
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
@@ -348,6 +348,6 @@ function PropertyCard({ p, index }: { p: TokenizedProperty; index: number }) {
           <ArrowRight className="h-3.5 w-3.5" />
         </span>
       </div>
-    </motion.article>
+    </m.article>
   );
 }

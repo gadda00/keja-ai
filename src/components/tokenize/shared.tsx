@@ -2,7 +2,7 @@
  * Keja Tokenize — shared UI primitives.
  * Uses the keja-ai design system (gold / ink / cream, Playfair + Inter).
  */
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import {
   Building2,
   CheckCircle2,
@@ -135,7 +135,7 @@ export function Modal({
   return (
     <AnimatePresence>
       {open ? (
-        <motion.div
+        <m.div
           ref={dialogRef}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -146,7 +146,7 @@ export function Modal({
           aria-modal="true"
           aria-label={title}
         >
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 24, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.97 }}
@@ -171,8 +171,8 @@ export function Modal({
               </button>
             </div>
             <div className="max-h-[78vh] overflow-y-auto p-6">{children}</div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       ) : null}
     </AnimatePresence>
   );
@@ -207,7 +207,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       >
         <AnimatePresence>
           {toasts.map((t) => (
-            <motion.div
+            <m.div
               key={t.id}
               initial={{ opacity: 0, y: 16, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -223,7 +223,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   </p>
                 ) : null}
               </div>
-            </motion.div>
+            </m.div>
           ))}
         </AnimatePresence>
       </div>

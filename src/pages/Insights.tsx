@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   ArrowRight,
   Coins,
@@ -44,14 +44,14 @@ export default function Insights() {
       {/* core principles */}
       <section className="section-pad bg-white">
         <div className="container-luxe">
-          <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
+          <m.div {...fadeUp} className="mx-auto max-w-2xl text-center">
             <p className="eyebrow">The three pillars</p>
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">Real estate rewards</h2>
             <p className="mt-4 italic text-ink-muted">
               &ldquo;The people who wait for a place to become expensive usually fund the profits of
               those who entered early.&rdquo;
             </p>
-          </motion.div>
+          </m.div>
           <div className="mt-12 grid gap-6 grid-cols-1 md:grid-cols-3">
             {[
               {
@@ -67,7 +67,7 @@ export default function Insights() {
                 text: 'Enter early, stay ahead, and let time build your wealth. Growth corridors sell at entry prices only once — the goal is to buy the corridor before the ribbon-cutting, not after.',
               },
             ].map((p, i) => (
-              <motion.div
+              <m.div
                 key={p.title}
                 {...fadeUp}
                 transition={{ ...fadeUp.transition, delay: i * 0.08 }}
@@ -76,7 +76,7 @@ export default function Insights() {
                 <p className="font-display text-4xl font-bold text-gold-300">0{i + 1}</p>
                 <h3 className="mt-3 font-display text-2xl font-semibold text-ink">{p.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-ink-muted">{p.text}</p>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -85,12 +85,12 @@ export default function Insights() {
       {/* advice for clients & investors */}
       <section className="section-pad bg-cream">
         <div className="container-luxe">
-          <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
+          <m.div {...fadeUp} className="mx-auto max-w-2xl text-center">
             <p className="eyebrow">Key advice for clients & investors</p>
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
               Six rules from the Keja desk
             </h2>
-          </motion.div>
+          </m.div>
           <div className="mt-12 grid gap-5 grid-cols-1 md:grid-cols-2">
             {[
               {
@@ -124,7 +124,7 @@ export default function Insights() {
                 text: 'If a platform cannot show you why a listing is trustworthy, treat it as unverified. Trust scores, published fraud flags, escrowed deposits — verification is a feature, not a slogan.',
               },
             ].map((c, i) => (
-              <motion.div
+              <m.div
                 key={c.title}
                 {...fadeUp}
                 transition={{ ...fadeUp.transition, delay: i * 0.05 }}
@@ -137,7 +137,7 @@ export default function Insights() {
                   <h3 className="font-display text-lg font-semibold text-ink">{c.title}</h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{c.text}</p>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -146,7 +146,7 @@ export default function Insights() {
       {/* CTA */}
       <section className="bg-ink py-16">
         <div className="container-luxe text-center">
-          <motion.div {...fadeUp}>
+          <m.div {...fadeUp}>
             <h2 className="font-display text-2xl font-bold text-white sm:text-4xl">
               Want these principles applied to <span className="gold-text">your</span> next
               property?
@@ -167,14 +167,14 @@ export default function Insights() {
                 Open the calculator
               </Link>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
       {/* long-form guides */}
       <section className="section-pad bg-cream">
         <div className="container-luxe">
-          <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
+          <m.div {...fadeUp} className="mx-auto max-w-2xl text-center">
             <p className="eyebrow">The Keja guidebook</p>
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
               Long-form, worth your time
@@ -183,10 +183,10 @@ export default function Insights() {
               The market desk writes the guides we wish someone had written for us — complete,
               current and honest about what is a fact, an estimate, or an assumption.
             </p>
-          </motion.div>
+          </m.div>
           <div className="mt-12 grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {ARTICLES.map((a, i) => (
-              <motion.div
+              <m.div
                 key={a.slug}
                 {...fadeUp}
                 transition={{ ...fadeUp.transition, delay: (i % 3) * 0.07 }}
@@ -213,7 +213,7 @@ export default function Insights() {
                     <span className="text-gold-700">· Read →</span>
                   </p>
                 </Link>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   ArrowRight,
   Bot,
@@ -79,7 +79,7 @@ export default function Manage() {
               text: 'Monthly statements: rent collected, expenses, arrears status, and portfolio performance. Annual summaries ready for your accountant. No surprises, ever.',
             },
           ].map((s, i) => (
-            <motion.div
+            <m.div
               key={s.title}
               {...fadeUp}
               transition={{ ...fadeUp.transition, delay: i * 0.05 }}
@@ -90,7 +90,7 @@ export default function Manage() {
               </span>
               <h3 className="mt-4 font-display text-lg font-semibold text-ink">{s.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-ink-muted">{s.text}</p>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </section>
@@ -98,7 +98,7 @@ export default function Manage() {
       {/* pricing */}
       <section className="section-pad bg-cream">
         <div className="container-luxe grid items-center gap-12 lg:grid-cols-2">
-          <motion.div {...fadeUp}>
+          <m.div {...fadeUp}>
             <p className="eyebrow">Simple, honest fees</p>
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
               One line of math you’ll like
@@ -128,9 +128,9 @@ export default function Manage() {
                 management.
               </p>
             </div>
-          </motion.div>
+          </m.div>
 
-          <motion.div {...fadeUp} className="card-luxe overflow-hidden">
+          <m.div {...fadeUp} className="card-luxe overflow-hidden">
             <img
               src={asset('/images/props/interior_0.jpg')}
               alt="Managed apartment interior"
@@ -159,7 +159,7 @@ export default function Manage() {
                 Get a management quote
               </Link>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 

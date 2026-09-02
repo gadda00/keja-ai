@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   AlertTriangle,
   BadgeCheck,
@@ -78,7 +78,7 @@ export default function Home() {
         </div>
 
         <div className="container-luxe relative flex flex-col items-center py-24 text-center sm:py-32">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
@@ -87,9 +87,9 @@ export default function Home() {
               <Sparkles className="h-3.5 w-3.5" />
               AI Real Estate · by Chacadom Investments
             </span>
-          </motion.div>
+          </m.div>
 
-          <motion.h1
+          <m.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.12 }}
@@ -99,9 +99,9 @@ export default function Home() {
             <span className="mt-3 block text-xl font-medium text-white/70 sm:text-2xl">
               Intelligent Real Estate. Smarter Investments.
             </span>
-          </motion.h1>
+          </m.h1>
 
-          <motion.p
+          <m.p
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.24 }}
@@ -110,11 +110,11 @@ export default function Home() {
             Keja.ai is Kenya’s AI property advisor and cross-agency trust layer. We don’t just list
             property — we tell you which listings you can trust, with verified titles, transparent
             yields and honest investment math.
-          </motion.p>
+          </m.p>
 
           {/* role-aware strip — the first session gets one job, not eleven */}
           {role && roleMeta ? (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
@@ -136,11 +136,11 @@ export default function Home() {
               >
                 change
               </button>
-            </motion.div>
+            </m.div>
           ) : null}
 
           {/* Search bar */}
-          <motion.form
+          <m.form
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.36 }}
@@ -164,9 +164,9 @@ export default function Home() {
                 <Search className="h-4 w-4" /> Search
               </button>
             </div>
-          </motion.form>
+          </m.form>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
@@ -182,9 +182,9 @@ export default function Home() {
                 {a}
               </Link>
             ))}
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
@@ -205,7 +205,7 @@ export default function Home() {
             >
               <ShieldCheck className="h-4 w-4" /> How we verify
             </Link>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
@@ -218,17 +218,13 @@ export default function Home() {
             { icon: AlertTriangle, value: `${flaggedCount}`, label: 'Fraud flags caught' },
             { icon: ShieldCheck, value: `${avgTrust}/100`, label: 'Avg. trust score' },
           ].map((s) => (
-            <motion.div
-              key={s.label}
-              {...fadeUp}
-              className="flex flex-col items-center text-center"
-            >
+            <m.div key={s.label} {...fadeUp} className="flex flex-col items-center text-center">
               <s.icon className="h-5 w-5 text-gold-600" />
               <p className="mt-2 font-display text-3xl font-bold text-ink">{s.value}</p>
               <p className="mt-1 text-xs font-medium uppercase tracking-wider text-ink-muted">
                 {s.label}
               </p>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </section>
@@ -237,7 +233,7 @@ export default function Home() {
       <section className="relative overflow-hidden bg-ink">
         <div className="absolute inset-0 bg-gold-shimmer opacity-[0.05]" aria-hidden="true" />
         <div className="container-luxe relative grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-2">
-          <motion.div {...fadeUp}>
+          <m.div {...fadeUp}>
             <span className="inline-flex items-center gap-2 rounded-full border border-gold-400/40 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide2 text-gold-300 backdrop-blur">
               <MapPin className="h-3.5 w-3.5" /> Flagship location spotlight
             </span>
@@ -280,9 +276,9 @@ export default function Home() {
                 {karenCount > 0 && ` (${karenCount})`}
               </Link>
             </div>
-          </motion.div>
+          </m.div>
 
-          <motion.div {...fadeUp} className="relative">
+          <m.div {...fadeUp} className="relative">
             <div className="absolute -inset-4 -z-10 rounded-[2.5rem] bg-gold-500/10 blur-2xl" />
             <div className="overflow-hidden rounded-3xl shadow-card-hover ring-1 ring-gold-300/30">
               <picture>
@@ -317,14 +313,14 @@ export default function Home() {
                 incl. 50.6-acre expansion site
               </p>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
       {/* ============================== KEJA AI SECTION ============================== */}
       <section className="section-pad bg-cream">
         <div className="container-luxe grid items-center gap-12 lg:grid-cols-2">
-          <motion.div {...fadeUp}>
+          <m.div {...fadeUp}>
             <p className="eyebrow">Meet Keja — your AI advisor</p>
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
               Conversational property search, <span className="gold-text">done right</span>
@@ -365,9 +361,9 @@ export default function Home() {
             <Link to="/ask" className="btn-gold mt-8">
               Start chatting <ChevronRight className="h-4 w-4" />
             </Link>
-          </motion.div>
+          </m.div>
 
-          <motion.div {...fadeUp} className="relative">
+          <m.div {...fadeUp} className="relative">
             <div className="absolute -inset-4 sm:-inset-6 -z-10 rounded-[2.5rem] bg-gold-100/40 blur-2xl" />
             <div className="overflow-hidden rounded-3xl shadow-card-hover ring-1 ring-gold-200">
               <picture>
@@ -395,14 +391,14 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
       {/* ============================== TRUST LAYER ============================== */}
       <section className="section-pad bg-ink">
         <div className="container-luxe">
-          <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center">
+          <m.div {...fadeUp} className="mx-auto max-w-3xl text-center">
             <p className="eyebrow !text-gold-400">The Keja Trust Layer</p>
             <h2 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl">
               We don’t just list property.
@@ -413,7 +409,7 @@ export default function Home() {
               above multiple agencies — so trust-scoring is structurally possible, and structurally
               defensible.
             </p>
-          </motion.div>
+          </m.div>
 
           <div className="mt-14 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {[
@@ -438,7 +434,7 @@ export default function Home() {
                 text: 'Phone-number history, complaint patterns and prior listing behaviour build a reputation score for every agent.',
               },
             ].map((c, i) => (
-              <motion.div
+              <m.div
                 key={c.title}
                 {...fadeUp}
                 transition={{ ...fadeUp.transition, delay: i * 0.08 }}
@@ -449,18 +445,18 @@ export default function Home() {
                 </span>
                 <h3 className="mt-4 font-display text-lg font-semibold text-white">{c.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-white/55">{c.text}</p>
-              </motion.div>
+              </m.div>
             ))}
           </div>
 
-          <motion.div {...fadeUp} className="mt-10 text-center">
+          <m.div {...fadeUp} className="mt-10 text-center">
             <Link
               to="/trust"
               className="inline-flex items-center gap-2 text-sm font-semibold text-gold-300 hover:text-gold-200"
             >
               Explore the Trust Center <ChevronRight className="h-4 w-4" />
             </Link>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
@@ -503,7 +499,7 @@ export default function Home() {
       {/* ============================== FEATURED ============================== */}
       <section className="section-pad bg-white">
         <div className="container-luxe">
-          <motion.div {...fadeUp} className="flex flex-wrap items-end justify-between gap-4">
+          <m.div {...fadeUp} className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="eyebrow">Featured — trust score 90+</p>
               <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
@@ -513,17 +509,13 @@ export default function Home() {
             <Link to="/properties" className="btn-outline">
               Browse all {MARKET.length} listings <ChevronRight className="h-4 w-4" />
             </Link>
-          </motion.div>
+          </m.div>
 
           <div className="mt-10 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {featuredProperties.slice(0, 6).map((p, i) => (
-              <motion.div
-                key={p.id}
-                {...fadeUp}
-                transition={{ ...fadeUp.transition, delay: i * 0.06 }}
-              >
+              <m.div key={p.id} {...fadeUp} transition={{ ...fadeUp.transition, delay: i * 0.06 }}>
                 <PropertyCard property={p} />
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -532,7 +524,7 @@ export default function Home() {
       {/* ============================== TOKENIZE SECTION ============================== */}
       <section className="section-pad bg-cream">
         <div className="container-luxe grid items-center gap-12 lg:grid-cols-2">
-          <motion.div {...fadeUp}>
+          <m.div {...fadeUp}>
             <span className="inline-flex items-center gap-2 rounded-full border border-gold-300 bg-white px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wide2 text-gold-700">
               <Sparkles className="h-3.5 w-3.5" /> New — Keja Tokenize
             </span>
@@ -586,9 +578,9 @@ export default function Home() {
                 How tokenization works
               </Link>
             </div>
-          </motion.div>
+          </m.div>
 
-          <motion.div {...fadeUp} className="relative">
+          <m.div {...fadeUp} className="relative">
             <div className="absolute -inset-4 sm:-inset-6 -z-10 rounded-[2.5rem] bg-gold-100/50 blur-2xl" />
             <div className="relative overflow-hidden rounded-3xl shadow-card-hover ring-1 ring-gold-200">
               <img
@@ -629,19 +621,19 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
       {/* ============================== HOW IT WORKS ============================== */}
       <section className="section-pad bg-cream">
         <div className="container-luxe">
-          <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center">
+          <m.div {...fadeUp} className="mx-auto max-w-3xl text-center">
             <p className="eyebrow">The full flow</p>
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
               From discovery to management — <span className="gold-text">one intelligent flow</span>
             </h2>
-          </motion.div>
+          </m.div>
 
           <div className="mt-14 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
             {[
@@ -671,7 +663,7 @@ export default function Home() {
                 text: 'Tenants, rent collection, maintenance and owner statements.',
               },
             ].map((s, i) => (
-              <motion.div
+              <m.div
                 key={s.step}
                 {...fadeUp}
                 transition={{ ...fadeUp.transition, delay: i * 0.07 }}
@@ -683,7 +675,7 @@ export default function Home() {
                 {i < 4 && (
                   <ChevronRight className="absolute -right-3 top-1/2 hidden h-5 w-5 -translate-y-1/2 text-gold-400 lg:block" />
                 )}
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -715,7 +707,7 @@ export default function Home() {
               cta: 'Chat now',
             },
           ].map((t) => (
-            <motion.div
+            <m.div
               key={t.title}
               {...fadeUp}
               className="card-luxe card-luxe-hover flex flex-col p-7"
@@ -742,7 +734,7 @@ export default function Home() {
                   {t.cta} →
                 </a>
               )}
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </section>
@@ -822,7 +814,7 @@ export default function Home() {
       <section className="relative overflow-hidden bg-ink">
         <div className="absolute inset-0 bg-gold-shimmer opacity-[0.06]" />
         <div className="container-luxe relative py-20 text-center sm:py-24">
-          <motion.div {...fadeUp}>
+          <m.div {...fadeUp}>
             <p className="eyebrow !text-gold-400">For you. For your family. For your future.</p>
             <h2 className="mt-4 font-display text-3xl font-bold text-white sm:text-5xl">
               We don’t just find you a home.
@@ -843,7 +835,7 @@ export default function Home() {
                 Browse listings
               </Link>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
     </div>

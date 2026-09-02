@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   Bot,
   Building2,
@@ -61,13 +61,13 @@ export default function About() {
               text: 'Trust first, premium second. Transparent facts, clearly labelled estimates, sound investment logic, and a professional client experience — across every agency on the platform.',
             },
           ].map((c) => (
-            <motion.div key={c.title} {...fadeUp} className="card-luxe p-7">
+            <m.div key={c.title} {...fadeUp} className="card-luxe p-7">
               <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold-gradient shadow-gold-sm">
                 <c.icon className="h-6 w-6 text-white" />
               </span>
               <h3 className="mt-4 font-display text-xl font-semibold text-ink">{c.title}</h3>
               <p className="mt-2.5 text-sm leading-relaxed text-ink-muted">{c.text}</p>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </section>
@@ -75,7 +75,7 @@ export default function About() {
       {/* what makes us different */}
       <section className="section-pad bg-cream">
         <div className="container-luxe grid items-center gap-12 lg:grid-cols-2">
-          <motion.div {...fadeUp}>
+          <m.div {...fadeUp}>
             <p className="eyebrow">Why we exist</p>
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
               Kenyan real estate runs on trust. Trust was missing.
@@ -99,9 +99,9 @@ export default function About() {
                 partner agency, because Keja is the constant and agencies are the inventory.
               </p>
             </div>
-          </motion.div>
+          </m.div>
 
-          <motion.div {...fadeUp} className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+          <m.div {...fadeUp} className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             {[
               {
                 icon: Bot,
@@ -130,7 +130,7 @@ export default function About() {
                 <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{c.text}</p>
               </div>
             ))}
-          </motion.div>
+          </m.div>
         </div>
       </section>
 

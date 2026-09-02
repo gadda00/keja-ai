@@ -2,7 +2,7 @@
  * Keja Tokenize — KYC/AML onboarding modal (4 steps):
  * identity → document → declarations → simulated screening result.
  */
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import {
   ArrowLeft,
   ArrowRight,
@@ -141,7 +141,7 @@ export function KycModal() {
       <AnimatePresence mode="wait">
         {/* step 1 — identity */}
         {step === 0 && !done && (
-          <motion.div
+          <m.div
             key="s1"
             initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
@@ -206,12 +206,12 @@ export function KycModal() {
                 Continue <ArrowRight className="h-4 w-4" />
               </button>
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* step 2 — document */}
         {step === 1 && !done && (
-          <motion.div
+          <m.div
             key="s2"
             initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
@@ -298,12 +298,12 @@ export function KycModal() {
                 </button>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* step 3 — declarations */}
         {step === 2 && !done && (
-          <motion.div
+          <m.div
             key="s3"
             initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
@@ -363,12 +363,12 @@ export function KycModal() {
                 </button>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* step 4 — screening / result */}
         {step === 3 || done ? (
-          <motion.div key="s4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <m.div key="s4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             {!done ? (
               <div className="flex flex-col items-center gap-4 py-8">
                 <div className="relative">
@@ -421,7 +421,7 @@ export function KycModal() {
                 </button>
               </div>
             )}
-          </motion.div>
+          </m.div>
         ) : null}
       </AnimatePresence>
 

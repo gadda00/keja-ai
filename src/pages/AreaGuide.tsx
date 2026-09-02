@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   ArrowRight,
   CalendarCheck,
@@ -100,7 +100,7 @@ export default function AreaGuide() {
             <span className="text-gold-300">{guide.name}</span>
           </nav>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
@@ -108,9 +108,9 @@ export default function AreaGuide() {
             <span className="inline-flex items-center gap-2 rounded-full border border-gold-400/40 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide2 text-gold-300 backdrop-blur">
               <MapPin className="h-3.5 w-3.5" /> Neighbourhood guide · {guide.location}
             </span>
-          </motion.div>
+          </m.div>
 
-          <motion.h1
+          <m.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.12 }}
@@ -120,18 +120,18 @@ export default function AreaGuide() {
             <span className="mt-4 block text-lg font-medium text-white/70 sm:text-2xl">
               {guide.tagline}
             </span>
-          </motion.h1>
+          </m.h1>
 
-          <motion.p
+          <m.p
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.24 }}
             className="mt-6 max-w-2xl leading-relaxed text-white/75 sm:text-lg"
           >
             {guide.summary}
-          </motion.p>
+          </m.p>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.36 }}
@@ -152,7 +152,7 @@ export default function AreaGuide() {
             >
               <MessageCircle className="h-4 w-4" /> Ask about {guide.shortName}
             </a>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
@@ -160,11 +160,7 @@ export default function AreaGuide() {
       <section className="border-b border-gold-100 bg-white">
         <div className="container-luxe grid grid-cols-2 gap-6 py-10 sm:grid-cols-3 lg:grid-cols-5">
           {guide.stats.map((s) => (
-            <motion.div
-              key={s.label}
-              {...fadeUp}
-              className="flex flex-col items-center text-center"
-            >
+            <m.div key={s.label} {...fadeUp} className="flex flex-col items-center text-center">
               <p className="font-display text-3xl font-bold text-ink">{s.value}</p>
               <p className="mt-1 text-xs font-medium uppercase tracking-wider text-ink-muted">
                 {s.label}
@@ -174,7 +170,7 @@ export default function AreaGuide() {
                   {s.note}
                 </p>
               ) : null}
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </section>
@@ -182,7 +178,7 @@ export default function AreaGuide() {
       {/* ============================== LIFESTYLE ============================== */}
       <section className="section-pad bg-cream">
         <div className="container-luxe">
-          <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
+          <m.div {...fadeUp} className="mx-auto max-w-2xl text-center">
             <p className="eyebrow">The lifestyle</p>
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
               A whole town centre, <span className="gold-text">at the end of the lane</span>
@@ -192,11 +188,11 @@ export default function AreaGuide() {
               The Waterfront describes itself — and it is a fair description of what Karen residents
               get within minutes of their gates.
             </p>
-          </motion.div>
+          </m.div>
 
           <div className="mt-12 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {guide.amenities.map((a, i) => (
-              <motion.div
+              <m.div
                 key={a.title}
                 {...fadeUp}
                 transition={{ ...fadeUp.transition, delay: i * 0.05 }}
@@ -207,7 +203,7 @@ export default function AreaGuide() {
                 </span>
                 <h3 className="mt-4 font-display text-base font-semibold text-ink">{a.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted">{a.text}</p>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -216,7 +212,7 @@ export default function AreaGuide() {
       {/* ============================== VIDEO ============================== */}
       <section className="section-pad bg-ink">
         <div className="container-luxe grid items-center gap-12 lg:grid-cols-2">
-          <motion.div {...fadeUp}>
+          <m.div {...fadeUp}>
             <p className="eyebrow !text-gold-400">See it for yourself</p>
             <h2 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl">
               Walk the Waterfront <span className="gold-text">before you visit</span>
@@ -254,9 +250,9 @@ export default function AreaGuide() {
                 Official Waterfront site <ExternalLink className="h-4 w-4" />
               </a>
             </div>
-          </motion.div>
+          </m.div>
 
-          <motion.div {...fadeUp} className="relative">
+          <m.div {...fadeUp} className="relative">
             <div className="absolute -inset-4 -z-10 rounded-[2.5rem] bg-gold-500/10 blur-2xl" />
             <div className="overflow-hidden rounded-3xl shadow-card-hover ring-1 ring-gold-300/30">
               <VideoFacade
@@ -267,24 +263,24 @@ export default function AreaGuide() {
                 posterAlt={guide.gallery[0].alt}
               />
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
       {/* ============================== GALLERY ============================== */}
       <section className="section-pad bg-white">
         <div className="container-luxe">
-          <motion.div {...fadeUp} className="flex flex-wrap items-end justify-between gap-4">
+          <m.div {...fadeUp} className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="eyebrow">Around the Waterfront</p>
               <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
                 The setting — town centre <span className="gold-text">and suburb</span>
               </h2>
             </div>
-          </motion.div>
+          </m.div>
           <div className="mt-10 grid gap-5 grid-cols-1 sm:grid-cols-2">
             {guide.gallery.map((g, i) => (
-              <motion.figure
+              <m.figure
                 key={g.base}
                 {...fadeUp}
                 transition={{ ...fadeUp.transition, delay: i * 0.06 }}
@@ -304,7 +300,7 @@ export default function AreaGuide() {
                 <figcaption className="bg-white px-5 py-4 text-xs leading-relaxed text-ink-muted">
                   {g.alt}
                 </figcaption>
-              </motion.figure>
+              </m.figure>
             ))}
           </div>
         </div>
@@ -313,15 +309,15 @@ export default function AreaGuide() {
       {/* ============================== INVESTMENT CASE ============================== */}
       <section className="section-pad bg-cream">
         <div className="container-luxe">
-          <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
+          <m.div {...fadeUp} className="mx-auto max-w-2xl text-center">
             <p className="eyebrow">The investment case</p>
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
               Why buyers pay attention to <span className="gold-text">this corridor</span>
             </h2>
-          </motion.div>
+          </m.div>
           <div className="mt-12 grid gap-5 grid-cols-1 md:grid-cols-3">
             {guide.investmentThesis.map((t, i) => (
-              <motion.div
+              <m.div
                 key={t.title}
                 {...fadeUp}
                 transition={{ ...fadeUp.transition, delay: i * 0.07 }}
@@ -332,7 +328,7 @@ export default function AreaGuide() {
                 </span>
                 <h3 className="mt-5 font-display text-xl font-semibold text-ink">{t.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-ink-muted">{t.text}</p>
-              </motion.div>
+              </m.div>
             ))}
           </div>
           <p className="mx-auto mt-8 max-w-3xl text-center text-xs leading-relaxed text-ink-muted">
@@ -346,7 +342,7 @@ export default function AreaGuide() {
       {/* ============================== LIVE INVENTORY ============================== */}
       <section className="section-pad bg-white">
         <div className="container-luxe">
-          <motion.div {...fadeUp} className="flex flex-wrap items-end justify-between gap-4">
+          <m.div {...fadeUp} className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="eyebrow">Live near the Waterfront</p>
               <h2 className="heading-display mt-3 text-3xl sm:text-4xl">
@@ -356,18 +352,18 @@ export default function AreaGuide() {
             <Link to={`/properties?area=${encodeURIComponent(guide.area)}`} className="btn-outline">
               View all in {guide.area} <ArrowRight className="h-4 w-4" />
             </Link>
-          </motion.div>
+          </m.div>
 
           {areaListings.length > 0 ? (
             <div className="mt-10 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {areaListings.slice(0, 6).map((p, i) => (
-                <motion.div
+                <m.div
                   key={p.id}
                   {...fadeUp}
                   transition={{ ...fadeUp.transition, delay: i * 0.06 }}
                 >
                   <PropertyCard property={p} />
-                </motion.div>
+                </m.div>
               ))}
             </div>
           ) : (

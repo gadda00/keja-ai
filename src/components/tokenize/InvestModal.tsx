@@ -2,7 +2,7 @@
  * Keja Tokenize — token purchase flow:
  * order → confirm → staged blockchain broadcast → ownership certificate.
  */
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -124,7 +124,7 @@ export function InvestModal() {
       <AnimatePresence mode="wait">
         {/* ─── order ─── */}
         {step === 'order' && p ? (
-          <motion.div
+          <m.div
             key="order"
             initial={{ opacity: 0, x: 12 }}
             animate={{ opacity: 1, x: 0 }}
@@ -192,12 +192,12 @@ export function InvestModal() {
             <button className="btn-gold mt-5 !h-11 w-full" onClick={() => setStep('confirm')}>
               Review order <ArrowRight className="h-4 w-4" />
             </button>
-          </motion.div>
+          </m.div>
         ) : null}
 
         {/* ─── confirm ─── */}
         {step === 'confirm' && p ? (
-          <motion.div
+          <m.div
             key="confirm"
             initial={{ opacity: 0, x: 12 }}
             animate={{ opacity: 1, x: 0 }}
@@ -269,12 +269,12 @@ export function InvestModal() {
                 Confirm {fmtUsd(cost)} purchase
               </button>
             </div>
-          </motion.div>
+          </m.div>
         ) : null}
 
         {/* ─── processing ─── */}
         {step === 'processing' && (
-          <motion.div key="processing" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <m.div key="processing" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <div className="flex flex-col items-center gap-4 py-8">
               <div className="relative">
                 <Loader2 className="h-14 w-14 animate-spin text-gold-600" />
@@ -304,12 +304,12 @@ export function InvestModal() {
                 ))}
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* ─── success ─── */}
         {step === 'success' && result && p ? (
-          <motion.div
+          <m.div
             key="success"
             initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -381,7 +381,7 @@ export function InvestModal() {
                 View my portfolio <ArrowRight className="h-4 w-4" />
               </button>
             </div>
-          </motion.div>
+          </m.div>
         ) : null}
       </AnimatePresence>
     </Modal>

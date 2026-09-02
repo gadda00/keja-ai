@@ -2,7 +2,7 @@
  * Keja Tokenize — property detail: investment case, structure & compliance,
  * distribution history and the sticky investment calculator.
  */
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   ArrowLeft,
   BellRing,
@@ -76,7 +76,7 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
         <div className="mt-6 grid items-start gap-8 lg:grid-cols-[1fr_380px]">
           {/* ─── left column ─── */}
           <div>
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               className="relative overflow-hidden rounded-2xl border border-gold-200 shadow-gold-md"
@@ -92,7 +92,7 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
                   {yieldPct(p).toFixed(1)}% net yield
                 </span>
               </div>
-            </motion.div>
+            </m.div>
 
             <div className="mt-6">
               <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-gold-600">
@@ -224,7 +224,7 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
           </div>
 
           {/* ─── right sticky: invest card ─── */}
-          <motion.aside
+          <m.aside
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             className="lg:sticky lg:top-24"
@@ -392,7 +392,7 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
                     : 'Offering opens Q4 2026'}
               </div>
             </div>
-          </motion.aside>
+          </m.aside>
         </div>
       </div>
     </div>

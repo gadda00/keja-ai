@@ -5,7 +5,6 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
 import { AuthProvider } from '@/lib/auth';
-import { TokenizeProvider } from '@/lib/tokenizeStore';
 
 import App from './App';
 
@@ -23,9 +22,7 @@ ReactDOM.createRoot(root).render(
   <StrictMode>
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <AuthProvider>
-        <TokenizeProvider>
-          <App />
-        </TokenizeProvider>
+        <App />
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>

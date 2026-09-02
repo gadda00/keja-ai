@@ -2,7 +2,7 @@
  * Keja Tokenize — Issuer Console: a 6-step guided wizard that takes a property
  * from acquisition details to token issuance (client-side simulation).
  */
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import {
   ArrowLeft,
   ArrowRight,
@@ -156,7 +156,7 @@ export function IssuerConsole() {
     return (
       <div className="min-h-screen bg-cream">
         <div className="mx-auto max-w-2xl px-4 py-16">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
             className="overflow-hidden rounded-3xl border border-gold-200 bg-white shadow-gold-lg"
@@ -217,7 +217,7 @@ export function IssuerConsole() {
                 </button>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     );
@@ -298,7 +298,7 @@ export function IssuerConsole() {
             <AnimatePresence mode="wait">
               {/* 1 — property */}
               {step === 1 && (
-                <motion.div
+                <m.div
                   key="s1"
                   initial={{ opacity: 0, x: 12 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -402,12 +402,12 @@ export function IssuerConsole() {
                       onChange={(e) => set('highlights', e.target.value)}
                     />
                   </div>
-                </motion.div>
+                </m.div>
               )}
 
               {/* 2 — legal */}
               {step === 2 && (
-                <motion.div
+                <m.div
                   key="s2"
                   initial={{ opacity: 0, x: 12 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -466,12 +466,12 @@ export function IssuerConsole() {
                       />
                     </div>
                   </div>
-                </motion.div>
+                </m.div>
               )}
 
               {/* 3 — tokenomics */}
               {step === 3 && (
-                <motion.div
+                <m.div
                   key="s3"
                   initial={{ opacity: 0, x: 12 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -548,12 +548,12 @@ export function IssuerConsole() {
                     Example: a $10M property at $10 per token becomes 1,000,000 tokens — each a
                     provable, auditable unit of fractional ownership.
                   </p>
-                </motion.div>
+                </m.div>
               )}
 
               {/* 4 — income */}
               {step === 4 && (
-                <motion.div
+                <m.div
                   key="s4"
                   initial={{ opacity: 0, x: 12 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -632,12 +632,12 @@ export function IssuerConsole() {
                       <p className="text-[10px] text-ink-faint">ceiling 25%</p>
                     </div>
                   </div>
-                </motion.div>
+                </m.div>
               )}
 
               {/* 5 — compliance */}
               {step === 5 && (
-                <motion.div
+                <m.div
                   key="s5"
                   initial={{ opacity: 0, x: 12 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -687,12 +687,12 @@ export function IssuerConsole() {
                       </span>
                     </label>
                   ))}
-                </motion.div>
+                </m.div>
               )}
 
               {/* 6 — review & issue */}
               {step === 6 && (
-                <motion.div
+                <m.div
                   key="s6"
                   initial={{ opacity: 0, x: 12 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -739,7 +739,7 @@ export function IssuerConsole() {
                       <Sparkles className="h-4 w-4" /> Issue {fmtNum(totalTokens)} tokens
                     </button>
                   )}
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
 

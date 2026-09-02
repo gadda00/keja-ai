@@ -2,7 +2,7 @@
  * Keja Tokenize — Learn academy: the worked example ($10M → 1M tokens),
  * the six-step operating model, key advantages, Kenya regulatory landscape, FAQ.
  */
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   ArrowLeftRight,
   BadgeCheck,
@@ -197,7 +197,7 @@ export function Learn() {
               ))}
             </div>
           </div>
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.96 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -233,7 +233,7 @@ export function Learn() {
               applies to every listing: SPV wrapper, independent valuation, title verification and
               KYC-gated investors only.
             </p>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
@@ -248,7 +248,7 @@ export function Learn() {
           />
           <div className="mt-10 grid gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {MODEL_STEPS.map((s, i) => (
-              <motion.div
+              <m.div
                 key={s.title}
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -266,7 +266,7 @@ export function Learn() {
                 </div>
                 <h3 className="mt-4 text-[15px] font-bold text-ink">{s.title}</h3>
                 <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">{s.body}</p>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -281,7 +281,7 @@ export function Learn() {
         />
         <div className="mt-8 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
           {ADVANTAGES.map((a) => (
-            <motion.div
+            <m.div
               key={a.title}
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -291,7 +291,7 @@ export function Learn() {
               <a.icon className="h-5 w-5 text-gold-600" />
               <h3 className="mt-3 text-[13.5px] font-bold text-ink">{a.title}</h3>
               <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-muted">{a.body}</p>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </section>

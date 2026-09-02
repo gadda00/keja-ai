@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   AlertTriangle,
   BadgeCheck,
@@ -655,7 +655,7 @@ export default function ListProperty() {
       <section className="section-pad bg-white">
         <div className="container-luxe grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((s, i) => (
-            <motion.div
+            <m.div
               key={s.title}
               {...fadeUp}
               transition={{ ...fadeUp.transition, delay: i * 0.07 }}
@@ -669,7 +669,7 @@ export default function ListProperty() {
               </div>
               <h3 className="mt-4 font-display text-lg font-semibold text-ink">{s.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-ink-muted">{s.text}</p>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </section>
@@ -677,7 +677,7 @@ export default function ListProperty() {
       {/* wizard & pricing */}
       <section className="section-pad bg-cream">
         <div className="container-luxe grid gap-10 grid-cols-1 lg:grid-cols-2">
-          <motion.div {...fadeUp} className="card-luxe p-6 sm:p-8">
+          <m.div {...fadeUp} className="card-luxe p-6 sm:p-8">
             {submitted ? (
               <div className="py-10 text-center">
                 <CheckCircle2 className="mx-auto h-14 w-14 text-emerald-600" />
@@ -761,9 +761,9 @@ export default function ListProperty() {
                 </div>
               </>
             )}
-          </motion.div>
+          </m.div>
 
-          <motion.div {...fadeUp}>
+          <m.div {...fadeUp}>
             <p className="eyebrow">Transparent pricing</p>
             <h2 className="heading-display mt-3 text-3xl sm:text-4xl">No sale, no fee. Ever.</h2>
             <div className="mt-8 space-y-4">
@@ -806,7 +806,7 @@ export default function ListProperty() {
                 qualified buyers — automatically.
               </p>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 

@@ -67,11 +67,13 @@
 
 ## Remaining roadmap (ordered)
 
-1. **Bundle:** the eager index chunk is ~558 kB raw / 159 kB gzipped because
-   `Home` (42 `motion.` usages) and `MotionConfig` load framer-motion
-   eagerly. A `LazyMotion` + `m` migration across 15 files would cut roughly
-   a third of that, but touches every animated component — deferred until it
-   can be verified visually, not just by build size.
+1. ~~**Bundle:** the eager index chunk is ~558 kB raw~~ **DONE (wave 7):**
+   `LazyMotion` + `m` migration across all animated files (engine now an async
+   `motionFeatures` chunk), `Properties` route and `AuthModal` lazy-split,
+   and the `TokenizeProvider` moved inside the lazy `/tokenize` + `/admin`
+   boundaries (write-through localStorage makes route-level providers safe).
+   Entry chunk: **~491 kB raw / ~131 kB gzipped** — under the 500 kB budget,
+   verified visually in a headless browser (hero animates to opacity 1).
 2. **Admin console breadth:** `adminStore`/`seo.ts`/`auth.tsx` still lack
    direct unit tests (they are exercised indirectly through app tests).
 3. **Insights library provenance:** article front-matter (author, reviewed-at,
@@ -79,6 +81,16 @@
    is provided.
 4. **Analytics egress:** the privacy-first local event bus is complete; any
    dashboard/CRM export waits for the Phase-2 backend.
+
+## Wave 7 — live client mandates + performance budget
+
+Two more **real client mandates** joined the marketplace with owner-supplied
+photography: KJA-024 Daykio Kiragu executive 5BR (asking KES 67M,
+direct-owner mandate) and KJA-025 Kantafu 30 acres (KES 5.5M/acre, ready
+title, direct owner transaction) — both honestly labelled `titleCheck:
+pending` until the verification desk completes independent searches, with a
+new Kantafu area insight. The entry bundle was brought back under the 500 kB
+performance budget (see roadmap item 1).
 
 Document version: 2.0.0 — maintained in-repo; update with every improvement
 wave (see `docs/REVIEW_ACTIONS.md` for the external-review tracker).

@@ -31,6 +31,7 @@ import AdminUsers from '@/components/admin/AdminUsers';
 import { useAuth } from '@/lib/auth';
 import { autoPilotStats } from '@/lib/autoListings';
 import { usePageMeta } from '@/lib/seo';
+import { TokenizeProvider } from '@/lib/tokenizeStore';
 
 const timeAgoSafe = (iso: string) => {
   try {
@@ -59,6 +60,15 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid }[] = [
 ];
 
 export default function Admin() {
+  // Provider lives inside the lazy route boundary (AdminOverview consumes it)
+  return (
+    <TokenizeProvider>
+      <AdminPage />
+    </TokenizeProvider>
+  );
+}
+
+function AdminPage() {
   usePageMeta(
     'Admin Console — Keja Platform Operations',
     'Users, verification queue, leads, partners, audit trail and settings.'

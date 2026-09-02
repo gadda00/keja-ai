@@ -27,6 +27,7 @@ import { PropertyDetail } from '@/components/tokenize/PropertyDetail';
 import { ToastProvider } from '@/components/tokenize/shared';
 import { usePageMeta } from '@/lib/seo';
 import type { TokenizeView } from '@/lib/tokenizeStore';
+import { TokenizeProvider } from '@/lib/tokenizeStore';
 import { useTokenize } from '@/lib/tokenizeStore';
 
 const VIEW_TABS: { v: TokenizeView; label: string; icon: typeof Store }[] = [
@@ -103,6 +104,16 @@ function TokenizeInner() {
 }
 
 export default function Tokenize() {
+  // Provider lives inside the lazy route boundary so the tokenize engine +
+  // asset data stay out of the entry bundle (main.tsx no longer wraps the app).
+  return (
+    <TokenizeProvider>
+      <TokenizePage />
+    </TokenizeProvider>
+  );
+}
+
+function TokenizePage() {
   usePageMeta(
     'Keja Tokenize — Fractional Ownership from $100',
     "Own a fraction of Nairobi's finest real estate. KYC-gated, SPV-structured, simulated-ledger tokenization demo."

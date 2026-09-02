@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   AlertTriangle,
   ArrowRight,
@@ -233,7 +233,7 @@ export default function PropertyDetail() {
             property.images.length > 1 ? 'lg:grid-cols-[2fr_1fr]' : ''
           }`}
         >
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="relative overflow-hidden rounded-2xl"
@@ -280,7 +280,7 @@ export default function PropertyDetail() {
                 {copied ? <CheckCircle2 className="h-5 w-5" /> : <Share2 className="h-5 w-5" />}
               </button>
             </div>
-          </motion.div>
+          </m.div>
           {property.images.length > 1 && (
             <div className="grid grid-cols-3 gap-3 lg:grid-cols-1">
               {property.images.slice(0, 3).map((img, i) => (

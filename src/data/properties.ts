@@ -1486,6 +1486,155 @@ export const PROPERTIES: Property[] = [
       'Master-planned corridor',
     ],
   },
+  {
+    id: 'KJA-024',
+    title: 'Executive 5BR Residence — Daykio Kiragu, Karen',
+    type: 'villa',
+    purpose: ['buy'],
+    area: 'Karen',
+    county: 'Nairobi',
+    price: 67000000,
+    rentEstimate: 300000,
+    bedrooms: 5,
+    bathrooms: 5,
+    sizeSqm: 460,
+    amenities: [
+      'Manicured Garden',
+      'Balconies on All Floors',
+      'Floor-to-Ceiling Windows',
+      'Tray Ceilings with Chandeliers',
+      'Hardwood Flooring',
+      'Fireplace',
+      'Fitted Kitchen',
+      'Gated Community',
+    ],
+    images: [
+      IMG('daykio_0'),
+      IMG('daykio_1'),
+      IMG('daykio_2'),
+      IMG('daykio_4'),
+      IMG('daykio_5'),
+      IMG('daykio_3'),
+      IMG('daykio_6'),
+      IMG('daykio_7'),
+      IMG('daykio_8'),
+    ],
+    description:
+      'A newly finished executive residence on Daykio Kiragu Road, minutes from Karen centre and the Waterfront. The five-bedroom home rises three storeys in crisp white with dark shingle roofing, framed by a manicured lawn. Inside: hardwood floors, tray ceilings with recessed lighting and chandeliers, a fitted kitchen, and floor-to-ceiling glazing that floods the open-plan living and dining rooms with light. Sold on a direct-owner mandate through the Chacadom client desk — photos are the owner\u2019s own, unedited.',
+    agency: 'Chacadom Premier Properties',
+    agent: { name: 'Chacadom Client Desk', phone: '+254 108 611 387' },
+    trustScore: 82,
+    verification: {
+      titleCheck: 'pending',
+      ardhisasaMatch: false,
+      photosVerified: true,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-09-02',
+    },
+    trustSignals: [
+      {
+        label: 'Title search',
+        status: 'warn',
+        detail:
+          'Seller states clean title; independent search booked via our verification desk before any deposit moves.',
+      },
+      {
+        label: 'Photo authenticity',
+        status: 'pass',
+        detail: 'Owner-supplied originals, EXIF-consistent; no recycling across agencies.',
+      },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail:
+          'Asking KES 67M sits within the Karen premium band (estimate — see comparables in Ask Keja).',
+      },
+      {
+        label: 'Mandate',
+        status: 'pass',
+        detail: 'Direct-owner mandate held by Chacadom Investments — no intermediary chain.',
+      },
+    ],
+    availability: 'available',
+    grossYieldEstimate: 5.4,
+    appreciationForecast: 7.5,
+    listedAt: '2026-09-02',
+    views: 118,
+    highlights: [
+      'Asking KES 67M',
+      'Direct-owner mandate',
+      'Daykio Kiragu Road address',
+      'Newly finished · premium finishes',
+    ],
+  },
+  {
+    id: 'KJA-025',
+    title: '30-Acre Prime Land with Ready Title — Kantafu',
+    type: 'land',
+    purpose: ['buy', 'invest'],
+    area: 'Kantafu',
+    county: 'Machakos',
+    price: 165000000,
+    sizeSqm: 121406,
+    amenities: [
+      'Ready Title Deed',
+      'Electricity on Site',
+      'Piped Water',
+      'Natural Drainage Gradient',
+      'Developed Neighbourhood',
+      'Direct Owner Transaction',
+    ],
+    images: [IMG('land_0'), IMG('land_1')],
+    description:
+      'Thirty acres of strategically located land in Kantafu, roughly 1.3 km off the tarmac and under 500 m from Old Kangundo Road. Electricity and piped water are on site, the parcel carries a natural drainage gradient, and it sits inside a fully developed neighbourhood with schools, churches and mosques nearby and several housing projects already underway. Suited to gated-community development, an institutional project, subdivision or land banking. Offered at KES 5.5M per acre (slightly negotiable) on a ready title with the owner available for a direct transaction — a single clean deed, not a family-assembly exercise.',
+    agency: 'Chacadom Premier Properties',
+    agent: { name: 'Chacadom Client Desk', phone: '+254 108 611 387' },
+    trustScore: 80,
+    verification: {
+      titleCheck: 'pending',
+      ardhisasaMatch: false,
+      photosVerified: false,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-09-02',
+    },
+    trustSignals: [
+      {
+        label: 'Title search',
+        status: 'warn',
+        detail:
+          'Ready title deed presented by owner; independent search and map verification scheduled before deposit.',
+      },
+      {
+        label: 'Pricing analysis',
+        status: 'pass',
+        detail:
+          'KES 5.5M/acre is in line with Kantafu acreage quotes (estimate — verify against comparables in Ask Keja).',
+      },
+      {
+        label: 'Photo authenticity',
+        status: 'warn',
+        detail: 'Listing photos are illustrative until our surveyor captures on-site imagery.',
+      },
+      {
+        label: 'Mandate',
+        status: 'pass',
+        detail:
+          'Direct-owner mandate held by Chacadom Investments — direct transaction, no broker chain.',
+      },
+    ],
+    availability: 'available',
+    appreciationForecast: 9.0,
+    listedAt: '2026-09-02',
+    views: 96,
+    highlights: [
+      'KES 5.5M per acre',
+      'Ready title deed',
+      '1.3 km from tarmac',
+      'Direct owner transaction',
+    ],
+  },
 ];
 
 /**
@@ -1586,6 +1735,11 @@ export const areaInsights: Record<string, { avgPricePerSqm: string; yield: strin
       avgPricePerSqm: 'KES 165k–195k',
       yield: '5–6%',
       note: 'Low-density premium suburb anchored by The Waterfront Karen town centre; capital growth over income — the reported 50.6-acre expansion is the corridor catalyst.',
+    },
+    Kantafu: {
+      avgPricePerSqm: 'KES 3.5k–5.5k',
+      yield: 'n/a (land)',
+      note: 'Kangundo-corridor acreage market; electricity and water on site, development spreading out from the tarmac — a land-banking play with real infrastructure.',
     },
     Lavington: {
       avgPricePerSqm: 'KES 115k–130k',
