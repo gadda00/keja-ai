@@ -143,7 +143,8 @@ export default function Manage() {
                   ['Rent collected', 'KES 110,000'],
                   ['Occupancy (rolling 12m)', '89%'],
                   ['Maintenance spend', 'KES 8,400'],
-                  ['Net to owner', 'KES 93,080'],
+                  ['Management fee (8%)', 'KES 8,800'],
+                  ['Net to owner', 'KES 92,800'],
                   ['Arrears', 'None — tenant A+'],
                 ].map(([k, v]) => (
                   <p

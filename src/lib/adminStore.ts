@@ -408,7 +408,7 @@ const MARKET_RATE_PER_SQM: Record<string, [number, number]> = {
   Riverside: [90000, 200000],
   Westlands: [90000, 230000],
   Lavington: [85000, 210000],
-  Karen: [60000, 160000],
+  Karen: [140000, 200000],
   'Upper Hill': [120000, 300000],
   Diani: [2000, 9000], // land
   default: [40000, 260000],

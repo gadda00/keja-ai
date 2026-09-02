@@ -51,6 +51,7 @@ export default function PropertyDetail() {
           title: property.title,
           description: property.description,
           price: property.price,
+          priceOnApplication: property.priceOnApplication,
           images: property.images,
           area: property.area,
           county: property.county,
@@ -64,7 +65,7 @@ export default function PropertyDetail() {
         breadcrumbJsonLd([
           { name: 'Home', path: '/' },
           { name: 'Properties', path: '/properties' },
-          { name: property.title, path: `/keja-ai/properties/${property.id}` },
+          { name: property.title, path: `/properties/${property.id}` },
         ]),
       ]
     : null;
@@ -104,7 +105,9 @@ export default function PropertyDetail() {
   const investment = useMemo(() => {
     // Rental listings (price = monthly rent) are not purchase assets — the
     // rent/price yield model would produce absurd numbers (e.g. 980%).
-    if (!property?.rentEstimate || isRentalPrice(property.price)) return null;
+    // Price-on-application listings have no price to model either.
+    if (!property?.rentEstimate || isRentalPrice(property.price) || property.priceOnApplication)
+      return null;
     return analyzeInvestment({
       price: property.price,
       furnishingCost: property.type === 'apartment' ? Math.round(property.price * 0.04) : 0,
@@ -121,7 +124,7 @@ export default function PropertyDetail() {
   }, [property]);
 
   const mortgage = useMemo(() => {
-    if (!property || isRentalPrice(property.price)) return null;
+    if (!property || property.priceOnApplication || isRentalPrice(property.price)) return null;
     return calculateMortgage({
       propertyPrice: property.price,
       depositPct: mortgageDeposit,
@@ -219,9 +222,15 @@ export default function PropertyDetail() {
           </div>
           <div className="text-right">
             <p className="font-display text-3xl font-bold text-ink sm:text-4xl">
-              {formatKES(property.price, { monthly: isRentalPrice(property.price) })}
+              {property.priceOnApplication
+                ? 'Price on application'
+                : formatKES(property.price, { monthly: isRentalPrice(property.price) })}
             </p>
-            {property.paymentPlan ? (
+            {property.priceOnApplication ? (
+              <p className="mt-1 text-xs font-medium text-gold-700">
+                Unit mix & payment terms from the vendor on WhatsApp
+              </p>
+            ) : property.paymentPlan ? (
               <p className="mt-1 text-xs font-medium text-gold-700">{property.paymentPlan}</p>
             ) : null}
           </div>
@@ -580,7 +589,7 @@ export default function PropertyDetail() {
           </div>
 
           {/* right column — sticky agent card */}
-          <div className="lg:sticky lg:top-24 lg:self-start">
+          <div className="lg:sticky lg:top-24 sticky-banner-shift-lg lg:self-start">
             <div className="card-luxe p-6">
               <div className="flex items-center gap-3">
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gold-gradient font-display text-lg font-bold text-white">
@@ -620,15 +629,32 @@ export default function PropertyDetail() {
                 </p>
               )}
               <a
-                href={whatsappLink(
-                  `Hello, I’m interested in ${property.id} — ${property.title} (${property.area}). Is it still available?`
-                )}
+                href={
+                  property.whatsappProductUrl ??
+                  whatsappLink(
+                    `Hello, I’m interested in ${property.id} — ${property.title} (${property.area}). Is it still available?`
+                  )
+                }
                 target="_blank"
                 rel="noreferrer"
                 className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500"
               >
-                WhatsApp agent
+                {property.whatsappProductUrl ? 'View listing on WhatsApp' : 'WhatsApp agent'}
               </a>
+              {property.whatsappProductUrl ? (
+                <p className="mt-2 text-center text-xs text-ink-faint">
+                  The vendor’s authoritative WhatsApp product page — part of Chacadom’s{' '}
+                  <a
+                    href="https://wa.me/c/254108611387"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-semibold text-emerald-700 underline decoration-emerald-300 underline-offset-2 hover:text-emerald-600"
+                  >
+                    live catalogue
+                  </a>
+                  .
+                </p>
+              ) : null}
               <Link to="/ask" className="btn-dark mt-3 w-full">
                 <Bot className="h-4 w-4" /> Ask Keja about this property
               </Link>
@@ -641,8 +667,9 @@ export default function PropertyDetail() {
                       <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-600" />
                       <p className="mt-3 font-semibold text-ink">Viewing request received ✓</p>
                       <p className="mt-1.5 text-xs leading-relaxed text-ink-muted">
-                        {property.agent.name} will confirm your slot. Reference: {reference}. Any
-                        viewing fee is held in M-Pesa escrow until the viewing is confirmed.
+                        {property.agent.name} will confirm your slot. Reference: {reference}. In
+                        production, any viewing fee would be held in escrow and released only after
+                        the viewing is confirmed (M-Pesa escrow — roadmap).
                       </p>
                     </div>
                   ) : (

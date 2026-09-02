@@ -20,7 +20,7 @@ export default function ArticleDetail() {
           breadcrumbJsonLd([
             { name: 'Home', path: '/' },
             { name: 'Insights', path: '/insights' },
-            { name: article.title, path: `/keja-ai/insights/${article.slug}` },
+            { name: article.title, path: `/insights/${article.slug}` },
           ]),
         ]
       : null,

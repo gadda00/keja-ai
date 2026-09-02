@@ -11,15 +11,15 @@
 
 ## Current state (verified, not aspirational)
 
-| Dimension    | Status                                                                                                                                                  |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Typecheck    | strict `tsc -b` — 0 errors                                                                                                                              |
-| Tests        | 108 passing (14 files: finance, search, scoring, autopilot, escalation, claims, verification, analytics, anomaly, stores, markdown renderer, role gate) |
-| Lint         | oxlint + ESLint (flat config, `--max-warnings 0`) + Prettier — all clean                                                                                |
-| Build        | Vite 8 production build, route-level code splitting, recharts isolated to a lazy chunk                                                                  |
-| Static-first | every sitemap route prerendered to status-200 HTML incl. a real 404 page                                                                                |
-| CI           | deploy on main + PR-check workflow (full verification incl. prerender)                                                                                  |
-| Auto-Pilot   | scheduled ingestion pipeline, quality-gated, Prettier-formatted commits                                                                                 |
+| Dimension    | Status                                                                                                                                                                    |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Typecheck    | strict `tsc -b` — 0 errors                                                                                                                                                |
+| Tests        | 123 passing (16 files: finance, search, scoring, autopilot, escalation, claims, verification, analytics, anomaly, stores, markdown renderer, role gate, SEO URL contract) |
+| Lint         | oxlint + ESLint (flat config, `--max-warnings 0`) + Prettier — all clean                                                                                                  |
+| Build        | Vite 8 production build, route-level code splitting, recharts isolated to a lazy chunk                                                                                    |
+| Static-first | every sitemap route prerendered to status-200 HTML incl. a real 404 page                                                                                                  |
+| CI           | deploy on main + PR-check workflow (full verification incl. prerender)                                                                                                    |
+| Auto-Pilot   | scheduled ingestion pipeline, quality-gated, Prettier-formatted commits                                                                                                   |
 
 ## Wave 5 (this audit) — what changed and why
 

@@ -2,6 +2,7 @@ import { Bot, CheckCircle2, Mail, MapPin, MessageCircle, Phone, Send } from 'luc
 import { type FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import SmartImg from '@/components/ui/SmartImg';
 import { SITE, whatsappLink } from '@/config';
 import { asset } from '@/config';
 import { usePageMeta } from '@/lib/seo';
@@ -210,7 +211,7 @@ export default function Contact() {
             </div>
 
             <div className="overflow-hidden rounded-2xl">
-              <img
+              <SmartImg
                 src={asset('/brand/keja-banner.jpg')}
                 alt="Keja by Chacadom"
                 className="w-full object-cover"

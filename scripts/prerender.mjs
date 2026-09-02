@@ -218,8 +218,14 @@ async function main() {
         document.querySelectorAll('script[src*="@vite"]').forEach((s) => s.remove())
         return '<!DOCTYPE html>\n' + document.documentElement.outerHTML
       })
+      html = html.replaceAll(PREVIEW_ORIGIN, PROD_ORIGIN)
+      // The 404 capture echoes the fake path '/404-preview' inside
+      // canonical/og:url (written by usePageMeta before the text rewrite
+      // below). A noindex 404 needs neither — strip them first so no
+      // malformed URL like '…/keja-aithis page' ever ships.
       html = html
-        .replaceAll(PREVIEW_ORIGIN, PROD_ORIGIN)
+        .replace(/<link\s+rel="canonical"[^>]*>\s*/g, '')
+        .replace(/<meta\s+property="og:url"[^>]*>\s*/g, '')
         .replaceAll('/404-preview', 'this page')
       if (html.includes('localhost:')) {
         throw new Error('localhost URL survived the rewrite — check canonical/meta/modulepreload')

@@ -58,6 +58,10 @@ export function InvestModal() {
   }, [investPropertyId]);
 
   const maxBuy = p ? Math.max(p.minTokens, Math.min(tokensAvailable(p), 2000)) : 0;
+  // Sold-out LIVE offerings previously still let a user configure an order
+  // (maxBuy was floored at minTokens even with 0 available) that only failed
+  // at execute. Disable the CTA instead — the secondary market is the venue.
+  const soldOut = p ? tokensAvailable(p) <= 0 : false;
   const amount = p
     ? Math.min(Math.max(tokens ?? Math.min(p.minTokens * 5, maxBuy), p.minTokens), maxBuy)
     : 0;
@@ -264,9 +268,11 @@ export function InvestModal() {
               <button className="btn-outline flex-1" onClick={() => setStep('order')}>
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>
-              <button className="btn-gold flex-[2]" disabled={!ack} onClick={execute}>
+              <button className="btn-gold flex-[2]" disabled={!ack || soldOut} onClick={execute}>
                 <BadgeDollarSign className="h-4 w-4" />
-                Confirm {fmtUsd(cost)} purchase
+                {soldOut
+                  ? 'Fully funded — trade on the secondary market'
+                  : `Confirm ${fmtUsd(cost)} purchase`}
               </button>
             </div>
           </m.div>

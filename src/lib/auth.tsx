@@ -388,7 +388,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
           throw new Error('No account found with that email. Create one below.');
         }
         if (account.status === 'suspended')
-          throw new Error('This account has been suspended. Contact support@keja.ai.');
+          throw new Error('This account has been suspended. Contact info@chacadom.com.');
         const pw = store.get<Record<string, string>>('pw', {});
         const expected = pw[account.email];
         // demo accounts accept their seeded password

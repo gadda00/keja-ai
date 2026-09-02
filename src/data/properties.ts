@@ -27,6 +27,9 @@ export interface Property {
   area: string;
   county: string;
   price: number;
+  /** True when the vendor quotes no public price — `price` is then a 0
+   *  sentinel and every UI surface renders "Price on application". */
+  priceOnApplication?: boolean;
   rentEstimate?: number;
   bedrooms?: number;
   bathrooms?: number;
@@ -36,6 +39,8 @@ export interface Property {
   description: string;
   agency: string;
   agent: { name: string; phone: string };
+  /** Vendor's authoritative WhatsApp product page for this listing. */
+  whatsappProductUrl?: string;
   trustScore: number;
   verification: Verification;
   trustSignals: TrustSignal[];
@@ -54,11 +59,11 @@ export interface Property {
 const IMG = (n: string) => asset(`/images/props/${n}.jpg`);
 
 export const AGENCIES = [
-  { name: 'Chacadom Premier Properties', listings: 9, rating: 4.9, verifiedSince: '2024' },
-  { name: 'Nairobi Habitat Realtors', listings: 4, rating: 4.7, verifiedSince: '2024' },
-  { name: 'Savanna Heights Realty', listings: 4, rating: 4.6, verifiedSince: '2025' },
-  { name: 'Pwani Beach Homes', listings: 3, rating: 4.8, verifiedSince: '2025' },
-  { name: 'Rift Valley Land & Homes', listings: 3, rating: 4.5, verifiedSince: '2024' },
+  { name: 'Chacadom Premier Properties', rating: 4.9, verifiedSince: '2026' },
+  { name: 'Nairobi Habitat Realtors', rating: 4.7, verifiedSince: '2024' },
+  { name: 'Savanna Heights Realty', rating: 4.6, verifiedSince: '2025' },
+  { name: 'Pwani Beach Homes', rating: 4.8, verifiedSince: '2025' },
+  { name: 'Rift Valley Land & Homes', rating: 4.5, verifiedSince: '2024' },
 ];
 
 export const PROPERTIES: Property[] = [
@@ -403,7 +408,7 @@ export const PROPERTIES: Property[] = [
     ],
     images: [IMG('apartment_1'), IMG('townhouse_0')],
     description:
-      'Off-plan 3-bedroom apartment in a growing Syokimau development, 8 minutes from the SGR terminus and the Eastern Bypass. Payment plan: 40% deposit, balance in comfortable installments over 12 months. Off-plan buying here locks in 2025 pricing in a corridor that has seen consistent infrastructure-driven appreciation — the Standard Gauge Railway, expressway links, and the upcoming Konza spill-over effect.',
+      'Off-plan 3-bedroom apartment in a growing Syokimau development, 8 minutes from the SGR terminus and the Eastern Bypass. Payment plan: 40% deposit, balance in comfortable installments over 12 months. Off-plan buying here locks in today\u2019s pricing in a corridor that has seen consistent infrastructure-driven appreciation — the Standard Gauge Railway, expressway links, and the upcoming Konza spill-over effect.',
     agency: 'Savanna Heights Realty',
     agent: { name: 'Peter Kariuki', phone: '+254 712 000 004' },
     trustScore: 84,
@@ -1275,6 +1280,7 @@ export const PROPERTIES: Property[] = [
   {
     id: 'KJA-021',
     title: '3BR Ensuite Duplex with DSQ — Barini Apartments',
+    whatsappProductUrl: 'https://wa.me/p/9934790383206612/254108611387',
     type: 'apartment',
     purpose: ['buy', 'invest'],
     area: 'Kilimani',
@@ -1350,6 +1356,7 @@ export const PROPERTIES: Property[] = [
   {
     id: 'KJA-022',
     title: '5BR All-Ensuite Family Home on Half an Acre — Runda',
+    whatsappProductUrl: 'https://wa.me/p/9609409105786950/254108611387',
     type: 'villa',
     purpose: ['buy'],
     area: 'Runda',
@@ -1418,6 +1425,7 @@ export const PROPERTIES: Property[] = [
   {
     id: 'KJA-023',
     title: 'Executive 4BR Mansion — Kijani, Tatu City',
+    whatsappProductUrl: 'https://wa.me/p/24081714854762435/254108611387',
     type: 'villa',
     purpose: ['buy'],
     area: 'Tatu City',
@@ -1635,6 +1643,146 @@ export const PROPERTIES: Property[] = [
       'Direct owner transaction',
     ],
   },
+  {
+    id: 'KJA-026',
+    title: 'Amethyst Springs — 1–2BR Premium Tower, Kilimani',
+    whatsappProductUrl: 'https://wa.me/p/24503322992671363/254108611387',
+    type: 'apartment',
+    purpose: ['buy', 'invest'],
+    area: 'Kilimani',
+    county: 'Nairobi',
+    price: 0,
+    priceOnApplication: true,
+    bedrooms: 2,
+    bathrooms: 2,
+    sizeSqm: 58,
+    amenities: [
+      'Infinity Pool',
+      'Sky Bar',
+      'Gym · Spa · Sauna',
+      'Cinema',
+      'Co-working Lounge',
+      "Residents' Lounge",
+      'Paddle Court',
+      "Kids' Playroom",
+      '24/7 Security',
+    ],
+    images: [IMG('listing_amethyst')],
+    description:
+      'Vendor stock from Chacadom\u2019s live WhatsApp catalogue: a refined residential tower off Dennis Pritt Road in Kilimani, minutes from the Arboretum and State House. Floor-to-ceiling windows and curved-glass architecture frame panoramic city views; one-bedroom units from 58 sqm suit the short-let investor, while two-bedroom layouts run to 110 sqm with suspended bedrooms and studies. The amenity deck — cinema, sky bar, residents\u2019 lounge, paddle court and kids\u2019 playroom — is built for professionals and families alike. Priced on application: the current unit mix, floor plans and payment terms come directly from the vendor\u2019s WhatsApp product page linked below. Keja\u2019s verification desk holds the developer\u2019s brochure renders on file and the developer due-diligence pack is in progress — the badge below reflects that honest, in-progress state.',
+    agency: 'Chacadom Premier Properties',
+    agent: { name: 'Chacadom listings desk', phone: '+254 108 611 387' },
+    trustScore: 72,
+    verification: {
+      titleCheck: 'pending',
+      ardhisasaMatch: false,
+      photosVerified: false,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-09-02',
+    },
+    trustSignals: [
+      {
+        label: 'Photo authenticity',
+        status: 'warn',
+        detail:
+          'Developer marketing renders (not as-built photography) — inspect the show unit before committing.',
+      },
+      {
+        label: 'Price reasonableness',
+        status: 'warn',
+        detail:
+          'Priced on application — no market comparison is possible until the vendor quotes unit pricing.',
+      },
+      {
+        label: 'Listing history',
+        status: 'pass',
+        detail:
+          'Single listing sourced from the verified Chacadom vendor catalogue; no re-posting patterns.',
+      },
+    ],
+    availability: 'available',
+    offPlan: true,
+    listedAt: '2026-09-02',
+    views: 41,
+    highlights: [
+      'Price on application',
+      '58–110 sqm unit mix',
+      'Infinity pool + sky bar',
+      'Off Dennis Pritt Road, Kilimani',
+    ],
+  },
+  {
+    id: 'KJA-027',
+    title: 'Amber Bay Heights — 24-Floor Residential Tower, Westlands (Off-Plan)',
+    type: 'apartment',
+    purpose: ['buy', 'invest'],
+    area: 'Westlands',
+    county: 'Nairobi',
+    price: 0,
+    priceOnApplication: true,
+    sizeSqm: 0,
+    amenities: [
+      'Rooftop Infinity Pool',
+      'Sky Bar',
+      'Gym & Yoga Deck',
+      'Conference Room',
+      'Coffee Lounge',
+      'Cascade Pools',
+      "Residents' Facilities Stack",
+      '24/7 Security',
+    ],
+    images: [IMG('listing_amberbay')],
+    description:
+      'Client-desk mandate: a 24-floor residential tower on General Mathenge Drive in Westlands, offering studio to three-bedroom layouts over a full amenity stack — rooftop infinity pool with skyline views, sky bar, residents\u2019 lounge, gym and yoga deck, conference facilities and a coffee lounge. Off-plan sales with structured payment plans; developer-supplied imagery and brochures are available through our desk. Priced on application: unit mix, floor plans and payment terms are shared directly through the Chacadom client desk on WhatsApp. Keja\u2019s verification of the developer\u2019s approvals and title documentation is in progress — the badge below reflects that honest, in-progress state.',
+    agency: 'Chacadom Premier Properties',
+    agent: { name: 'Chacadom Client Desk', phone: '+254 108 611 387' },
+    trustScore: 70,
+    verification: {
+      titleCheck: 'pending',
+      ardhisasaMatch: false,
+      photosVerified: false,
+      duplicateCheck: 'clean',
+      listingVelocity: 'normal',
+      lastChecked: '2026-09-02',
+    },
+    trustSignals: [
+      {
+        label: 'Title search',
+        status: 'warn',
+        detail:
+          'Off-plan development: developer approvals and title documentation under verification before any deposit moves.',
+      },
+      {
+        label: 'Photo authenticity',
+        status: 'warn',
+        detail:
+          'Developer brochure renders — final finishes may differ from the marketing imagery.',
+      },
+      {
+        label: 'Price reasonableness',
+        status: 'warn',
+        detail: 'Priced on application — Westlands tower pricing quoted per unit on request.',
+      },
+      {
+        label: 'Mandate',
+        status: 'pass',
+        detail:
+          'Mandate held by the Chacadom client desk — direct developer relationship, no broker chain.',
+      },
+    ],
+    availability: 'available',
+    offPlan: true,
+    completionDate: '2027',
+    listedAt: '2026-09-02',
+    views: 38,
+    highlights: [
+      'Price on application',
+      '24 floors · studios to 3BR',
+      'Rooftop infinity pool',
+      'General Mathenge Drive, Westlands',
+    ],
+  },
 ];
 
 /**
@@ -1707,9 +1855,9 @@ export const areaInsights: Record<string, { avgPricePerSqm: string; yield: strin
       note: 'Two Rivers catalyst; fastest-growing family suburb on Nairobi’s north-west edge.',
     },
     Runda: {
-      avgPricePerSqm: 'KES 60k–90k',
+      avgPricePerSqm: 'KES 140k–190k',
       yield: '6.0–7.0%',
-      note: 'Gigiri diplomatic belt; large family homes on half-acre plots, quiet resale market.',
+      note: 'Gigiri diplomatic belt; large family homes on half-acre plots, quiet resale market — premium stock trades at the top of the band.',
     },
     'Athi River': {
       avgPricePerSqm: 'KES 25k–45k',
@@ -1722,7 +1870,7 @@ export const areaInsights: Record<string, { avgPricePerSqm: string; yield: strin
       note: 'Coastal holiday-let market; December–March occupancy drives annual returns.',
     },
     Kilimani: {
-      avgPricePerSqm: 'KES 95k–110k',
+      avgPricePerSqm: 'KES 95k–120k',
       yield: '8.5–9.5%',
       note: 'Nairobi\u2019s densest premium rental corridor; strong expat demand.',
     },

@@ -30,8 +30,9 @@ import {
 } from 'recharts';
 
 import SmartImg from '@/components/ui/SmartImg';
-import { AGENCIES, PROPERTIES } from '@/data/properties';
+import { AGENCIES } from '@/data/properties';
 import { formatKES } from '@/lib/format';
+import { useAllProperties } from '@/lib/inventory';
 import { usePageMeta } from '@/lib/seo';
 import type { Lead } from '@/lib/store';
 import { KEYS, seedLeads, useStore } from '@/lib/store';
@@ -68,25 +69,28 @@ export default function Dashboard() {
   const [userLeads] = useStore<Lead[]>(KEYS.leads, []);
   const [viewed] = useStore<string[]>(KEYS.viewed, []);
   const [favorites] = useStore<string[]>(KEYS.favorites, []);
+  // Unified inventory (auto + approved partner submissions + seed) so the
+  // Dashboard always agrees with the Properties marketplace and Home stats.
+  const MARKET = useAllProperties();
   const leads = useMemo(() => [...userLeads, ...seedLeads], [userLeads]);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
   const stats = useMemo(() => {
     const byType: Record<string, number> = {};
-    PROPERTIES.forEach((p) => {
+    MARKET.forEach((p) => {
       byType[p.type] = (byType[p.type] ?? 0) + 1;
     });
     return {
-      total: PROPERTIES.length,
-      available: PROPERTIES.filter((p) => p.availability === 'available').length,
-      reserved: PROPERTIES.filter((p) => p.availability === 'reserved').length,
-      flagged: PROPERTIES.filter((p) => p.trustScore < 60).length,
-      avgTrust: Math.round(PROPERTIES.reduce((s, p) => s + p.trustScore, 0) / PROPERTIES.length),
-      totalValue: PROPERTIES.reduce((s, p) => s + p.price, 0),
+      total: MARKET.length,
+      available: MARKET.filter((p) => p.availability === 'available').length,
+      reserved: MARKET.filter((p) => p.availability === 'reserved').length,
+      flagged: MARKET.filter((p) => p.trustScore < 60).length,
+      avgTrust: Math.round(MARKET.reduce((s, p) => s + p.trustScore, 0) / MARKET.length),
+      totalValue: MARKET.reduce((s, p) => s + p.price, 0),
       byType: Object.entries(byType).map(([name, value]) => ({ name, value })),
       hotCount: leads.filter((l) => l.temperature === 'HOT').length,
     };
-  }, [leads]);
+  }, [leads, MARKET]);
 
   const occupancyData = [
     { month: 'Mar', occupancy: 82, rent: 92 },
@@ -97,7 +101,7 @@ export default function Dashboard() {
     { month: 'Aug', occupancy: 91, rent: 100 },
   ];
 
-  const verificationQueue = PROPERTIES.filter((p) => p.trustScore < 90).slice(0, 5);
+  const verificationQueue = MARKET.filter((p) => p.trustScore < 90).slice(0, 5);
 
   return (
     <div className="bg-cream/60">
@@ -139,9 +143,9 @@ export default function Dashboard() {
             { icon: Users, label: 'Leads', value: leads.length, sub: `${stats.hotCount} HOT` },
             {
               icon: TrendingUp,
-              label: 'Portfolio value',
+              label: 'Inventory value',
               value: formatKES(stats.totalValue, { compact: true }),
-              sub: 'across agencies',
+              sub: 'across the marketplace',
             },
             {
               icon: Eye,
@@ -412,7 +416,11 @@ export default function Dashboard() {
                 <p className="mt-1 text-xs text-ink-muted">
                   ★ {a.rating} · verified {a.verifiedSince}
                 </p>
-                <p className="mt-2 font-display text-xl font-bold text-gold-600">{a.listings}</p>
+                {/* derived from live inventory so the count can never drift
+                    from what the marketplace actually shows */}
+                <p className="mt-2 font-display text-xl font-bold text-gold-600">
+                  {MARKET.filter((p) => p.agency === a.name).length}
+                </p>
                 <p className="text-[10px] uppercase tracking-wider text-ink-faint">
                   active listings
                 </p>

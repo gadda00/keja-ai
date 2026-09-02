@@ -116,13 +116,19 @@ export function matchesSearch(p: Property, f: SavedSearch['filters']): boolean {
     if (!hay.includes(q)) return false;
   }
   if (f.type && f.type !== 'all' && p.type !== f.type) return false;
-  if (f.purpose === 'rent' && !p.purpose.includes('rent')) return false;
+  // Rent mode shows true rentals only (price IS the monthly rent) — mirrors
+  // the Properties page filter; sale-priced "also rentable" stock stays in
+  // the buy/invest modes.
+  if (f.purpose === 'rent' && !(p.purpose.includes('rent') && isRentalPrice(p.price))) return false;
   if (f.purpose === 'buy' && !p.purpose.includes('buy')) return false;
   if (f.purpose === 'invest' && !p.purpose.includes('invest')) return false;
   if (f.area && f.area !== 'all' && p.area !== f.area) return false;
   if (f.maxPrice != null) {
     const atCeiling = f.maxPrice >= (rentMode ? RENT_CEILING : PRICE_CEILING);
     if (!atCeiling) {
+      // Price-on-application listings carry no price — a cap cannot vouch
+      // for them, so they leave capped result sets (portal convention).
+      if (p.priceOnApplication) return false;
       // Rent-mode caps apply to rentals (monthly KES k); sale-mode caps to
       // sale listings (KES M). Rentals pass sale caps and vice-versa — the
       // units are incomparable, so a cap in one scale never filters the other.

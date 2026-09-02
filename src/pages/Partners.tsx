@@ -25,6 +25,7 @@ import { Link } from 'react-router-dom';
 
 import { logAudit, usePartners } from '@/lib/adminStore';
 import { useAuth } from '@/lib/auth';
+import { useAllProperties } from '@/lib/inventory';
 import { usePageMeta } from '@/lib/seo';
 
 const CHANNELS = [
@@ -84,6 +85,10 @@ export default function Partners() {
   );
   const { user, isLoggedIn } = useAuth();
   const [partners, setPartners] = usePartners();
+  // Live inventory so the headline stat always matches the marketplace
+  // (Home and Dashboard compute from the same unified source).
+  const MARKET = useAllProperties();
+  const verifiedListings = MARKET.filter((p) => p.trustScore >= 75).length;
   const [applied, setApplied] = useState(false);
   const [form, setForm] = useState({
     orgName: '',
@@ -153,7 +158,7 @@ export default function Partners() {
       {/* stats strip */}
       <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
-          { icon: Building2, value: '20+', label: 'Live verified listings' },
+          { icon: Building2, value: `${verifiedListings}`, label: 'Live verified listings' },
           { icon: Users, value: '5', label: 'Partner agencies' },
           { icon: Globe2, value: '5', label: 'Feed connections' },
           { icon: TrendingUp, value: '$45.5M', label: 'Tokenized asset value' },

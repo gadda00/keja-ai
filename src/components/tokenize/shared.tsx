@@ -84,7 +84,7 @@ export function SectionTitle({
     <div className={center ? 'mx-auto max-w-2xl text-center' : 'max-w-2xl'}>
       <div className="flex items-center justify-center gap-3">
         {!center && <span className="h-px w-8 bg-gold-gradient" />}
-        <span className="text-[11px] font-bold uppercase tracking-wide2 text-gold-600">
+        <span className="text-[11px] font-bold uppercase tracking-wide2 text-gold-700">
           {eyebrow}
         </span>
       </div>

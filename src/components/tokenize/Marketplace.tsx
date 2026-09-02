@@ -293,7 +293,7 @@ function PropertyCard({ p, index }: { p: TokenizedProperty; index: number }) {
         </div>
       </div>
       <div className="p-5">
-        <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-gold-600">
+        <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-gold-700">
           <TypeIcon type={p.propertyType} className="h-3.5 w-3.5" />
           {propertyTypeLabel(p.propertyType)} · {p.tokenSymbol}
         </div>

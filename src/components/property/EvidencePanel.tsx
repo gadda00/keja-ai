@@ -9,11 +9,12 @@ import {
   UserCheck,
   X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import type { Property } from '@/data/properties';
 import { REPORT_REASONS, reportListing, type ReportReason } from '@/lib/adminStore';
 import { track } from '@/lib/analytics';
+import { useFocusTrap } from '@/lib/useFocusTrap';
 import {
   evidenceFor,
   FRESHNESS_COPY,
@@ -41,6 +42,10 @@ export default function EvidencePanel({ property }: { property: Property }) {
   const [detail, setDetail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [reviewRequested, setReviewRequested] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  // Same keyboard contract as the other dialogs (AuthModal, RoleGate): focus
+  // locked inside the overlay, Escape closes, focus returns on unmount.
+  useFocusTrap(dialogRef, reportOpen, () => setReportOpen(false));
 
   const checks = evidenceFor(property);
   const fresh = listingFreshness(property);
@@ -178,7 +183,7 @@ export default function EvidencePanel({ property }: { property: Property }) {
           aria-label="Report an issue"
           className="fixed inset-0 z-[80] flex items-center justify-center bg-ink/60 p-4"
         >
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+          <div ref={dialogRef} className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="font-display text-lg font-bold text-ink">Report an issue</h3>

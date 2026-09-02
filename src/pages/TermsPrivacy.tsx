@@ -46,7 +46,7 @@ const SECTIONS = [
     paras: [
       'We process personal data on the lawful bases of contract performance (accounts, viewing requests), legitimate interest (platform security, fraud prevention, audit logs) and consent (marketing communications, saved-search alerts you enable). We collect only what the product needs: identity and contact data, your saved searches and favourites, and the records of actions you take.',
       'In this demonstration build, all data is stored locally on your device (browser storage) — it never leaves your machine and is not transferred to our servers. In production, data is stored with Kenya-resident processors where feasible, encrypted in transit and at rest, retained only as long as necessary, and never sold.',
-      'You may request access, correction, or deletion of your data at any time (privacy@keja.ai). You may also complain to the Office of the Data Protection Commissioner (ODPC).',
+      'You may request access, correction, or deletion of your data at any time (info@chacadom.com). You may also complain to the Office of the Data Protection Commissioner (ODPC).',
     ],
   },
   {
@@ -54,7 +54,7 @@ const SECTIONS = [
     title: '6. Changes and contact',
     paras: [
       'We may update these terms as the platform evolves; material changes will be announced in-app. Continued use after changes take effect constitutes acceptance.',
-      'Questions: hello@keja.ai · Chacadom Investments, Westlands, Nairobi, Kenya.',
+      'Questions: info@chacadom.com · Chacadom Investments, Westlands, Nairobi, Kenya.',
     ],
   },
 ];

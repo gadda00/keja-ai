@@ -142,6 +142,20 @@ html.demo-banner main {
   padding-top: 6.25rem; /* 64px navbar + 36px banner */
 }
 
+/* Sticky sub-bars (Properties filter bar, Tokenize tab bar) pin 4rem below
+   the viewport top to clear the navbar — when the demo banner is visible the
+   navbar itself sits 36px lower, so the bars must shift equally or they slide
+   underneath it on scroll. */
+html.demo-banner .sticky-banner-shift {
+  top: 6.25rem; /* 4rem navbar + 2.25rem banner */
+}
+/* The detail-page side rail uses top-24 (6rem) at lg and up. */
+@media (min-width: 1024px) {
+  html.demo-banner .sticky-banner-shift-lg {
+    top: 8.25rem; /* 6rem + 2.25rem banner */
+  }
+}
+
 /* Anchor targets should not hide under the shifted fixed header */
 #claims,
 #score {

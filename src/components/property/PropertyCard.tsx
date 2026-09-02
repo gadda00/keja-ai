@@ -125,7 +125,7 @@ export default function PropertyCard({ property }: { property: Property }) {
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-gold-600">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-gold-700">
               {property.area} · {property.county}
             </p>
             <Link to={`/properties/${property.id}`}>
@@ -147,9 +147,15 @@ export default function PropertyCard({ property }: { property: Property }) {
               <Bath className="h-4 w-4 text-gold-500" /> {property.bathrooms} bath
             </span>
           ) : null}
-          <span className="inline-flex items-center gap-1.5">
-            <Ruler className="h-4 w-4 text-gold-500" /> {property.sizeSqm.toLocaleString()} sqm
-          </span>
+          {property.sizeSqm > 0 ? (
+            <span className="inline-flex items-center gap-1.5">
+              <Ruler className="h-4 w-4 text-gold-500" /> {property.sizeSqm.toLocaleString()} sqm
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5">
+              <Ruler className="h-4 w-4 text-gold-500" /> Unit mix on application
+            </span>
+          )}
           <span className="inline-flex items-center gap-1.5">
             <Building2 className="h-4 w-4 text-gold-500" /> {property.agency}
           </span>
@@ -179,9 +185,11 @@ export default function PropertyCard({ property }: { property: Property }) {
         <div className="mt-auto flex items-end justify-between border-t border-gold-100 pt-4">
           <div>
             <p className="font-display text-xl font-bold text-ink">
-              {formatKES(property.price, { monthly: isRent })}
+              {property.priceOnApplication
+                ? 'Price on application'
+                : formatKES(property.price, { monthly: isRent })}
             </p>
-            {property.rentEstimate && !isRent ? (
+            {property.rentEstimate && !isRent && !property.priceOnApplication ? (
               <p className="text-xs text-ink-faint">
                 Est. rent {formatKES(property.rentEstimate, { monthly: true })}
               </p>

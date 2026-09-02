@@ -222,9 +222,11 @@ export const FX_KES_PER_USD = 129;
 /** Listings priced below this floor are rentals (monthly pricing). Single source of truth. */
 export const RENTAL_PRICE_FLOOR = 500_000;
 
-/** Rentals in this marketplace are priced below the 500k sale floor. */
+/** Rentals in this marketplace are priced below the 500k sale floor. A zero
+ *  price is the price-on-application sentinel (no public price), never a
+ *  rental — call sites rely on this to keep POA listings out of rent math. */
 export function isRentalPrice(price: number): boolean {
-  return price < RENTAL_PRICE_FLOOR;
+  return price > 0 && price < RENTAL_PRICE_FLOOR;
 }
 
 /** Kenyan buyer cost stack (statutory + typical professional fees, % of price). */

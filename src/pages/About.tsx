@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import { asset } from '@/config';
+import { asset, SITE } from '@/config';
 import { usePageMeta } from '@/lib/seo';
 
 const fadeUp = {
@@ -156,6 +156,14 @@ export default function About() {
             <Link to="/contact" className="btn-gold mt-6">
               Partner with us <ChevronRight className="h-4 w-4" />
             </Link>
+            <a
+              href={SITE.parentSiteUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 block text-sm font-semibold text-gold-300 underline decoration-gold-500/50 underline-offset-4 transition hover:text-gold-100"
+            >
+              Visit the Chacadom Investments corporate site →
+            </a>
           </div>
         </div>
       </section>

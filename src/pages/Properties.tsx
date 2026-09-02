@@ -88,7 +88,13 @@ export default function Properties() {
       );
     }
     if (type !== 'all') list = list.filter((p) => p.type === type);
-    if (purpose === 'rent') list = list.filter((p) => p.purpose.includes('rent'));
+    // Rent mode shows true rentals only (price IS the monthly rent, below the
+    // rental price floor). Sale-priced listings that merely allow renting
+    // (purpose includes 'rent' but price is a sale price) used to leak into
+    // rent results at their sale price — e.g. "KES 11M" next to a KES 65k/mo
+    // rental. They are investment stock for the buy/invest modes instead.
+    if (purpose === 'rent')
+      list = list.filter((p) => p.purpose.includes('rent') && isRentalPrice(p.price));
     if (purpose === 'buy') list = list.filter((p) => p.purpose.includes('buy'));
     if (purpose === 'invest') list = list.filter((p) => p.purpose.includes('invest'));
     if (area !== 'all') list = list.filter((p) => p.area === area);
@@ -98,10 +104,14 @@ export default function Properties() {
     const rentMode = purpose === 'rent';
     const atCeiling = maxPrice >= (rentMode ? RENT_CEILING : PRICE_CEILING);
     if (!atCeiling) {
+      // POA listings carry no price, so a price cap cannot vouch for them —
+      // they drop out of capped result sets (portals behave the same way).
       list = list.filter((p) =>
-        isRentalPrice(p.price)
-          ? !(rentMode && p.price > maxPrice * 1000)
-          : !(!rentMode && p.price > maxPrice * 1_000_000)
+        p.priceOnApplication
+          ? false
+          : isRentalPrice(p.price)
+            ? !(rentMode && p.price > maxPrice * 1000)
+            : !(!rentMode && p.price > maxPrice * 1_000_000)
       );
     }
     if (minBeds > 0) list = list.filter((p) => (p.bedrooms ?? 0) >= minBeds);
@@ -185,7 +195,7 @@ export default function Properties() {
         </div>
 
         {/* search + filter bar */}
-        <div className="sticky top-16 z-30 mt-8 rounded-2xl bg-white p-4 shadow-card ring-1 ring-gold-100">
+        <div className="sticky top-16 sticky-banner-shift z-30 mt-8 rounded-2xl bg-white p-4 shadow-card ring-1 ring-gold-100">
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative min-w-[240px] flex-1">
               <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gold-600" />

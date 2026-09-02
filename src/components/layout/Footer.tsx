@@ -17,7 +17,15 @@ export default function Footer() {
                 Keja<span className="gold-text">.ai</span>
               </span>
               <span className="text-[9px] font-semibold uppercase tracking-wide2 text-gold-300">
-                by Chacadom
+                by{' '}
+                <a
+                  href={SITE.parentSiteUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline decoration-gold-500/60 underline-offset-2 transition hover:text-gold-100"
+                >
+                  Chacadom
+                </a>
               </span>
             </span>
           </div>

@@ -5,8 +5,14 @@ import { asset, SITE, SITE_URL } from '@/config';
 
 /** Default social image — matches the static tag shipped in index.html so a
  *  route without its own image resets to the site default instead of sharing
- *  the previous route's image (or dropping the card entirely). */
-const DEFAULT_OG_IMAGE = asset('og-image.jpg');
+ *  the previous route's image (or dropping the card entirely).
+ *  Absolute (SITE_URL + base): the OG/Twitter spec requires absolute URLs —
+ *  relative paths make scrapers drop the share card entirely. */
+const DEFAULT_OG_IMAGE = `${SITE_URL}${asset('og-image.jpg')}`;
+
+/** Absolute URL for an image path (handles '' and '/x' inputs; http passthrough). */
+const absoluteImage = (path: string) =>
+  path.startsWith('http') ? path : `${SITE_URL}${asset(path.replace(/^\//, ''))}`;
 
 function upsertMeta(attr: 'name' | 'property', key: string, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
@@ -74,9 +80,7 @@ export function usePageMeta(
     upsertMeta('property', 'og:title', full);
     upsertMeta('name', 'twitter:title', full);
     if (options?.image) {
-      const img = options.image.startsWith('http')
-        ? options.image
-        : `${window.location.origin}${asset(options.image.replace(/^\//, ''))}`;
+      const img = absoluteImage(options.image);
       upsertMeta('property', 'og:image', img);
       upsertMeta('name', 'twitter:image', img);
       upsertMeta('property', 'og:image:width', '1200');
@@ -105,6 +109,12 @@ export function usePageMeta(
 /* ------------------------- structured data builders ------------------------ */
 
 export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
+  // Defensive: also strip the deployment base if a caller (historically)
+  // passed an already-prefixed path, so item URLs never double the base
+  // (…/keja-ai/keja-ai/properties/… is a 404 inside structured data).
+  const basePath = import.meta.env.BASE_URL;
+  const stripBase = (p: string) =>
+    basePath !== '/' && p.startsWith(basePath) ? p.slice(basePath.length) : p.replace(/^\//, '');
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -112,7 +122,7 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
       '@type': 'ListItem',
       position: i + 1,
       name: it.name,
-      item: `${SITE_URL}${import.meta.env.BASE_URL}${it.path.replace(/^\//, '')}`,
+      item: `${SITE_URL}${basePath}${stripBase(it.path)}`,
     })),
   };
 }
@@ -122,6 +132,8 @@ export function realEstateListingJsonLd(p: {
   title: string;
   description: string;
   price: number;
+  /** When true the vendor quotes no public price — the Offer omits price. */
+  priceOnApplication?: boolean;
   images: string[];
   area: string;
   county: string;
@@ -146,14 +158,17 @@ export function realEstateListingJsonLd(p: {
     ),
     offers: {
       '@type': 'Offer',
-      price: p.price,
-      priceCurrency: 'KES',
+      // POA listings carry no price — an Offer with price 0 would
+      // miscommunicate "free" to crawlers.
+      ...(p.priceOnApplication ? {} : { price: p.price, priceCurrency: 'KES' }),
       availability: 'https://schema.org/InStock',
       seller: { '@type': 'RealEstateAgent', name: p.agency },
     },
     ...(p.bedrooms ? { numberOfRooms: p.bedrooms } : {}),
     ...(p.bathrooms ? { numberOfBathroomsTotal: p.bathrooms } : {}),
-    floorSize: { '@type': 'QuantitativeValue', value: p.sizeSqm, unitCode: 'MTK' },
+    ...(p.sizeSqm > 0
+      ? { floorSize: { '@type': 'QuantitativeValue', value: p.sizeSqm, unitCode: 'MTK' } }
+      : {}),
     address: {
       '@type': 'PostalAddress',
       addressLocality: p.area,
@@ -180,6 +195,7 @@ export function articleJsonLd(a: {
     author: { '@type': 'Organization', name: a.author },
     publisher: { '@type': 'Organization', name: SITE.parent },
     mainEntityOfPage: `${SITE_URL}${import.meta.env.BASE_URL}insights/${a.slug}`,
+    ...(a.image ? { image: [absoluteImage(a.image)] } : {}),
   };
 }
 

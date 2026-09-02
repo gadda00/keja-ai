@@ -12,7 +12,7 @@ import { Link, useParams } from 'react-router-dom';
 
 import PropertyCard from '@/components/property/PropertyCard';
 import VideoFacade from '@/components/ui/VideoFacade';
-import { asset, whatsappLink } from '@/config';
+import { asset, siteUrl, whatsappLink } from '@/config';
 import { getNeighborhoodGuide } from '@/data/neighborhoods';
 import { useAllProperties } from '@/lib/inventory';
 import { usePageMeta } from '@/lib/seo';
@@ -49,11 +49,13 @@ export default function AreaGuide() {
             '@type': 'Place',
             name: guide.name,
             description: guide.summary,
-            url: `https://gadda00.github.io/keja-ai/areas/${guide.slug}`,
+            url: siteUrl(`/areas/${guide.slug}`),
             address: {
               '@type': 'PostalAddress',
+              // derived from live inventory so a second guide outside Nairobi
+              // would not be mislabelled
               addressLocality: guide.area,
-              addressRegion: 'Nairobi',
+              addressRegion: MARKET.find((p) => p.area === guide.area)?.county ?? 'Nairobi',
               addressCountry: 'KE',
             },
             sameAs: guide.sources.map((s) => s.url),

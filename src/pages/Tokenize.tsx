@@ -43,9 +43,9 @@ const VALID_VIEWS: TokenizeView[] = ['marketplace', 'market', 'portfolio', 'issu
 function TabBar() {
   const { view, setView } = useTokenize();
   return (
-    <div className="sticky top-16 z-30 border-b border-gold-100 bg-white/95 backdrop-blur-md">
+    <div className="sticky top-16 sticky-banner-shift z-30 border-b border-gold-100 bg-white/95 backdrop-blur-md">
       <div className="container-luxe no-scrollbar flex items-center gap-1 overflow-x-auto py-2.5">
-        <span className="mr-2 hidden items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide2 text-gold-600 sm:flex">
+        <span className="mr-2 hidden items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide2 text-gold-700 sm:flex">
           <Coins className="h-4 w-4" /> Keja Tokenize
         </span>
         {VIEW_TABS.map((t) => (

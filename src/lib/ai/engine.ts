@@ -620,7 +620,7 @@ export class KejaAI {
         },
         {
           label: 'REPORTED',
-          text: 'Transaction and expansion figures as reported by Business Daily Africa and Construction Kenya (July\u2013August 2026).',
+          text: 'Transaction and expansion figures as reported by Business Daily Africa and Construction Kenya (see the linked sources on the guide page).',
         },
         {
           label: 'ESTIMATE',

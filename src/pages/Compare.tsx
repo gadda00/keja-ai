@@ -54,9 +54,13 @@ export default function Compare() {
   };
 
   const removeOne = (id: string) => {
-    const next = compare.filter((c) => c !== id);
+    // Remove from the effective source of truth: when arriving via a shared
+    // ?ids= link the store is empty, so filtering only the store wiped the
+    // whole comparison. Filter the effective ids, then sync both sinks.
+    const current = params.get('ids') ? ids : compare;
+    const next = current.filter((c) => c !== id);
     setCompare(next);
-    if (params.get('ids')) setParams(next.length ? { ids: next.join(',') } : {}, { replace: true });
+    setParams(next.length ? { ids: next.join(',') } : {}, { replace: true });
   };
 
   const rows: { label: string; render: (p: (typeof items)[number]) => ReactNode }[] = [
@@ -64,7 +68,9 @@ export default function Compare() {
       label: 'Price',
       render: (p) => (
         <b className="font-display text-lg text-ink">
-          {formatKES(p.price, { monthly: isRentalPrice(p.price) })}
+          {p.priceOnApplication
+            ? 'Price on application'
+            : formatKES(p.price, { monthly: isRentalPrice(p.price) })}
         </b>
       ),
     },
@@ -163,6 +169,8 @@ export default function Compare() {
     {
       label: 'Mortgage (20% deposit, 15yr)',
       render: (p) => {
+        if (p.priceOnApplication)
+          return <span className="text-ink-muted">Priced on application</span>;
         if (isRentalPrice(p.price)) return <span className="text-ink-muted">Rental listing</span>;
         const m = calculateMortgage({
           propertyPrice: p.price,

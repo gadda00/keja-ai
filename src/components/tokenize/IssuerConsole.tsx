@@ -97,7 +97,11 @@ export function IssuerConsole() {
     num(f.totalValueUsd) >= 100_000 &&
       num(f.tokenPriceUsd) >= 1 &&
       totalTokens >= 1000 &&
-      num(f.minTokens) >= 1,
+      num(f.minTokens) >= 1 &&
+      // an offering whose minimum order exceeds its own token count is
+      // unfulfillable by construction (e.g. $100k at $1,000/token = 100 tokens
+      // with minTokens 500)
+      num(f.minTokens) <= totalTokens,
     num(f.annualNetIncomeUsd) > 0 && yieldPct <= 25 && yieldPct > 0,
     f.valuationReport && f.titleSearch && f.kycGating && f.cmaAck,
     true,

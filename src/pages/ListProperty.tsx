@@ -537,6 +537,10 @@ export default function ListProperty() {
                 </button>
               ))}
             </div>
+            <p className="mt-2 text-xs leading-relaxed text-ink-faint">
+              Demo build: photo upload isn’t wired yet — a published submission carries a neutral
+              stock placeholder image (listed as photo-unverified) until the storage backend ships.
+            </p>
           </div>
         </>
       )}

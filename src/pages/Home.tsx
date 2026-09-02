@@ -213,8 +213,8 @@ export default function Home() {
       <section className="border-b border-gold-100 bg-white">
         <div className="container-luxe grid grid-cols-2 gap-6 py-10 sm:grid-cols-4">
           {[
-            { icon: Building2, value: `${verifiedCount}`, label: 'Verified listings' },
-            { icon: BadgeCheck, value: `${verifiedCount}`, label: 'Trust-scored properties' },
+            { icon: BadgeCheck, value: `${verifiedCount}`, label: 'Verified listings' },
+            { icon: Building2, value: `${MARKET.length}`, label: 'Listings on market' },
             { icon: AlertTriangle, value: `${flaggedCount}`, label: 'Fraud flags caught' },
             { icon: ShieldCheck, value: `${avgTrust}/100`, label: 'Avg. trust score' },
           ].map((s) => (
@@ -747,7 +747,7 @@ export default function Home() {
           </span>
           <div className="flex-1">
             <h3 className="font-display text-2xl font-bold text-ink">
-              This week, our trust layer caught a listing priced 34% below market
+              Recently, our trust layer caught a listing priced 34% below market
             </h3>
             <p className="mt-2 max-w-3xl text-sm leading-relaxed text-ink-muted">
               Re-posted three times under different agent names, with photos lifted from another

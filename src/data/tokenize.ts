@@ -129,7 +129,7 @@ export const TOKENIZED_PROPERTIES: TokenizedProperty[] = [
     managementFeePct: 8,
     highlights: [
       '96% occupancy with blue-chip corporate tenants on 5–9 year leases',
-      'USD-linked rental income, quarterly distributions since 2024',
+      'USD-linked rental income, quarterly distributions since Q4 2025',
       'Independent valuation by Knight Frank Kenya (Feb 2026)',
       'Title verified on Ardhisasa land registry — zero encumbrances',
     ],
@@ -164,7 +164,7 @@ export const TOKENIZED_PROPERTIES: TokenizedProperty[] = [
     title: 'Kilimani Sky Residences',
     tagline: 'Serviced apartments serving Nairobi’s expat & corporate demand',
     description:
-      'An 86-unit serviced apartment block in Kilimani, Nairobi’s highest-yield residential sub-market. Units are managed under a single operator agreement with corporate housing demand from NGOs, embassies and tech firms, delivering consistently high occupancy. The asset produced an 8.1% net yield over the trailing 12 months, with distributions paid monthly to token holders.',
+      'An 86-unit serviced apartment block in Kilimani, Nairobi’s highest-yield residential sub-market. Units are managed under a single operator agreement with corporate housing demand from NGOs, embassies and tech firms, delivering consistently high occupancy. The asset produced an 8.0% net yield over the trailing 12 months, with distributions paid monthly to token holders.',
     location: 'Wood Avenue, Kilimani',
     city: 'Nairobi',
     country: 'Kenya',
@@ -239,7 +239,7 @@ export const TOKENIZED_PROPERTIES: TokenizedProperty[] = [
     highlights: [
       'Supermarket anchor on 12-year lease — 41% of rental income',
       'First investor distribution projected for Q1 2027',
-      'Target allocation: 62% funded as of today',
+      'Target allocation: 62% funded at listing',
       'Independent valuation by Broll Kenya (Jun 2026)',
     ],
     distributions: [],

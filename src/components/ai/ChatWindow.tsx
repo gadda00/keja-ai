@@ -65,7 +65,10 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
       text: clean,
       ts: new Date().toISOString(),
     };
-    setMessages((prev: ChatMessage[]) => [...prev, userMsg]);
+    // Chat history is capped (like notifications at 50 and audit at 500) so
+    // months of conversation can never exhaust the localStorage quota — a
+    // failed silent write would otherwise drop every later message.
+    setMessages((prev: ChatMessage[]) => [...prev, userMsg].slice(-200));
     setInput('');
 
     // navigation shortcuts from quick replies
@@ -94,7 +97,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
           text: 'Opening the **sign-in panel** for you now. Pick *Continue with Google* or use a demo account. 🔐',
           ts: new Date().toISOString(),
         };
-        setMessages((prev: ChatMessage[]) => [...prev, userMsg, kejaMsg]);
+        setMessages((prev: ChatMessage[]) => [...prev, userMsg, kejaMsg].slice(-200));
         setTimeout(() => setAuthModalOpen(true), 500);
         return;
       }
@@ -104,7 +107,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
         text: shortcut.msg,
         ts: new Date().toISOString(),
       };
-      setMessages((prev: ChatMessage[]) => [...prev, userMsg, kejaMsg]);
+      setMessages((prev: ChatMessage[]) => [...prev, userMsg, kejaMsg].slice(-200));
       setTimeout(() => void navigate(shortcut.to), 600);
       return;
     }
@@ -123,7 +126,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
         quickReplies: response.quickReplies,
         propertyIds: response.propertyIds,
       };
-      setMessages((prev: ChatMessage[]) => [...prev, kejaMsg]);
+      setMessages((prev: ChatMessage[]) => [...prev, kejaMsg].slice(-200));
       setTyping(false);
       // Completed qualification → write the lead so the sales CRM (Admin →
       // Leads, agent Dashboard) actually receives what the bot promised.
@@ -155,7 +158,7 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
         );
       } else if (response.action === 'open-calculator') {
         setTimeout(() => {
-          void navigate('/calculator');
+          void navigate('/invest');
         }, 700);
       }
     }, delay);
