@@ -212,7 +212,7 @@ export const WATERFRONT_KAREN: NeighborhoodGuide = {
   video: {
     id: 'zDlefHy09pg',
     title: 'The Waterfront, Karen — Things To Do, Prices & Location',
-    channel: 'Nairobi guide (YouTube)',
+    channel: 'Kyls Journal (YouTube)',
   },
   sources: [
     { label: 'The Waterfront Karen (official)', url: 'https://thewaterfrontkaren.com' },

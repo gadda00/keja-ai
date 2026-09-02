@@ -10,9 +10,18 @@ import { asset, SITE, SITE_URL } from '@/config';
  *  relative paths make scrapers drop the share card entirely. */
 const DEFAULT_OG_IMAGE = `${SITE_URL}${asset('og-image.jpg')}`;
 
-/** Absolute URL for an image path (handles '' and '/x' inputs; http passthrough). */
+const basePath = import.meta.env.BASE_URL;
+/** Strips an already-prefixed deployment base (or the leading slash) so URL
+ *  builders prefix exactly once — never …/keja-ai/keja-ai/… (a 404). */
+const assetStripBase = (p: string) =>
+  basePath !== '/' && p.startsWith(basePath) ? p.slice(basePath.length) : p.replace(/^\//, '');
+
+/** Absolute URL for an image path (handles '' and '/x' inputs; http passthrough).
+ *  Data sources store BOTH raw paths ('/og-image.jpg', guide heroes) and
+ *  asset()-prefixed paths (property images) — assetStripBase normalizes so the
+ *  deployment base is added exactly once. */
 const absoluteImage = (path: string) =>
-  path.startsWith('http') ? path : `${SITE_URL}${asset(path.replace(/^\//, ''))}`;
+  path.startsWith('http') ? path : `${SITE_URL}${assetStripBase(path)}`;
 
 function upsertMeta(attr: 'name' | 'property', key: string, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
@@ -112,9 +121,6 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
   // Defensive: also strip the deployment base if a caller (historically)
   // passed an already-prefixed path, so item URLs never double the base
   // (…/keja-ai/keja-ai/properties/… is a 404 inside structured data).
-  const basePath = import.meta.env.BASE_URL;
-  const stripBase = (p: string) =>
-    basePath !== '/' && p.startsWith(basePath) ? p.slice(basePath.length) : p.replace(/^\//, '');
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -122,7 +128,7 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
       '@type': 'ListItem',
       position: i + 1,
       name: it.name,
-      item: `${SITE_URL}${basePath}${stripBase(it.path)}`,
+      item: `${SITE_URL}${basePath}${assetStripBase(it.path)}`,
     })),
   };
 }
@@ -152,9 +158,7 @@ export function realEstateListingJsonLd(p: {
     url: `${SITE_URL}${import.meta.env.BASE_URL}properties/${p.id}`,
     datePosted: p.listedAt,
     image: p.images.map((img) =>
-      img.startsWith('http')
-        ? img
-        : `${SITE_URL}${import.meta.env.BASE_URL}${img.replace(/^\//, '')}`
+      img.startsWith('http') ? img : `${SITE_URL}${basePath}${assetStripBase(img)}`
     ),
     offers: {
       '@type': 'Offer',

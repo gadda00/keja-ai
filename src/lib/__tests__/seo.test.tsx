@@ -109,6 +109,20 @@ describe('realEstateListingJsonLd — price-on-application and floor size', () =
     ld.image.forEach((img) => expect(img).toMatch(/^https?:\/\//));
   });
 
+  it('normalizes asset()-prefixed image paths so the base is added exactly once (no …/keja-ai/keja-ai/… 404s in structured data)', () => {
+    const ld = realEstateListingJsonLd({
+      ...base,
+      price: 67_000_000,
+      // property data stores asset()-prefixed paths (IMG('x') in properties.ts)
+      images: ['/keja-ai/images/props/apartment_1.jpg', '/images/props/villa_0.jpg'],
+      sizeSqm: 460,
+    }) as { image: string[] };
+    ld.image.forEach((img) => {
+      expect(img).toMatch(new RegExp(`^${SITE_URL}`));
+      expect(img.includes('/keja-ai/keja-ai/')).toBe(false);
+    });
+  });
+
   it('keeps price and floorSize for normally priced listings', () => {
     const ld = realEstateListingJsonLd({ ...base, price: 67_000_000, sizeSqm: 460 }) as Record<
       string,

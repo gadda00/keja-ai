@@ -14,7 +14,7 @@
 | Dimension    | Status                                                                                                                                                                    |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Typecheck    | strict `tsc -b` — 0 errors                                                                                                                                                |
-| Tests        | 123 passing (16 files: finance, search, scoring, autopilot, escalation, claims, verification, analytics, anomaly, stores, markdown renderer, role gate, SEO URL contract) |
+| Tests        | 124 passing (16 files: finance, search, scoring, autopilot, escalation, claims, verification, analytics, anomaly, stores, markdown renderer, role gate, SEO URL contract) |
 | Lint         | oxlint + ESLint (flat config, `--max-warnings 0`) + Prettier — all clean                                                                                                  |
 | Build        | Vite 8 production build, route-level code splitting, recharts isolated to a lazy chunk                                                                                    |
 | Static-first | every sitemap route prerendered to status-200 HTML incl. a real 404 page                                                                                                  |
