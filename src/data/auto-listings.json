@@ -1,7 +1,40 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-02T14:24:19.620Z",
+  "generatedAt": "2026-09-02T19:21:57.175Z",
   "runs": [
+    {
+      "id": "run-2026-09-02-17153",
+      "startedAt": "2026-09-02T19:21:57.175Z",
+      "ingested": 4,
+      "published": 4,
+      "queued": 0,
+      "rejected": 0,
+      "deduped": 9,
+      "sources": {
+        "scanner": 4,
+        "feeds": 0
+      },
+      "feedStatus": [
+        {
+          "feed": "diaspora-property.xml",
+          "format": "XML",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "horizon-realtors.csv",
+          "format": "CSV",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "skyline-agents.json",
+          "format": "JSON",
+          "items": 3,
+          "state": "ok"
+        }
+      ]
+    },
     {
       "id": "run-2026-09-02-59121",
       "startedAt": "2026-09-02T14:24:19.620Z",
@@ -566,6 +599,80 @@
   ],
   "listings": [
     {
+      "id": "KJA-A0082",
+      "title": "Bright 1-Bedroom City Apartment in Athi River",
+      "type": "apartment",
+      "purpose": ["rent"],
+      "area": "Athi River",
+      "county": "Machakos",
+      "price": 25000,
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "sizeSqm": 57,
+      "amenities": [
+        "Balcony",
+        "Fibre internet ready",
+        "Rooftop terrace",
+        "Secure parking",
+        "Borehole water"
+      ],
+      "images": [
+        "/images/props/interior_0.jpg",
+        "/images/props/apartment_2.jpg",
+        "/images/props/bedroom_0.jpg"
+      ],
+      "description": "Rarely available: a apartment in Athi River combining space (57 sqm), light and a convenient address. Interiors are clean and neutral, ready for immediate occupation or a light personal refresh. Viewings are recommended — honest stock in Athi River at this price point rarely lingers.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Esther Kimani",
+        "phone": "+254 705 118 663"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-02T08:55:00.000Z",
+      "appreciationForecast": 7.5,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "Athi River location with steady tenant demand",
+        "Close to EPZ industrial zone",
+        "Popular with young professional tenants"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-02T08:55:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "n/a",
+        "areaYieldBand": 7.2,
+        "areaPpsmBand": [25000, 45000],
+        "areaAcreBand": [2, 6],
+        "qualityScore": 92,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "Price sits inside the area market band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "45-word description · 3 photos · 5 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
       "id": "KJA-A0078",
       "title": "Modern Land Parcel in Karen",
       "type": "land",
@@ -624,6 +731,78 @@
             "label": "Content quality screen",
             "status": "warn",
             "detail": "38-word description · 1 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0080",
+      "title": "Bright 5-Bedroom Villa in Lavington",
+      "type": "villa",
+      "purpose": ["buy", "invest"],
+      "area": "Lavington",
+      "county": "Nairobi",
+      "price": 36500000,
+      "rentEstimate": 225000,
+      "grossYieldEstimate": 7.4,
+      "bedrooms": 5,
+      "bathrooms": 3,
+      "sizeSqm": 405,
+      "amenities": [
+        "Borehole + storage tanks",
+        "Swimming pool",
+        "Staff quarters",
+        "EV charger ready"
+      ],
+      "images": ["/images/props/interior_0.jpg", "/images/props/townhouse_1.jpg"],
+      "description": "Set in the heart of Lavington, this villa delivers 405 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. The Lavington market band and 7.4% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Kevin Ochieng",
+        "phone": "+254 745 902 210"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-02T07:53:00.000Z",
+      "appreciationForecast": 6.3,
+      "offPlan": true,
+      "furnished": false,
+      "highlights": [
+        "KES 90k/sqm — below the Lavington band",
+        "Close to Riara Road",
+        "Est. gross yield ~7.4% p.a. (area band 7.4%)",
+        "Off-plan with staged payment plan"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-02T07:53:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 7.4,
+        "areaPpsmBand": [90000, 135000],
+        "areaAcreBand": [80, 160],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 90k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "48-word description · 2 photos · 4 amenities"
           },
           {
             "label": "Source screening",
@@ -694,6 +873,74 @@
             "label": "Content quality screen",
             "status": "pass",
             "detail": "56-word description · 3 photos · 5 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0079",
+      "title": "Elegant Land Parcel in Runda",
+      "type": "land",
+      "purpose": ["buy"],
+      "area": "Runda",
+      "county": "Nairobi",
+      "price": 60250000,
+      "sizeSqm": 9141,
+      "amenities": [
+        "Water on site",
+        "Electricity on site",
+        "Clean freehold title",
+        "Beaconed boundaries"
+      ],
+      "images": ["/images/props/land_0.jpg"],
+      "description": "This 9141 sqm land parcel in Runda has been finished to a practical standard and priced with discipline. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Runda at this price point rarely lingers.",
+      "agency": "Prestige Homes KE",
+      "agent": {
+        "name": "Brian Mutua",
+        "phone": "+254 738 220 776"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-02T07:39:00.000Z",
+      "appreciationForecast": 6,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 7k/sqm — below the Runda band",
+        "Close to Gigiri UN complex",
+        "Popular with expatriate family tenants",
+        "2.26 acres with beaconed boundaries"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-02T07:39:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 6,
+        "areaPpsmBand": [60000, 95000],
+        "areaAcreBand": [15, 40],
+        "qualityScore": 86,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 26.7M/acre within the area band (15–40M)"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "43-word description · 1 photos · 4 amenities"
           },
           {
             "label": "Source screening",
@@ -1393,6 +1640,73 @@
             "label": "Content quality screen",
             "status": "warn",
             "detail": "43-word description · 1 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0081",
+      "title": "Charming 4-Bedroom Family Villa in Riverside",
+      "type": "villa",
+      "purpose": ["buy"],
+      "area": "Riverside",
+      "county": "Nairobi",
+      "price": 44750000,
+      "rentEstimate": 269000,
+      "grossYieldEstimate": 7.2,
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "sizeSqm": 389,
+      "amenities": ["Borehole + storage tanks", "Swimming pool", "Half-acre garden", "Guest wing"],
+      "images": ["/images/props/villa_1.jpg", "/images/props/townhouse_1.jpg"],
+      "description": "Set in the heart of Riverside, this villa delivers 389 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. Benchmarked against comparable stock in Riverside, this listing offers defensible entry pricing for an income-focused buyer.",
+      "agency": "Nairobi Prime Properties",
+      "agent": {
+        "name": "Grace Wairimu",
+        "phone": "+254 736 481 902"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-02T01:33:00.000Z",
+      "appreciationForecast": 6.7,
+      "offPlan": true,
+      "furnished": false,
+      "highlights": [
+        "KES 115k/sqm — within the Riverside band",
+        "Close to Riverside Drive offices",
+        "Est. gross yield ~7.2% p.a. (area band 7.2%)",
+        "Off-plan with staged payment plan"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-02T01:33:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 7.2,
+        "areaPpsmBand": [95000, 140000],
+        "areaAcreBand": [85, 170],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 115k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "48-word description · 2 photos · 4 amenities"
           },
           {
             "label": "Source screening",
@@ -4442,284 +4756,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "KJA-A0029",
-      "title": "Sunny 4-Bedroom Residence in Westlands",
-      "type": "apartment",
-      "purpose": ["buy"],
-      "area": "Westlands",
-      "county": "Nairobi",
-      "price": 20500000,
-      "rentEstimate": 130000,
-      "grossYieldEstimate": 7.6,
-      "bedrooms": 4,
-      "bathrooms": 2,
-      "sizeSqm": 154,
-      "amenities": [
-        "CCTV surveillance",
-        "Lift access",
-        "Rooftop terrace",
-        "24/7 security",
-        "Fibre internet ready"
-      ],
-      "images": [
-        "/images/props/bedroom_0.jpg",
-        "/images/props/apartment_0.jpg",
-        "/images/props/interior_0.jpg"
-      ],
-      "description": "A well-presented apartment in Westlands, Nairobi, offering 154 sqm of bright, efficiently planned space. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Westlands, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Coastal Living Estates",
-      "agent": {
-        "name": "Halima Yusuf",
-        "phone": "+254 718 337 540"
-      },
-      "availability": "available",
-      "listedAt": "2026-08-30T06:28:00.000Z",
-      "appreciationForecast": 7.4,
-      "offPlan": false,
-      "furnished": true,
-      "highlights": [
-        "KES 133k/sqm — within the Westlands band",
-        "Close to Westgate Mall",
-        "Est. gross yield ~7.6% p.a. (area band 7.6%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-08-30T06:28:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 7.6,
-        "areaPpsmBand": [100000, 150000],
-        "areaAcreBand": [90, 180],
-        "qualityScore": 92,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 133k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "47-word description · 3 photos · 5 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0036",
-      "title": "Charming 2-Bedroom Garden Bungalow in Athi River",
-      "type": "bungalow",
-      "purpose": ["buy"],
-      "area": "Athi River",
-      "county": "Machakos",
-      "price": 2400000,
-      "rentEstimate": 15000,
-      "grossYieldEstimate": 7.5,
-      "bedrooms": 2,
-      "bathrooms": 2,
-      "sizeSqm": 72,
-      "amenities": ["Car porch", "Mature garden", "Water storage tanks"],
-      "images": ["/images/props/townhouse_0.jpg", "/images/props/interior_1.jpg"],
-      "description": "Rarely available: a bungalow in Athi River combining space (72 sqm), light and a convenient address. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. Benchmarked against comparable stock in Athi River, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Coastal Living Estates",
-      "agent": {
-        "name": "Halima Yusuf",
-        "phone": "+254 718 337 540"
-      },
-      "availability": "available",
-      "listedAt": "2026-08-30T06:27:00.000Z",
-      "appreciationForecast": 5.9,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 33k/sqm — within the Athi River band",
-        "Close to Mombasa Road corridor",
-        "Est. gross yield ~7.5% p.a. (area band 7.2%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-08-30T06:27:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 7.2,
-        "areaPpsmBand": [25000, 45000],
-        "areaAcreBand": [2, 6],
-        "qualityScore": 87,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 33k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "47-word description · 2 photos · 3 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0021",
-      "title": "Charming Land Parcel in Nyali",
-      "type": "land",
-      "purpose": ["buy"],
-      "area": "Nyali",
-      "county": "Mombasa",
-      "price": 9900000,
-      "sizeSqm": 3846,
-      "amenities": [
-        "Water on site",
-        "Ready title deed",
-        "Beaconed boundaries",
-        "Graded access road"
-      ],
-      "images": ["/images/props/land_0.jpg"],
-      "description": "Rarely available: a land parcel in Nyali combining space (3846 sqm), light and a convenient address. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Nyali at this price point rarely lingers.",
-      "agency": "Prestige Homes KE",
-      "agent": {
-        "name": "Alice Mumbi",
-        "phone": "+254 726 900 451"
-      },
-      "availability": "available",
-      "listedAt": "2026-08-30T06:19:00.000Z",
-      "appreciationForecast": 5.5,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 3k/sqm — below the Nyali band",
-        "Close to Nyali Centre",
-        "Popular with young professional tenants",
-        "0.95 acres with beaconed boundaries"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-08-30T06:19:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 6.8,
-        "areaPpsmBand": [60000, 100000],
-        "areaAcreBand": [8, 25],
-        "qualityScore": 86,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 10.4M/acre within the area band (8–25M)"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "41-word description · 1 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0034",
-      "title": "Modern Land Parcel in Kilimani",
-      "type": "land",
-      "purpose": ["buy"],
-      "area": "Kilimani",
-      "county": "Nairobi",
-      "price": 1108250000,
-      "sizeSqm": 40178,
-      "amenities": [
-        "Electricity on site",
-        "Near tarmac road",
-        "Graded access road",
-        "Ready title deed"
-      ],
-      "images": ["/images/props/land_0.jpg"],
-      "description": "A well-presented land parcel in Kilimani, Nairobi, offering 40178 sqm of bright, efficiently planned space. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Kilimani at this price point rarely lingers.",
-      "agency": "Diaspora Property Group",
-      "agent": {
-        "name": "Kevin Ochieng",
-        "phone": "+254 745 902 210"
-      },
-      "availability": "available",
-      "listedAt": "2026-08-30T05:56:00.000Z",
-      "appreciationForecast": 7.1,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 28k/sqm — below the Kilimani band",
-        "Close to Kilimani Primary",
-        "Popular with growing family tenants",
-        "9.93 acres with beaconed boundaries"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-08-30T05:56:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 8.2,
-        "areaPpsmBand": [95000, 145000],
-        "areaAcreBand": [80, 160],
-        "qualityScore": 86,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 111.6M/acre within the area band (80–160M)"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "40-word description · 1 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
     }
   ],
   "pending": [],
@@ -4777,7 +4813,11 @@
     "apartment|Kileleshwa|3br|11",
     "townhouse|Nanyuki|5br|8",
     "apartment|Riverside|1br|6",
-    "land|Karen|0br|63"
+    "land|Karen|0br|63",
+    "land|Runda|0br|60",
+    "villa|Lavington|5br|37",
+    "villa|Riverside|4br|45",
+    "apartment|Athi River|1br|5"
   ],
   "rejected": []
 }
