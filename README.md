@@ -25,7 +25,7 @@ Application pack for the **Keja.ai Tokenization Pilot** (applicant: Chacadom Inv
 | **Content**              | Six long-form market guides (`/insights`), Trust Center methodology, ecosystem map (8 products)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | **Neighbourhood guides** | The Waterfront Karen flagship location — `/areas/waterfront-karen`: photo/video guide, FACT/REPORTED/ESTIMATE-labelled investment thesis, live Karen inventory join, homepage spotlight, Waterfront badge on Karen listing cards, AI-engine intent ("tell me about the waterfront")                                                                                                                                                                                                                                                                                                                                                            |
 | **Truth layer**          | **Claims register** (`/trust#claims`): every public capability declared with live/simulated/partner-dependent/planned status, evidence and path-to-live · **Evidence panels** on listings: scope, method, check date, 90-day expiry, freshness states, report-an-issue + human-review paths · **Admin adjudication queue** for user reports · **Persistent demo banner** on sensitive routes · **AI escalation guard** (legal/tax/valuation/lending/suitability questions route to humans, never improvised) · privacy-first local analytics bus (11-event taxonomy, no third parties) · first-visit role picker (buy/rent/invest/list/manage) |
-| **Platform**             | PWA (installable, offline shell), per-route SEO meta + JSON-LD (RealEstateListing/Article/FAQPage/BreadcrumbList) + auto-generated sitemap, **prerendered status-200 HTML for every sitemap route (82 pages + a real 404 page)** (crawlers + social unfurls), reduced-motion support, WCAG-AA focus management, error boundary + real 404, 108 unit tests + CI gates (typecheck, ESLint flat config + oxlint, Prettier, vitest) — enforced on PRs AND deploys                                                                                                                                                                                  |
+| **Platform**             | PWA (installable, offline shell), per-route SEO meta + JSON-LD (RealEstateListing/Article/FAQPage/BreadcrumbList) + auto-generated sitemap, **prerendered status-200 HTML for every sitemap route (109 pages + a real 404 page)** (crawlers + social unfurls with absolute og:image URLs), reduced-motion support, WCAG-AA focus management, error boundary + real 404, 124 unit tests + CI gates (typecheck, ESLint flat config + oxlint, Prettier, vitest) — enforced on PRs AND deploys                                                                                                                                                     |
 
 ## Stack
 
@@ -51,7 +51,7 @@ node scripts/generate-data-dictionary.mjs  # regenerate docs/DATA_DICTIONARY.md 
 ## Architecture notes
 
 - `src/lib/` — engines: `finance.ts` (investment/mortgage/affordability math), `investmentScore.ts`, `ai/engine.ts` (intent parser + professional-advice escalation), `auth.tsx`, `adminStore.ts` (verification queue + listing-report adjudication), `tokenizeStore.tsx` (holdings/FIFO ledger), `searchStore.ts` (saved searches/notifications), `inventory.ts` (merged marketplace), `seo.ts` (per-route meta), `useFocusTrap.ts`, `verification.ts` (evidence model: scope/dates/expiry/freshness), `analytics.ts` (local-only event bus + taxonomy), `roleStore.ts` (first-visit role picker)
-- `src/data/` — properties (20 listings + area insights), tokenize assets, long-form articles, **claims.ts (the capability claims register — the site cannot claim what is not declared there)**
+- `src/data/` — properties (27 seed listings + area insights), tokenize assets, long-form articles, **claims.ts (the capability claims register — the site cannot claim what is not declared there)**
 - `docs/` — `REVIEW_ACTIONS.md` (external-review recommendation tracker), `DATA_DICTIONARY.md` (generated)
 - `src/components/tokenize/` — the tokenization module (marketplace, trade, portfolio, issuer, learn)
 - `public/sw.js` — versioned service worker (cache-first assets, network-first pages, offline fallback)
@@ -105,7 +105,7 @@ All data is client-side demo data — no production backend, no real securities.
 
 ## Deployment
 
-`git push origin main` → GitHub Actions builds with `--base=/keja-ai/`, copies `index.html → 404.html` (SPA fallback), deploys to GitHub Pages.
+`git push origin main` → GitHub Actions builds with `--base=/keja-ai/`, prerenders every sitemap route to status-200 HTML (including a real, noindex `404.html` captured from the router's NotFound page — no SPA-fallback copy of Home), deploys to GitHub Pages.
 
 ## Roadmap
 
