@@ -3,6 +3,13 @@
 Kenya's AI real-estate advisor and cross-agency trust layer — a product of **Chacadom Investments**.
 Live at **https://gadda00.github.io/keja-ai/**
 
+## Regulatory readiness — CMA Regulatory Sandbox
+
+Application pack for the **Keja.ai Tokenization Pilot** (applicant: Chacadom Investments), prepared per the CMA sandbox requirements (sandbox.cma.or.ke):
+
+- **[Testing Plan (PDF)](docs/cma/Chacadom_CMA_Sandbox_Testing_Plan.pdf)** — a twelve-month, four-phase live test: hard participation and exposure caps, suitability screening before subscription, segregated client money, phase gates reported to the Authority, and a rehearsed exit (full licence / letter of no objection / wind-down).
+- **[Safeguards & Risk-Management Plan (PDF)](docs/cma/Chacadom_CMA_Sandbox_Safeguards_Risk_Management_Plan.pdf)** — three-lines governance, a twelve-risk register with named owners, KYC/AML controls, Kenya Data Protection Act compliance, incident classes with CMA notification times, and a wind-down that ranks investors' capital ahead of the applicant's recovery.
+
 ## What's inside
 
 | Area                     | Highlights                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
