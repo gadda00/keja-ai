@@ -1,7 +1,40 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-03T08:53:20.631Z",
+  "generatedAt": "2026-09-03T14:28:03.628Z",
   "runs": [
+    {
+      "id": "run-2026-09-03-83354",
+      "startedAt": "2026-09-03T14:28:03.628Z",
+      "ingested": 4,
+      "published": 4,
+      "queued": 0,
+      "rejected": 0,
+      "deduped": 9,
+      "sources": {
+        "scanner": 4,
+        "feeds": 0
+      },
+      "feedStatus": [
+        {
+          "feed": "diaspora-property.xml",
+          "format": "XML",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "horizon-realtors.csv",
+          "format": "CSV",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "skyline-agents.json",
+          "format": "JSON",
+          "items": 3,
+          "state": "ok"
+        }
+      ]
+    },
     {
       "id": "run-2026-09-03-00606",
       "startedAt": "2026-09-03T08:53:20.631Z",
@@ -665,6 +698,77 @@
   ],
   "listings": [
     {
+      "id": "KJA-A0093",
+      "title": "Elegant 1-Bedroom City Apartment in Kilimani",
+      "type": "apartment",
+      "purpose": ["buy", "invest"],
+      "area": "Kilimani",
+      "county": "Nairobi",
+      "price": 6800000,
+      "rentEstimate": 46000,
+      "grossYieldEstimate": 8.1,
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "sizeSqm": 62,
+      "amenities": ["Lift access", "Borehole water", "24/7 security", "Fibre internet ready"],
+      "images": [
+        "/images/props/apartment_0.jpg",
+        "/images/props/interior_1.jpg",
+        "/images/props/apartment_2.jpg"
+      ],
+      "description": "A well-presented apartment in Kilimani, Nairobi, offering 62 sqm of bright, efficiently planned space. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Kilimani, this listing offers defensible entry pricing for an income-focused buyer.",
+      "agency": "Nairobi Prime Properties",
+      "agent": {
+        "name": "Grace Wairimu",
+        "phone": "+254 736 481 902"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-03T09:30:00.000Z",
+      "appreciationForecast": 6.1,
+      "offPlan": true,
+      "furnished": true,
+      "highlights": [
+        "KES 110k/sqm — within the Kilimani band",
+        "Close to Yaya Centre",
+        "Est. gross yield ~8.1% p.a. (area band 8.2%)",
+        "Off-plan with staged payment plan"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-03T09:30:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 8.2,
+        "areaPpsmBand": [95000, 145000],
+        "areaAcreBand": [80, 160],
+        "qualityScore": 92,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 110k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "47-word description · 3 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
       "id": "KJA-A0088",
       "title": "Charming 3-Bedroom Bungalow in Kitengela",
       "type": "bungalow",
@@ -865,6 +969,74 @@
       }
     },
     {
+      "id": "KJA-A0091",
+      "title": "Elegant Building Plot in Athi River",
+      "type": "land",
+      "purpose": ["buy", "invest"],
+      "area": "Athi River",
+      "county": "Machakos",
+      "price": 23400000,
+      "sizeSqm": 28974,
+      "amenities": [
+        "Electricity on site",
+        "Graded access road",
+        "Water on site",
+        "Clean freehold title"
+      ],
+      "images": ["/images/props/land_0.jpg"],
+      "description": "Rarely available: a land parcel in Athi River combining space (28974 sqm), light and a convenient address. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Athi River at this price point rarely lingers.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Kevin Ochieng",
+        "phone": "+254 745 902 210"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-03T06:33:00.000Z",
+      "appreciationForecast": 6,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 808/sqm — below the Athi River band",
+        "Close to Daystar University",
+        "Popular with corporate tenant tenants",
+        "7.16 acres with beaconed boundaries"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-03T06:33:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 7.2,
+        "areaPpsmBand": [25000, 45000],
+        "areaAcreBand": [2, 6],
+        "qualityScore": 86,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 3.3M/acre within the area band (2–6M)"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "43-word description · 1 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
       "id": "KJA-A0087",
       "title": "Refined 3-Bedroom Townhouse in Syokimau",
       "type": "townhouse",
@@ -987,6 +1159,151 @@
             "label": "Content quality screen",
             "status": "warn",
             "detail": "48-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0094",
+      "title": "Sunny 1-Bedroom Residence in Ruaka",
+      "type": "apartment",
+      "purpose": ["buy"],
+      "area": "Ruaka",
+      "county": "Nairobi",
+      "price": 3650000,
+      "rentEstimate": 24000,
+      "grossYieldEstimate": 7.9,
+      "bedrooms": 1,
+      "bathrooms": 2,
+      "sizeSqm": 41,
+      "amenities": [
+        "Fibre internet ready",
+        "Secure parking",
+        "Gym",
+        "Backup generator",
+        "Lift access"
+      ],
+      "images": [
+        "/images/props/apartment_1.jpg",
+        "/images/props/apartment_0.jpg",
+        "/images/props/bedroom_0.jpg"
+      ],
+      "description": "This 41 sqm apartment in Ruaka has been finished to a practical standard and priced with discipline. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. The Ruaka market band and 8% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Prestige Homes KE",
+      "agent": {
+        "name": "Alice Mumbi",
+        "phone": "+254 726 900 451"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-03T04:17:00.000Z",
+      "appreciationForecast": 5.2,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 89k/sqm — within the Ruaka band",
+        "Close to Two Rivers Mall",
+        "Est. gross yield ~7.9% p.a. (area band 8%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-03T04:17:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 8,
+        "areaPpsmBand": [65000, 95000],
+        "areaAcreBand": [10, 28],
+        "qualityScore": 95,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 89k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "50-word description · 3 photos · 5 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0092",
+      "title": "Bright Acreage in Riverside",
+      "type": "land",
+      "purpose": ["buy"],
+      "area": "Riverside",
+      "county": "Nairobi",
+      "price": 406650000,
+      "sizeSqm": 12738,
+      "amenities": [
+        "Clean freehold title",
+        "Graded access road",
+        "Beaconed boundaries",
+        "Near tarmac road"
+      ],
+      "images": ["/images/props/land_1.jpg"],
+      "description": "Set in the heart of Riverside, this land parcel delivers 12738 sqm of comfortable living with genuine character. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Riverside at this price point rarely lingers.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Esther Kimani",
+        "phone": "+254 705 118 663"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-03T03:43:00.000Z",
+      "appreciationForecast": 8.5,
+      "offPlan": true,
+      "furnished": false,
+      "highlights": [
+        "KES 32k/sqm — below the Riverside band",
+        "Close to Chiromo Lane",
+        "Popular with expatriate family tenants",
+        "Off-plan with staged payment plan",
+        "3.15 acres with beaconed boundaries"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-03T03:43:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 7.2,
+        "areaPpsmBand": [95000, 140000],
+        "areaAcreBand": [85, 170],
+        "qualityScore": 86,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 129.2M/acre within the area band (85–170M)"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "43-word description · 1 photos · 4 amenities"
           },
           {
             "label": "Source screening",
@@ -4546,279 +4863,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "KJA-A0011",
-      "title": "Horizon Realtors — Syokimau 1/8 Acre Plot",
-      "type": "land",
-      "purpose": ["buy", "invest"],
-      "area": "Syokimau",
-      "county": "Machakos",
-      "price": 2200000,
-      "sizeSqm": 506,
-      "amenities": [
-        "Near tarmac road",
-        "Beaconed boundaries",
-        "Electricity on site",
-        "Water on site"
-      ],
-      "images": ["/images/props/land_1.jpg"],
-      "description": "Set in the heart of Syokimau, this land parcel delivers 506 sqm of comfortable living with genuine character. Documentation is available for inspection; the holding is clean and transfer-ready. A practical choice for anyone seeking a genuine Syokimau address without overpaying.",
-      "agency": "Horizon Realtors",
-      "agent": {
-        "name": "Faith Njeri",
-        "phone": "+254 733 255 902"
-      },
-      "availability": "available",
-      "listedAt": "2026-08-30T09:21:30.659Z",
-      "appreciationForecast": 6,
-      "offPlan": true,
-      "furnished": false,
-      "highlights": [
-        "KES 4k/sqm — below the Syokimau band",
-        "Close to Mlolongo interchange",
-        "Popular with young professional tenants",
-        "Off-plan with staged payment plan",
-        "0.13 acres with beaconed boundaries"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "feed:csv:horizon-realtors.csv",
-        "firstSeenAt": "2026-08-30T09:21:30.659Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 7.8,
-        "areaPpsmBand": [35000, 60000],
-        "areaAcreBand": [2, 15],
-        "qualityScore": 91,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 17.6M/acre within the area band (2–15M)"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "41-word description · 1 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "pass",
-            "detail": "Contracted partner feed (horizon-realtors.csv)"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0012",
-      "title": "Skyline Agents Kenya — Kilimani 3-Bed with City Views",
-      "type": "apartment",
-      "purpose": ["buy", "invest"],
-      "area": "Kilimani",
-      "county": "Nairobi",
-      "price": 13500000,
-      "rentEstimate": 92000,
-      "grossYieldEstimate": 8.2,
-      "bedrooms": 3,
-      "bathrooms": 2,
-      "sizeSqm": 138,
-      "amenities": ["Backup generator", "Secure parking", "Lift access", "Rooftop terrace"],
-      "images": [
-        "/images/props/apartment_1.jpg",
-        "/images/props/interior_1.jpg",
-        "/images/props/apartment_2.jpg"
-      ],
-      "description": "Set in the heart of Kilimani, this apartment delivers 138 sqm of comfortable living with genuine character. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. At KES 98k/sqm the pricing sits below the Kilimani band, and the area yield band of 8.2% supports a solid income case.",
-      "agency": "Skyline Agents Kenya",
-      "agent": {
-        "name": "Mercy Wanjiru",
-        "phone": "+254 712 400 118"
-      },
-      "availability": "available",
-      "listedAt": "2026-08-30T09:21:30.659Z",
-      "appreciationForecast": 4.9,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 98k/sqm — below the Kilimani band",
-        "Close to Prestige Plaza",
-        "Est. gross yield ~8.2% p.a. (area band 8.2%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "feed:json:skyline-agents.json",
-        "firstSeenAt": "2026-08-30T09:21:30.659Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 8.2,
-        "areaPpsmBand": [95000, 145000],
-        "areaAcreBand": [2, 15],
-        "qualityScore": 100,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 98k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "56-word description · 3 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "pass",
-            "detail": "Contracted partner feed (skyline-agents.json)"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0013",
-      "title": "Skyline Agents Kenya — Ruaka Family Townhouse",
-      "type": "townhouse",
-      "purpose": ["buy", "invest"],
-      "area": "Ruaka",
-      "county": "Nairobi",
-      "price": 15500000,
-      "rentEstimate": 103000,
-      "grossYieldEstimate": 8,
-      "bedrooms": 4,
-      "bathrooms": 3,
-      "sizeSqm": 190,
-      "amenities": ["Private garden", "Solar water heating", "Clubhouse access", "Borehole water"],
-      "images": ["/images/props/townhouse_1.jpg", "/images/props/interior_2.jpg"],
-      "description": "An honest, well-maintained townhouse in Ruaka — 190 sqm of sensible layout for owners and investors alike. The property sits on a mature, well-kept compound with room for family life and entertaining. Benchmarked against comparable stock in Ruaka, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Skyline Agents Kenya",
-      "agent": {
-        "name": "Peter Kariuki",
-        "phone": "+254 720 811 340"
-      },
-      "availability": "available",
-      "listedAt": "2026-08-30T09:21:30.659Z",
-      "appreciationForecast": 4.9,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 82k/sqm — within the Ruaka band",
-        "Close to Two Rivers Mall",
-        "Est. gross yield ~8% p.a. (area band 8%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "feed:json:skyline-agents.json",
-        "firstSeenAt": "2026-08-30T09:21:30.659Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 8,
-        "areaPpsmBand": [65000, 95000],
-        "areaAcreBand": [2, 15],
-        "qualityScore": 95,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 82k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "48-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "pass",
-            "detail": "Contracted partner feed (skyline-agents.json)"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0014",
-      "title": "Skyline Agents Kenya — Kitengela 0.5 Acre Commercial Plot",
-      "type": "land",
-      "purpose": ["buy", "invest"],
-      "area": "Kitengela",
-      "county": "Kajiado",
-      "price": 6500000,
-      "sizeSqm": 2023,
-      "amenities": [
-        "Clean freehold title",
-        "Electricity on site",
-        "Beaconed boundaries",
-        "Near tarmac road"
-      ],
-      "images": ["/images/props/land_0.jpg"],
-      "description": "Set in the heart of Kitengela, this land parcel delivers 2023 sqm of comfortable living with genuine character. A level, dry parcel suitable for immediate development or a medium-term hold. Convenient, well-connected and realistically priced for the current market.",
-      "agency": "Skyline Agents Kenya",
-      "agent": {
-        "name": "Mercy Wanjiru",
-        "phone": "+254 712 400 118"
-      },
-      "availability": "available",
-      "listedAt": "2026-08-30T09:21:30.659Z",
-      "appreciationForecast": 6.2,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 3k/sqm — below the Kitengela band",
-        "Close to Namanga Road",
-        "Popular with young professional tenants",
-        "0.50 acres with beaconed boundaries"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "feed:json:skyline-agents.json",
-        "firstSeenAt": "2026-08-30T09:21:30.659Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 7.6,
-        "areaPpsmBand": [30000, 55000],
-        "areaAcreBand": [2, 15],
-        "qualityScore": 91,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 13.0M/acre within the area band (2–15M)"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "39-word description · 1 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "pass",
-            "detail": "Contracted partner feed (skyline-agents.json)"
-          }
-        ]
-      }
     }
   ],
   "pending": [],
@@ -4887,7 +4931,11 @@
     "townhouse|Syokimau|3br|4",
     "bungalow|Kitengela|3br|6",
     "apartment|Athi River|2br|5",
-    "villa|Lavington|5br|49"
+    "villa|Lavington|5br|49",
+    "land|Athi River|0br|23",
+    "land|Riverside|0br|407",
+    "apartment|Kilimani|1br|7",
+    "apartment|Ruaka|1br|4"
   ],
   "rejected": []
 }
