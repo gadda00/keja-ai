@@ -1,7 +1,40 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-03T00:08:09.792Z",
+  "generatedAt": "2026-09-03T08:53:20.631Z",
   "runs": [
+    {
+      "id": "run-2026-09-03-00606",
+      "startedAt": "2026-09-03T08:53:20.631Z",
+      "ingested": 4,
+      "published": 4,
+      "queued": 0,
+      "rejected": 0,
+      "deduped": 9,
+      "sources": {
+        "scanner": 4,
+        "feeds": 0
+      },
+      "feedStatus": [
+        {
+          "feed": "diaspora-property.xml",
+          "format": "XML",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "horizon-realtors.csv",
+          "format": "CSV",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "skyline-agents.json",
+          "format": "JSON",
+          "items": 3,
+          "state": "ok"
+        }
+      ]
+    },
     {
       "id": "run-2026-09-03-89765",
       "startedAt": "2026-09-03T00:08:09.792Z",
@@ -632,6 +665,72 @@
   ],
   "listings": [
     {
+      "id": "KJA-A0088",
+      "title": "Charming 3-Bedroom Bungalow in Kitengela",
+      "type": "bungalow",
+      "purpose": ["buy", "invest"],
+      "area": "Kitengela",
+      "county": "Kajiado",
+      "price": 6450000,
+      "rentEstimate": 41000,
+      "grossYieldEstimate": 7.6,
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "sizeSqm": 157,
+      "amenities": ["Water storage tanks", "Mature garden", "Quiet cul-de-sac"],
+      "images": ["/images/props/interior_1.jpg", "/images/props/apartment_1.jpg"],
+      "description": "Rarely available: a bungalow in Kitengela combining space (157 sqm), light and a convenient address. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. At KES 41k/sqm the pricing sits within the Kitengela band, and the area yield band of 7.6% supports a solid income case.",
+      "agency": "Horizon Realtors",
+      "agent": {
+        "name": "Dennis Otieno",
+        "phone": "+254 701 644 087"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-03T09:21:00.000Z",
+      "appreciationForecast": 5.4,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 41k/sqm — within the Kitengela band",
+        "Close to Eastleigh-Kitengela bypass",
+        "Est. gross yield ~7.6% p.a. (area band 7.6%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-03T09:21:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 7.6,
+        "areaPpsmBand": [30000, 55000],
+        "areaAcreBand": [2.5, 8],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 41k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "51-word description · 2 photos · 3 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
       "id": "KJA-A0083",
       "title": "Elegant 6-Bedroom Family Villa in Runda",
       "type": "villa",
@@ -756,6 +855,206 @@
             "label": "Content quality screen",
             "status": "warn",
             "detail": "38-word description · 1 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0087",
+      "title": "Refined 3-Bedroom Townhouse in Syokimau",
+      "type": "townhouse",
+      "purpose": ["buy", "invest"],
+      "area": "Syokimau",
+      "county": "Machakos",
+      "price": 4250000,
+      "rentEstimate": 28000,
+      "grossYieldEstimate": 7.9,
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "sizeSqm": 97,
+      "amenities": ["Solar water heating", "Borehole water", "Staff quarters", "Perimeter wall"],
+      "images": ["/images/props/townhouse_0.jpg", "/images/props/townhouse_1.jpg"],
+      "description": "Rarely available: a townhouse in Syokimau combining space (97 sqm), light and a convenient address. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 44k/sqm the pricing sits within the Syokimau band, and the area yield band of 7.8% supports a solid income case.",
+      "agency": "Skyline Agents Kenya",
+      "agent": {
+        "name": "Peter Kariuki",
+        "phone": "+254 720 811 340"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-03T06:18:00.000Z",
+      "appreciationForecast": 5.2,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 44k/sqm — within the Syokimau band",
+        "Close to Mlolongo interchange",
+        "Est. gross yield ~7.9% p.a. (area band 7.8%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-03T06:18:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 7.8,
+        "areaPpsmBand": [35000, 60000],
+        "areaAcreBand": [3, 9],
+        "qualityScore": 93,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 44k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "52-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0090",
+      "title": "Sunny 5-Bedroom Family Villa in Lavington",
+      "type": "villa",
+      "purpose": ["buy", "invest"],
+      "area": "Lavington",
+      "county": "Nairobi",
+      "price": 48600000,
+      "rentEstimate": 300000,
+      "grossYieldEstimate": 7.4,
+      "bedrooms": 5,
+      "bathrooms": 3,
+      "sizeSqm": 408,
+      "amenities": ["Gated community", "EV charger ready", "Guest wing", "Staff quarters"],
+      "images": ["/images/props/villa_1.jpg", "/images/props/townhouse_1.jpg"],
+      "description": "Set in the heart of Lavington, this villa delivers 408 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. Benchmarked against comparable stock in Lavington, this listing offers defensible entry pricing for an income-focused buyer.",
+      "agency": "Nairobi Prime Properties",
+      "agent": {
+        "name": "Grace Wairimu",
+        "phone": "+254 736 481 902"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-03T05:42:00.000Z",
+      "appreciationForecast": 7.4,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 119k/sqm — within the Lavington band",
+        "Close to Lavington Mall",
+        "Est. gross yield ~7.4% p.a. (area band 7.4%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-03T05:42:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 7.4,
+        "areaPpsmBand": [90000, 135000],
+        "areaAcreBand": [80, 160],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 119k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "48-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0089",
+      "title": "Bright 2-Bedroom Apartment in Athi River",
+      "type": "apartment",
+      "purpose": ["rent"],
+      "area": "Athi River",
+      "county": "Machakos",
+      "price": 25000,
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "sizeSqm": 99,
+      "amenities": ["Backup generator", "CCTV surveillance", "Gym", "Rooftop terrace", "Balcony"],
+      "images": [
+        "/images/props/interior_1.jpg",
+        "/images/props/apartment_2.jpg",
+        "/images/props/interior_0.jpg"
+      ],
+      "description": "Rarely available: a apartment in Athi River combining space (99 sqm), light and a convenient address. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Convenient, well-connected and realistically priced for the current market.",
+      "agency": "Coastal Living Estates",
+      "agent": {
+        "name": "Ali Hassan",
+        "phone": "+254 722 684 195"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-03T03:40:00.000Z",
+      "appreciationForecast": 6.9,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "Athi River location with steady tenant demand",
+        "Close to Daystar University",
+        "Popular with expatriate family tenants"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-03T03:40:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "n/a",
+        "areaYieldBand": 7.2,
+        "areaPpsmBand": [25000, 45000],
+        "areaAcreBand": [2, 6],
+        "qualityScore": 92,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "Price sits inside the area market band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "42-word description · 3 photos · 5 amenities"
           },
           {
             "label": "Source screening",
@@ -4520,276 +4819,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "KJA-A0015",
-      "title": "Spacious 2-Bedroom City Apartment in Milimani",
-      "type": "apartment",
-      "purpose": ["rent"],
-      "area": "Milimani",
-      "county": "Kisumu",
-      "price": 25000,
-      "bedrooms": 2,
-      "bathrooms": 2,
-      "sizeSqm": 94,
-      "amenities": ["Fibre internet ready", "Lift access", "Balcony", "Secure parking"],
-      "images": [
-        "/images/props/interior_1.jpg",
-        "/images/props/apartment_0.jpg",
-        "/images/props/interior_0.jpg"
-      ],
-      "description": "An honest, well-maintained apartment in Milimani — 94 sqm of sensible layout for owners and investors alike. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. A practical choice for anyone seeking a genuine Milimani address without overpaying.",
-      "agency": "Skyline Agents Kenya",
-      "agent": {
-        "name": "Peter Kariuki",
-        "phone": "+254 720 811 340"
-      },
-      "availability": "available",
-      "listedAt": "2026-08-30T09:14:00.000Z",
-      "appreciationForecast": 5.8,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "Milimani location with steady tenant demand",
-        "Close to Milimani estates",
-        "Popular with expatriate family tenants"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-08-30T09:14:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "n/a",
-        "areaYieldBand": 7.4,
-        "areaPpsmBand": [40000, 70000],
-        "areaAcreBand": [4, 12],
-        "qualityScore": 92,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "Price sits inside the area market band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "46-word description · 3 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0004",
-      "title": "Classic 4-Bedroom Garden Bungalow in Runda",
-      "type": "bungalow",
-      "purpose": ["buy"],
-      "area": "Runda",
-      "county": "Nairobi",
-      "price": 9550000,
-      "rentEstimate": 48000,
-      "grossYieldEstimate": 6,
-      "bedrooms": 4,
-      "bathrooms": 2,
-      "sizeSqm": 105,
-      "amenities": ["Car porch", "Solar water heating", "Quiet cul-de-sac"],
-      "images": ["/images/props/townhouse_0.jpg", "/images/props/apartment_1.jpg"],
-      "description": "This 105 sqm bungalow in Runda has been finished to a practical standard and priced with discipline. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. The Runda market band and 6% yield environment make this a disciplined income or appreciation play.",
-      "agency": "Prestige Homes KE",
-      "agent": {
-        "name": "Brian Mutua",
-        "phone": "+254 738 220 776"
-      },
-      "availability": "available",
-      "listedAt": "2026-08-30T08:25:00.000Z",
-      "appreciationForecast": 5.8,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 91k/sqm — above the Runda band",
-        "Close to Village Market",
-        "Est. gross yield ~6% p.a. (area band 6%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-08-30T08:25:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "above",
-        "areaYieldBand": 6,
-        "areaPpsmBand": [60000, 95000],
-        "areaAcreBand": [15, 40],
-        "qualityScore": 87,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 91k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "47-word description · 2 photos · 3 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0002",
-      "title": "Bright 1-Bedroom Residence in Kitengela",
-      "type": "apartment",
-      "purpose": ["buy", "invest"],
-      "area": "Kitengela",
-      "county": "Kajiado",
-      "price": 2100000,
-      "rentEstimate": 15000,
-      "grossYieldEstimate": 8.6,
-      "bedrooms": 1,
-      "bathrooms": 2,
-      "sizeSqm": 59,
-      "amenities": ["Fibre internet ready", "Gym", "Rooftop terrace", "Secure parking"],
-      "images": [
-        "/images/props/apartment_0.jpg",
-        "/images/props/apartment_2.jpg",
-        "/images/props/apartment_1.jpg"
-      ],
-      "description": "Rarely available: a apartment in Kitengela combining space (59 sqm), light and a convenient address. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Kitengela, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Coastal Living Estates",
-      "agent": {
-        "name": "Halima Yusuf",
-        "phone": "+254 718 337 540"
-      },
-      "availability": "available",
-      "listedAt": "2026-08-30T07:56:00.000Z",
-      "appreciationForecast": 8.2,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 36k/sqm — below the Kitengela band",
-        "Close to Kitengela town",
-        "Est. gross yield ~8.6% p.a. (area band 7.6%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-08-30T07:56:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 7.6,
-        "areaPpsmBand": [30000, 55000],
-        "areaAcreBand": [2.5, 8],
-        "qualityScore": 92,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 36k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "48-word description · 3 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0038",
-      "title": "Elegant 5-Bedroom Villa in Kilimani",
-      "type": "villa",
-      "purpose": ["buy"],
-      "area": "Kilimani",
-      "county": "Nairobi",
-      "price": 47450000,
-      "rentEstimate": 324000,
-      "grossYieldEstimate": 8.2,
-      "bedrooms": 5,
-      "bathrooms": 3,
-      "sizeSqm": 449,
-      "amenities": ["Guest wing", "Half-acre garden", "EV charger ready", "Staff quarters"],
-      "images": ["/images/props/interior_0.jpg", "/images/props/townhouse_1.jpg"],
-      "description": "A well-presented villa in Kilimani, Nairobi, offering 449 sqm of bright, efficiently planned space. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 106k/sqm the pricing sits within the Kilimani band, and the area yield band of 8.2% supports a solid income case.",
-      "agency": "Horizon Realtors",
-      "agent": {
-        "name": "Dennis Otieno",
-        "phone": "+254 701 644 087"
-      },
-      "availability": "available",
-      "listedAt": "2026-08-30T07:49:00.000Z",
-      "appreciationForecast": 6.1,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 106k/sqm — within the Kilimani band",
-        "Close to Prestige Plaza",
-        "Est. gross yield ~8.2% p.a. (area band 8.2%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-08-30T07:49:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 8.2,
-        "areaPpsmBand": [95000, 145000],
-        "areaAcreBand": [80, 160],
-        "qualityScore": 93,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 106k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "51-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
     }
   ],
   "pending": [],
@@ -4854,7 +4883,11 @@
     "apartment|Athi River|1br|5",
     "villa|Runda|6br|23",
     "land|Lavington|0br|688",
-    "land|Karen|0br|152"
+    "land|Karen|0br|152",
+    "townhouse|Syokimau|3br|4",
+    "bungalow|Kitengela|3br|6",
+    "apartment|Athi River|2br|5",
+    "villa|Lavington|5br|49"
   ],
   "rejected": []
 }
