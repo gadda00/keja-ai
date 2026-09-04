@@ -1,7 +1,40 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-04T18:57:57.100Z",
+  "generatedAt": "2026-09-04T23:58:58.629Z",
   "runs": [
+    {
+      "id": "run-2026-09-04-38607",
+      "startedAt": "2026-09-04T23:58:58.629Z",
+      "ingested": 4,
+      "published": 4,
+      "queued": 0,
+      "rejected": 0,
+      "deduped": 9,
+      "sources": {
+        "scanner": 4,
+        "feeds": 0
+      },
+      "feedStatus": [
+        {
+          "feed": "diaspora-property.xml",
+          "format": "XML",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "horizon-realtors.csv",
+          "format": "CSV",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "skyline-agents.json",
+          "format": "JSON",
+          "items": 3,
+          "state": "ok"
+        }
+      ]
+    },
     {
       "id": "run-2026-09-04-77078",
       "startedAt": "2026-09-04T18:57:57.100Z",
@@ -933,6 +966,71 @@
       }
     },
     {
+      "id": "KJA-A0129",
+      "title": "Bright Commercial Unit in Syokimau",
+      "type": "commercial",
+      "purpose": ["buy"],
+      "area": "Syokimau",
+      "county": "Machakos",
+      "price": 18000000,
+      "rentEstimate": 117000,
+      "grossYieldEstimate": 7.8,
+      "bathrooms": 1,
+      "sizeSqm": 403,
+      "amenities": ["Ample parking bays", "Fibre backbone", "Conference facilities", "Central A/C"],
+      "images": ["/images/props/office_1.jpg", "/images/props/interior_2.jpg"],
+      "description": "Rarely available: a commercial unit in Syokimau combining space (403 sqm), light and a convenient address. Infrastructure — power backup, connectivity and parking — supports immediate occupation. At KES 45k/sqm the pricing sits within the Syokimau band, and the area yield band of 7.8% supports a solid income case.",
+      "agency": "Horizon Realtors",
+      "agent": {
+        "name": "Dennis Otieno",
+        "phone": "+254 701 644 087"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-04T09:39:00.000Z",
+      "appreciationForecast": 7.2,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 45k/sqm — within the Syokimau band",
+        "Close to Mlolongo interchange",
+        "Est. gross yield ~7.8% p.a. (area band 7.8%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-04T09:39:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 7.8,
+        "areaPpsmBand": [35000, 60000],
+        "areaAcreBand": [3, 9],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 45k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "49-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
       "id": "KJA-A0110",
       "title": "Charming 4-Bedroom Family Villa in Nanyuki",
       "type": "villa",
@@ -1203,6 +1301,77 @@
       }
     },
     {
+      "id": "KJA-A0131",
+      "title": "Elegant 4-Bedroom Family Villa in Kasarani",
+      "type": "villa",
+      "purpose": ["buy"],
+      "area": "Kasarani",
+      "county": "Nairobi",
+      "price": 12000000,
+      "rentEstimate": 86000,
+      "grossYieldEstimate": 8.6,
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "sizeSqm": 229,
+      "amenities": [
+        "Borehole + storage tanks",
+        "EV charger ready",
+        "Solar backup",
+        "Swimming pool"
+      ],
+      "images": ["/images/props/villa_0.jpg", "/images/props/villa_1.jpg"],
+      "description": "This 229 sqm villa in Kasarani has been finished to a practical standard and priced with discipline. The property sits on a mature, well-kept compound with room for family life and entertaining. The Kasarani market band and 8.6% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Esther Kimani",
+        "phone": "+254 705 118 663"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-04T06:16:00.000Z",
+      "appreciationForecast": 6.3,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 52k/sqm — within the Kasarani band",
+        "Close to Kasarani stadium",
+        "Est. gross yield ~8.6% p.a. (area band 8.6%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-04T06:16:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 8.6,
+        "areaPpsmBand": [45000, 70000],
+        "areaAcreBand": [5, 14],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 52k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "48-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
       "id": "KJA-A0123",
       "title": "Elegant 2-Bedroom Residence in Milimani",
       "type": "apartment",
@@ -1338,6 +1507,72 @@
       }
     },
     {
+      "id": "KJA-A0128",
+      "title": "Well-kept 5-Bedroom Cluster Home in Kileleshwa",
+      "type": "townhouse",
+      "purpose": ["buy"],
+      "area": "Kileleshwa",
+      "county": "Nairobi",
+      "price": 31450000,
+      "rentEstimate": 220000,
+      "grossYieldEstimate": 8.4,
+      "bedrooms": 5,
+      "bathrooms": 2,
+      "sizeSqm": 254,
+      "amenities": ["Borehole water", "Staff quarters", "Solar water heating", "Perimeter wall"],
+      "images": ["/images/props/apartment_2.jpg", "/images/props/interior_2.jpg"],
+      "description": "A well-presented townhouse in Kileleshwa, Nairobi, offering 254 sqm of bright, efficiently planned space. The property sits on a mature, well-kept compound with room for family life and entertaining. The Kileleshwa market band and 8.4% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Kevin Ochieng",
+        "phone": "+254 745 902 210"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-04T04:49:00.000Z",
+      "appreciationForecast": 5.5,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 124k/sqm — above the Kileleshwa band",
+        "Close to Gitanga Road shops",
+        "Est. gross yield ~8.4% p.a. (area band 8.4%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-04T04:49:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "above",
+        "areaYieldBand": 8.4,
+        "areaPpsmBand": [85000, 125000],
+        "areaAcreBand": [70, 140],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 124k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "45-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
       "id": "KJA-A0121",
       "title": "Classic Land Parcel in Westlands",
       "type": "land",
@@ -1396,6 +1631,74 @@
             "label": "Content quality screen",
             "status": "warn",
             "detail": "40-word description · 1 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0130",
+      "title": "Contemporary Acreage in Westlands",
+      "type": "land",
+      "purpose": ["buy", "invest"],
+      "area": "Westlands",
+      "county": "Nairobi",
+      "price": 804350000,
+      "sizeSqm": 21804,
+      "amenities": [
+        "Ready title deed",
+        "Water on site",
+        "Beaconed boundaries",
+        "Electricity on site"
+      ],
+      "images": ["/images/props/land_1.jpg"],
+      "description": "A well-presented land parcel in Westlands, Nairobi, offering 21804 sqm of bright, efficiently planned space. Documentation is available for inspection; the holding is clean and transfer-ready. A practical choice for anyone seeking a genuine Westlands address without overpaying.",
+      "agency": "Horizon Realtors",
+      "agent": {
+        "name": "Dennis Otieno",
+        "phone": "+254 701 644 087"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-04T03:42:00.000Z",
+      "appreciationForecast": 7.4,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 37k/sqm — below the Westlands band",
+        "Close to Peponi School",
+        "Popular with diaspora investor tenants",
+        "5.39 acres with beaconed boundaries"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-04T03:42:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 7.6,
+        "areaPpsmBand": [100000, 150000],
+        "areaAcreBand": [90, 180],
+        "qualityScore": 86,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 149.3M/acre within the area band (90–180M)"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "38-word description · 1 photos · 4 amenities"
           },
           {
             "label": "Source screening",
@@ -4738,285 +5041,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "KJA-A0065",
-      "title": "Well-kept 5-Bedroom Villa in Kasarani",
-      "type": "villa",
-      "purpose": ["buy"],
-      "area": "Kasarani",
-      "county": "Nairobi",
-      "price": 9050000,
-      "rentEstimate": 65000,
-      "grossYieldEstimate": 8.6,
-      "bedrooms": 5,
-      "bathrooms": 3,
-      "sizeSqm": 160,
-      "amenities": [
-        "Borehole + storage tanks",
-        "Half-acre garden",
-        "Solar backup",
-        "Staff quarters"
-      ],
-      "images": ["/images/props/villa_1.jpg", "/images/props/villa_0.jpg"],
-      "description": "This 160 sqm villa in Kasarani has been finished to a practical standard and priced with discipline. The property sits on a mature, well-kept compound with room for family life and entertaining. Benchmarked against comparable stock in Kasarani, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Nairobi Prime Properties",
-      "agent": {
-        "name": "Samuel Kiptoo",
-        "phone": "+254 710 259 664"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-01T07:59:00.000Z",
-      "appreciationForecast": 8.5,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 57k/sqm — within the Kasarani band",
-        "Close to Garden City",
-        "Est. gross yield ~8.6% p.a. (area band 8.6%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-01T07:59:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 8.6,
-        "areaPpsmBand": [45000, 70000],
-        "areaAcreBand": [5, 14],
-        "qualityScore": 90,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 57k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "48-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0054",
-      "title": "Modern Office Suite in Nakuru",
-      "type": "commercial",
-      "purpose": ["buy", "invest"],
-      "area": "Nakuru",
-      "county": "Nakuru",
-      "price": 10950000,
-      "rentEstimate": 71000,
-      "grossYieldEstimate": 7.8,
-      "bathrooms": 0,
-      "sizeSqm": 252,
-      "amenities": ["Raised floors", "Loading bay", "Ample parking bays", "Central A/C"],
-      "images": ["/images/props/office_0.jpg", "/images/props/interior_2.jpg"],
-      "description": "An honest, well-maintained commercial unit in Nakuru — 252 sqm of sensible layout for owners and investors alike. Infrastructure — power backup, connectivity and parking — supports immediate occupation. Benchmarked against comparable stock in Nakuru, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Nairobi Prime Properties",
-      "agent": {
-        "name": "Samuel Kiptoo",
-        "phone": "+254 710 259 664"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-01T07:29:00.000Z",
-      "appreciationForecast": 7.9,
-      "offPlan": true,
-      "furnished": false,
-      "highlights": [
-        "KES 43k/sqm — within the Nakuru band",
-        "Close to Kabarak Road",
-        "Est. gross yield ~7.8% p.a. (area band 7.8%)",
-        "Off-plan with staged payment plan"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-01T07:29:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 7.8,
-        "areaPpsmBand": [30000, 55000],
-        "areaAcreBand": [1.5, 6],
-        "qualityScore": 90,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 43k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "45-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0052",
-      "title": "Modern 1-Bedroom City Apartment in Riverside",
-      "type": "apartment",
-      "purpose": ["buy"],
-      "area": "Riverside",
-      "county": "Nairobi",
-      "price": 7100000,
-      "rentEstimate": 43000,
-      "grossYieldEstimate": 7.3,
-      "bedrooms": 1,
-      "bathrooms": 2,
-      "sizeSqm": 60,
-      "amenities": [
-        "Balcony",
-        "Borehole water",
-        "Fibre internet ready",
-        "Rooftop terrace",
-        "Lift access"
-      ],
-      "images": [
-        "/images/props/apartment_0.jpg",
-        "/images/props/interior_0.jpg",
-        "/images/props/interior_1.jpg"
-      ],
-      "description": "Set in the heart of Riverside, this apartment delivers 60 sqm of comfortable living with genuine character. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Riverside, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Nairobi Prime Properties",
-      "agent": {
-        "name": "Grace Wairimu",
-        "phone": "+254 736 481 902"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-01T07:12:00.000Z",
-      "appreciationForecast": 7.7,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 118k/sqm — within the Riverside band",
-        "Close to Riverside Drive offices",
-        "Est. gross yield ~7.3% p.a. (area band 7.2%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-01T07:12:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 7.2,
-        "areaPpsmBand": [95000, 140000],
-        "areaAcreBand": [85, 170],
-        "qualityScore": 95,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 118k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "50-word description · 3 photos · 5 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0061",
-      "title": "Spacious 4-Bedroom Bungalow in Nanyuki",
-      "type": "bungalow",
-      "purpose": ["buy", "invest"],
-      "area": "Nanyuki",
-      "county": "Laikipia",
-      "price": 4300000,
-      "rentEstimate": 23000,
-      "grossYieldEstimate": 6.4,
-      "bedrooms": 4,
-      "bathrooms": 2,
-      "sizeSqm": 184,
-      "amenities": ["Quiet cul-de-sac", "Car porch", "Mature garden"],
-      "images": ["/images/props/apartment_1.jpg", "/images/props/interior_1.jpg"],
-      "description": "An honest, well-maintained bungalow in Nanyuki — 184 sqm of sensible layout for owners and investors alike. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. At KES 23k/sqm the pricing sits below the Nanyuki band, and the area yield band of 6.4% supports a solid income case.",
-      "agency": "Skyline Agents Kenya",
-      "agent": {
-        "name": "Peter Kariuki",
-        "phone": "+254 720 811 340"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-01T06:57:00.000Z",
-      "appreciationForecast": 8.3,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 23k/sqm — below the Nanyuki band",
-        "Close to Mount Kenya foothills",
-        "Est. gross yield ~6.4% p.a. (area band 6.4%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-01T06:57:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 6.4,
-        "areaPpsmBand": [20000, 45000],
-        "areaAcreBand": [0.8, 4],
-        "qualityScore": 90,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 23k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "53-word description · 2 photos · 3 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
     }
   ],
   "pending": [],
@@ -5116,7 +5140,11 @@
     "land|Ruaka|0br|79",
     "bungalow|Lavington|4br|23",
     "villa|Karen|4br|35",
-    "apartment|Nanyuki|3br|5"
+    "apartment|Nanyuki|3br|5",
+    "townhouse|Kileleshwa|5br|31",
+    "commercial|Syokimau|0br|18",
+    "land|Westlands|0br|804",
+    "villa|Kasarani|4br|12"
   ],
   "rejected": []
 }
