@@ -1,7 +1,40 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-04T00:00:39.355Z",
+  "generatedAt": "2026-09-04T08:48:17.684Z",
   "runs": [
+    {
+      "id": "run-2026-09-04-97489",
+      "startedAt": "2026-09-04T08:48:17.683Z",
+      "ingested": 4,
+      "published": 4,
+      "queued": 0,
+      "rejected": 0,
+      "deduped": 9,
+      "sources": {
+        "scanner": 4,
+        "feeds": 0
+      },
+      "feedStatus": [
+        {
+          "feed": "diaspora-property.xml",
+          "format": "XML",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "horizon-realtors.csv",
+          "format": "CSV",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "skyline-agents.json",
+          "format": "JSON",
+          "items": 3,
+          "state": "ok"
+        }
+      ]
+    },
     {
       "id": "run-2026-09-04-39210",
       "startedAt": "2026-09-04T00:00:39.355Z",
@@ -836,6 +869,142 @@
       }
     },
     {
+      "id": "KJA-A0120",
+      "title": "Bright 6-Bedroom Family Villa in Nanyuki",
+      "type": "villa",
+      "purpose": ["buy", "invest"],
+      "area": "Nanyuki",
+      "county": "Laikipia",
+      "price": 6500000,
+      "rentEstimate": 35000,
+      "grossYieldEstimate": 6.5,
+      "bedrooms": 6,
+      "bathrooms": 3,
+      "sizeSqm": 285,
+      "amenities": ["Half-acre garden", "Borehole + storage tanks", "Guest wing", "Staff quarters"],
+      "images": ["/images/props/townhouse_1.jpg", "/images/props/villa_1.jpg"],
+      "description": "An honest, well-maintained villa in Nanyuki — 285 sqm of sensible layout for owners and investors alike. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 23k/sqm the pricing sits below the Nanyuki band, and the area yield band of 6.4% supports a solid income case.",
+      "agency": "Skyline Agents Kenya",
+      "agent": {
+        "name": "Mercy Wanjiru",
+        "phone": "+254 712 400 118"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-04T08:49:00.000Z",
+      "appreciationForecast": 7.7,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 23k/sqm — below the Nanyuki band",
+        "Close to Nanyuki town",
+        "Est. gross yield ~6.5% p.a. (area band 6.4%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-04T08:49:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 6.4,
+        "areaPpsmBand": [20000, 45000],
+        "areaAcreBand": [0.8, 4],
+        "qualityScore": 93,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 23k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "54-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0119",
+      "title": "Spacious 2-Bedroom City Apartment in Madaraka",
+      "type": "apartment",
+      "purpose": ["buy", "invest"],
+      "area": "Madaraka",
+      "county": "Nairobi",
+      "price": 8300000,
+      "rentEstimate": 61000,
+      "grossYieldEstimate": 8.8,
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "sizeSqm": 90,
+      "amenities": ["Lift access", "Gym", "Backup generator", "24/7 security"],
+      "images": [
+        "/images/props/apartment_1.jpg",
+        "/images/props/interior_0.jpg",
+        "/images/props/interior_1.jpg"
+      ],
+      "description": "This 90 sqm apartment in Madaraka has been finished to a practical standard and priced with discipline. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. The Madaraka market band and 8.8% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Esther Kimani",
+        "phone": "+254 705 118 663"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-04T02:55:00.000Z",
+      "appreciationForecast": 8.1,
+      "offPlan": false,
+      "furnished": true,
+      "highlights": [
+        "KES 92k/sqm — within the Madaraka band",
+        "Close to Strathmore University",
+        "Est. gross yield ~8.8% p.a. (area band 8.8%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-04T02:55:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 8.8,
+        "areaPpsmBand": [70000, 100000],
+        "areaAcreBand": [8, 20],
+        "qualityScore": 95,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 92k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "50-word description · 3 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
       "id": "KJA-A0111",
       "title": "Refined 4-Bedroom Cluster Home in Nanyuki",
       "type": "townhouse",
@@ -892,6 +1061,137 @@
             "label": "Content quality screen",
             "status": "warn",
             "detail": "48-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0118",
+      "title": "Well-kept 2-Bedroom Bungalow in Nakuru",
+      "type": "bungalow",
+      "purpose": ["buy", "invest"],
+      "area": "Nakuru",
+      "county": "Nakuru",
+      "price": 3200000,
+      "rentEstimate": 21000,
+      "grossYieldEstimate": 7.9,
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "sizeSqm": 71,
+      "amenities": ["Solar water heating", "Water storage tanks", "Mature garden"],
+      "images": ["/images/props/townhouse_0.jpg", "/images/props/interior_1.jpg"],
+      "description": "An honest, well-maintained bungalow in Nakuru — 71 sqm of sensible layout for owners and investors alike. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. At KES 45k/sqm the pricing sits within the Nakuru band, and the area yield band of 7.8% supports a solid income case.",
+      "agency": "Horizon Realtors",
+      "agent": {
+        "name": "Dennis Otieno",
+        "phone": "+254 701 644 087"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-04T02:33:00.000Z",
+      "appreciationForecast": 5.2,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 45k/sqm — within the Nakuru band",
+        "Close to Lake Nakuru National Park",
+        "Est. gross yield ~7.9% p.a. (area band 7.8%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-04T02:33:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 7.8,
+        "areaPpsmBand": [30000, 55000],
+        "areaAcreBand": [1.5, 6],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 45k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "53-word description · 2 photos · 3 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0117",
+      "title": "Sunny Office Suite in Lavington",
+      "type": "commercial",
+      "purpose": ["buy", "invest"],
+      "area": "Lavington",
+      "county": "Nairobi",
+      "price": 63850000,
+      "rentEstimate": 394000,
+      "grossYieldEstimate": 7.4,
+      "bathrooms": 2,
+      "sizeSqm": 629,
+      "amenities": ["Central A/C", "Raised floors", "Fibre backbone", "Ample parking bays"],
+      "images": ["/images/props/interior_2.jpg", "/images/props/office_0.jpg"],
+      "description": "Set in the heart of Lavington, this commercial unit delivers 629 sqm of comfortable living with genuine character. Infrastructure — power backup, connectivity and parking — supports immediate occupation. Benchmarked against comparable stock in Lavington, this listing offers defensible entry pricing for an income-focused buyer.",
+      "agency": "Coastal Living Estates",
+      "agent": {
+        "name": "Halima Yusuf",
+        "phone": "+254 718 337 540"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-04T02:31:00.000Z",
+      "appreciationForecast": 6.6,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 102k/sqm — within the Lavington band",
+        "Close to Lavington Mall",
+        "Est. gross yield ~7.4% p.a. (area band 7.4%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-04T02:31:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 7.4,
+        "areaPpsmBand": [90000, 135000],
+        "areaAcreBand": [80, 160],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 102k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "45-word description · 2 photos · 4 amenities"
           },
           {
             "label": "Source screening",
@@ -4672,276 +4972,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "KJA-A0055",
-      "title": "Refined Land Parcel in Nanyuki",
-      "type": "land",
-      "purpose": ["buy"],
-      "area": "Nanyuki",
-      "county": "Laikipia",
-      "price": 7650000,
-      "sizeSqm": 36384,
-      "amenities": ["Ready title deed", "Water on site", "Near tarmac road", "Beaconed boundaries"],
-      "images": ["/images/props/land_0.jpg"],
-      "description": "An honest, well-maintained land parcel in Nanyuki — 36384 sqm of sensible layout for owners and investors alike. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Nanyuki at this price point rarely lingers.",
-      "agency": "Diaspora Property Group",
-      "agent": {
-        "name": "Kevin Ochieng",
-        "phone": "+254 745 902 210"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-01T02:42:00.000Z",
-      "appreciationForecast": 5.5,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 210/sqm — below the Nanyuki band",
-        "Close to Mount Kenya foothills",
-        "Popular with growing family tenants",
-        "8.99 acres with beaconed boundaries"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-01T02:42:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 6.4,
-        "areaPpsmBand": [20000, 45000],
-        "areaAcreBand": [0.8, 4],
-        "qualityScore": 86,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 0.9M/acre within the area band (0.8–4M)"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "43-word description · 1 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0062",
-      "title": "Spacious 4-Bedroom Apartment in Nakuru",
-      "type": "apartment",
-      "purpose": ["buy", "invest"],
-      "area": "Nakuru",
-      "county": "Nakuru",
-      "price": 8400000,
-      "rentEstimate": 55000,
-      "grossYieldEstimate": 7.9,
-      "bedrooms": 4,
-      "bathrooms": 2,
-      "sizeSqm": 169,
-      "amenities": [
-        "Borehole water",
-        "Rooftop terrace",
-        "Backup generator",
-        "CCTV surveillance",
-        "Balcony"
-      ],
-      "images": [
-        "/images/props/interior_1.jpg",
-        "/images/props/interior_0.jpg",
-        "/images/props/bedroom_0.jpg"
-      ],
-      "description": "An honest, well-maintained apartment in Nakuru — 169 sqm of sensible layout for owners and investors alike. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Nakuru, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Nairobi Prime Properties",
-      "agent": {
-        "name": "Grace Wairimu",
-        "phone": "+254 736 481 902"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-01T02:34:00.000Z",
-      "appreciationForecast": 5.3,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 50k/sqm — above the Nakuru band",
-        "Close to Lake Nakuru National Park",
-        "Est. gross yield ~7.9% p.a. (area band 7.8%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-01T02:34:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "above",
-        "areaYieldBand": 7.8,
-        "areaPpsmBand": [30000, 55000],
-        "areaAcreBand": [1.5, 6],
-        "qualityScore": 95,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 50k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "50-word description · 3 photos · 5 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0066",
-      "title": "Refined Retail Space in Madaraka",
-      "type": "commercial",
-      "purpose": ["buy"],
-      "area": "Madaraka",
-      "county": "Nairobi",
-      "price": 9400000,
-      "rentEstimate": 69000,
-      "grossYieldEstimate": 8.8,
-      "bathrooms": 2,
-      "sizeSqm": 127,
-      "amenities": ["Raised floors", "Central A/C", "Fibre backbone", "Grade-A finishes"],
-      "images": ["/images/props/office_0.jpg", "/images/props/office_1.jpg"],
-      "description": "This 127 sqm commercial unit in Madaraka has been finished to a practical standard and priced with discipline. Infrastructure — power backup, connectivity and parking — supports immediate occupation. Benchmarked against comparable stock in Madaraka, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Nairobi Prime Properties",
-      "agent": {
-        "name": "Grace Wairimu",
-        "phone": "+254 736 481 902"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-01T02:26:00.000Z",
-      "appreciationForecast": 7.1,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 74k/sqm — below the Madaraka band",
-        "Close to Strathmore University",
-        "Est. gross yield ~8.8% p.a. (area band 8.8%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-01T02:26:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 8.8,
-        "areaPpsmBand": [70000, 100000],
-        "areaAcreBand": [8, 20],
-        "qualityScore": 90,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 74k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "45-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0040",
-      "title": "Contemporary 2-Bedroom Bungalow in Nyali",
-      "type": "bungalow",
-      "purpose": ["buy"],
-      "area": "Nyali",
-      "county": "Mombasa",
-      "price": 9350000,
-      "rentEstimate": 53000,
-      "grossYieldEstimate": 6.8,
-      "bedrooms": 2,
-      "bathrooms": 2,
-      "sizeSqm": 100,
-      "amenities": ["Car porch", "Water storage tanks", "Quiet cul-de-sac"],
-      "images": ["/images/props/townhouse_0.jpg", "/images/props/apartment_1.jpg"],
-      "description": "Rarely available: a bungalow in Nyali combining space (100 sqm), light and a convenient address. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. At KES 94k/sqm the pricing sits above the Nyali band, and the area yield band of 6.8% supports a solid income case.",
-      "agency": "Skyline Agents Kenya",
-      "agent": {
-        "name": "Mercy Wanjiru",
-        "phone": "+254 712 400 118"
-      },
-      "availability": "available",
-      "listedAt": "2026-08-31T09:38:00.000Z",
-      "appreciationForecast": 6.8,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 94k/sqm — above the Nyali band",
-        "Close to Mombasa Marine Park",
-        "Est. gross yield ~6.8% p.a. (area band 6.8%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-08-31T09:38:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "above",
-        "areaYieldBand": 6.8,
-        "areaPpsmBand": [60000, 100000],
-        "areaAcreBand": [8, 25],
-        "qualityScore": 90,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 94k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "51-word description · 2 photos · 3 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
     }
   ],
   "pending": [],
@@ -5030,7 +5060,11 @@
     "apartment|Nyali|3br|15",
     "apartment|Nakuru|2br|7",
     "commercial|Westlands|0br|22",
-    "apartment|Kileleshwa|2br|10"
+    "apartment|Kileleshwa|2br|10",
+    "commercial|Lavington|0br|64",
+    "bungalow|Nakuru|2br|3",
+    "apartment|Madaraka|2br|8",
+    "villa|Nanyuki|6br|7"
   ],
   "rejected": []
 }
