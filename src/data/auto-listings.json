@@ -1,7 +1,40 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-05T18:12:42.517Z",
+  "generatedAt": "2026-09-05T23:49:40.651Z",
   "runs": [
+    {
+      "id": "run-2026-09-05-80631",
+      "startedAt": "2026-09-05T23:49:40.651Z",
+      "ingested": 4,
+      "published": 4,
+      "queued": 0,
+      "rejected": 0,
+      "deduped": 9,
+      "sources": {
+        "scanner": 4,
+        "feeds": 0
+      },
+      "feedStatus": [
+        {
+          "feed": "diaspora-property.xml",
+          "format": "XML",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "horizon-realtors.csv",
+          "format": "CSV",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "skyline-agents.json",
+          "format": "JSON",
+          "items": 3,
+          "state": "ok"
+        }
+      ]
+    },
     {
       "id": "run-2026-09-05-62387",
       "startedAt": "2026-09-05T18:12:42.517Z",
@@ -1066,6 +1099,72 @@
       }
     },
     {
+      "id": "KJA-A0145",
+      "title": "Bright 4-Bedroom Family Villa in Lavington",
+      "type": "villa",
+      "purpose": ["buy", "invest"],
+      "area": "Lavington",
+      "county": "Nairobi",
+      "price": 27050000,
+      "rentEstimate": 167000,
+      "grossYieldEstimate": 7.4,
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "sizeSqm": 294,
+      "amenities": ["Half-acre garden", "Solar backup", "Borehole + storage tanks", "Guest wing"],
+      "images": ["/images/props/villa_0.jpg", "/images/props/interior_0.jpg"],
+      "description": "Set in the heart of Lavington, this villa delivers 294 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. The Lavington market band and 7.4% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Esther Kimani",
+        "phone": "+254 705 118 663"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-05T09:30:00.000Z",
+      "appreciationForecast": 6,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 92k/sqm — below the Lavington band",
+        "Close to Lavington Mall",
+        "Est. gross yield ~7.4% p.a. (area band 7.4%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-05T09:30:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 7.4,
+        "areaPpsmBand": [90000, 135000],
+        "areaAcreBand": [80, 160],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 92k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "48-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
       "id": "KJA-A0135",
       "title": "Contemporary Building Plot in Kilimani",
       "type": "land",
@@ -1190,6 +1289,82 @@
             "label": "Content quality screen",
             "status": "warn",
             "detail": "48-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0144",
+      "title": "Refined 2-Bedroom City Apartment in Nyali",
+      "type": "apartment",
+      "purpose": ["buy", "invest"],
+      "area": "Nyali",
+      "county": "Mombasa",
+      "price": 6750000,
+      "rentEstimate": 38000,
+      "grossYieldEstimate": 6.8,
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "sizeSqm": 68,
+      "amenities": [
+        "Lift access",
+        "Secure parking",
+        "Balcony",
+        "Fibre internet ready",
+        "Borehole water"
+      ],
+      "images": [
+        "/images/props/apartment_2.jpg",
+        "/images/props/apartment_0.jpg",
+        "/images/props/bedroom_0.jpg"
+      ],
+      "description": "Rarely available: a apartment in Nyali combining space (68 sqm), light and a convenient address. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Nyali, this listing offers defensible entry pricing for an income-focused buyer.",
+      "agency": "Coastal Living Estates",
+      "agent": {
+        "name": "Ali Hassan",
+        "phone": "+254 722 684 195"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-05T09:16:00.000Z",
+      "appreciationForecast": 7.6,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 99k/sqm — above the Nyali band",
+        "Close to Mombasa Marine Park",
+        "Est. gross yield ~6.8% p.a. (area band 6.8%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-05T09:16:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "above",
+        "areaYieldBand": 6.8,
+        "areaPpsmBand": [60000, 100000],
+        "areaAcreBand": [8, 25],
+        "qualityScore": 92,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 99k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "48-word description · 3 photos · 5 amenities"
           },
           {
             "label": "Source screening",
@@ -1622,6 +1797,138 @@
             "label": "Content quality screen",
             "status": "pass",
             "detail": "50-word description · 3 photos · 5 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0143",
+      "title": "Modern 5-Bedroom Cluster Home in Kasarani",
+      "type": "townhouse",
+      "purpose": ["buy", "invest"],
+      "area": "Kasarani",
+      "county": "Nairobi",
+      "price": 11050000,
+      "rentEstimate": 79000,
+      "grossYieldEstimate": 8.6,
+      "bedrooms": 5,
+      "bathrooms": 2,
+      "sizeSqm": 208,
+      "amenities": ["Perimeter wall", "Clubhouse access", "Private garden", "Gated compound"],
+      "images": ["/images/props/apartment_2.jpg", "/images/props/townhouse_1.jpg"],
+      "description": "This 208 sqm townhouse in Kasarani has been finished to a practical standard and priced with discipline. The property sits on a mature, well-kept compound with room for family life and entertaining. Benchmarked against comparable stock in Kasarani, this listing offers defensible entry pricing for an income-focused buyer.",
+      "agency": "Nairobi Prime Properties",
+      "agent": {
+        "name": "Grace Wairimu",
+        "phone": "+254 736 481 902"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-05T02:10:00.000Z",
+      "appreciationForecast": 4.5,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 53k/sqm — within the Kasarani band",
+        "Close to Thika Road Mall",
+        "Est. gross yield ~8.6% p.a. (area band 8.6%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-05T02:10:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 8.6,
+        "areaPpsmBand": [45000, 70000],
+        "areaAcreBand": [5, 14],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 53k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "48-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0146",
+      "title": "Contemporary 3-Bedroom Bungalow in Kilimani",
+      "type": "bungalow",
+      "purpose": ["buy"],
+      "area": "Kilimani",
+      "county": "Nairobi",
+      "price": 19950000,
+      "rentEstimate": 136000,
+      "grossYieldEstimate": 8.2,
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "sizeSqm": 145,
+      "amenities": ["Quiet cul-de-sac", "Water storage tanks", "Solar water heating"],
+      "images": ["/images/props/interior_1.jpg", "/images/props/apartment_1.jpg"],
+      "description": "A well-presented bungalow in Kilimani, Nairobi, offering 145 sqm of bright, efficiently planned space. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. The Kilimani market band and 8.2% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Prestige Homes KE",
+      "agent": {
+        "name": "Brian Mutua",
+        "phone": "+254 738 220 776"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-05T01:59:00.000Z",
+      "appreciationForecast": 8.5,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 138k/sqm — above the Kilimani band",
+        "Close to Prestige Plaza",
+        "Est. gross yield ~8.2% p.a. (area band 8.2%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-05T01:59:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "above",
+        "areaYieldBand": 8.2,
+        "areaPpsmBand": [95000, 145000],
+        "areaAcreBand": [80, 160],
+        "qualityScore": 87,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 138k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "44-word description · 2 photos · 3 amenities"
           },
           {
             "label": "Source screening",
@@ -4862,292 +5169,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "KJA-A0074",
-      "title": "Charming 3-Bedroom City Apartment in Riverside",
-      "type": "apartment",
-      "purpose": ["buy", "invest"],
-      "area": "Riverside",
-      "county": "Nairobi",
-      "price": 14700000,
-      "rentEstimate": 88000,
-      "grossYieldEstimate": 7.2,
-      "bedrooms": 3,
-      "bathrooms": 2,
-      "sizeSqm": 116,
-      "amenities": ["Rooftop terrace", "Balcony", "CCTV surveillance", "Secure parking", "Gym"],
-      "images": [
-        "/images/props/interior_0.jpg",
-        "/images/props/apartment_1.jpg",
-        "/images/props/interior_1.jpg"
-      ],
-      "description": "Set in the heart of Riverside, this apartment delivers 116 sqm of comfortable living with genuine character. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. At KES 127k/sqm the pricing sits within the Riverside band, and the area yield band of 7.2% supports a solid income case.",
-      "agency": "Horizon Realtors",
-      "agent": {
-        "name": "Dennis Otieno",
-        "phone": "+254 701 644 087"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-02T07:52:00.000Z",
-      "appreciationForecast": 5.8,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 127k/sqm — within the Riverside band",
-        "Close to Chiromo Lane",
-        "Est. gross yield ~7.2% p.a. (area band 7.2%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-02T07:52:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 7.2,
-        "areaPpsmBand": [95000, 140000],
-        "areaAcreBand": [85, 170],
-        "qualityScore": 95,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 127k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "56-word description · 3 photos · 5 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0079",
-      "title": "Elegant Land Parcel in Runda",
-      "type": "land",
-      "purpose": ["buy"],
-      "area": "Runda",
-      "county": "Nairobi",
-      "price": 60250000,
-      "sizeSqm": 9141,
-      "amenities": [
-        "Water on site",
-        "Electricity on site",
-        "Clean freehold title",
-        "Beaconed boundaries"
-      ],
-      "images": ["/images/props/land_0.jpg"],
-      "description": "This 9141 sqm land parcel in Runda has been finished to a practical standard and priced with discipline. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Runda at this price point rarely lingers.",
-      "agency": "Prestige Homes KE",
-      "agent": {
-        "name": "Brian Mutua",
-        "phone": "+254 738 220 776"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-02T07:39:00.000Z",
-      "appreciationForecast": 6,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 7k/sqm — below the Runda band",
-        "Close to Gigiri UN complex",
-        "Popular with expatriate family tenants",
-        "2.26 acres with beaconed boundaries"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-02T07:39:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 6,
-        "areaPpsmBand": [60000, 95000],
-        "areaAcreBand": [15, 40],
-        "qualityScore": 86,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 26.7M/acre within the area band (15–40M)"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "43-word description · 1 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0075",
-      "title": "Bright 3-Bedroom Residence in Kileleshwa",
-      "type": "apartment",
-      "purpose": ["buy"],
-      "area": "Kileleshwa",
-      "county": "Nairobi",
-      "price": 10550000,
-      "rentEstimate": 74000,
-      "grossYieldEstimate": 8.4,
-      "bedrooms": 3,
-      "bathrooms": 2,
-      "sizeSqm": 138,
-      "amenities": [
-        "Secure parking",
-        "Fibre internet ready",
-        "Gym",
-        "Rooftop terrace",
-        "Backup generator"
-      ],
-      "images": [
-        "/images/props/interior_0.jpg",
-        "/images/props/interior_1.jpg",
-        "/images/props/apartment_0.jpg"
-      ],
-      "description": "A well-presented apartment in Kileleshwa, Nairobi, offering 138 sqm of bright, efficiently planned space. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. The Kileleshwa market band and 8.4% yield environment make this a disciplined income or appreciation play.",
-      "agency": "Prestige Homes KE",
-      "agent": {
-        "name": "Alice Mumbi",
-        "phone": "+254 726 900 451"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-02T07:27:00.000Z",
-      "appreciationForecast": 7.1,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 76k/sqm — below the Kileleshwa band",
-        "Close to Lavington Mall",
-        "Est. gross yield ~8.4% p.a. (area band 8.4%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-02T07:27:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 8.4,
-        "areaPpsmBand": [85000, 125000],
-        "areaAcreBand": [70, 140],
-        "qualityScore": 92,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 76k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "47-word description · 3 photos · 5 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0071",
-      "title": "Refined 5-Bedroom Villa in Milimani",
-      "type": "villa",
-      "purpose": ["buy", "invest"],
-      "area": "Milimani",
-      "county": "Kisumu",
-      "price": 19100000,
-      "rentEstimate": 118000,
-      "grossYieldEstimate": 7.4,
-      "bedrooms": 5,
-      "bathrooms": 3,
-      "sizeSqm": 343,
-      "amenities": [
-        "Half-acre garden",
-        "Swimming pool",
-        "Staff quarters",
-        "Borehole + storage tanks"
-      ],
-      "images": ["/images/props/interior_0.jpg", "/images/props/villa_1.jpg"],
-      "description": "An honest, well-maintained villa in Milimani — 343 sqm of sensible layout for owners and investors alike. The property sits on a mature, well-kept compound with room for family life and entertaining. The Milimani market band and 7.4% yield environment make this a disciplined income or appreciation play.",
-      "agency": "Diaspora Property Group",
-      "agent": {
-        "name": "Esther Kimani",
-        "phone": "+254 705 118 663"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-02T06:50:00.000Z",
-      "appreciationForecast": 6.3,
-      "offPlan": true,
-      "furnished": false,
-      "highlights": [
-        "KES 56k/sqm — within the Milimani band",
-        "Close to Lake Victoria shoreline",
-        "Est. gross yield ~7.4% p.a. (area band 7.4%)",
-        "Off-plan with staged payment plan"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-02T06:50:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 7.4,
-        "areaPpsmBand": [40000, 70000],
-        "areaAcreBand": [4, 12],
-        "qualityScore": 90,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 56k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "48-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
     }
   ],
   "pending": [],
@@ -5262,7 +5283,11 @@
     "bungalow|Nanyuki|2br|3",
     "villa|Westlands|4br|23",
     "apartment|Riverside|2br|12",
-    "townhouse|Riverside|3br|19"
+    "townhouse|Riverside|3br|19",
+    "townhouse|Kasarani|5br|11",
+    "apartment|Nyali|2br|7",
+    "villa|Lavington|4br|27",
+    "bungalow|Kilimani|3br|20"
   ],
   "rejected": []
 }
