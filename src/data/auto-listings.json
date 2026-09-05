@@ -1,7 +1,40 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-04T23:58:58.629Z",
+  "generatedAt": "2026-09-05T08:18:47.703Z",
   "runs": [
+    {
+      "id": "run-2026-09-05-27681",
+      "startedAt": "2026-09-05T08:18:47.703Z",
+      "ingested": 3,
+      "published": 3,
+      "queued": 0,
+      "rejected": 0,
+      "deduped": 10,
+      "sources": {
+        "scanner": 3,
+        "feeds": 0
+      },
+      "feedStatus": [
+        {
+          "feed": "diaspora-property.xml",
+          "format": "XML",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "horizon-realtors.csv",
+          "format": "CSV",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "skyline-agents.json",
+          "format": "JSON",
+          "items": 3,
+          "state": "ok"
+        }
+      ]
+    },
     {
       "id": "run-2026-09-04-38607",
       "startedAt": "2026-09-04T23:58:58.629Z",
@@ -895,6 +928,213 @@
     }
   ],
   "listings": [
+    {
+      "id": "KJA-A0132",
+      "title": "Classic 3-Bedroom Cluster Home in Runda",
+      "type": "townhouse",
+      "purpose": ["buy", "invest"],
+      "area": "Runda",
+      "county": "Nairobi",
+      "price": 13800000,
+      "rentEstimate": 69000,
+      "grossYieldEstimate": 6,
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "sizeSqm": 159,
+      "amenities": ["Double garage", "Clubhouse access", "Perimeter wall", "Gated compound"],
+      "images": ["/images/props/townhouse_0.jpg", "/images/props/apartment_2.jpg"],
+      "description": "This 159 sqm townhouse in Runda has been finished to a practical standard and priced with discipline. The property sits on a mature, well-kept compound with room for family life and entertaining. The Runda market band and 6% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Kevin Ochieng",
+        "phone": "+254 745 902 210"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-05T09:18:00.000Z",
+      "appreciationForecast": 5.5,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 87k/sqm — within the Runda band",
+        "Close to Village Market",
+        "Est. gross yield ~6% p.a. (area band 6%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-05T09:18:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 6,
+        "areaPpsmBand": [60000, 95000],
+        "areaAcreBand": [15, 40],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 87k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "48-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0133",
+      "title": "Contemporary 4-Bedroom Family Villa in Milimani",
+      "type": "villa",
+      "purpose": ["buy", "invest"],
+      "area": "Milimani",
+      "county": "Kisumu",
+      "price": 15350000,
+      "rentEstimate": 95000,
+      "grossYieldEstimate": 7.4,
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "sizeSqm": 240,
+      "amenities": [
+        "Borehole + storage tanks",
+        "Half-acre garden",
+        "Solar backup",
+        "Gated community"
+      ],
+      "images": ["/images/props/villa_0.jpg", "/images/props/villa_1.jpg"],
+      "description": "An honest, well-maintained villa in Milimani — 240 sqm of sensible layout for owners and investors alike. The property sits on a mature, well-kept compound with room for family life and entertaining. The Milimani market band and 7.4% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Kevin Ochieng",
+        "phone": "+254 745 902 210"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-05T05:28:00.000Z",
+      "appreciationForecast": 7.3,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 64k/sqm — above the Milimani band",
+        "Close to Lake Victoria shoreline",
+        "Est. gross yield ~7.4% p.a. (area band 7.4%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-05T05:28:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "above",
+        "areaYieldBand": 7.4,
+        "areaPpsmBand": [40000, 70000],
+        "areaAcreBand": [4, 12],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 64k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "48-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0134",
+      "title": "Bright 4-Bedroom Residence in Ruaka",
+      "type": "apartment",
+      "purpose": ["buy", "invest"],
+      "area": "Ruaka",
+      "county": "Nairobi",
+      "price": 11550000,
+      "rentEstimate": 77000,
+      "grossYieldEstimate": 8,
+      "bedrooms": 4,
+      "bathrooms": 1,
+      "sizeSqm": 176,
+      "amenities": ["Gym", "Rooftop terrace", "Lift access", "Backup generator", "Balcony"],
+      "images": [
+        "/images/props/bedroom_0.jpg",
+        "/images/props/interior_1.jpg",
+        "/images/props/apartment_1.jpg"
+      ],
+      "description": "This 176 sqm apartment in Ruaka has been finished to a practical standard and priced with discipline. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. The Ruaka market band and 8% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Kevin Ochieng",
+        "phone": "+254 745 902 210"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-05T02:44:00.000Z",
+      "appreciationForecast": 4.9,
+      "offPlan": false,
+      "furnished": true,
+      "highlights": [
+        "KES 66k/sqm — below the Ruaka band",
+        "Close to Ruaka town centre",
+        "Est. gross yield ~8% p.a. (area band 8%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-05T02:44:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 8,
+        "areaPpsmBand": [65000, 95000],
+        "areaAcreBand": [10, 28],
+        "qualityScore": 95,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 66k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "50-word description · 3 photos · 5 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
     {
       "id": "KJA-A0127",
       "title": "Sunny 3-Bedroom City Apartment in Nanyuki",
@@ -4827,220 +5067,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "KJA-A0081",
-      "title": "Charming 4-Bedroom Family Villa in Riverside",
-      "type": "villa",
-      "purpose": ["buy"],
-      "area": "Riverside",
-      "county": "Nairobi",
-      "price": 44750000,
-      "rentEstimate": 269000,
-      "grossYieldEstimate": 7.2,
-      "bedrooms": 4,
-      "bathrooms": 3,
-      "sizeSqm": 389,
-      "amenities": ["Borehole + storage tanks", "Swimming pool", "Half-acre garden", "Guest wing"],
-      "images": ["/images/props/villa_1.jpg", "/images/props/townhouse_1.jpg"],
-      "description": "Set in the heart of Riverside, this villa delivers 389 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. Benchmarked against comparable stock in Riverside, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Nairobi Prime Properties",
-      "agent": {
-        "name": "Grace Wairimu",
-        "phone": "+254 736 481 902"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-02T01:33:00.000Z",
-      "appreciationForecast": 6.7,
-      "offPlan": true,
-      "furnished": false,
-      "highlights": [
-        "KES 115k/sqm — within the Riverside band",
-        "Close to Riverside Drive offices",
-        "Est. gross yield ~7.2% p.a. (area band 7.2%)",
-        "Off-plan with staged payment plan"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-02T01:33:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 7.2,
-        "areaPpsmBand": [95000, 140000],
-        "areaAcreBand": [85, 170],
-        "qualityScore": 90,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 115k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "48-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0058",
-      "title": "Well-kept 4-Bedroom Residence in Madaraka",
-      "type": "apartment",
-      "purpose": ["buy", "invest"],
-      "area": "Madaraka",
-      "county": "Nairobi",
-      "price": 13950000,
-      "rentEstimate": 102000,
-      "grossYieldEstimate": 8.8,
-      "bedrooms": 4,
-      "bathrooms": 2,
-      "sizeSqm": 166,
-      "amenities": [
-        "CCTV surveillance",
-        "Balcony",
-        "Gym",
-        "Fibre internet ready",
-        "Rooftop terrace"
-      ],
-      "images": [
-        "/images/props/bedroom_0.jpg",
-        "/images/props/apartment_2.jpg",
-        "/images/props/apartment_0.jpg"
-      ],
-      "description": "This 166 sqm apartment in Madaraka has been finished to a practical standard and priced with discipline. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. At KES 84k/sqm the pricing sits within the Madaraka band, and the area yield band of 8.8% supports a solid income case.",
-      "agency": "Horizon Realtors",
-      "agent": {
-        "name": "Dennis Otieno",
-        "phone": "+254 701 644 087"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-01T09:48:00.000Z",
-      "appreciationForecast": 6.4,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 84k/sqm — within the Madaraka band",
-        "Close to Madaraka shops",
-        "Est. gross yield ~8.8% p.a. (area band 8.8%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-01T09:48:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 8.8,
-        "areaPpsmBand": [70000, 100000],
-        "areaAcreBand": [8, 20],
-        "qualityScore": 95,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 84k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "56-word description · 3 photos · 5 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0063",
-      "title": "Refined 1-Bedroom Residence in Milimani",
-      "type": "apartment",
-      "purpose": ["buy", "invest"],
-      "area": "Milimani",
-      "county": "Kisumu",
-      "price": 2900000,
-      "rentEstimate": 18000,
-      "grossYieldEstimate": 7.4,
-      "bedrooms": 1,
-      "bathrooms": 1,
-      "sizeSqm": 45,
-      "amenities": ["Lift access", "Borehole water", "CCTV surveillance", "Balcony"],
-      "images": [
-        "/images/props/apartment_0.jpg",
-        "/images/props/apartment_1.jpg",
-        "/images/props/bedroom_0.jpg"
-      ],
-      "description": "An honest, well-maintained apartment in Milimani — 45 sqm of sensible layout for owners and investors alike. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. At KES 64k/sqm the pricing sits above the Milimani band, and the area yield band of 7.4% supports a solid income case.",
-      "agency": "Skyline Agents Kenya",
-      "agent": {
-        "name": "Peter Kariuki",
-        "phone": "+254 720 811 340"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-01T08:52:00.000Z",
-      "appreciationForecast": 7.9,
-      "offPlan": true,
-      "furnished": false,
-      "highlights": [
-        "KES 64k/sqm — above the Milimani band",
-        "Close to Milimani estates",
-        "Est. gross yield ~7.4% p.a. (area band 7.4%)",
-        "Off-plan with staged payment plan"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-01T08:52:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "above",
-        "areaYieldBand": 7.4,
-        "areaPpsmBand": [40000, 70000],
-        "areaAcreBand": [4, 12],
-        "qualityScore": 95,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 64k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "56-word description · 3 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
     }
   ],
   "pending": [],
@@ -5144,7 +5170,10 @@
     "townhouse|Kileleshwa|5br|31",
     "commercial|Syokimau|0br|18",
     "land|Westlands|0br|804",
-    "villa|Kasarani|4br|12"
+    "villa|Kasarani|4br|12",
+    "townhouse|Runda|3br|14",
+    "villa|Milimani|4br|15",
+    "apartment|Ruaka|4br|12"
   ],
   "rejected": []
 }
