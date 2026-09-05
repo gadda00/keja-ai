@@ -1,7 +1,40 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-05T13:25:16.715Z",
+  "generatedAt": "2026-09-05T18:12:42.517Z",
   "runs": [
+    {
+      "id": "run-2026-09-05-62387",
+      "startedAt": "2026-09-05T18:12:42.517Z",
+      "ingested": 4,
+      "published": 4,
+      "queued": 0,
+      "rejected": 0,
+      "deduped": 9,
+      "sources": {
+        "scanner": 4,
+        "feeds": 0
+      },
+      "feedStatus": [
+        {
+          "feed": "diaspora-property.xml",
+          "format": "XML",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "horizon-realtors.csv",
+          "format": "CSV",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "skyline-agents.json",
+          "format": "JSON",
+          "items": 3,
+          "state": "ok"
+        }
+      ]
+    },
     {
       "id": "run-2026-09-05-16688",
       "startedAt": "2026-09-05T13:25:16.715Z",
@@ -1167,6 +1200,72 @@
       }
     },
     {
+      "id": "KJA-A0142",
+      "title": "Charming 3-Bedroom Cluster Home in Riverside",
+      "type": "townhouse",
+      "purpose": ["buy", "invest"],
+      "area": "Riverside",
+      "county": "Nairobi",
+      "price": 18550000,
+      "rentEstimate": 111000,
+      "grossYieldEstimate": 7.2,
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "sizeSqm": 158,
+      "amenities": ["Borehole water", "Solar water heating", "Clubhouse access", "Staff quarters"],
+      "images": ["/images/props/townhouse_0.jpg", "/images/props/apartment_2.jpg"],
+      "description": "Set in the heart of Riverside, this townhouse delivers 158 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. The Riverside market band and 7.2% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Prestige Homes KE",
+      "agent": {
+        "name": "Brian Mutua",
+        "phone": "+254 738 220 776"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-05T08:36:00.000Z",
+      "appreciationForecast": 6.9,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 117k/sqm — within the Riverside band",
+        "Close to Riverside Square",
+        "Est. gross yield ~7.2% p.a. (area band 7.2%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-05T08:36:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 7.2,
+        "areaPpsmBand": [95000, 140000],
+        "areaAcreBand": [85, 170],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 117k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "48-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
       "id": "KJA-A0137",
       "title": "Modern 1-Bedroom Residence in Ruaka",
       "type": "apartment",
@@ -1234,6 +1333,78 @@
             "label": "Content quality screen",
             "status": "pass",
             "detail": "50-word description · 3 photos · 5 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0140",
+      "title": "Charming 4-Bedroom Villa in Westlands",
+      "type": "villa",
+      "purpose": ["buy", "invest"],
+      "area": "Westlands",
+      "county": "Nairobi",
+      "price": 22700000,
+      "rentEstimate": 144000,
+      "grossYieldEstimate": 7.6,
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "sizeSqm": 183,
+      "amenities": [
+        "Borehole + storage tanks",
+        "Swimming pool",
+        "Staff quarters",
+        "Half-acre garden"
+      ],
+      "images": ["/images/props/villa_1.jpg", "/images/props/villa_0.jpg"],
+      "description": "A well-presented villa in Westlands, Nairobi, offering 183 sqm of bright, efficiently planned space. The property sits on a mature, well-kept compound with room for family life and entertaining. The Westlands market band and 7.6% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Prestige Homes KE",
+      "agent": {
+        "name": "Alice Mumbi",
+        "phone": "+254 726 900 451"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-05T07:14:00.000Z",
+      "appreciationForecast": 5.5,
+      "offPlan": true,
+      "furnished": false,
+      "highlights": [
+        "KES 124k/sqm — within the Westlands band",
+        "Close to Sarit Centre",
+        "Est. gross yield ~7.6% p.a. (area band 7.6%)",
+        "Off-plan with staged payment plan"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-05T07:14:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 7.6,
+        "areaPpsmBand": [100000, 150000],
+        "areaAcreBand": [90, 180],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 124k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "45-word description · 2 photos · 4 amenities"
           },
           {
             "label": "Source screening",
@@ -1451,6 +1622,142 @@
             "label": "Content quality screen",
             "status": "pass",
             "detail": "50-word description · 3 photos · 5 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0141",
+      "title": "Bright 2-Bedroom City Apartment in Riverside",
+      "type": "apartment",
+      "purpose": ["buy", "invest"],
+      "area": "Riverside",
+      "county": "Nairobi",
+      "price": 11800000,
+      "rentEstimate": 71000,
+      "grossYieldEstimate": 7.2,
+      "bedrooms": 2,
+      "bathrooms": 2,
+      "sizeSqm": 108,
+      "amenities": ["24/7 security", "CCTV surveillance", "Gym", "Backup generator", "Lift access"],
+      "images": [
+        "/images/props/apartment_2.jpg",
+        "/images/props/bedroom_0.jpg",
+        "/images/props/interior_0.jpg"
+      ],
+      "description": "Set in the heart of Riverside, this apartment delivers 108 sqm of comfortable living with genuine character. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. The Riverside market band and 7.2% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Esther Kimani",
+        "phone": "+254 705 118 663"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-05T01:50:00.000Z",
+      "appreciationForecast": 7.8,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 109k/sqm — within the Riverside band",
+        "Close to Riverside Drive offices",
+        "Est. gross yield ~7.2% p.a. (area band 7.2%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-05T01:50:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 7.2,
+        "areaPpsmBand": [95000, 140000],
+        "areaAcreBand": [85, 170],
+        "qualityScore": 95,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 109k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "50-word description · 3 photos · 5 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0139",
+      "title": "Elegant 2-Bedroom Garden Bungalow in Nanyuki",
+      "type": "bungalow",
+      "purpose": ["buy"],
+      "area": "Nanyuki",
+      "county": "Laikipia",
+      "price": 2500000,
+      "rentEstimate": 15000,
+      "grossYieldEstimate": 7.2,
+      "bedrooms": 2,
+      "bathrooms": 2,
+      "sizeSqm": 97,
+      "amenities": ["Quiet cul-de-sac", "Car porch", "Solar water heating"],
+      "images": ["/images/props/townhouse_0.jpg", "/images/props/apartment_1.jpg"],
+      "description": "An honest, well-maintained bungalow in Nanyuki — 97 sqm of sensible layout for owners and investors alike. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 26k/sqm the pricing sits below the Nanyuki band, and the area yield band of 6.4% supports a solid income case.",
+      "agency": "Skyline Agents Kenya",
+      "agent": {
+        "name": "Mercy Wanjiru",
+        "phone": "+254 712 400 118"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-05T01:34:00.000Z",
+      "appreciationForecast": 6.5,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 26k/sqm — below the Nanyuki band",
+        "Close to Nanyuki town",
+        "Est. gross yield ~7.2% p.a. (area band 6.4%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-05T01:34:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 6.4,
+        "areaPpsmBand": [20000, 45000],
+        "areaAcreBand": [0.8, 4],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 26k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "54-word description · 2 photos · 3 amenities"
           },
           {
             "label": "Source screening",
@@ -4841,271 +5148,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "KJA-A0076",
-      "title": "Charming 5-Bedroom Townhouse in Nanyuki",
-      "type": "townhouse",
-      "purpose": ["buy", "invest"],
-      "area": "Nanyuki",
-      "county": "Laikipia",
-      "price": 7650000,
-      "rentEstimate": 41000,
-      "grossYieldEstimate": 6.4,
-      "bedrooms": 5,
-      "bathrooms": 2,
-      "sizeSqm": 251,
-      "amenities": ["Double garage", "Staff quarters", "Borehole water", "Solar water heating"],
-      "images": ["/images/props/apartment_2.jpg", "/images/props/interior_2.jpg"],
-      "description": "An honest, well-maintained townhouse in Nanyuki — 251 sqm of sensible layout for owners and investors alike. The property sits on a mature, well-kept compound with room for family life and entertaining. Benchmarked against comparable stock in Nanyuki, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Coastal Living Estates",
-      "agent": {
-        "name": "Halima Yusuf",
-        "phone": "+254 718 337 540"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-02T06:33:00.000Z",
-      "appreciationForecast": 8.3,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 30k/sqm — within the Nanyuki band",
-        "Close to Nanyuki town",
-        "Est. gross yield ~6.4% p.a. (area band 6.4%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-02T06:33:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 6.4,
-        "areaPpsmBand": [20000, 45000],
-        "areaAcreBand": [0.8, 4],
-        "qualityScore": 90,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 30k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "48-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0072",
-      "title": "Well-kept 4-Bedroom Cluster Home in Karen",
-      "type": "townhouse",
-      "purpose": ["buy"],
-      "area": "Karen",
-      "county": "Nairobi",
-      "price": 14850000,
-      "rentEstimate": 72000,
-      "grossYieldEstimate": 5.8,
-      "bedrooms": 4,
-      "bathrooms": 2,
-      "sizeSqm": 165,
-      "amenities": ["Solar water heating", "Double garage", "Staff quarters", "Borehole water"],
-      "images": ["/images/props/townhouse_1.jpg", "/images/props/townhouse_0.jpg"],
-      "description": "Set in the heart of Karen, this townhouse delivers 165 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. Viewings are recommended — honest stock in Karen at this price point rarely lingers.",
-      "agency": "Diaspora Property Group",
-      "agent": {
-        "name": "Kevin Ochieng",
-        "phone": "+254 745 902 210"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-02T05:39:00.000Z",
-      "appreciationForecast": 7.5,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 90k/sqm — above the Karen band",
-        "Close to Karen Blixen Museum",
-        "Est. gross yield ~5.8% p.a. (area band 5.8%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-02T05:39:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "above",
-        "areaYieldBand": 5.8,
-        "areaPpsmBand": [55000, 90000],
-        "areaAcreBand": [18, 45],
-        "qualityScore": 90,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 90k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "46-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0073",
-      "title": "Classic Office Suite in Lavington",
-      "type": "commercial",
-      "purpose": ["buy"],
-      "area": "Lavington",
-      "county": "Nairobi",
-      "price": 78300000,
-      "rentEstimate": 483000,
-      "grossYieldEstimate": 7.4,
-      "bathrooms": 0,
-      "sizeSqm": 827,
-      "amenities": ["Raised floors", "Ample parking bays", "100% backup power", "Central A/C"],
-      "images": ["/images/props/interior_2.jpg", "/images/props/office_0.jpg"],
-      "description": "Set in the heart of Lavington, this commercial unit delivers 827 sqm of comfortable living with genuine character. Infrastructure — power backup, connectivity and parking — supports immediate occupation. Benchmarked against comparable stock in Lavington, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Coastal Living Estates",
-      "agent": {
-        "name": "Ali Hassan",
-        "phone": "+254 722 684 195"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-02T04:36:00.000Z",
-      "appreciationForecast": 6.4,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 95k/sqm — below the Lavington band",
-        "Close to Jaffery Academy",
-        "Est. gross yield ~7.4% p.a. (area band 7.4%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-02T04:36:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 7.4,
-        "areaPpsmBand": [90000, 135000],
-        "areaAcreBand": [80, 160],
-        "qualityScore": 90,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 95k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "45-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0069",
-      "title": "Charming Building Plot in Nanyuki",
-      "type": "land",
-      "purpose": ["buy", "invest"],
-      "area": "Nanyuki",
-      "county": "Laikipia",
-      "price": 32650000,
-      "sizeSqm": 34658,
-      "amenities": [
-        "Graded access road",
-        "Ready title deed",
-        "Near tarmac road",
-        "Clean freehold title"
-      ],
-      "images": ["/images/props/land_1.jpg"],
-      "description": "An honest, well-maintained land parcel in Nanyuki — 34658 sqm of sensible layout for owners and investors alike. Documentation is available for inspection; the holding is clean and transfer-ready. Convenient, well-connected and realistically priced for the current market.",
-      "agency": "Coastal Living Estates",
-      "agent": {
-        "name": "Halima Yusuf",
-        "phone": "+254 718 337 540"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-02T04:25:00.000Z",
-      "appreciationForecast": 4.6,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 942/sqm — below the Nanyuki band",
-        "Close to Nanyuki town",
-        "Popular with growing family tenants",
-        "8.56 acres with beaconed boundaries"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-02T04:25:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 6.4,
-        "areaPpsmBand": [20000, 45000],
-        "areaAcreBand": [0.8, 4],
-        "qualityScore": 86,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 3.8M/acre within the area band (0.8–4M)"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "38-word description · 1 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
     }
   ],
   "pending": [],
@@ -5216,7 +5258,11 @@
     "land|Kilimani|0br|9",
     "commercial|Nanyuki|0br|6",
     "apartment|Ruaka|1br|6",
-    "apartment|Runda|2br|6"
+    "apartment|Runda|2br|6",
+    "bungalow|Nanyuki|2br|3",
+    "villa|Westlands|4br|23",
+    "apartment|Riverside|2br|12",
+    "townhouse|Riverside|3br|19"
   ],
   "rejected": []
 }
