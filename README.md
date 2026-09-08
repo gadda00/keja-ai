@@ -106,7 +106,11 @@ All data is client-side demo data — no production backend, no real securities.
 
 ## Deployment
 
-`git push origin main` → GitHub Actions builds with `--base=/keja-ai/`, prerenders every sitemap route to status-200 HTML (including a real, noindex `404.html` captured from the router's NotFound page — no SPA-fallback copy of Home), deploys to GitHub Pages.
+**Canonical: keja.app (Netlify).** `git push origin main` → `deploy-netlify.yml` runs the full quality pipeline (typecheck, tests, ESLint, sitemap), builds with `VITE_BASE=/ VITE_SITE_URL=https://keja.app`, prerenders every sitemap route, stamps the service-worker cache version and ships to Netlify (`keja-ai.netlify.app`, custom domain `keja.app`).
+
+**Mirror: GitHub Pages.** `deploy-pages.yml` builds with `--base=/keja-ai/` and prerenders every sitemap route to status-200 HTML (including a real, noindex `404.html` captured from the router's NotFound page).
+
+**Native apps.** `npm run mobile:sync` then Android Studio / Xcode — see `docs/MOBILE.md`.
 
 ## Roadmap
 

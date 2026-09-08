@@ -1,0 +1,83 @@
+name: Deploy to Netlify (keja.app)
+
+# The canonical production deployment: every push to main that passes the
+# full quality pipeline ships to Netlify (keja-ai.netlify.app, keja.app once
+# the custom domain is verified). GitHub Pages stays as the /keja-ai/ mirror
+# via deploy-pages.yml.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: netlify-prod
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium for prerendering
+        run: npx playwright install chromium --with-deps
+
+      - name: Typecheck
+        run: npx tsc -b
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Lint (ESLint flat config, blocking)
+        run: npm run lint:eslint
+
+      - name: Sitemap
+        run: node scripts/generate-sitemap.mjs
+
+      # Root base + keja.app origin: this is the canonical domain build.
+      - name: Build (root base, keja.app origin)
+        run: VITE_BASE=/ VITE_SITE_URL=https://keja.app npm run build
+
+      - name: Prerender all sitemap routes
+        run: PRERENDER_ORIGIN=https://keja.app node scripts/prerender.mjs --base /
+
+      - name: Stamp service-worker cache version
+        run: node scripts/sw-version.mjs
+
+      - name: Deploy to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          zip -qr dist.zip dist -x "dist/.vite/*"
+          resp=$(curl -s -X POST "https://api.netlify.com/api/v1/sites/${NETLIFY_SITE_ID}/deploys" \
+            -H "Authorization: Bearer ${NETLIFY_AUTH_TOKEN}" \
+            -H "Content-Type: application/zip" \
+            --data-binary @dist.zip)
+          deploy_id=$(echo "$resp" | jq -r '.id // empty')
+          if [ -z "$deploy_id" ]; then
+            echo "Deploy failed: $resp" && exit 1
+          fi
+          echo "Deploy started: $deploy_id"
+          # wait for the deploy to become ready (max ~5 min)
+          for i in $(seq 1 30); do
+            state=$(curl -s "https://api.netlify.com/api/v1/deploys/${deploy_id}" \
+              -H "Authorization: Bearer ${NETLIFY_AUTH_TOKEN}" | jq -r '.state')
+            echo "  state: $state"
+            [ "$state" = "ready" ] && break
+            [ "$state" = "error" ] && exit 1
+            sleep 10
+          done
+          [ "$state" = "ready" ] || { echo "Deploy did not become ready"; exit 1; }
+          echo "✅ Live: https://keja-ai.netlify.app"
