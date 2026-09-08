@@ -19,6 +19,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import type { TokenizedProperty } from '@/data/tokenize';
 import { fundedPct, tokensAvailable, yieldPct } from '@/data/tokenize';
@@ -106,6 +107,13 @@ export function PropertyDetail({ property }: { property: TokenizedProperty }) {
               <p className="mt-2 flex items-center gap-1.5 text-sm text-ink-muted">
                 <MapPin className="h-4 w-4 text-gold-600" /> {p.location}, {p.city} · {p.tagline}
               </p>
+              <Link
+                to="/trust#claims"
+                title="This is a fictional demonstration asset — see the claims register"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[10.5px] font-bold uppercase tracking-wide text-amber-800 transition hover:bg-amber-100"
+              >
+                <Info className="h-3.5 w-3.5" /> FICTIONAL ASSET · TRIAL DATA
+              </Link>
 
               <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {[

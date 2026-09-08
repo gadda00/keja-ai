@@ -15,7 +15,19 @@ import { Link, useLocation } from 'react-router-dom';
 const DISMISSED_KEY = 'keja.demoBanner.dismissed';
 
 /** Routes where the demo boundary must re-assert itself. */
-const SENSITIVE_ROUTES = ['/tokenize', '/admin', '/account', '/dashboard'];
+const SENSITIVE_ROUTES = [
+  '/tokenize',
+  '/admin',
+  '/account',
+  '/dashboard',
+  // Stakeholder workspaces — every figure they show is local demo data.
+  '/manage',
+  '/tenant',
+  '/pro',
+  '/valuation',
+  '/develop',
+  '/diaspora',
+];
 
 export default function DemoBanner() {
   // synchronous first render (no hydration flicker): returning users within

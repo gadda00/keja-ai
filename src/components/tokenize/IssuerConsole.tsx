@@ -8,6 +8,7 @@ import {
   ArrowRight,
   Banknote,
   Building2,
+  CandlestickChart,
   CheckCircle2,
   ClipboardCheck,
   Coins,
@@ -20,10 +21,11 @@ import {
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import { fundedPct, tokensAvailable } from '@/data/tokenize';
 import type { IssuerDraft, IssueResult } from '@/lib/tokenizeStore';
 import { useTokenize } from '@/lib/tokenizeStore';
 
-import { fmtNum, fmtUsd, SectionTitle, useToast } from './shared';
+import { fmtNum, fmtUsd, SectionTitle, StatusBadge, useToast } from './shared';
 
 const STEPS = [
   { id: 1, label: 'Property', icon: Building2, desc: 'Identify & describe the asset' },
@@ -43,8 +45,15 @@ const TYPE_OPTIONS = [
 ] as const;
 
 export function IssuerConsole() {
-  const { setView, issueProperty, openProperty } = useTokenize();
+  const { setView, issueProperty, openProperty, properties, openTrading } = useTokenize();
   const { toast } = useToast();
+
+  /* post-issuance lifecycle rows: your custom issuances + any offering that
+   * has sold out (FUNDED) and is waiting for the issuer to open trading */
+  const issuedListings = useMemo(
+    () => properties.filter((p) => p.custom === true || p.status === 'FUNDED'),
+    [properties]
+  );
 
   const [step, setStep] = useState(1);
   const [issuing, setIssuing] = useState(false);
@@ -157,6 +166,7 @@ export function IssuerConsole() {
 
   /* ─── success screen ─── */
   if (issued) {
+    const issuedProp = properties.find((x) => x.id === issued.property.id) ?? issued.property;
     return (
       <div className="min-h-screen bg-cream">
         <div className="mx-auto max-w-2xl px-4 py-16">
@@ -200,6 +210,41 @@ export function IssuerConsole() {
               <p className="mt-4 break-all rounded-xl border border-gold-200 bg-white p-3 font-mono text-[11px] text-gold-700">
                 {issued.txHash}
               </p>
+              {/* post-issuance lifecycle: open secondary trading once FUNDED */}
+              <div className="mt-4 rounded-xl border border-gold-100 bg-cream p-4">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-gold-700">
+                  Post-issuance lifecycle
+                </p>
+                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-muted">
+                  FUNDING → FUNDED (fully subscribed) → LIVE (trading open). Once every token sells,
+                  open secondary trading so holders can buy and sell on the simulated market.
+                </p>
+                <button
+                  disabled={issuedProp.status !== 'FUNDED'}
+                  onClick={() => {
+                    openTrading(issuedProp.id);
+                    toast({
+                      title:
+                        'Trading opened — the asset now trades on the simulated secondary market (trial)',
+                      description: `${issuedProp.tokenSymbol} is LIVE on the Keja Tokenize secondary market.`,
+                    });
+                  }}
+                  className={`mt-3 inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-[12.5px] font-bold transition ${
+                    issuedProp.status === 'FUNDED'
+                      ? 'bg-ink text-gold-300 hover:bg-ink-soft'
+                      : 'cursor-not-allowed bg-ink/20 text-ink-muted'
+                  }`}
+                >
+                  <CandlestickChart className="h-4 w-4" />
+                  {issuedProp.status === 'LIVE' ? 'Trading is open' : 'Open secondary trading'}
+                </button>
+                {issuedProp.status !== 'FUNDED' && issuedProp.status !== 'LIVE' ? (
+                  <p className="mt-1.5 text-[11px] text-ink-muted">
+                    Enabled once the offering is fully subscribed ({fundedPct(issuedProp)}% funded)
+                    — the Issuer Console lists it under “Your issued tokens”.
+                  </p>
+                ) : null}
+              </div>
               <div className="mt-6 flex flex-col gap-2 sm:flex-row">
                 <button
                   className="btn-outline flex-1"
@@ -773,6 +818,72 @@ export function IssuerConsole() {
             )}
           </div>
         </div>
+
+        {/* ─── post-issuance: your issued tokens & funded offerings ─── */}
+        {issuedListings.length > 0 ? (
+          <div className="mt-12">
+            <SectionTitle
+              eyebrow="Post-issuance"
+              title="Your issued tokens & funded offerings"
+              sub="Offerings move FUNDING → FUNDED (fully subscribed) → LIVE (trading open). Once an offering sells out, open secondary trading so holders can buy and sell it on the simulated market (trial)."
+            />
+            <div className="mt-6 space-y-3">
+              {issuedListings.map((p) => (
+                <div
+                  key={p.id}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold-100 bg-white p-4"
+                >
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-bold text-ink">{p.tokenSymbol}</p>
+                      <StatusBadge status={p.status} />
+                      <span className="rounded-full bg-gold-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gold-700 ring-1 ring-gold-100">
+                        {p.custom ? 'Your issuance' : 'Keja offering'}
+                      </span>
+                    </div>
+                    <p className="mt-1 truncate text-[13px] text-ink-muted">{p.title}</p>
+                    <p className="mt-0.5 text-[12px] text-ink-muted">
+                      {fundedPct(p)}% funded · {fmtNum(tokensAvailable(p))} of{' '}
+                      {fmtNum(p.totalTokens)} tokens left
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-1.5">
+                    {p.status === 'LIVE' ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3.5 py-2 text-[11px] font-bold text-emerald-700">
+                        <CheckCircle2 className="h-4 w-4" /> Trading open
+                      </span>
+                    ) : (
+                      <button
+                        disabled={p.status !== 'FUNDED'}
+                        onClick={() => {
+                          openTrading(p.id);
+                          toast({
+                            title:
+                              'Trading opened — the asset now trades on the simulated secondary market (trial)',
+                            description: `${p.tokenSymbol} is LIVE on the Keja Tokenize secondary market.`,
+                          });
+                        }}
+                        className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-[12.5px] font-bold transition ${
+                          p.status === 'FUNDED'
+                            ? 'bg-ink text-gold-300 hover:bg-ink-soft'
+                            : 'cursor-not-allowed bg-ink/20 text-ink-muted'
+                        }`}
+                      >
+                        <CandlestickChart className="h-4 w-4" /> Open secondary trading
+                      </button>
+                    )}
+                    {p.status === 'FUNDING' ? (
+                      <p className="text-[11px] text-ink-muted">
+                        Enabled at full subscription — investors are still buying the primary
+                        offering.
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

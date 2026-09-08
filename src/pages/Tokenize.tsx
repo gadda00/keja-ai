@@ -1,6 +1,6 @@
 /**
  * Keja Tokenize — main page. Client-side real estate tokenization platform
- * (simulation): marketplace, KYC-gated investing, portfolio, issuer console
+ * (trial mode): marketplace, KYC-gated investing, portfolio, issuer console
  * and academy. State persists in localStorage; the ledger is simulated.
  *
  * Deep links: /tokenize?view=marketplace|learn|portfolio|issuer
@@ -14,7 +14,7 @@ import {
   Store,
 } from 'lucide-react';
 import { Suspense, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import { InvestModal } from '@/components/tokenize/InvestModal';
 import { IssuerConsole } from '@/components/tokenize/IssuerConsole';
@@ -62,10 +62,31 @@ function TabBar() {
             {t.label}
           </button>
         ))}
-        <span className="ml-auto hidden shrink-0 items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-700 md:inline-flex">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-          DEMO — SIMULATION MODE
+        <span className="ml-auto hidden shrink-0 items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-[11px] font-bold text-amber-800 ring-1 ring-amber-200 md:inline-flex">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
+          TRIAL MODE
         </span>
+      </div>
+    </div>
+  );
+}
+
+/** One-line honesty bar shown on the money-touching trial views. */
+function TrialBar() {
+  return (
+    <div className="border-b border-amber-200 bg-amber-50">
+      <div className="container-luxe flex flex-wrap items-center gap-x-2 gap-y-1 py-2.5 text-[12px] leading-relaxed text-amber-900">
+        <span className="font-bold uppercase tracking-wide text-amber-700">Trial mode</span>
+        <span>
+          — a $25,000 virtual wallet, fictional assets and a fast-forward clock demonstrate the full
+          token lifecycle. Nothing here is real money or real securities.
+        </span>
+        <Link
+          to="/trust#claims"
+          className="font-bold text-amber-800 underline underline-offset-2 hover:text-amber-950"
+        >
+          Claims register
+        </Link>
       </div>
     </div>
   );
@@ -90,6 +111,7 @@ function TokenizeInner() {
   return (
     <div>
       <TabBar />
+      {(view === 'marketplace' || view === 'market' || view === 'portfolio') && <TrialBar />}
       {view === 'marketplace' && <Marketplace />}
       {view === 'market' && <SecondaryMarket />}
       {view === 'property' && selected ? <PropertyDetail property={selected} /> : null}

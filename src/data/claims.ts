@@ -192,6 +192,69 @@ export const CAPABILITY_CLAIMS: CapabilityClaim[] = [
       'A vetted identity-verification provider with purpose-limited access, explicit retention rules and audit logging.',
   },
 
+  /* ----------------------------- stakeholder tools --------------------------- */
+  {
+    id: 'landlord-studio',
+    claim: 'Landlords manage units, tenants, rent collection and statements.',
+    status: 'live',
+    surface: 'Landlord Studio (/manage)',
+    evidence:
+      'Interactive studio with rent ledger, arrears, maintenance tickets and computed owner statements; all math is pure functions covered by unit tests. Data is browser-local demo data — no M-Pesa or bank sync exists.',
+    lastReviewed: CLAIM_LAST_REVIEWED,
+    pathToLive:
+      'M-Pesa Daraja statement integration and manager-entered operations before real ledgers.',
+  },
+  {
+    id: 'tenant-hub',
+    claim: 'Renters build applications, track leases and file maintenance requests.',
+    status: 'live',
+    surface: 'Tenant Hub (/tenant)',
+    evidence:
+      'Application builder, lease tracker and maintenance flows run client-side with validation; covered by unit tests. Requests demo-route to the Landlord Studio pipeline only.',
+    lastReviewed: CLAIM_LAST_REVIEWED,
+    pathToLive: 'Agency-side routing of applications and requests with SLAs.',
+  },
+  {
+    id: 'keja-pro',
+    claim: 'Agents build CMAs, generate listing copy and manage leads and viewings.',
+    status: 'live',
+    surface: 'KEJA PRO (/pro)',
+    evidence:
+      'CMA band math, deterministic listing-copy grammar, lead pipeline and viewing scheduling run on the live inventory; covered by unit tests. No real agencies are onboarded.',
+    lastReviewed: CLAIM_LAST_REVIEWED,
+    pathToLive: 'Per-agent workspaces with server-side identity and real lead routing.',
+  },
+  {
+    id: 'valuation-desk',
+    claim: 'Indicative valuation bands from live comparables.',
+    status: 'live',
+    surface: 'Valuation Desk (/valuation)',
+    evidence:
+      'Deterministic comparables engine (median/blend/condition adjustments, confidence by comp count) over the live inventory; covered by unit tests. Explicitly labelled ESTIMATE — formal valuations still escalate to humans.',
+    lastReviewed: CLAIM_LAST_REVIEWED,
+    pathToLive: 'Licensed valuer partnerships for signed valuation reports.',
+  },
+  {
+    id: 'developer-console',
+    claim: 'Developers screen land feasibility with cashflow and sensitivity math.',
+    status: 'live',
+    surface: 'Developer Console (/develop)',
+    evidence:
+      'Feasibility, month-by-month cashflow and sensitivity grid are pure functions with unit tests. Screening-grade ESTIMATE math only — not investment advice.',
+    lastReviewed: CLAIM_LAST_REVIEWED,
+    pathToLive: 'Cost benchmarks from live contractor quotations and bank-accurate finance terms.',
+  },
+  {
+    id: 'diaspora-hub',
+    claim: 'Diaspora buyers get viewing scheduling, PoA and remittance tools.',
+    status: 'live',
+    surface: 'Diaspora Hub (/diaspora)',
+    evidence:
+      'Timezone-accurate scheduling, interactive PoA checklist and fee-model comparison calculators run client-side; covered by unit tests. FX figures are static ESTIMATE anchors; no remittance partner is integrated.',
+    lastReviewed: CLAIM_LAST_REVIEWED,
+    pathToLive: 'Licensed remittance partners with live rates and escrow-style custody.',
+  },
+
   /* ---------------------------------- accounts ------------------------------- */
   {
     id: 'accounts',

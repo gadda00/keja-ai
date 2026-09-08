@@ -25,7 +25,9 @@ export default function WhatsAppFloat() {
 
   return (
     <div
-      className={`fixed right-5 z-40 flex items-end gap-3 transition-all ${lifted ? 'bottom-24' : 'bottom-5'}`}
+      className={`fixed right-5 z-40 flex items-end gap-3 transition-all ${
+        lifted ? 'bottom-36 md:bottom-24' : 'bottom-20 md:bottom-5'
+      }`}
     >
       {showLabel && !dismissed ? (
         <div className="relative mb-1 hidden max-w-[220px] animate-fadeUp rounded-2xl rounded-br-none bg-white p-4 shadow-card-hover ring-1 ring-gold-100 sm:block">

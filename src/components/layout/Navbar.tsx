@@ -1,5 +1,6 @@
 import {
   Building2,
+  ChevronDown,
   Home,
   LayoutDashboard,
   LogOut,
@@ -22,18 +23,40 @@ const NAV = [
   { to: '/partners', label: 'Partners' },
   { to: '/ask', label: 'Ask Keja AI' },
   { to: '/trust', label: 'Trust Center' },
-  { to: '/dashboard', label: 'Dashboard' },
   { to: '/insights', label: 'Insights' },
+];
+
+/** Stakeholder workspaces under the "Tools" dropdown (desktop) and the
+    mobile menu (all items listed flat). Routes re-assert the demo banner. */
+const TOOL_GROUPS = [
+  {
+    heading: 'Own & rent',
+    items: [
+      { to: '/manage', label: 'Landlord Studio', desc: 'Units, tenants, rent ledger' },
+      { to: '/tenant', label: 'Tenant Hub', desc: 'Applications & move-in tools' },
+      { to: '/diaspora', label: 'Diaspora Hub', desc: 'Buy from abroad, PoA & FX' },
+    ],
+  },
+  {
+    heading: 'Professionals',
+    items: [
+      { to: '/pro', label: 'KEJA PRO', desc: 'CMA builder, listing writer, leads' },
+      { to: '/valuation', label: 'Valuation Desk', desc: 'Indicative comparables band' },
+      { to: '/develop', label: 'Developer Console', desc: 'Feasibility & cashflow' },
+    ],
+  },
 ];
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAdmin, logout, setAuthModalOpen } = useAuth();
   const menuRef = useRef<HTMLDivElement>(null);
+  const toolsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -41,7 +64,10 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => setOpen(false), [location.pathname]);
+  useEffect(() => {
+    setOpen(false);
+    setToolsOpen(false);
+  }, [location.pathname]);
 
   // close menus on Escape
   useEffect(() => {
@@ -49,21 +75,27 @@ export default function Navbar() {
       if (e.key === 'Escape') {
         setOpen(false);
         setMenuOpen(false);
+        setToolsOpen(false);
       }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
-  // close avatar menu on outside click
+  // close avatar + tools menus on outside click
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen && !toolsOpen) return;
     const onClick = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+      if (toolsRef.current && !toolsRef.current.contains(e.target as Node)) setToolsOpen(false);
     };
     document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
-  }, [menuOpen]);
+  }, [menuOpen, toolsOpen]);
+
+  const anyToolActive = TOOL_GROUPS.some((g) =>
+    g.items.some((it) => location.pathname.startsWith(it.to))
+  );
 
   const handleLogout = () => {
     setMenuOpen(false);
@@ -93,7 +125,87 @@ export default function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Main navigation">
-          {NAV.map((item) => (
+          {NAV.slice(0, 3).map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                `rounded-lg px-2.5 py-2 text-[13px] font-medium transition-colors ${
+                  isActive
+                    ? 'bg-gold-50 text-gold-700'
+                    : item.highlight
+                      ? 'text-gold-700 hover:bg-gold-50/60'
+                      : 'text-ink-soft hover:bg-gold-50/60 hover:text-gold-700'
+                }`
+              }
+            >
+              {item.highlight ? (
+                <span className="inline-flex items-center gap-1.5">
+                  {item.label}
+                  <span className="rounded-full bg-gold-gradient px-1.5 py-px text-[9px] font-bold uppercase tracking-wide text-white">
+                    New
+                  </span>
+                </span>
+              ) : (
+                item.label
+              )}
+            </NavLink>
+          ))}
+
+          {/* Stakeholder workspaces dropdown */}
+          <div className="relative" ref={toolsRef}>
+            <button
+              onClick={() => setToolsOpen(!toolsOpen)}
+              className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-2 text-[13px] font-medium transition-colors ${
+                toolsOpen || anyToolActive
+                  ? 'bg-gold-50 text-gold-700'
+                  : 'text-ink-soft hover:bg-gold-50/60 hover:text-gold-700'
+              }`}
+              aria-label="Stakeholder tools menu"
+              aria-expanded={toolsOpen}
+              aria-haspopup="true"
+            >
+              Tools
+              <ChevronDown
+                className={`h-3.5 w-3.5 transition-transform ${toolsOpen ? 'rotate-180' : ''}`}
+                aria-hidden
+              />
+            </button>
+            {toolsOpen ? (
+              <div className="absolute left-1/2 z-50 mt-2 w-[26rem] -translate-x-1/2 overflow-hidden rounded-xl bg-white shadow-card-hover ring-1 ring-gold-200">
+                {TOOL_GROUPS.map((group, gi) => (
+                  <div
+                    key={group.heading}
+                    className={gi === 0 ? 'p-2' : 'border-t border-gold-100 p-2'}
+                  >
+                    <p className="px-2 pb-1 pt-1.5 text-[10px] font-bold uppercase tracking-wide2 text-ink-faint">
+                      {group.heading}
+                    </p>
+                    {group.items.map((tool) => (
+                      <NavLink
+                        key={tool.label}
+                        to={tool.to}
+                        onClick={() => setToolsOpen(false)}
+                        className={({ isActive }) =>
+                          `block rounded-lg px-2.5 py-2 transition ${
+                            isActive ? 'bg-gold-50' : 'hover:bg-gold-50/60'
+                          }`
+                        }
+                      >
+                        <span className="block text-sm font-semibold text-ink">{tool.label}</span>
+                        <span className="block text-xs text-ink-muted">{tool.desc}</span>
+                      </NavLink>
+                    ))}
+                  </div>
+                ))}
+                <div className="border-t border-gold-100 bg-gold-50/40 px-3 py-2 text-[11px] text-ink-muted">
+                  One workspace per stakeholder — all demo data stays in your browser.
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          {NAV.slice(3).map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -249,6 +361,25 @@ export default function Navbar() {
                 )}
               </NavLink>
             ))}
+            <div className="mt-3 border-t border-gold-100 pt-2">
+              <p className="px-4 pb-1 text-[10px] font-bold uppercase tracking-wide2 text-ink-faint">
+                Stakeholder tools
+              </p>
+              {TOOL_GROUPS.flatMap((g) => g.items).map((tool) => (
+                <NavLink
+                  key={tool.label}
+                  to={tool.to}
+                  className={({ isActive }) =>
+                    `flex items-baseline justify-between rounded-lg px-4 py-2.5 ${
+                      isActive ? 'bg-gold-50 text-gold-700' : 'text-ink-soft hover:bg-gold-50/60'
+                    }`
+                  }
+                >
+                  <span className="text-sm font-semibold">{tool.label}</span>
+                  <span className="ml-2 truncate text-[11px] text-ink-muted">{tool.desc}</span>
+                </NavLink>
+              ))}
+            </div>
             <div className="mt-2 flex gap-2">
               {user ? (
                 <>

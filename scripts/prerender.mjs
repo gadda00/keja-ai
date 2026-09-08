@@ -117,11 +117,15 @@ async function main() {
   const { chromium } = await import('playwright')
 
   // Local static server: vite preview serves dist/ exactly as it will be hosted.
+  // VITE_BASE is forwarded so preview serves at the SAME base the dist/ was
+  // built for (vite.config derives base from it; a root build must not be
+  // previewed under the default /keja-ai/ subpath or every route 404s).
   // Spawn in its own process group so killing the tree actually frees the port
   const server = spawn('npx', ['vite', 'preview', '--port', '4173', '--strictPort'], {
     cwd: ROOT,
     stdio: 'ignore',
     detached: true,
+    env: { ...process.env, VITE_BASE: `${BASE}/` },
   })
 
   const origin = 'http://localhost:4173'
@@ -149,7 +153,7 @@ async function main() {
     for (const route of ROUTES) {
       const url = origin + BASE + route
       try {
-        await page.goto(url, { waitUntil: 'networkidle' })
+        await page.goto(url, { waitUntil: 'load', timeout: 20000 })
         // settle: let React mount + lazy chunks load + usePageMeta run
         await page.waitForFunction(() => document.readyState === 'complete')
         await page.waitForTimeout(route.startsWith('/properties/') ? 600 : 350)
@@ -211,7 +215,7 @@ async function main() {
     // ("We couldn't find /404-preview") is rewritten to a neutral phrase.
     try {
       const url = origin + BASE + '/404-preview'
-      await page.goto(url, { waitUntil: 'networkidle' })
+      await page.goto(url, { waitUntil: 'load', timeout: 20000 })
       await page.waitForFunction(() => document.readyState === 'complete')
       await page.waitForTimeout(350)
       let html = await page.evaluate(() => {

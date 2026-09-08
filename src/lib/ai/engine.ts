@@ -414,6 +414,115 @@ export class KejaAI {
       };
     }
 
+    // ---------------------- stakeholder workspaces ------------------------
+    // Specific tool requests route to the workspace; generic "products"
+    // questions still fall through to the ecosystem answer below.
+    if (
+      /(landlord studio|rent ledger|rent roll|collect(ing)? rent|arrears|owner statement|tenant management|manage tenants|property management tools|vacancy track|maintenance ticket)/.test(
+        t
+      )
+    ) {
+      return {
+        text: 'The **Landlord Studio** is built for exactly that — /manage:\n\n📋 **Units & tenants** — leases, deposits, vacancy status\n💵 **Rent ledger** — monthly collections by M-Pesa / bank / cash, arrears computed per tenant\n🔧 **Maintenance** — tickets with priority, cost and resolution flow\n🧾 **Owner statements** — computed monthly: collections, maintenance, management fee, net\n\nEverything is interactive demo data in your browser (production syncs M-Pesa statements) — but the math is real and every figure is labelled.',
+        meta: [
+          {
+            label: 'FACT',
+            text: 'Landlord Studio runs locally with unit-tested ledger, arrears and statement math',
+          },
+        ],
+        quickReplies: ['Open the Landlord Studio', 'I need property management', 'Talk to a human'],
+      };
+    }
+
+    if (
+      /(rental application|tenant hub|moving checklist|lease tracker|renew(al)? lease|i.re a renter|i am renting|new tenant|move.?in checklist)/.test(
+        t
+      )
+    ) {
+      return {
+        text: 'The **Tenant Hub** — built for renters, /tenant:\n\n📝 **Rental application builder** — profile, budget, employment and refs, ready to share with any partner agency\n🔑 **Lease tracker** — renewal countdown, rent-due reminders, deposit record\n🔧 **Maintenance requests** — categorised, tracked, status timeline\n📦 **Moving checklist** — KPLC transfer, water, internet… progress saved\n\nWant me to open it? You can also check rent affordability first — I run the numbers with the CBK 33% rule.',
+        meta: [
+          {
+            label: 'FACT',
+            text: 'Tenant Hub application validation and renewal math are covered by unit tests',
+          },
+        ],
+        quickReplies: ['Open the Tenant Hub', 'Check my rent affordability', 'Browse rentals'],
+      };
+    }
+
+    if (
+      /(keja pro|cma|comparables? (report|analysis|tool)|listing (description|copy|writer)|agent workspace|agent tools|viewing scheduler|generate listing)/.test(
+        t
+      )
+    ) {
+      return {
+        text: '**KEJA PRO** is the agent workspace — /pro:\n\n📊 **CMA builder** — comparables pulled live from inventory, price band, price/sqm, trust-labelled, printable\n✍️ **Listing writer** — professional listing copy in seconds (tone: professional / warm / luxury / diaspora), always labelled \u201cAI-assisted draft\u201d\n🔥 **Lead inbox** — the HOT / WARM / COLD pipeline (leads sync from my qualification chats)\n📅 **Viewings** — schedule, track, follow up\n\nFree for partner agencies — inventory is the trade.',
+        meta: [
+          {
+            label: 'FACT',
+            text: 'CMA band math and the listing grammar engine are deterministic and unit-tested',
+          },
+        ],
+        quickReplies: ['Open KEJA PRO', 'Become a partner', 'How does verification work?'],
+      };
+    }
+
+    if (
+      /(valuation desk|market bands?|price band|indicative valuation|comparables|estimate (my |the )?(house|home|property|land|plot|flat|apartment))/.test(
+        t
+      )
+    ) {
+      return {
+        text: 'The **Valuation Desk** gives you an honest starting point — /valuation:\n\nIt computes an **indicative band** (low / median / high) from live comparables in our inventory, blended with price-per-sqm when sizes are known, adjusted for condition, and labelled with a **confidence level based on how many comps exist**.\n\n📐 It is an ESTIMATE, not a valuation — a licensed valuer physically inspecting the property is the only number to transact on, and Keja escalates formal valuations by design. But for screening, negotiation prep and sanity checks, it\u2019s the fastest read in the market.',
+        meta: [
+          {
+            label: 'FACT',
+            text: 'Comparables engine with confidence bands; formal valuations always escalate to humans',
+          },
+        ],
+        quickReplies: ['Open the Valuation Desk', 'Talk to a human', 'Compare areas'],
+      };
+    }
+
+    if (
+      /(developer console|feasibility|land banking|gdv|development (project|math|screening)|build cost|absorption|development margin)/.test(
+        t
+      )
+    ) {
+      return {
+        text: 'The **Developer Console** screens land deals in minutes — /develop:\n\n🏗️ **Feasibility** — land, build, soft costs, finance → total cost, GDV, profit, margin, break-even units\n📈 **Cashflow** — month-by-month revenue, phased costs, interest, peak funding, payback\n🎯 **Sensitivity** — build cost vs sales price grid, colour-coded\n📊 **Demand snapshot** — live inventory counts and medians per area\n\nAll ESTIMATE-class screening math — the numbers a bankable feasibility study then formalises with contractor quotes and bank terms.',
+        meta: [
+          {
+            label: 'FACT',
+            text: 'Feasibility, cashflow and sensitivity engines are pure functions with unit tests',
+          },
+        ],
+        quickReplies: [
+          'Open the Developer Console',
+          'Investment analysis instead',
+          'Talk to a human',
+        ],
+      };
+    }
+
+    if (
+      /(diaspora|abroad|from the (uk|us|uae|dubai|states)|power of attorney|\bpoa\b|remittance|send money home|remote (viewing|purchase)|kenyan(s)? (abroad|overseas))/.test(
+        t
+      )
+    ) {
+      return {
+        text: '**Diaspora Hub** — built for Kenyans abroad buying or managing property back home, /diaspora:\n\n🌍 **Remote viewing scheduler** — time-zone accurate (UK / US East / US West / UAE / Nairobi), book video walk-throughs\n🛂 **Purchase journey** — 8 tracked steps: verification call, escrow-style deposit, PoA at the embassy, Ardhisasa title search, valuation, offer, stamp duty & registration, handover\n💱 **Money & FX** — corridor cost comparison (bank / specialist / stablecoin models) with ESTIMATE labels\n📜 **PoA checklist** — the 9 documents and steps, progress saved\n\nNo legal or tax advice by design — professionals handle the real thing; the hub keeps you organised.',
+        meta: [
+          {
+            label: 'FACT',
+            text: 'Timezone conversion, fee models and checklists are deterministic and unit-tested',
+          },
+        ],
+        quickReplies: ['Open the Diaspora Hub', 'Show me diaspora listings', 'Talk to a human'],
+      };
+    }
+
     // Ecosystem / products
     if (
       /(ecosystem|keja home|keja invest|keja pro|keja manage|keja data|keja search|products?|platform family|what products)/.test(
@@ -552,11 +661,16 @@ export class KejaAI {
       };
     }
 
-    // Sell / list property
+    // Sell / list property / management — routes to the right workspace
     if (/(sell|list my|listing my|sell my|tenant|manage|management|kodi)/.test(t)) {
       return {
-        text: 'I help two kinds of clients here:\n\n**Selling?** Your listing goes through our verification pipeline — title check, photo verification, price benchmarking — then appears with the *Verified by Keja* badge, which sells faster and at fairer prices.\n\n**Landlord?** Our management desk handles tenant sourcing, rent collection (M-Pesa), maintenance and monthly owner statements.\n\nWhich one sounds like you?',
-        quickReplies: ['I want to sell', 'I need property management', 'Talk to a human'],
+        text: 'I help three kinds of clients here:\n\n**Selling?** Your listing goes through our verification pipeline — title check, photo verification, price benchmarking — then appears with the *Verified by Keja* badge. The 4-step wizard is free and drafts auto-save.\n\n**Landlord?** The **Landlord Studio** (/manage) runs units, tenants, rent ledger, maintenance and computed owner statements — real math, demo data.\n\n**Tenant?** The **Tenant Hub** (/tenant) handles rental applications, lease tracking and maintenance requests.\n\nWhich one sounds like you?',
+        quickReplies: [
+          'I want to sell',
+          'Open the Landlord Studio',
+          'Open the Tenant Hub',
+          'Talk to a human',
+        ],
       };
     }
 

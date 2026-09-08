@@ -6,15 +6,20 @@ import { m } from 'framer-motion';
 import {
   ArrowRight,
   Banknote,
+  Clock,
   Coins,
   Copy,
+  FastForward,
   Link2,
+  PlusCircle,
+  RotateCcw,
   ShieldCheck,
   Sparkles,
   TrendingUp,
   UserRound,
   Wallet,
 } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 import type {
   Investment,
@@ -24,7 +29,13 @@ import type {
   TokenizedProperty,
 } from '@/data/tokenize';
 import { yieldPct } from '@/data/tokenize';
-import { useTokenize } from '@/lib/tokenizeStore';
+import type { AccrualResult } from '@/lib/tokenizeStore';
+import {
+  portfolioMarkToMarket,
+  TRIAL_START_BALANCE_USD,
+  TRIAL_TOPUP_USD,
+  useTokenize,
+} from '@/lib/tokenizeStore';
 
 import {
   fmtDate,
@@ -46,7 +57,11 @@ interface Holding {
   ownershipPct: number;
 }
 
-function computeHoldings(properties: TokenizedProperty[], investments: Investment[]): Holding[] {
+function computeHoldings(
+  properties: TokenizedProperty[],
+  investments: Investment[],
+  marketPrices: Record<string, number>
+): Holding[] {
   const byId = new Map(properties.map((p) => [p.id, p]));
   const merged = new Map<string, { tokens: number; cost: number }>();
   for (const inv of investments) {
@@ -65,7 +80,7 @@ function computeHoldings(properties: TokenizedProperty[], investments: Investmen
       property,
       tokens: h.tokens,
       costBasisUsd: h.cost,
-      currentValueUsd: h.tokens * property.tokenPriceUsd,
+      currentValueUsd: h.tokens * (marketPrices[propertyId] ?? property.tokenPriceUsd),
       annualIncomeUsd: h.tokens * incomePerToken,
       ownershipPct:
         property.totalTokens > 0 ? +((h.tokens / property.totalTokens) * 100).toFixed(4) : 0,
@@ -111,6 +126,8 @@ function StatCard({
   sub,
   accent,
   delay,
+  tone,
+  badge,
 }: {
   icon: typeof Wallet;
   label: string;
@@ -118,6 +135,10 @@ function StatCard({
   sub?: string;
   accent?: boolean;
   delay: number;
+  /** green/red value colouring (e.g. unrealized P/L) */
+  tone?: 'up' | 'down';
+  /** small honesty chip (ESTIMATE / trial labels) */
+  badge?: string;
 }) {
   return (
     <m.div
@@ -126,15 +147,38 @@ function StatCard({
       transition={{ delay, duration: 0.4 }}
       className={`rounded-2xl border p-5 ${accent ? 'border-transparent bg-ink text-white shadow-gold-lg' : 'border-gold-100 bg-white'}`}
     >
-      <div className="flex items-center gap-2 text-gold-600">
+      <div className="flex flex-wrap items-center gap-2 text-gold-600">
         <Icon className="h-4 w-4" />
         <span
           className={`text-[10.5px] font-bold uppercase tracking-[0.14em] ${accent ? 'text-gold-300' : 'text-gold-700'}`}
         >
           {label}
         </span>
+        {badge ? (
+          <span
+            className={`ml-auto rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+              accent
+                ? 'bg-white/15 text-gold-200'
+                : 'bg-amber-50 text-amber-800 ring-1 ring-amber-200'
+            }`}
+          >
+            {badge}
+          </span>
+        ) : null}
       </div>
-      <p className={`mt-2 text-2xl font-bold ${accent ? 'text-white' : 'text-ink'}`}>{value}</p>
+      <p
+        className={`mt-2 text-2xl font-bold ${
+          accent
+            ? 'text-white'
+            : tone === 'up'
+              ? 'text-emerald-700'
+              : tone === 'down'
+                ? 'text-red-700'
+                : 'text-ink'
+        }`}
+      >
+        {value}
+      </p>
       {sub ? (
         <p className={`mt-1 text-[12px] ${accent ? 'text-white/60' : 'text-ink-muted'}`}>{sub}</p>
       ) : null}
@@ -153,6 +197,12 @@ export function PortfolioView() {
     receivedDistributions,
     signOut,
     openProperty,
+    walletUsd,
+    clockOffsetMs,
+    topUpTrial,
+    resetTrial,
+    advanceTrialCycle,
+    marketPrice,
   } = useTokenize();
   const { toast } = useToast();
 
@@ -168,6 +218,12 @@ export function PortfolioView() {
       signOut={signOut}
       openProperty={openProperty}
       toast={toast}
+      walletUsd={walletUsd}
+      clockDays={Math.round(clockOffsetMs / 86_400_000)}
+      topUpTrial={topUpTrial}
+      resetTrial={resetTrial}
+      advanceTrialCycle={advanceTrialCycle}
+      marketPrice={marketPrice}
     />
   );
 }
@@ -181,6 +237,12 @@ function PortfolioInner({
   signOut,
   openProperty,
   toast,
+  walletUsd,
+  clockDays,
+  topUpTrial,
+  resetTrial,
+  advanceTrialCycle,
+  marketPrice,
 }: {
   investor: Investor;
   properties: TokenizedProperty[];
@@ -190,10 +252,30 @@ function PortfolioInner({
   signOut: () => void;
   openProperty: (id: string) => void;
   toast: (t: { title: string; description?: string }) => void;
+  walletUsd: number;
+  clockDays: number;
+  topUpTrial: () => void;
+  resetTrial: () => void;
+  advanceTrialCycle: () => AccrualResult;
+  marketPrice: (propertyId: string) => number;
 }) {
-  const holdings = computeHoldings(properties, investments);
-  const portfolioValue = holdings.reduce((s, h) => s + h.currentValueUsd, 0);
-  const costBasis = holdings.reduce((s, h) => s + h.costBasisUsd, 0);
+  const [confirmReset, setConfirmReset] = useState(false);
+
+  // The store does not expose marketPrices directly — approximate by sampling
+  // the store's marketPrice() per property (post-trade override → seed → issuance).
+  const marketPrices = useMemo(() => {
+    const rec: Record<string, number> = {};
+    for (const p of properties) rec[p.id] = marketPrice(p.id);
+    return rec;
+  }, [properties, marketPrice]);
+  const mtm = useMemo(
+    () => portfolioMarkToMarket(investments, properties, marketPrices),
+    [investments, properties, marketPrices]
+  );
+
+  const holdings = computeHoldings(properties, investments, marketPrices);
+  const portfolioValue = mtm.currentValueUsd;
+  const costBasis = mtm.totalCostUsd;
   const annualIncome = holdings.reduce((s, h) => s + h.annualIncomeUsd, 0);
   const lifetimeDistributions = distributions.reduce((s, d) => s + d.amountUsd, 0);
   const totalTokens = holdings.reduce((s, h) => s + h.tokens, 0);
@@ -203,6 +285,7 @@ function PortfolioInner({
     .map((s) => s[0])
     .slice(0, 2)
     .join('');
+  const up = mtm.pnlUsd >= 0;
 
   return (
     <div className="min-h-screen bg-cream">
@@ -248,37 +331,107 @@ function PortfolioInner({
         </div>
 
         {/* stats */}
-        <div className="mt-8 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
           <StatCard
             icon={Wallet}
             label="Portfolio value"
             value={fmtUsd(portfolioValue)}
             sub={`${fmtNum(totalTokens)} tokens held`}
+            badge="ESTIMATE"
             accent
             delay={0}
+          />
+          <StatCard
+            icon={TrendingUp}
+            label="Unrealized P/L"
+            value={`${up ? '+' : '−'}${fmtUsd(Math.abs(mtm.pnlUsd))} (${up ? '+' : '−'}${Math.abs(mtm.pnlPct).toFixed(1)}%)`}
+            sub={`vs ${fmtUsd(costBasis)} cost basis`}
+            badge="Marked to simulated market"
+            tone={up ? 'up' : 'down'}
+            delay={0.08}
           />
           <StatCard
             icon={TrendingUp}
             label="Projected annual income"
             value={fmtUsd(annualIncome, 2)}
             sub={`Blended yield ${blendedYield}%`}
-            delay={0.08}
+            delay={0.16}
           />
           <StatCard
             icon={Banknote}
             label="Distributions received"
             value={fmtUsd(lifetimeDistributions, 2)}
             sub={`${distributions.length} payouts to date`}
-            delay={0.16}
+            delay={0.24}
           />
           <StatCard
             icon={Coins}
             label="Cost basis"
             value={fmtUsd(costBasis)}
             sub={`${holdings.length} assets · USD denominated`}
-            delay={0.24}
+            delay={0.32}
           />
         </div>
+
+        {/* trial wallet */}
+        <m.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.4 }}
+          className="mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-amber-200 bg-amber-50 p-5"
+        >
+          <div className="flex items-center gap-4">
+            <div className="rounded-xl bg-white p-3 ring-1 ring-amber-200">
+              <Wallet className="h-6 w-6 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-[10.5px] font-bold uppercase tracking-[0.14em] text-amber-700">
+                Trial wallet — simulated money
+              </p>
+              <p className="mt-0.5 text-3xl font-bold text-ink">{fmtUsd(walletUsd)}</p>
+              <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-0.5 text-[11px] font-bold text-amber-800 ring-1 ring-amber-200">
+                <Clock className="h-3 w-3" /> Trial clock +{clockDays}{' '}
+                {clockDays === 1 ? 'day' : 'days'}
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => {
+                topUpTrial();
+                toast({
+                  title: 'Trial credits added — simulated money',
+                  description: `+${fmtUsd(TRIAL_TOPUP_USD)} in virtual trial credits.`,
+                });
+              }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-4 py-2.5 text-[12.5px] font-bold text-amber-800 transition hover:bg-amber-100"
+            >
+              <PlusCircle className="h-4 w-4" /> Top up +{fmtUsd(TRIAL_TOPUP_USD)} trial credits
+            </button>
+            {confirmReset ? (
+              <button
+                onClick={() => {
+                  resetTrial();
+                  setConfirmReset(false);
+                  toast({
+                    title: 'Trial reset',
+                    description: `Wallet, holdings, trades and distributions cleared — fresh ${fmtUsd(TRIAL_START_BALANCE_USD)} in trial credits.`,
+                  });
+                }}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-red-300 bg-red-50 px-4 py-2.5 text-[12.5px] font-bold text-red-700 transition hover:bg-red-100"
+              >
+                <RotateCcw className="h-4 w-4" /> Confirm reset — wipe trial data
+              </button>
+            ) : (
+              <button
+                onClick={() => setConfirmReset(true)}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-gold-200 bg-white px-4 py-2.5 text-[12.5px] font-bold text-ink-soft transition hover:border-red-200 hover:text-red-700"
+              >
+                <RotateCcw className="h-4 w-4" /> Reset trial
+              </button>
+            )}
+          </div>
+        </m.div>
 
         {/* holdings */}
         <div className="mt-12">
@@ -360,7 +513,30 @@ function PortfolioInner({
         {/* distributions + ledger */}
         <div className="mt-12 grid gap-8 grid-cols-1 lg:grid-cols-2">
           <div>
-            <SectionTitle eyebrow="Income" title="Distribution history" />
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <SectionTitle eyebrow="Income" title="Distribution history" />
+              <button
+                onClick={() => {
+                  const r = advanceTrialCycle();
+                  if (r.creditedUsd > 0) {
+                    toast({
+                      title: `Distribution cycle credited: ${fmtUsd(r.creditedUsd)} across ${r.entries.length} ${r.entries.length === 1 ? 'property' : 'properties'} (trial)`,
+                      description:
+                        'Trial clock fast-forwarded one cycle — credits added to the trial wallet.',
+                    });
+                  } else {
+                    toast({
+                      title: 'Cycle advanced — no distribution due yet',
+                      description:
+                        'The trial clock moved forward; income-paying LIVE holdings distribute at their next cycle.',
+                    });
+                  }
+                }}
+                className="btn-outline shrink-0 !h-11"
+              >
+                <FastForward className="h-4 w-4" /> Fast-forward trial clock
+              </button>
+            </div>
             <div className="mt-6 overflow-hidden rounded-2xl border border-gold-100 bg-white">
               {distributions.length === 0 ? (
                 <p className="p-6 text-center text-[13px] text-ink-muted">

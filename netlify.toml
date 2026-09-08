@@ -1,8 +1,8 @@
 [build]
   # Full parity with the GitHub Pages deploy: build + prerender every route
   # (status-200 HTML, real 404 page) instead of shipping a bare SPA shell.
-  # PRERENDER_ORIGIN picks up Netlify's own URL so canonicals/og:url are right.
-  command = "npm run build && PRERENDER_ORIGIN=$URL node scripts/prerender.mjs --base /"
+  # keja.app is the canonical home: root base + keja.app origin for SEO/og.
+  command = "npm run build && npx playwright install chromium && PRERENDER_ORIGIN=$URL node scripts/prerender.mjs --base /"
   publish = "dist"
 
 [[redirects]]
@@ -16,3 +16,7 @@
   # jsdom 30 / undici 8 (test + toolchain) require Node >= 22, matching
   # .nvmrc, package.json engines and the GitHub Actions workflows.
   NODE_VERSION = "22"
+  # Root base for the keja.app domain (GitHub Pages keeps its subpath via CI
+  # --base=/keja-ai/; Netlify is the canonical root deployment).
+  VITE_BASE = "/"
+  VITE_SITE_URL = "https://keja.app"

@@ -1,9 +1,13 @@
 User-agent: *
 Allow: /
-# Client-only app pages that waste crawl budget (paths include the /keja-ai/
-# base — the old unprefixed directives matched nothing on GitHub Pages)
+# Client-only app pages that waste crawl budget. Both the prefixed (legacy
+# GitHub Pages mirror) and unprefixed (keja.app) forms are listed so the
+# single file serves both deployments.
+Disallow: /admin
+Disallow: /account
+Disallow: /dashboard
 Disallow: /keja-ai/admin
 Disallow: /keja-ai/account
 Disallow: /keja-ai/dashboard
 
-Sitemap: https://gadda00.github.io/keja-ai/sitemap.xml
+Sitemap: https://keja.app/sitemap.xml

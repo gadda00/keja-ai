@@ -1,7 +1,14 @@
 /**
- * Keja Tokenize — client-side state store.
+ * Keja Tokenize — client-side state store (TRIAL MODE).
  * React context + localStorage persistence. Simulates the full loop:
- * KYC → purchase → ledger → portfolio → issuance. No backend required.
+ * KYC → purchase → ledger → portfolio → issuance → secondary trading →
+ * distributions. No backend, no real chain, no real money.
+ *
+ * Trial mode (2026-09): every investor gets a virtual USD wallet funded
+ * with trial credits; buys debit it, sales and distributions credit it; the
+ * secondary market matches orders against a walking book (price impact);
+ * LIVE properties accrue distributions on a virtual trial clock the user can
+ * fast-forward so the full lifecycle is demonstrable in minutes.
  */
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -24,7 +31,28 @@ import {
 
 const STORAGE_KEY = 'keja-tokenize-v1';
 
+/** Trial credits granted on first visit / after a reset. */
+export const TRIAL_START_BALANCE_USD = 25_000;
+/** Trial top-up chunk (clearly labelled in the UI). */
+export const TRIAL_TOPUP_USD = 10_000;
+/** One monthly distribution cycle on the trial clock. */
+export const MONTH_CYCLE_MS = 30 * 24 * 60 * 60 * 1000;
+/** One quarterly cycle on the trial clock. */
+export const QUARTER_CYCLE_MS = 91 * 24 * 60 * 60 * 1000;
+
 export type TokenizeView = 'marketplace' | 'property' | 'portfolio' | 'issuer' | 'learn' | 'market';
+
+/** Executed secondary-market trade (trial). */
+export interface Trade {
+  id: string;
+  propertyId: string;
+  symbol: string;
+  side: 'BUY' | 'SELL';
+  tokens: number;
+  avgPriceUsd: number;
+  totalUsd: number;
+  timestamp: string;
+}
 
 interface PersistedState {
   investor: Investor | null;
@@ -35,6 +63,23 @@ interface PersistedState {
   soldDelta: Record<string, number>;
   receivedDistributions: ReceivedDistribution[];
   waitlist: string[];
+  /* ----- trial mode state ----- */
+  /** virtual USD wallet (trial credits; simulated money only) */
+  walletUsd: number;
+  /** live mid-price overrides after secondary trades (per property id) */
+  marketPrices: Record<string, number>;
+  /** executed secondary trades (trial) */
+  trades: Trade[];
+  /** virtual trial-clock offset from real time */
+  clockOffsetMs: number;
+  /** ISO timestamp of the last distribution accrual run */
+  lastAccrual: string | null;
+  /** lifecycle overrides: FUNDING sold out → FUNDED; issuer opens trading → LIVE */
+  statusOverrides: Record<string, 'FUNDED' | 'LIVE'>;
+  /** investor-count deltas (first purchase per property increments) */
+  investorCountDelta: Record<string, number>;
+  /** when the trial started (ISO) */
+  trialStartedAt: string;
 }
 
 const EMPTY: PersistedState = {
@@ -45,6 +90,14 @@ const EMPTY: PersistedState = {
   soldDelta: {},
   receivedDistributions: [],
   waitlist: [],
+  walletUsd: TRIAL_START_BALANCE_USD,
+  marketPrices: {},
+  trades: [],
+  clockOffsetMs: 0,
+  lastAccrual: null,
+  statusOverrides: {},
+  investorCountDelta: {},
+  trialStartedAt: new Date().toISOString(),
 };
 
 function load(): PersistedState {
@@ -52,7 +105,7 @@ function load(): PersistedState {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return EMPTY;
     const parsed = JSON.parse(raw) as Partial<PersistedState>;
-    return { ...EMPTY, ...parsed };
+    return { ...EMPTY, ...parsed, walletUsd: parsed.walletUsd ?? TRIAL_START_BALANCE_USD };
   } catch {
     return EMPTY;
   }
@@ -89,6 +142,47 @@ export interface TokenizeStore {
   loadDemoPortfolio: () => void;
   signOut: () => void;
   joinWaitlist: (propertyId: string) => void;
+
+  /* ----- trial mode ----- */
+  /** Virtual USD wallet balance (trial credits — simulated money). */
+  walletUsd: number;
+  /** Executed secondary trades (trial). */
+  trades: Trade[];
+  /** Virtual trial clock offset in ms. */
+  clockOffsetMs: number;
+  /** Effective "now" on the trial clock (real now + offset). */
+  trialNowMs: number;
+  /** Add a labelled chunk of trial credits. */
+  topUpTrial: () => void;
+  /** Buy on the secondary market against the ask side (walking book). */
+  buySecondary: (propertyId: string, tokenAmount: number) => SecondaryTradeResult;
+  /** Sell on the secondary market against the bid side (walking book). */
+  sellSecondary: (propertyId: string, tokenAmount: number) => SecondaryTradeResult;
+  /** Fast-forward the trial clock one distribution cycle, then accrue. */
+  advanceTrialCycle: () => AccrualResult;
+  /** Live mid price for a property (post-trade override or issuance price). */
+  marketPrice: (propertyId: string) => number;
+  /** Wipe everything and restart the trial with fresh credits. */
+  resetTrial: () => void;
+  /** Issuer action: open secondary trading on a fully-funded offering. */
+  openTrading: (propertyId: string) => void;
+}
+
+export interface SecondaryTradeResult {
+  tokens: number;
+  avgPriceUsd: number;
+  totalUsd: number;
+  txHash: string;
+  symbol: string;
+  title: string;
+  /** price the book moved to after the fill (market impact) */
+  newMid: number;
+}
+
+export interface AccrualResult {
+  cyclesAdvanced: number;
+  creditedUsd: number;
+  entries: ReceivedDistribution[];
 }
 
 export interface KycForm {
@@ -157,14 +251,30 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
     }
   }, [state]);
 
-  /** seeded properties with runtime sold deltas + custom issued properties */
+  /** seeded properties with runtime sold deltas, lifecycle overrides,
+   *  investor-count deltas + custom issued properties */
   const properties = useMemo<TokenizedProperty[]>(() => {
-    const seeded = TOKENIZED_PROPERTIES.map((p) => ({
-      ...p,
-      tokensSold: Math.min(p.totalTokens, p.tokensSold + (state.soldDelta[p.id] ?? 0)),
-    }));
-    return [...seeded, ...state.customProperties];
-  }, [state.soldDelta, state.customProperties]);
+    const seeded = TOKENIZED_PROPERTIES.map((p) => {
+      const sold = Math.min(p.totalTokens, p.tokensSold + (state.soldDelta[p.id] ?? 0));
+      // Lifecycle: a FUNDING offering that sells out becomes FUNDED; an
+      // explicit override (issuer "open trading") then promotes it to LIVE.
+      let { status } = p;
+      if (p.status === 'FUNDING' && sold >= p.totalTokens) status = 'FUNDED';
+      const override = state.statusOverrides[p.id];
+      if (override === 'LIVE') status = 'LIVE';
+      return {
+        ...p,
+        tokensSold: sold,
+        status,
+        investorCount: p.investorCount + (state.investorCountDelta[p.id] ?? 0),
+      };
+    });
+    const custom = state.customProperties.map((p) => {
+      const override = state.statusOverrides[p.id];
+      return override === 'LIVE' ? { ...p, status: 'LIVE' as const } : p;
+    });
+    return [...seeded, ...custom];
+  }, [state.soldDelta, state.customProperties, state.statusOverrides, state.investorCountDelta]);
 
   const openProperty = useCallback((id: string) => {
     setSelectedPropertyId(id);
@@ -214,9 +324,15 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
           `Only ${available.toLocaleString()} ${p.tokenSymbol} tokens remain — reduce your order`
         );
       const cost = tokenAmount * p.tokenPriceUsd;
+      // Trial wallet: primary purchases pay from virtual trial credits.
+      if (cost > state.walletUsd)
+        throw new Error(
+          `Trial wallet has $${Math.round(state.walletUsd).toLocaleString()} — this order costs $${Math.round(cost).toLocaleString()}. Top up trial credits or reduce the order.`
+        );
       const txHash = randomHex(64);
       const blockNumber = nextBlockNumber();
-      const now = new Date().toISOString();
+      const now = new Date(Date.now() + state.clockOffsetMs).toISOString();
+      const firstBuy = !state.investments.some((i) => i.propertyId === propertyId);
 
       const investment: Investment = {
         id: `inv-${Date.now().toString(36)}`,
@@ -243,7 +359,12 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
         ...s,
         investments: [investment, ...s.investments],
         ledger: [ledgerTx, ...s.ledger],
+        walletUsd: s.walletUsd - cost,
         soldDelta: { ...s.soldDelta, [p.id]: (s.soldDelta[p.id] ?? 0) + tokenAmount },
+        // first purchase on this offering counts a new investor
+        investorCountDelta: firstBuy
+          ? { ...s.investorCountDelta, [p.id]: (s.investorCountDelta[p.id] ?? 0) + 1 }
+          : s.investorCountDelta,
       }));
 
       const newSold = sold + tokenAmount;
@@ -268,7 +389,7 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
         fundedPct: funded,
       };
     },
-    [properties]
+    [properties, state.walletUsd, state.clockOffsetMs, state.investments]
   );
 
   const sellTokens = useCallback(
@@ -281,7 +402,7 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
       if (tokenAmount <= 0 || tokenAmount > held) throw new Error('Insufficient tokens');
       const proceeds = tokenAmount * pricePerTokenUsd;
       const txHash = randomHex(64);
-      const now = new Date().toISOString();
+      const now = new Date(Date.now() + state.clockOffsetMs).toISOString();
       const ledgerTx: LedgerTx = {
         txHash,
         blockNumber: nextBlockNumber(),
@@ -308,6 +429,7 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
           ...s,
           investments,
           ledger: [ledgerTx, ...s.ledger],
+          walletUsd: s.walletUsd + proceeds,
           soldDelta: {
             ...s.soldDelta,
             [propertyId]: Math.max(0, (s.soldDelta[propertyId] ?? 0) - tokenAmount),
@@ -316,7 +438,7 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
       });
       return { proceedsUsd: proceeds, txHash, tokens: tokenAmount };
     },
-    [properties, state.investments]
+    [properties, state.investments, state.clockOffsetMs]
   );
 
   const issueProperty = useCallback(
@@ -428,6 +550,223 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  /* ------------------------------ trial actions ----------------------------- */
+
+  const topUpTrial = useCallback(() => {
+    setState((s) => ({ ...s, walletUsd: s.walletUsd + TRIAL_TOPUP_USD }));
+  }, []);
+
+  const buySecondary = useCallback(
+    (propertyId: string, tokenAmount: number): SecondaryTradeResult => {
+      const p = properties.find((x) => x.id === propertyId);
+      if (!p) throw new Error('Property not found');
+      if (tokenAmount <= 0) throw new Error('Enter a token amount');
+      const book = buildOrderBook(p.id, seedMidPrice(p), state.marketPrices[p.id]);
+      const fill = matchMarketOrder('buy', tokenAmount, book.bids, book.asks);
+      if (fill.filled <= 0) throw new Error('No ask depth on the book right now');
+      if (fill.totalUsd > state.walletUsd)
+        throw new Error(
+          `Trial wallet has $${Math.round(state.walletUsd).toLocaleString()} — this order fills $${Math.round(fill.totalUsd).toLocaleString()}. Top up trial credits or reduce the order.`
+        );
+      const txHash = randomHex(64);
+      const now = new Date(Date.now() + state.clockOffsetMs).toISOString();
+      const investment: Investment = {
+        id: `inv-${Date.now().toString(36)}`,
+        propertyId,
+        tokenAmount: fill.filled,
+        pricePerTokenUsd: fill.avgPriceUsd,
+        totalCostUsd: fill.totalUsd,
+        txHash,
+        blockNumber: nextBlockNumber(),
+        createdAt: now,
+      };
+      const ledgerTx: LedgerTx = {
+        txHash,
+        blockNumber: nextBlockNumber(),
+        symbol: p.tokenSymbol,
+        title: p.title,
+        tokens: fill.filled,
+        totalCostUsd: fill.totalUsd,
+        timestamp: now,
+        type: 'PURCHASE',
+      };
+      const trade: Trade = {
+        id: `trd-${Date.now().toString(36)}`,
+        propertyId,
+        symbol: p.tokenSymbol,
+        side: 'BUY',
+        tokens: fill.filled,
+        avgPriceUsd: fill.avgPriceUsd,
+        totalUsd: fill.totalUsd,
+        timestamp: now,
+      };
+      setState((s) => ({
+        ...s,
+        investments: [investment, ...s.investments],
+        ledger: [ledgerTx, ...s.ledger],
+        trades: [trade, ...s.trades],
+        walletUsd: s.walletUsd - fill.totalUsd,
+        marketPrices: { ...s.marketPrices, [propertyId]: fill.newMid },
+      }));
+      return {
+        tokens: fill.filled,
+        avgPriceUsd: fill.avgPriceUsd,
+        totalUsd: fill.totalUsd,
+        txHash,
+        symbol: p.tokenSymbol,
+        title: p.title,
+        newMid: fill.newMid,
+      };
+    },
+    [properties, state.marketPrices, state.walletUsd, state.clockOffsetMs]
+  );
+
+  const sellSecondary = useCallback(
+    (propertyId: string, tokenAmount: number): SecondaryTradeResult => {
+      const p = properties.find((x) => x.id === propertyId);
+      if (!p) throw new Error('Property not found');
+      const held = state.investments
+        .filter((i) => i.propertyId === propertyId)
+        .reduce((acc, i) => acc + i.tokenAmount, 0);
+      if (tokenAmount <= 0 || tokenAmount > held) throw new Error('Insufficient tokens');
+      const book = buildOrderBook(p.id, seedMidPrice(p), state.marketPrices[p.id]);
+      const fill = matchMarketOrder('sell', tokenAmount, book.bids, book.asks);
+      if (fill.filled <= 0) throw new Error('No bid depth on the book right now');
+      const txHash = randomHex(64);
+      const now = new Date(Date.now() + state.clockOffsetMs).toISOString();
+      const ledgerTx: LedgerTx = {
+        txHash,
+        blockNumber: nextBlockNumber(),
+        symbol: p.tokenSymbol,
+        title: p.title,
+        tokens: -fill.filled,
+        totalCostUsd: fill.totalUsd,
+        timestamp: now,
+        type: 'SALE',
+      };
+      const trade: Trade = {
+        id: `trd-${Date.now().toString(36)}`,
+        propertyId,
+        symbol: p.tokenSymbol,
+        side: 'SELL',
+        tokens: fill.filled,
+        avgPriceUsd: fill.avgPriceUsd,
+        totalUsd: fill.totalUsd,
+        timestamp: now,
+      };
+      setState((s) => {
+        let remaining = fill.filled;
+        const investments = s.investments
+          .filter((i) => i.propertyId === propertyId)
+          .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+          .map((i) => {
+            if (remaining <= 0) return i;
+            const take = Math.min(i.tokenAmount, remaining);
+            remaining -= take;
+            return { ...i, tokenAmount: i.tokenAmount - take };
+          })
+          .filter((i) => i.tokenAmount > 0);
+        return {
+          ...s,
+          investments,
+          ledger: [ledgerTx, ...s.ledger],
+          trades: [trade, ...s.trades],
+          walletUsd: s.walletUsd + fill.totalUsd,
+          marketPrices: { ...s.marketPrices, [propertyId]: fill.newMid },
+          soldDelta: {
+            ...s.soldDelta,
+            [propertyId]: Math.max(0, (s.soldDelta[propertyId] ?? 0) - fill.filled),
+          },
+        };
+      });
+      return {
+        tokens: fill.filled,
+        avgPriceUsd: fill.avgPriceUsd,
+        totalUsd: fill.totalUsd,
+        txHash,
+        symbol: p.tokenSymbol,
+        title: p.title,
+        newMid: fill.newMid,
+      };
+    },
+    [properties, state.investments, state.marketPrices, state.clockOffsetMs]
+  );
+
+  /** Accrue distributions for cycles elapsed on the trial clock. */
+  const accrue = useCallback(
+    (nowMs: number): AccrualResult => {
+      const baseMs = state.lastAccrual ? +new Date(state.lastAccrual) : nowMs;
+      const entries = computeAccruedDistributions(state.investments, properties, baseMs, nowMs);
+      const credited = entries.reduce((a, e) => a + e.amountUsd, 0);
+      setState((s) => ({
+        ...s,
+        lastAccrual: new Date(nowMs).toISOString(),
+        walletUsd: s.walletUsd + credited,
+        receivedDistributions:
+          credited > 0 ? [...entries, ...s.receivedDistributions] : s.receivedDistributions,
+      }));
+      return { cyclesAdvanced: entries.length, creditedUsd: credited, entries };
+    },
+    [state.lastAccrual, state.investments, properties]
+  );
+
+  const advanceTrialCycle = useCallback((): AccrualResult => {
+    // advance the virtual clock by the shortest cycle among held LIVE assets
+    // (30 days when nothing is held) so monthly payers credit first and the
+    // quarterly cadence visibly differs on the calendar.
+    const heldLiveIds = new Set(state.investments.map((i) => i.propertyId));
+    const heldLive = properties.filter((p) => heldLiveIds.has(p.id) && p.status === 'LIVE');
+    const step = heldLive.length
+      ? Math.min(...heldLive.map((p) => cycleLengthMs(p.distributionFreq)))
+      : MONTH_CYCLE_MS;
+    const nowMs = Date.now() + state.clockOffsetMs + step;
+    const baseMs = state.lastAccrual ? +new Date(state.lastAccrual) : nowMs;
+    const entries = computeAccruedDistributions(state.investments, properties, baseMs, nowMs);
+    const credited = entries.reduce((a, e) => a + e.amountUsd, 0);
+    setState((s) => ({
+      ...s,
+      clockOffsetMs: s.clockOffsetMs + step,
+      lastAccrual: new Date(nowMs).toISOString(),
+      walletUsd: s.walletUsd + credited,
+      receivedDistributions:
+        credited > 0 ? [...entries, ...s.receivedDistributions] : s.receivedDistributions,
+    }));
+    return { cyclesAdvanced: entries.length, creditedUsd: credited, entries };
+  }, [state.investments, state.clockOffsetMs, state.lastAccrual, properties]);
+
+  const marketPrice = useCallback(
+    (propertyId: string) =>
+      state.marketPrices[propertyId] ??
+      seedMidPrice(properties.find((p) => p.id === propertyId)) ??
+      properties.find((p) => p.id === propertyId)?.tokenPriceUsd ??
+      0,
+    [properties, state.marketPrices]
+  );
+
+  const resetTrial = useCallback(() => {
+    setState({ ...EMPTY, trialStartedAt: new Date().toISOString() });
+  }, []);
+
+  const openTrading = useCallback((propertyId: string) => {
+    setState((s) => ({ ...s, statusOverrides: { ...s.statusOverrides, [propertyId]: 'LIVE' } }));
+  }, []);
+
+  // auto-accrue on mount for returning users whose real-time clock has passed
+  // full cycles since the last accrual (trial clock unchanged — silent, honest)
+  useEffect(() => {
+    if (state.lastAccrual) {
+      const nowMs = Date.now() + state.clockOffsetMs;
+      const entries = computeAccruedDistributions(
+        state.investments,
+        properties,
+        +new Date(state.lastAccrual),
+        nowMs
+      );
+      if (entries.length > 0) void accrue(nowMs);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const value = useMemo<TokenizeStore>(
     () => ({
       investor: state.investor,
@@ -456,6 +795,17 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
       loadDemoPortfolio,
       signOut,
       joinWaitlist,
+      walletUsd: state.walletUsd,
+      trades: state.trades,
+      clockOffsetMs: state.clockOffsetMs,
+      trialNowMs: Date.now() + state.clockOffsetMs,
+      topUpTrial,
+      buySecondary,
+      sellSecondary,
+      advanceTrialCycle,
+      marketPrice,
+      resetTrial,
+      openTrading,
     }),
     [
       state,
@@ -477,6 +827,13 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
       loadDemoPortfolio,
       signOut,
       joinWaitlist,
+      topUpTrial,
+      buySecondary,
+      sellSecondary,
+      advanceTrialCycle,
+      marketPrice,
+      resetTrial,
+      openTrading,
     ]
   );
 
@@ -487,6 +844,173 @@ export function useTokenize(): TokenizeStore {
   const ctx = useContext(Ctx);
   if (!ctx) throw new Error('useTokenize must be used inside <TokenizeProvider>');
   return ctx;
+}
+
+/* ---------------------- trial-mode engine (pure, unit-tested) ---------------------- */
+
+/** One order-book level (price + resting size). */
+export interface BookLevel {
+  price: number;
+  size: number;
+}
+
+/** deterministic pseudo-random from string seed (same series as the UI) */
+function seeded(seed: string): () => number {
+  let h = 2166136261;
+  for (const c of seed) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+  return () => {
+    h = Math.imul(h ^ (h >>> 15), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    return ((h ^= h >>> 16) >>> 0) / 4294967296;
+  };
+}
+
+/** Deterministic 30-point price walk from the issuance price (illustrative history). */
+export function marketSeries(p: TokenizedProperty): { i: number; price: number }[] {
+  const rnd = seeded(p.id);
+  const points: { i: number; price: number }[] = [];
+  let price = p.tokenPriceUsd;
+  for (let i = 0; i < 30; i++) {
+    price = Math.max(0.5 * p.tokenPriceUsd, price * (1 + (rnd() - 0.48) * 0.02));
+    points.push({ i, price });
+  }
+  return points;
+}
+
+/** Where the book sits before any trial trade: seeded walk's last point. */
+export function seedMidPrice(p: TokenizedProperty | undefined): number | undefined {
+  if (!p) return undefined;
+  return marketSeries(p)[29].price;
+}
+
+/** Order book around the current mid: 3 bid/ask levels, deterministic sizes. */
+export function buildOrderBook(
+  propertyId: string,
+  seedMid: number | undefined,
+  liveMid: number | undefined
+): { mid: number; bids: BookLevel[]; asks: BookLevel[]; volume24h: number } {
+  const mid = liveMid ?? seedMid ?? 10;
+  const rnd = seeded(`${propertyId}book`);
+  const bids = [1, 2, 3].map((k) => ({
+    price: mid * (1 - k * 0.004),
+    size: Math.round(200 + rnd() * 1800),
+  }));
+  const asks = [1, 2, 3].map((k) => ({
+    price: mid * (1 + k * 0.004),
+    size: Math.round(200 + rnd() * 1800),
+  }));
+  return { mid, bids, asks, volume24h: Math.round(4000 + rnd() * 26000) };
+}
+
+/**
+ * Walk the book to fill a market order — buys eat asks (ascending), sells eat
+ * bids (descending). Volume-weighted average price; partial fill when depth
+ * runs out; the book's mid settles just past the last consumed level so
+ * trades visibly move the price (market impact).
+ */
+export function matchMarketOrder(
+  side: 'buy' | 'sell',
+  size: number,
+  bids: BookLevel[],
+  asks: BookLevel[]
+): { filled: number; avgPriceUsd: number; totalUsd: number; newMid: number } {
+  const levels = [...(side === 'buy' ? asks : bids)].sort((a, b) =>
+    side === 'buy' ? a.price - b.price : b.price - a.price
+  );
+  let remaining = Math.max(0, size);
+  let cost = 0;
+  let filled = 0;
+  let lastPrice = 0;
+  for (const lvl of levels) {
+    if (remaining <= 0) break;
+    const take = Math.min(lvl.size, remaining);
+    cost += take * lvl.price;
+    filled += take;
+    remaining -= take;
+    lastPrice = lvl.price;
+  }
+  const newMid =
+    filled > 0
+      ? side === 'buy'
+        ? lastPrice * 1.0015
+        : lastPrice * 0.9985
+      : bids[0] && asks[0]
+        ? (bids[0].price + asks[0].price) / 2
+        : lastPrice;
+  return { filled, avgPriceUsd: filled > 0 ? cost / filled : 0, totalUsd: cost, newMid };
+}
+
+/** Trial-clock length of one distribution cycle. */
+export function cycleLengthMs(freq: 'MONTHLY' | 'QUARTERLY'): number {
+  return freq === 'MONTHLY' ? MONTH_CYCLE_MS : QUARTER_CYCLE_MS;
+}
+
+/** Distribution per token per cycle (declared net income / cycles / supply). */
+export function perCycleDistributionUsd(p: TokenizedProperty): number {
+  const cyclesPerYear = p.distributionFreq === 'MONTHLY' ? 12 : 4;
+  return p.totalTokens > 0 ? p.annualNetIncomeUsd / cyclesPerYear / p.totalTokens : 0;
+}
+
+/**
+ * Distributions owed to current holdings of LIVE properties for whole cycles
+ * elapsed on the trial clock between lastAccrualMs and nowMs. FUNDING and
+ * FUNDED assets pay nothing — only income-producing LIVE assets distribute.
+ */
+export function computeAccruedDistributions(
+  investments: Investment[],
+  properties: TokenizedProperty[],
+  lastAccrualMs: number,
+  nowMs: number
+): ReceivedDistribution[] {
+  const out: ReceivedDistribution[] = [];
+  for (const p of properties) {
+    if (p.status !== 'LIVE') continue;
+    const held = investments
+      .filter((i) => i.propertyId === p.id)
+      .reduce((acc, i) => acc + i.tokenAmount, 0);
+    if (held <= 0) continue;
+    const cycle = cycleLengthMs(p.distributionFreq);
+    const elapsed = Math.max(0, nowMs - lastAccrualMs);
+    const cycles = Math.floor(elapsed / cycle);
+    if (cycles <= 0) continue;
+    const perToken = perCycleDistributionUsd(p);
+    const amountUsd = held * perToken * cycles;
+    out.push({
+      id: `dist-${p.id}-${nowMs}`,
+      propertyId: p.id,
+      symbol: p.tokenSymbol,
+      title: p.title,
+      period: `${cycles} × ${p.distributionFreq === 'MONTHLY' ? 'monthly' : 'quarterly'} cycle${cycles > 1 ? 's' : ''}`,
+      payDate: new Date(nowMs).toISOString(),
+      tokens: held,
+      perTokenUsd: perToken,
+      amountUsd,
+    });
+  }
+  return out;
+}
+
+/** Mark-to-market portfolio value at live mid prices (trial). */
+export function portfolioMarkToMarket(
+  investments: Investment[],
+  properties: TokenizedProperty[],
+  marketPrices: Record<string, number>
+): { totalCostUsd: number; currentValueUsd: number; pnlUsd: number; pnlPct: number } {
+  let cost = 0;
+  let value = 0;
+  for (const i of investments) {
+    cost += i.totalCostUsd;
+    const p = properties.find((x) => x.id === i.propertyId);
+    const price = marketPrices[i.propertyId] ?? seedMidPrice(p) ?? p?.tokenPriceUsd ?? 0;
+    value += i.tokenAmount * price;
+  }
+  const pnl = value - cost;
+  return {
+    totalCostUsd: cost,
+    currentValueUsd: value,
+    pnlUsd: pnl,
+    pnlPct: cost > 0 ? (pnl / cost) * 100 : 0,
+  };
 }
 
 /* ------------------------------- small helpers ------------------------------ */

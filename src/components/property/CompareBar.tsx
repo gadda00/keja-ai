@@ -15,7 +15,7 @@ export default function CompareBar() {
     .map((id) => all.find((p) => p.id === id))
     .filter((p): p is Property => p != null);
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gold-200 bg-white/95 shadow-[0_-8px_30px_rgba(25,22,18,0.12)] backdrop-blur">
+    <div className="fixed inset-x-0 bottom-16 z-40 border-t border-gold-200 bg-white/95 shadow-[0_-8px_30px_rgba(25,22,18,0.12)] backdrop-blur md:bottom-0">
       <div className="container-luxe flex items-center gap-3 py-3">
         <GitCompareArrows className="h-5 w-5 shrink-0 text-gold-600" aria-hidden="true" />
         <p className="shrink-0 text-sm font-semibold text-ink">

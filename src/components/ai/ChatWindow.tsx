@@ -77,6 +77,30 @@ export default function ChatWindow({ compact = false }: { compact?: boolean }) {
         to: '/tokenize',
         msg: 'Taking you to **Keja Tokenize** — our tokenized real-estate marketplace. 🪙',
       },
+      'open keja pro': {
+        to: '/pro',
+        msg: 'Opening **KEJA PRO** — CMA builder, listing writer, lead inbox and viewings. 📊',
+      },
+      'open the landlord studio': {
+        to: '/manage',
+        msg: 'Opening the **Landlord Studio** — units, tenants, rent ledger and owner statements. 🧾',
+      },
+      'open the tenant hub': {
+        to: '/tenant',
+        msg: 'Opening the **Tenant Hub** — applications, lease tracking and moving tools. 🔑',
+      },
+      'open the valuation desk': {
+        to: '/valuation',
+        msg: 'Opening the **Valuation Desk** — indicative comparables bands, honestly labelled. 📐',
+      },
+      'open the developer console': {
+        to: '/develop',
+        msg: 'Opening the **Developer Console** — feasibility, cashflow and sensitivity. 🏗️',
+      },
+      'open the diaspora hub': {
+        to: '/diaspora',
+        msg: 'Opening the **Diaspora Hub** — remote viewings, PoA and FX tools. 🌍',
+      },
       'explore the ecosystem': {
         to: '/ecosystem',
         msg: 'Opening the **KEJA ecosystem** — all eight products, one intelligence layer. ✨',

@@ -5,6 +5,7 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import DemoBanner from '@/components/layout/DemoBanner';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import Footer from '@/components/layout/Footer';
+import MobileTabBar from '@/components/layout/MobileTabBar';
 import Navbar from '@/components/layout/Navbar';
 import WhatsAppFloat from '@/components/layout/WhatsAppFloat';
 import RoleGate from '@/components/onboarding/RoleGate';
@@ -33,6 +34,11 @@ const Partners = lazy(() => import('@/pages/Partners'));
 const Compare = lazy(() => import('@/pages/Compare'));
 const ArticleDetail = lazy(() => import('@/pages/ArticleDetail'));
 const AreaGuide = lazy(() => import('@/pages/AreaGuide'));
+const TenantHub = lazy(() => import('@/pages/TenantHub'));
+const ProWorkspace = lazy(() => import('@/pages/ProWorkspace'));
+const ValuationDesk = lazy(() => import('@/pages/ValuationDesk'));
+const DeveloperConsole = lazy(() => import('@/pages/DeveloperConsole'));
+const DiasporaHub = lazy(() => import('@/pages/DiasporaHub'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 /** Async framer-motion feature loader (keeps the entry bundle lean). */
@@ -81,7 +87,8 @@ export default function App() {
       </a>
       <Navbar />
       <DemoBanner />
-      <main id="main-content" className="flex-1 pt-16">
+      {/* pb-20 clears the mobile app-style tab bar (MobileTabBar) */}
+      <main id="main-content" className="flex-1 pt-16 pb-20 md:pb-0">
         <ErrorBoundary>
           <Suspense fallback={<LazyFallback />}>
             <MotionConfig reducedMotion="user">
@@ -105,6 +112,11 @@ export default function App() {
                   <Route path="/areas/:slug" element={<AreaGuide />} />
                   <Route path="/sell" element={<ListProperty />} />
                   <Route path="/manage" element={<Manage />} />
+                  <Route path="/tenant" element={<TenantHub />} />
+                  <Route path="/pro" element={<ProWorkspace />} />
+                  <Route path="/valuation" element={<ValuationDesk />} />
+                  <Route path="/develop" element={<DeveloperConsole />} />
+                  <Route path="/diaspora" element={<DiasporaHub />} />
                   <Route path="/account" element={<Account />} />
                   <Route path="/admin" element={<Admin />} />
                   <Route path="/ecosystem" element={<Ecosystem />} />
@@ -123,6 +135,7 @@ export default function App() {
       <CompareBar />
       <AuthModal />
       <RoleGate />
+      <MobileTabBar />
     </div>
   );
 }

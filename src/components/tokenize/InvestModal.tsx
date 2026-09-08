@@ -19,7 +19,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { tokensAvailable } from '@/data/tokenize';
 import type { BuyResult } from '@/lib/tokenizeStore';
-import { useTokenize } from '@/lib/tokenizeStore';
+import { TRIAL_TOPUP_USD, useTokenize } from '@/lib/tokenizeStore';
 
 import { fmtNum, fmtUsd, img, Modal, useToast } from './shared';
 
@@ -30,8 +30,49 @@ const PROCESS_STAGES = [
   'Awaiting block confirmation…',
 ];
 
+/** Amber shortfall warning + labelled trial top-up (display only — the store guards the wallet). */
+function WalletShortfall({
+  cost,
+  walletUsd,
+  onTopUp,
+}: {
+  cost: number;
+  walletUsd: number;
+  onTopUp: () => void;
+}) {
+  return (
+    <div
+      role="alert"
+      className="mt-3 flex flex-col gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-[12.5px] leading-relaxed text-amber-800"
+    >
+      <div className="flex items-start gap-2">
+        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+        <span>
+          This order costs <strong>{fmtUsd(cost)}</strong> but your trial wallet holds{' '}
+          <strong>{fmtUsd(walletUsd)}</strong> in simulated credits. Top up or reduce the order.
+        </span>
+      </div>
+      <button
+        onClick={onTopUp}
+        className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-3.5 py-2 text-[12px] font-bold text-amber-800 transition hover:bg-amber-100"
+      >
+        Top up +{fmtUsd(TRIAL_TOPUP_USD)} trial credits
+      </button>
+    </div>
+  );
+}
+
 export function InvestModal() {
-  const { investPropertyId, closeInvest, investor, setView, properties, buyTokens } = useTokenize();
+  const {
+    investPropertyId,
+    closeInvest,
+    investor,
+    setView,
+    properties,
+    buyTokens,
+    walletUsd,
+    topUpTrial,
+  } = useTokenize();
   const { toast } = useToast();
 
   const p = useMemo(
@@ -68,6 +109,15 @@ export function InvestModal() {
   const cost = amount * (p?.tokenPriceUsd ?? 0);
   const incomePerToken = p && p.totalTokens > 0 ? p.annualNetIncomeUsd / p.totalTokens : 0;
   const annualIncome = amount * incomePerToken;
+  const unaffordable = cost > walletUsd;
+
+  function handleTopUp() {
+    topUpTrial();
+    toast({
+      title: 'Trial credits added — simulated money',
+      description: `+${fmtUsd(TRIAL_TOPUP_USD)} in virtual trial credits.`,
+    });
+  }
 
   const stageTimerRef = useRef<number | null>(null);
   const broadcastRef = useRef<number | null>(null);
@@ -191,7 +241,17 @@ export function InvestModal() {
                   {((p.annualNetIncomeUsd / p.totalValueUsd) * 100).toFixed(1)}%
                 </span>
               </div>
+              <div className="flex justify-between border-t border-gold-200 pt-2.5 text-[12.5px]">
+                <span className="text-ink-muted">Trial wallet</span>
+                <span className={`font-semibold ${unaffordable ? 'text-amber-700' : 'text-ink'}`}>
+                  {fmtUsd(walletUsd)} available
+                </span>
+              </div>
             </div>
+
+            {unaffordable ? (
+              <WalletShortfall cost={cost} walletUsd={walletUsd} onTopUp={handleTopUp} />
+            ) : null}
 
             <button className="btn-gold mt-5 !h-11 w-full" onClick={() => setStep('confirm')}>
               Review order <ArrowRight className="h-4 w-4" />
@@ -250,6 +310,10 @@ export function InvestModal() {
               </div>
             ) : null}
 
+            {unaffordable ? (
+              <WalletShortfall cost={cost} walletUsd={walletUsd} onTopUp={handleTopUp} />
+            ) : null}
+
             <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-gold-100 p-3.5">
               <input
                 type="checkbox"
@@ -268,7 +332,11 @@ export function InvestModal() {
               <button className="btn-outline flex-1" onClick={() => setStep('order')}>
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>
-              <button className="btn-gold flex-[2]" disabled={!ack || soldOut} onClick={execute}>
+              <button
+                className="btn-gold flex-[2]"
+                disabled={!ack || soldOut || unaffordable}
+                onClick={execute}
+              >
                 <BadgeDollarSign className="h-4 w-4" />
                 {soldOut
                   ? 'Fully funded — trade on the secondary market'
@@ -370,6 +438,10 @@ export function InvestModal() {
                   <Copy className="ml-2 h-3.5 w-3.5 shrink-0 text-gold-700" />
                 </button>
                 <p className="mt-2 text-[11.5px] text-ink-muted">{result.firstDistributionHint}</p>
+                <p className="mt-1.5 text-[11.5px] text-ink-muted">
+                  Trial wallet debited {fmtUsd(result.totalCostUsd, 2)} — remaining trial credits{' '}
+                  {fmtUsd(walletUsd)} (simulated money).
+                </p>
               </div>
             </div>
 

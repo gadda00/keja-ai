@@ -36,13 +36,10 @@ export type LanguageCode = (typeof LANGUAGES)[number]['code'];
 
 /**
  * Canonical site origin — single source of truth for SEO, JSON-LD, sitemap
- * and robots. Override per-deploy with VITE_SITE_URL (e.g. when the custom
- * keja.ai domain lands); defaults to the current GitHub Pages host.
+ * and robots. keja.app is the canonical home; VITE_SITE_URL overrides for
+ * the legacy GitHub Pages mirror in CI.
  */
-export const SITE_URL = (import.meta.env.VITE_SITE_URL ?? 'https://gadda00.github.io').replace(
-  /\/$/,
-  ''
-);
+export const SITE_URL = (import.meta.env.VITE_SITE_URL ?? 'https://keja.app').replace(/\/$/, '');
 
 /** Absolute URL for a route path (handles both '' and '/x' inputs). */
 export const siteUrl = (path = '') =>

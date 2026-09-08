@@ -8,12 +8,14 @@ import {
   Building2,
   CalendarClock,
   Coins,
+  Info,
   Link2,
   MapPin,
   ShieldCheck,
   Sparkles,
   TrendingUp,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 import type { TokenizedProperty } from '@/data/tokenize';
 import { fundedPct, tokensAvailable, yieldPct } from '@/data/tokenize';
@@ -302,6 +304,15 @@ function PropertyCard({ p, index }: { p: TokenizedProperty; index: number }) {
           <MapPin className="h-3.5 w-3.5 text-gold-600" />
           {p.location}, {p.city}
         </p>
+        <Link
+          to="/trust#claims"
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
+          title="Every tokenize asset is a fictional demonstration — see the claims register"
+          className="mt-2 inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[9.5px] font-bold uppercase tracking-wide text-amber-800 transition hover:bg-amber-100"
+        >
+          <Info className="h-3 w-3" /> FICTIONAL ASSET · TRIAL DATA
+        </Link>
 
         <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-cream p-3 text-center">
           <div>
