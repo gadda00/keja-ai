@@ -74,7 +74,7 @@ Key lib modules (34 total): `trustScore.ts`, `verification.ts`, `investmentScore
 
 ## 8. Deployment, Domain and Infrastructure
 
-Deploy job: quality gates → SW stamp → zip → POST to Netlify API (secrets `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`) → poll until ready. keja.app: Spaceship NS (`launch1/launch2.spaceship.net`), A → `75.2.60.5`. Confirmed pending: the domain is claimed by a second Netlify account (`fb3b99bc-…`, API-verified 10 Sep 2026) — release steps + the automated `Fix keja.app domain` workflow in `docs/DOMAIN_CONFLICT_FIX.md`.
+Deploy job: quality gates → SW stamp → zip → POST to Netlify API (secrets `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`) → poll until ready. keja.app: Spaceship NS (`launch1/launch2.spaceship.net`), A → `75.2.60.5`. Confirmed pending: the domain is claimed by a second Netlify account (`fb3b99bc-…`, API-verified 10 Sep 2026) — release steps + the automated `Fix keja.app domain` workflow in `docs/DOMAIN_CONFLICT_FIX.md`. Second known blocker (same doc §7): Netlify's stuck operational-credits flag pauses new production deploys on the Free plan while the API reports credits `used=0` (Jul–Sep 2026 platform bug; support must reset). Published site stays live throughout; pushes still pass all quality gates and the deploy step self-diagnoses.
 
 ## 9. Repository Layout
 

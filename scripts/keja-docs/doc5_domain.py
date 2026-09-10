@@ -197,6 +197,36 @@ story += make_table(
     ratios=[0.32, 0.68],
     caption="Table 6.1 — Domain tooling shipped in the repository.")
 
+# 7 ─ Stuck operational-credits flag
+story += h1_block("Second Blocker — Stuck Operational-Credits Flag", "7", lead(
+    "While verifying the deploy pipeline on 10 September 2026, production deploys "
+    "began failing with a second, unrelated Netlify-side fault."))
+story.append(code_block(
+    "POST /api/v1/sites/{keja-ai}/deploys\n"
+    "{\"error\":\"Account credit usage exceeded - new deploys are blocked until credits are added\"}"))
+story.append(body(
+    "This is <b>not</b> an actual credit shortage. The Netlify API for this account "
+    "reports type=Free with credits included=300 and used=0, and no usage exceeded "
+    "anywhere—yet production deploys are blocked. This matches a <b>known Netlify "
+    "bug from July to September 2026</b> (the 'stuck operational-credits flag'), "
+    "reported by many Free-plan teams on the Netlify forums—one report matches this "
+    "case word-for-word, including the used=0 reading. Three facts characterise the "
+    "state: published sites stay live (keja-ai.netlify.app serves normally; only "
+    "<i>new</i> production deploys are paused); draft deploys continue to work, the "
+    "block is production-only; and only Netlify support can reset the flag—there is "
+    "no self-serve path and it does not self-clear within the billing cycle."))
+story.append(body(
+    "The recommended action: include the flag reset in the same support ticket as "
+    "the domain release from Chapter 3, or file it standalone—'Please reset the "
+    "stuck operational-credits flag for team gadda00 (account "
+    "68331ef7ea60d8e7aedec052). The API reports credits included=300, used=0, yet "
+    "production deploys fail with Account credit usage exceeded. This matches the "
+    "known Jul-Sep 2026 flag bug.' Until the reset, every push to main still builds "
+    "and passes all quality gates on GitHub; only the final deploy step is paused, "
+    "and it now exits with a self-diagnosing message pointing at this chapter. Once "
+    "support resets the flag, re-run the latest failed Deploy workflow and the "
+    "newest commit ships immediately."))
+
 mark_body_start(story)
 build_doc(story, BODY,
           "Resolving the keja.app Netlify Domain Conflict",

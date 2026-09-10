@@ -79,7 +79,14 @@ jobs:
             --data-binary @out.zip)
           deploy_id=$(echo "$resp" | jq -r '.id // empty')
           if [ -z "$deploy_id" ]; then
-            echo "Deploy failed: $resp" && exit 1
+            echo "Deploy failed: $resp"
+            if echo "$resp" | grep -q "credit usage exceeded"; then
+              echo "::error::Known Netlify Free-plan bug (Jul-Sep 2026): the stuck operational-credits flag"
+              echo "::error::pauses production deploys even while credits remain (API shows credits used=0)."
+              echo "::error::Published sites stay live. Fix: ask Netlify support to reset the flag for team"
+              echo "::error::gadda00 (account 68331ef7ea60d8e7aedec052) — see docs/DOMAIN_CONFLICT_FIX.md §7."
+            fi
+            exit 1
           fi
           echo "Deploy started: $deploy_id"
           for i in $(seq 1 30); do
@@ -91,4 +98,4 @@ jobs:
             sleep 10
           done
           [ "$state" = "ready" ] || { echo "Deploy did not become ready"; exit 1; }
-          echo "Live: https://keja.app"
+          echo "Live: https://keja-ai.netlify.app"

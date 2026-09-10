@@ -81,3 +81,29 @@ If items 1-2 fail: DNS propagation — re-run dig after 30 minutes. Item 4/8 on 
 |---|---|
 | `scripts/netlify-domain-fix.mjs` | Zero-dep Node script: `MODE=discover` (read-only inventory), `MODE=fix` (release → attach → SSL → verify), `MODE=probe` (raw endpoint diagnostics), `RELEASE_ONLY=1` (release without attaching, for the claiming account's token) |
 | `.github/workflows/fix-domain.yml` | Manual runner with the above modes; uses `NETLIFY_AUTH_TOKEN` / `NETLIFY_SITE_ID`, optional `NETLIFY_CLAIM_TOKEN` for cross-account release |
+
+## 7. Second Blocker Found 10 Sep 2026 — Stuck Operational-Credits Flag
+
+While verifying the deploy pipeline, production deploys started failing with:
+
+> `{"error":"Account credit usage exceeded - new deploys are blocked until credits are added"}`
+
+This is **not** an actual credit shortage. The Netlify API for this account reports `type=Free`,
+`credits: {"included":300,"used":0}` and no usage exceeded anywhere — yet production deploys are
+blocked. This matches a **known Netlify bug from July–September 2026** (the "stuck operational-credits
+flag"), reported by many Free-plan teams on the Netlify forums (e.g. answers.netlify.com threads
+166759, 166850, 166484 — one report matches this case word-for-word, including the `used:0` reading).
+
+Facts about the state:
+
+- **Published sites stay live** — keja-ai.netlify.app serves normally; only *new* production deploys are paused.
+- Only Netlify **support can reset the flag** (no self-serve path; it does not self-clear within the cycle).
+- Draft deploys continue to work; the block is production-only.
+
+**Action:** include this in the same support ticket as the domain release (§3) — or as a standalone
+ticket: *"Please reset the stuck operational-credits flag for team gadda00 (account
+68331ef7ea60d8e7aedec052). The API reports credits included=300, used=0, yet production deploys fail
+with 'Account credit usage exceeded'. This matches the known Jul–Sep 2026 flag bug."* Until the reset,
+every push to `main` builds and passes all quality gates on GitHub, and the deploy step exits with the
+self-diagnosing message added to `.github/workflows/deploy-netlify.yml`. Once support resets the flag,
+re-run the latest failed **Deploy to Netlify (keja.app)** workflow run and the newest commit ships.
