@@ -61,10 +61,15 @@ jobs:
           # committing — otherwise every ingest breaks `npm run
           # lint:prettier` and the drift compounds.
           npx --yes prettier@3.9.6 --write src/data/auto-listings.json
-          git config user.name "keja-autopilot[bot]"
-          git config user.email "autopilot@keja.ai"
+          # Vercel Hobby verification: commits must be authored by the team
+          # owner (torv54@gmail.com) or the deploy is blocked. The automation
+          # is identified by the commit message instead of the identity.
+          git config user.name "gadda00"
+          git config user.email "torv54@gmail.com"
           git add src/data/auto-listings.json
-          git commit -m "chore(autopilot): ingest new listings $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git commit -m "chore(autopilot): ingest new listings $(date -u +'%Y-%m-%d %H:%M UTC')
+
+Automated by the Auto-Pilot workflow (.github/workflows/auto-listings.yml)."
           git push
           echo "Committed — the verify job below gates it; the push itself"
           echo "triggers the Vercel deploy workflow on main."

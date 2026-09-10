@@ -35,3 +35,4 @@ npm-debug.log*
 *.sw?
 .vercel
 scripts/ghsecret/
+.deploy-stage/
