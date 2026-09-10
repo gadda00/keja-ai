@@ -11,6 +11,7 @@ import { Footer } from '@/components/shell/Footer';
 import { MobileTabBar } from '@/components/shell/MobileTabBar';
 import { DemoBanner } from '@/components/shell/DemoBanner';
 import { WhatsAppFloat } from '@/components/shell/WhatsAppFloat';
+import { InstallPrompt } from '@/components/shell/InstallPrompt';
 import { ErrorBoundary } from '@/components/shell/ErrorBoundary';
 import { TokenizeProvider } from '@/lib/tokenizeStore';
 import { AuthProvider } from '@/lib/auth';
@@ -165,6 +166,7 @@ export default function KejaApp() {
         <Footer />
         <WhatsAppFloat />
         <MobileTabBar />
+        <InstallPrompt />
         <ServiceWorkerRegistrar />
       </div>
     </HashRouter>

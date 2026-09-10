@@ -1,6 +1,9 @@
 [build]
   # Static export of the client-side SPA (hash routing) — served whole from
   # the CDN. keja.app is the canonical home.
+  # NOTE: production deploys are API-zip deploys from GitHub Actions, which
+  # do NOT read this file — the same rules ship inside out/ as
+  # public/_redirects + public/_headers. Keep both sides in sync.
   command = "NEXT_STATIC=1 npx next build && node scripts/sw-version.mjs"
   publish = "out"
 
@@ -27,6 +30,16 @@
 
 [[headers]]
   for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/splash/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/screenshots/*"
   [headers.values]
     Cache-Control = "public, max-age=604800"
 

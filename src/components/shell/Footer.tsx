@@ -8,6 +8,7 @@ import { Link } from '@/lib/router';
 import { ECOSYSTEM, PORTALS } from '@/lib/ecosystem';
 import { SITE } from '@/config';
 import { useI18n } from '@/lib/i18n';
+import { Smartphone } from 'lucide-react';
 
 const COMPANY = [
   { to: '/about', label: 'About Keja' },
@@ -55,6 +56,14 @@ export function Footer() {
                 {SITE.phone}
               </a>
             </div>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('keja:show-install'))}
+              className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3.5 py-1.5 text-xs font-bold text-primary transition-colors hover:bg-primary/10"
+            >
+              <Smartphone className="h-3.5 w-3.5" />
+              Install the app (Android &amp; iOS)
+            </button>
           </div>
 
           <nav aria-label="Ecosystem">
