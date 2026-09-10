@@ -67,9 +67,9 @@ jobs:
           git config user.name "gadda00"
           git config user.email "torv54@gmail.com"
           git add src/data/auto-listings.json
-          git commit -m "chore(autopilot): ingest new listings $(date -u +'%Y-%m-%d %H:%M UTC')
-
-Automated by the Auto-Pilot workflow (.github/workflows/auto-listings.yml)."
+          git commit \
+            -m "chore(autopilot): ingest new listings $(date -u +'%Y-%m-%d %H:%M UTC')" \
+            -m "Automated by the Auto-Pilot workflow (.github/workflows/auto-listings.yml)."
           git push
           echo "Committed — the verify job below gates it; the push itself"
           echo "triggers the Vercel deploy workflow on main."

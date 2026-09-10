@@ -82,8 +82,7 @@ jobs:
             exit 1
           fi
           echo "url=$url" >> "$GITHUB_OUTPUT"
-          echo "Deployment URL: $url (raw URL is Vercel-auth-gated; the smoke test
-               below hits the public production alias.)"
+          echo "Deployment URL: $url (raw URL is Vercel-auth-gated; smoke test below hits the public production alias)"
 
       # Raw deployment URLs are behind Vercel Authentication on Hobby — only
       # the project's assigned production domain (and custom domains) are
