@@ -178,7 +178,6 @@ async function main() {
     for (const s of probeTargets) {
       const paths = [
         `/sites/${s.id}/domains`,
-        `/sites/${s.id}/domains?per_page=100`,
         `/sites/${s.id}/domains/${DOMAIN}`,
         `/sites/${s.id}/domains/${WWW}`,
       ];
@@ -196,10 +195,43 @@ async function main() {
         log(`    -> ${r.status} ${(r.text || '(empty)').slice(0, 400).replace(/\s+/g, ' ')}`);
       }
     }
-    for (const p of [`/domains`, `/domains/${DOMAIN}`, `/domains/${DOMAIN}/dns_zones`, `/dns_zones?name=${DOMAIN}`]) {
+    for (const p of [`/domains`, `/domains/${DOMAIN}`, `/dns_zones?name=${DOMAIN}`]) {
       const r = await api('GET', p);
       log(`\n  GET ${p}`);
       log(`    -> ${r.status} ${(r.text || '(empty)').slice(0, 400).replace(/\s+/g, ' ')}`);
+    }
+
+    // every domain-ish field on every site object (catches branch deploy /
+    // deploy preview subdomain claims the classic check misses)
+    log('\n=== PROBE: every domain-ish field on every site ===');
+    for (const s of sites) {
+      const fresh = await api('GET', `/sites/${s.id}`);
+      const obj = fresh.json || s;
+      const domainFields = {};
+      for (const [k, v] of Object.entries(obj)) {
+        if (v && typeof v === 'string' && /(domain|\.app|\.com|\.net|\.org|\.africa|\.io|\.co)/i.test(k + ' ' + v) && k !== 'url' && k !== 'ssl_url' && k !== 'admin_url' && k !== 'deploy_url' && k !== 'build_settings' && k !== 'created_at' && k !== 'updated_at' && k !== 'published_deploy') {
+          domainFields[k] = v;
+        }
+      }
+      log(`  ${s.name}: ${JSON.stringify(domainFields)}`);
+    }
+
+    // audit log — when was keja.app ever touched, and by whom?
+    log('\n=== PROBE: account audit trail (domain-related events) ===');
+    for (const t of teams) {
+      const r = await api('GET', `/accounts/${t.id}/audit`);
+      if (!r.ok) {
+        log(`  GET /accounts/${t.id}/audit -> ${r.status} ${(r.text || '').slice(0, 200)}`);
+        continue;
+      }
+      const entries = r.json.audit_logs || r.json || [];
+      const hits = (Array.isArray(entries) ? entries : []).filter((e) =>
+        JSON.stringify(e).toLowerCase().includes(DOMAIN) || /domain|dns/i.test(e.action || '')
+      );
+      log(`  team ${t.name}: ${Array.isArray(entries) ? entries.length : 0} entries total, ${hits.length} domain-related`);
+      for (const e of hits.slice(0, 30)) {
+        log(`    - ${e.created_at || '?'} ${e.action || '?'} actor=${e.actor?.email || e.actor_id || '?'} ${JSON.stringify(e.payload || {}).slice(0, 220).replace(/\s+/g, ' ')}`);
+      }
     }
     log('\n=== PROBE COMPLETE (read-only) ===');
     return;
