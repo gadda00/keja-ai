@@ -16,13 +16,14 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "discover = report only (safe), fix = apply changes"
+        description: "discover = report only (safe), fix = apply changes, probe = raw endpoint diagnostics"
         required: true
         default: "discover"
         type: choice
         options:
           - discover
           - fix
+          - probe
 
 permissions:
   contents: read

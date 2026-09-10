@@ -31,8 +31,8 @@ if (!TOKEN) {
   console.error('::error::NETLIFY_AUTH_TOKEN is not set.');
   process.exit(1);
 }
-if (!['discover', 'fix'].includes(MODE)) {
-  console.error(`::error::MODE must be "discover" or "fix" (got "${MODE}")`);
+if (!['discover', 'fix', 'probe'].includes(MODE)) {
+  console.error(`::error::MODE must be "discover", "fix" or "probe" (got "${MODE}")`);
   process.exit(1);
 }
 
@@ -136,15 +136,26 @@ async function main() {
   const modernClaims = []; // {site, domainObj}
   for (const s of sites.slice(0, 60)) {
     const r = await api('GET', `/sites/${s.id}/domains`);
-    if (!r.ok || !Array.isArray(r.json)) continue;
-    for (const d of r.json) {
+    // Robust shape handling: array | {domains:[]} | {items:[]} | {data:[]}
+    let list = null;
+    if (Array.isArray(r.json)) list = r.json;
+    else if (r.json && Array.isArray(r.json.domains)) list = r.json.domains;
+    else if (r.json && Array.isArray(r.json.items)) list = r.json.items;
+    else if (r.json && Array.isArray(r.json.data)) list = r.json.data;
+    if (!list) {
+      log(`    ${s.name}: GET /domains -> ${r.status} (no list) body=${(r.text || '').slice(0, 180).replace(/\n/g, ' ')}`);
+      continue;
+    }
+    for (const d of list) {
       if (isTargetDomain(d.name)) {
         modernClaims.push({ site: s, domainObj: d });
         log(`    - ${d.name} on ${s.name} [${s.id}] ssl=${d.ssl_status ?? '?'} primary=${d.primary ?? '?'} verified=${d.verified_at ? 'yes' : 'no'}`);
+      } else {
+        log(`    ${s.name}: domain ${d.name} (ssl=${d.ssl_status ?? '?'})`);
       }
     }
   }
-  if (!modernClaims.length) log('    (no modern domain records found / endpoint unavailable)');
+  if (!modernClaims.length) log('    (no modern domain records found for the target domain family)');
 
   // ---- 5. DNS zones -----------------------------------------------------------
   log(`\n[5] Netlify DNS zones:`);
@@ -160,6 +171,40 @@ async function main() {
   const targetZone = zoneList.find((z) => z.name === DOMAIN);
 
   // ---- discovery ends here -----------------------------------------------------
+  if (MODE === 'probe') {
+    log('\n=== PROBE: raw responses from candidate domain endpoints ===');
+    const suspects = sites.filter((s) => s.id !== kejaSite.id);
+    const probeTargets = [kejaSite, ...suspects];
+    for (const s of probeTargets) {
+      const paths = [
+        `/sites/${s.id}/domains`,
+        `/sites/${s.id}/domains?per_page=100`,
+        `/sites/${s.id}/domains/${DOMAIN}`,
+        `/sites/${s.id}/domains/${WWW}`,
+      ];
+      for (const p of paths) {
+        const r = await api('GET', p);
+        log(`\n  GET ${p.replace(s.id, `<${s.name} id>`)}`);
+        log(`    -> ${r.status} ${(r.text || '(empty)').slice(0, 400).replace(/\s+/g, ' ')}`);
+      }
+    }
+    // account- and registry-scoped probes
+    for (const t of teams) {
+      for (const p of [`/accounts/${t.id}/domains`, `/${t.slug}/domains`]) {
+        const r = await api('GET', p);
+        log(`\n  GET ${p}`);
+        log(`    -> ${r.status} ${(r.text || '(empty)').slice(0, 400).replace(/\s+/g, ' ')}`);
+      }
+    }
+    for (const p of [`/domains`, `/domains/${DOMAIN}`, `/domains/${DOMAIN}/dns_zones`, `/dns_zones?name=${DOMAIN}`]) {
+      const r = await api('GET', p);
+      log(`\n  GET ${p}`);
+      log(`    -> ${r.status} ${(r.text || '(empty)').slice(0, 400).replace(/\s+/g, ' ')}`);
+    }
+    log('\n=== PROBE COMPLETE (read-only) ===');
+    return;
+  }
+
   if (MODE === 'discover') {
     log('\n=== DISCOVERY COMPLETE (no changes made) ===');
     const stale = claims.filter((c) => c.site.id !== kejaSite.id);
