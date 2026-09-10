@@ -243,12 +243,15 @@ async function main() {
     for (const t of teams) {
       const acc = await api('GET', `/accounts/${t.id}`);
       const caps = acc.json?.capabilities || acc.json;
-      log(`  GET /accounts/${t.id} -> ${acc.status}`);
-      log(`    ${JSON.stringify(caps).slice(0, 900).replace(/\s+/g, ' ')}`);
-      for (const p of [`/accounts/${t.id}/usage`, `/accounts/${t.id}/billing`, `/accounts/${t.id}/plan`]) {
-        const r = await api('GET', p);
-        log(`  GET ${p} -> ${r.status} ${(r.text || '(empty)').slice(0, 400).replace(/\s+/g, ' ')}`);
+      log(`  GET /accounts/${t.id} -> ${acc.status} type=${acc.json?.type_name || acc.json?.type || '?'}`);
+      const flat = JSON.stringify(caps);
+      // print credit / build / minutes related capabilities in full
+      for (const [k, v] of Object.entries(caps || {})) {
+        if (/credit|build|minute|deploy|bandwidth|seat|billing/i.test(k)) {
+          log(`    ${k}: ${JSON.stringify(v)}`);
+        }
       }
+      log(`    (capabilities length: ${flat.length} chars)`);
     }
     log('\n=== PROBE COMPLETE (read-only) ===');
     return;
