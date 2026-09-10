@@ -81,19 +81,22 @@ node scripts/auto-listings/run.mjs   # Auto-Pilot pipeline (zero npm deps)
 
 ## Deploy
 
-Production runs on **Vercel** (`keja-ai` project, Git-integrated with this repo). Every push
-to `main` — including Auto-Pilot's 6-hour cron commits — triggers a Vercel production build
-automatically: `bun install --frozen-lockfile` → typecheck/lint gates run in CI → `NEXT_STATIC=1
-next build` → service-worker version stamp → static `out/` served from the edge. No deploy
-secrets needed; Vercel reports the build status straight onto each commit and PR.
+Production runs on **Vercel** (project `keja-ai`, live at `keja-ai-rho.vercel.app` /
+**https://keja.app**). Every push to `main` — including Auto-Pilot's 6-hour cron commits —
+runs `.github/workflows/deploy-vercel.yml`: typecheck + lint gates, `bun install
+--frozen-lockfile`, static export + service-worker version stamp, then a `vercel` CLI
+prebuilt deploy (`pull → build --prod → deploy --prebuilt --prod`) authenticated by the
+`VERCEL_TOKEN` repo secret, followed by a live smoke test. The Vercel account has no GitHub
+integration connected, so deploys are API-driven from CI — same pattern the Netlify pipeline
+used.
 
 Routing, caching and security headers live in `vercel.json` (SPA rewrite, `sw.js` never
-cached, immutable-by-path asset caching, X-Frame-Options/HSTS). keja.app + www.keja.app are
-attached to the project — see `docs/DEPLOYMENT.md` for the full runbook (DNS records,
-verification, rollback) and the Netlify→Vercel migration notes.
+cached, per-path asset caching, X-Frame-Options/HSTS). keja.app + www.keja.app are attached
+to the project — see `docs/DEPLOYMENT.md` for the full runbook (DNS records, verification,
+rollback) and the Netlify→Vercel migration notes.
 
-`.github/workflows/production-check.yml` smoke-tests the live site after every push to
-`main` and hourly thereafter (manifest, service worker, headers).
+`.github/workflows/production-check.yml` smoke-tests the live site hourly
+(manifest, service worker, headers).
 
 ## Regulatory readiness — CMA Regulatory Sandbox
 

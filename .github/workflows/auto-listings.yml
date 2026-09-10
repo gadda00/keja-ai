@@ -67,7 +67,7 @@ jobs:
           git commit -m "chore(autopilot): ingest new listings $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
           echo "Committed — the verify job below gates it; the push itself"
-          echo "triggers the production deployment on Vercel (Git integration)."
+          echo "triggers the Vercel deploy workflow on main."
 
       - name: Run summary
         run: |
@@ -85,7 +85,7 @@ jobs:
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
   # Quality gate on the freshly-committed listings — the push itself
-  # already triggers the production deployment on Vercel (Git integration).
+  # already triggers the Vercel deploy workflow (deploy-vercel.yml) on main.
   verify:
     # Runs only when the ingest job committed new listings.
     needs: [ingest]

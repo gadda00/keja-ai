@@ -9,7 +9,8 @@
 | Layer | What runs it | Notes |
 |---|---|---|
 | Hosting / CDN | Vercel edge network | Static export — no server functions |
-| Build | Vercel Git integration (GitHub App) | Every push to `main` auto-deploys |
+| Build & deploy | GitHub Actions → `vercel` CLI prebuilt deploys | `.github/workflows/deploy-vercel.yml` on every push to `main` |
+| Production URLs | `keja-ai-rho.vercel.app` · `keja-ai-victors-projects-37d86841.vercel.app` | keja.app attaches via DNS (§4) |
 | Install | `bun install --frozen-lockfile` | Lockfile is `bun.lock` — never `npm ci` |
 | Build command | `NEXT_STATIC=1 npx next build && node scripts/sw-version.mjs` | Emits `out/` + stamps the service-worker cache version |
 | Runtime | 100% client-side SPA | Hash routing (`#/properties/KJA-001`), localStorage, offline shell |
@@ -20,6 +21,16 @@ The project deliberately uses the **static builder** (`"framework": null` in `ve
 rather than the Next.js framework preset: the app is a static export, and the static builder
 gives deterministic, first-class control of `vercel.json` rewrites and headers. Project-level
 settings in the Vercel dashboard mirror `vercel.json` — keep the two in sync if either changes.
+
+**Why CLI deploys, not the Vercel Git integration:** the Vercel account
+(`victors-projects-37d86841`) has no GitHub account connected — the GitHub link lives on a
+second Vercel login (the same identity that holds the `keja-ai.vercel.app` alias and held
+the Netlify keja.app claim). The GitHub Actions workflow therefore builds the static export
+and ships it with `vercel pull → build --prod → deploy --prebuilt --prod`, authenticated by
+the `VERCEL_TOKEN` repo secret. `vercel build` compiles `vercel.json` (rewrites + headers)
+into `.vercel/output/config.json`, so the deployed routing is exactly what the repo declares.
+If the GitHub App is ever connected to this Vercel account, the workflow can be dropped in
+favour of automatic Git deploys.
 
 ## 2. vercel.json — what each block does
 
@@ -42,17 +53,19 @@ settings in the Vercel dashboard mirror `vercel.json` — keep the two in sync i
 ## 3. Deploy pipeline
 
 1. Push to `main` (human or Auto-Pilot cron commit).
-2. GitHub Actions runs the quality gates: **PR check** workflow logic (typecheck + lint +
-   static build) applies on PRs; on `main`, Vercel's Git integration builds and deploys
-   and reports the result as a status check on the commit.
-3. Vercel build: `bun install --frozen-lockfile` → `NEXT_STATIC=1 npx next build` →
-   `node scripts/sw-version.mjs` (content-hashed SW cache version) → `out/` goes live.
-4. `.github/workflows/production-check.yml` smoke-tests the live site (HTTP 200,
-   manifest, `sw.js` with no-cache header, security headers) after every push and hourly.
+2. `.github/workflows/deploy-vercel.yml` runs the quality gates (typecheck + lint), then
+   `bun install --frozen-lockfile`, then the Vercel CLI prebuilt flow:
+   `vercel pull` (fetch project settings) → `vercel build --prod` (runs the static build +
+   SW stamp, compiles `vercel.json` routing) → `vercel deploy --prebuilt --prod`
+   (uploads the bundle — unchanged files are skipped via content hashing).
+3. The workflow prints the deployment URL and smoke-tests it (HTTP 200, manifest, `sw.js`
+   no-cache header, security headers).
+4. `.github/workflows/production-check.yml` re-runs that smoke test hourly against the
+   production alias.
 
-No deployment secrets are stored in GitHub — the Vercel Git integration handles auth.
-(The legacy `NETLIFY_AUTH_TOKEN` / `NETLIFY_SITE_ID` secrets were removed during the
-migration.)
+One repo secret is required: `VERCEL_TOKEN` (a Vercel personal access token with deploy
+scope). The legacy `NETLIFY_AUTH_TOKEN` / `NETLIFY_SITE_ID` secrets were removed during the
+migration.
 
 ## 4. keja.app DNS — the one manual step (Spaceship)
 
@@ -77,13 +90,14 @@ curl -I https://keja.app         # expect: HTTP 2xx + x-vercel-id header (served
 curl -I https://www.keja.app     # expect: 308 → https://keja.app
 ```
 
-## 5. Verification checklist (already completed during migration)
+## 5. Verification checklist (state at migration, 10 Sep 2026)
 
-- [x] Project `keja-ai` created, Git-integrated with `github.com/gadda00/keja-ai`
-- [x] Production build green on Vercel (static export + SW stamp)
+- [x] Project `keja-ai` created on Vercel (static builder, bun install, SW-stamped build)
+- [x] First production deployment READY + PROMOTED via CLI prebuilt flow
+- [x] Live smoke test on `keja-ai-rho.vercel.app`: 200, manifest, `sw.js` no-cache,
+      security headers, SPA rewrite — all green
 - [x] `keja.app` + `www.keja.app` attached; www configured as 308 redirect
-- [x] Live smoke test on the production alias: 200, manifest, `sw.js` no-cache,
-      security headers present
+- [x] `deploy-vercel.yml` + `production-check.yml` workflows in place
 - [x] Netlify `keja-ai` site deleted; Netlify repo secrets removed
 - [ ] **DNS records switched at Spaceship** (§4 — the only remaining step)
 - [ ] Post-switch check: `curl -I https://keja.app` serves from Vercel
@@ -105,13 +119,20 @@ domain simply points at Vercel's edge via DNS.
 What changed in the repo:
 
 - Added `vercel.json`; removed `netlify.toml`, `public/_redirects`, `public/_headers`
-  (Vercel reads routing/headers from `vercel.json` at the project level — nothing needs
-  to ship inside `out/`).
-- Removed `.github/workflows/deploy-netlify.yml` and `.github/workflows/fix-domain.yml`
-  (deployment is now Vercel's Git integration; the domain-fix tooling is moot).
-- Removed `scripts/netlify-domain-fix.mjs`.
-- Added `.github/workflows/production-check.yml` (live smoke test).
+  (Vercel reads routing/headers from `vercel.json`, compiled at `vercel build` time —
+  nothing needs to ship inside `out/`).
+- Replaced `.github/workflows/deploy-netlify.yml` with `deploy-vercel.yml` (same gate →
+  build → deploy → verify shape, shipping prebuilt output instead of a Netlify zip).
+- Removed `.github/workflows/fix-domain.yml` and `scripts/netlify-domain-fix.mjs`
+  (domain lifecycle is now two DNS records at Spaceship — §4).
+- Added `.github/workflows/production-check.yml` (hourly live smoke test).
 - `docs/DOMAIN_CONFLICT_FIX.md` marked superseded; this runbook replaces it.
+
+**Known quirk:** the bare `keja-ai.vercel.app` alias is owned by a *different* Vercel
+account (the same second login that held the Netlify keja.app claim and that carries the
+GitHub connection). It serves an unrelated/older deployment and is not used by this
+project — the production aliases are `keja-ai-rho.vercel.app` and
+`keja-ai-victors-projects-37d86841.vercel.app`, and the canonical domain is keja.app.
 
 What was **not** deleted: the other Netlify sites on the account (`chacadom`,
 `ecoawardsafrica`, `busara-ai`) are unrelated projects and were left untouched.

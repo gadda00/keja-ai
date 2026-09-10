@@ -1,7 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "nodeVersion": "22.x",
   "installCommand": "bun install --frozen-lockfile",
   "buildCommand": "NEXT_STATIC=1 npx next build && node scripts/sw-version.mjs",
   "outputDirectory": "out",

@@ -1,0 +1,58 @@
+# Production monitoring — hourly smoke test of the live site.
+#
+# Complements deploy-vercel.yml (which smoke-tests each new deployment
+# immediately): this one watches the steady state, so a regression that
+# appears between deploys (edge incident, DNS change, hijacked record)
+# surfaces in the Actions tab within the hour.
+name: Production check
+
+on:
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-check
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - url: https://keja-ai-rho.vercel.app
+            label: production alias
+            required: true
+          - url: https://keja.app
+            label: canonical domain (needs DNS switch at Spaceship)
+            required: false
+    steps:
+      - name: Smoke-test ${{ matrix.label }}
+        run: |
+          url="${{ matrix.url }}"
+          required="${{ matrix.required }}"
+          fail=0
+          code=$(curl -s --max-time 30 -o /dev/null -w "%{http_code}" "$url/" || echo 000)
+          echo "GET /                     -> $code"; [ "$code" = "200" ] || fail=1
+          if [ "$code" = "200" ]; then
+            headers=$(curl -sI --max-time 30 "$url/sw.js" || true)
+            echo "$headers" | grep -qi "^cache-control: public, max-age=0, must-revalidate" \
+              && echo "GET /sw.js cache-control  -> OK" || { echo "GET /sw.js cache-control  -> FAIL"; fail=1; }
+            echo "$headers" | grep -qi "^x-frame-options: DENY" \
+              && echo "GET /sw.js security hdrs  -> OK" || { echo "GET /sw.js security hdrs  -> FAIL"; fail=1; }
+            code=$(curl -s --max-time 30 -o /dev/null -w "%{http_code}" "$url/manifest.webmanifest" || echo 000)
+            echo "GET /manifest.webmanifest -> $code"; [ "$code" = "200" ] || fail=1
+          fi
+          if [ "$fail" = 1 ] && [ "$required" = "true" ]; then
+            echo "Smoke test FAILED on the production alias."
+            exit 1
+          elif [ "$fail" = 1 ]; then
+            echo "::warning::keja.app not serving the Vercel deployment yet — DNS records must point at Vercel (see docs/DEPLOYMENT.md §4)."
+          else
+            echo "Smoke test PASSED."
+          fi

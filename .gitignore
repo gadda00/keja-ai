@@ -33,3 +33,5 @@ npm-debug.log*
 .idea/
 *.suo
 *.sw?
+.vercel
+scripts/ghsecret/
