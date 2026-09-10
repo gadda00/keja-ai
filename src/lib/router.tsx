@@ -5,7 +5,7 @@
  * The whole Keja platform lives on a single Next.js route (`/`), with
  * hash-path deep links (`#/properties/KJA-001`). This works identically:
  *   - behind the sandbox preview gateway (only `/` is exposed),
- *   - on Netlify / keja.app (no server rewrites needed),
+ *   - on Vercel / keja.app (vercel.json rewrites keep legacy path URLs graceful),
  *   - inside the Capacitor Android/iOS shells (local file context).
  */
 import {

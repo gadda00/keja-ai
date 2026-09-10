@@ -66,7 +66,8 @@ jobs:
           git add src/data/auto-listings.json
           git commit -m "chore(autopilot): ingest new listings $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
-          echo "Committed — the gated deploy job below (same workflow) ships it."
+          echo "Committed — the verify job below gates it; the push itself"
+          echo "triggers the production deployment on Vercel (Git integration)."
 
       - name: Run summary
         run: |
@@ -84,10 +85,9 @@ jobs:
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
   # Quality gate on the freshly-committed listings — the push itself
-  # already triggers the canonical Netlify deploy workflow on main.
+  # already triggers the production deployment on Vercel (Git integration).
   verify:
-    # Quality gate on the freshly-committed listings — the push itself
-    # already triggers the canonical Netlify deploy workflow on main.
+    # Runs only when the ingest job committed new listings.
     needs: [ingest]
     if: needs.ingest.outputs.changed == 'true'
     runs-on: ubuntu-latest

@@ -4,7 +4,7 @@
 
 Kenya's AI real-estate ecosystem for every stakeholder — buyers, sellers, landlords, tenants,
 investors, developers, banks and institutions. A product of **Chacadom Investments**.
-Canonical home: **https://keja.app** (Netlify) · native apps: `docs/MOBILE.md`
+Canonical home: **https://keja.app** (Vercel) · native apps: `docs/MOBILE.md`
 
 ## The ecosystem (nine products)
 
@@ -64,8 +64,8 @@ backend-upgradeable) · Capacitor 8 native shells (Android + iOS).
 
 **Architecture note** — the whole platform mounts on the Next.js `/` route and navigates with
 hash paths (`#/properties/KJA-001`). That serves identically behind the sandbox preview
-gateway, on the Netlify CDN and inside the Capacitor shells, and keeps the app fully
-functional offline. The `NEXT_STATIC=1` build emits `out/` for Netlify and `cap sync`.
+gateway, on the Vercel CDN and inside the Capacitor shells, and keeps the app fully
+functional offline. The `NEXT_STATIC=1` build emits `out/` for Vercel and `cap sync`.
 
 ## Develop
 
@@ -74,24 +74,26 @@ bun install --frozen-lockfile   # the lockfile is bun.lock (CI installs the same
 npm run dev            # local dev server
 npm run typecheck      # tsc --noEmit (same gate as CI)
 npm run lint           # ESLint (same gate as CI)
-npm run build:static   # static export → out/ (what Netlify builds)
+npm run build:static   # static export → out/ (what Vercel builds)
 npm run mobile:sync    # static build + cap sync into android/ + ios/
 node scripts/auto-listings/run.mjs   # Auto-Pilot pipeline (zero npm deps)
 ```
 
 ## Deploy
 
-Pushes to `main` run `.github/workflows/deploy-netlify.yml`: typecheck + lint + static
-export + service-worker version stamp, then deploy to Netlify via API using the
-`NETLIFY_AUTH_TOKEN` / `NETLIFY_SITE_ID` repo secrets. keja.app is the canonical domain.
+Production runs on **Vercel** (`keja-ai` project, Git-integrated with this repo). Every push
+to `main` — including Auto-Pilot's 6-hour cron commits — triggers a Vercel production build
+automatically: `bun install --frozen-lockfile` → typecheck/lint gates run in CI → `NEXT_STATIC=1
+next build` → service-worker version stamp → static `out/` served from the edge. No deploy
+secrets needed; Vercel reports the build status straight onto each commit and PR.
 
-Auto-Pilot commits (6-hour cron) flow through the same quality gate and trigger the deploy.
+Routing, caching and security headers live in `vercel.json` (SPA rewrite, `sw.js` never
+cached, immutable-by-path asset caching, X-Frame-Options/HSTS). keja.app + www.keja.app are
+attached to the project — see `docs/DEPLOYMENT.md` for the full runbook (DNS records,
+verification, rollback) and the Netlify→Vercel migration notes.
 
-A second manual workflow, `.github/workflows/fix-domain.yml` (**Fix keja.app domain
-(Netlify)**), manages the keja.app custom-domain lifecycle through the same token:
-`discover` (read-only inventory), `fix` (release stale claims → attach keja.app + www →
-provision SSL → verify), and `probe` (raw diagnostics). See `docs/DOMAIN_CONFLICT_FIX.md`
-for the full runbook and the current domain status.
+`.github/workflows/production-check.yml` smoke-tests the live site after every push to
+`main` and hourly thereafter (manifest, service worker, headers).
 
 ## Regulatory readiness — CMA Regulatory Sandbox
 
@@ -127,8 +129,8 @@ Engineering, business and operations documents — PDF editions in `docs/pdf/`, 
 | Marketing playbook | `docs/MARKETING_PLAYBOOK.md` | `docs/pdf/keja-marketing-playbook.pdf` |
 | Strategy | `docs/STRATEGY.md` | `docs/pdf/keja-strategy.pdf` |
 | Kenya partner proposals (20 targets) | `docs/KENYA_PARTNER_PROPOSALS.md` | `docs/pdf/keja-kenya-partner-proposals.pdf` |
-| keja.app domain setup guide | — | `docs/pdf/keja-domain-setup-guide.pdf` |
-| keja.app Netlify domain-conflict fix | `docs/DOMAIN_CONFLICT_FIX.md` | `docs/pdf/keja-domain-conflict-fix.pdf` |
+| keja.app domain setup guide (Vercel) | `docs/DEPLOYMENT.md` | `docs/pdf/keja-domain-setup-guide.pdf` |
+| keja.app Netlify domain-conflict fix (historical) | `docs/DOMAIN_CONFLICT_FIX.md` | `docs/pdf/keja-domain-conflict-fix.pdf` |
 | PWA asset regeneration | `node scripts/generate-pwa-assets.mjs` | — |
 
 ## The honesty standard

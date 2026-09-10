@@ -1,6 +1,12 @@
 # Resolving the keja.app Netlify Domain Conflict
 
-> PDF edition: `docs/pdf/keja-domain-conflict-fix.pdf`. Companion: `docs/pdf/keja-domain-setup-guide.pdf` (general setup). State re-verified 10 September 2026 with API-level forensics — see the diagnosis below.
+> **⚠ SUPERSEDED (10 September 2026):** Keja AI now deploys on **Vercel**, not Netlify —
+> the Netlify domain claim described below is no longer relevant. The current runbook is
+> `docs/DEPLOYMENT.md` (Vercel setup + the two DNS records at Spaceship). This document is
+> kept as the forensic record of the Netlify era. The Netlify `keja-ai` site has been
+> deleted as part of the migration.
+
+> PDF edition: `docs/pdf/keja-domain-conflict-fix.pdf`. Companion: `docs/pdf/keja-domain-setup-guide.pdf` (Vercel edition). State re-verified 10 September 2026 with API-level forensics — see the diagnosis below.
 
 ## 1. What the Error Actually Means — and the Confirmed Diagnosis
 

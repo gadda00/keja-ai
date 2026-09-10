@@ -4,7 +4,12 @@
 
 ## 1. Executive Overview
 
-Keja AI is the single repository that builds, tests, deploys and operates Africa's real-estate intelligence and trust infrastructure. Canonical deployment: **https://keja.app** (Netlify), working URL https://keja-ai.netlify.app live and verified. Nine products plus four stakeholder portals, every capability claim anchored to the public claims register at `/#/trust`.
+Keja AI is the single repository that builds, tests, deploys and operates Africa's real-estate intelligence and trust infrastructure. Canonical deployment: **https://keja.app** (Vercel, since 10 September 2026), working URL https://keja-ai.vercel.app live and verified. Nine products plus four stakeholder portals, every capability claim anchored to the public claims register at `/#/trust`.
+
+> **Deployment update (10 September 2026):** production moved from Netlify to **Vercel**
+> (Git-integrated `keja-ai` project). The Netlify site was deleted; `netlify.toml`,
+> `public/_redirects` and `public/_headers` were replaced by `vercel.json`. Deploy pipeline
+> rows below reflect the Netlify era — see `docs/DEPLOYMENT.md` for the current setup.
 
 | Metric | Value |
 |---|---|
@@ -65,7 +70,7 @@ Key lib modules (34 total): `trustScore.ts`, `verification.ts`, `investmentScore
 | Workflow | Trigger | Does |
 |---|---|---|
 | PR check | PRs, non-main pushes | typecheck + lint + static build |
-| Deploy to Netlify (keja.app) | main pushes | same gates → zip `out/` → Netlify API deploy |
+| Deploy (Vercel Git integration) | main pushes | auto: bun install → NEXT_STATIC=1 build → sw stamp → out/ on the edge |
 | Auto-Pilot listings | cron 6h | ingest → commit → re-trigger deploy |
 
 **Post-mortem (early Sept 2026)**: every deploy failed because workflows ran `npm ci` while the repo lockfile is `bun.lock` (no `package-lock.json`). Ingest kept succeeding because it is zero-dependency. Fix in `ab30a10`: `oven-sh/setup-bun@v2` + `bun install --frozen-lockfile`, credentials guard, `_redirects`/`_headers` presence check. Next run: green end-to-end.

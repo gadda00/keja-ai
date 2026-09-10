@@ -1,5 +1,0 @@
-# Netlify redirect rules — ships inside out/ because API (zip) deploys do
-# not read netlify.toml from the repo. Mirrors the [[redirects]] block there.
-# SPA entry: every path resolves to the app shell; unknown hash routes show
-# the in-app 404 view.
-/*  /index.html  200
