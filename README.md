@@ -70,7 +70,7 @@ functional offline. The `NEXT_STATIC=1` build emits `out/` for Netlify and `cap 
 ## Develop
 
 ```bash
-npm install
+bun install --frozen-lockfile   # the lockfile is bun.lock (CI installs the same way)
 npm run dev            # local dev server
 npm run typecheck      # tsc --noEmit (same gate as CI)
 npm run lint           # ESLint (same gate as CI)
@@ -110,6 +110,20 @@ npm run mobile:apk     # debug APK
 npm run mobile:android # Android Studio
 npm run mobile:ios     # Xcode
 ```
+
+## Documentation suite
+
+Engineering, business and operations documents — PDF editions in `docs/pdf/`, markdown companions alongside:
+
+| Document | Markdown | PDF |
+| --- | --- | --- |
+| The Repository Picture (engineering dossier) | `docs/REPO_PICTURE.md` | `docs/pdf/keja-repo-picture.pdf` |
+| Marketing playbook | `docs/MARKETING_PLAYBOOK.md` | `docs/pdf/keja-marketing-playbook.pdf` |
+| Strategy | `docs/STRATEGY.md` | `docs/pdf/keja-strategy.pdf` |
+| Kenya partner proposals (20 targets) | `docs/KENYA_PARTNER_PROPOSALS.md` | `docs/pdf/keja-kenya-partner-proposals.pdf` |
+| keja.app domain setup guide | — | `docs/pdf/keja-domain-setup-guide.pdf` |
+| keja.app Netlify domain-conflict fix | `docs/DOMAIN_CONFLICT_FIX.md` | `docs/pdf/keja-domain-conflict-fix.pdf` |
+| PWA asset regeneration | `node scripts/generate-pwa-assets.mjs` | — |
 
 ## The honesty standard
 
