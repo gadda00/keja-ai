@@ -11,6 +11,7 @@ dist-ssr/
 # sandbox / local-only
 dev.log
 server.log
+tool-results/
 .zscripts/
 db/
 examples/

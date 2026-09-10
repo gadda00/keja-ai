@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+@page { size: 794px 1123px; margin: 0; }
+:root {
+  --c-bg: #eff0f1; --c-accent: #3681a6; --c-text: #1a1b1c;
+  --c-muted: #6f7578; --c-mid: #334650; --c-surface: #e4e7e8;
+}
+html, body { margin: 0; padding: 0; width: 794px; height: 1123px;
+  background: var(--c-bg); font-family: 'FreeSerif', Georgia, serif; }
+@media screen {
+  html { height: auto; display: flex; justify-content: center; min-height: 100vh; background: var(--c-bg); }
+  body { transform-origin: top center; scale: min(1, calc(100vw / 794)); margin: 0 auto; }
+}
+.cover { position: relative; width: 794px; height: 1123px;
+  border: none; outline: none; box-shadow: none; }
+.layer1 { position: absolute; inset: 0; overflow: hidden; z-index: 1; }
+.grid-bg { position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(51,70,80,0.03) 0.5px, transparent 0.5px),
+    linear-gradient(to bottom, rgba(51,70,80,0.03) 0.5px, transparent 0.5px);
+  background-size: 50px 50px; }
+.layer2 { position: absolute; inset: 0; z-index: 2; }
+.anchor-line { position: absolute; left: 95px; top: 112px; bottom: 112px;
+  width: 8px; background: var(--c-mid); }
+.layer3 { position: absolute; inset: 0; z-index: 3; }
+.kicker { position: absolute; left: 185px; top: 168px; width: 500px;
+  font-size: 16pt; font-family: 'Inter', 'FreeSerif', sans-serif;
+  letter-spacing: 3pt; text-transform: uppercase; color: var(--c-accent);
+  opacity: 0.75; font-weight: 400; }
+.hero { position: absolute; left: 185px; top: 320px; width: 530px;
+  font-size: 64pt; font-weight: 900; line-height: 1.15; color: var(--c-text);
+  letter-spacing: 1px; font-family: 'Inter', 'FreeSerif', sans-serif; }
+.hero .thin { font-weight: 300; color: var(--c-mid); }
+.summary { position: absolute; left: 185px; top: 565px; width: 476px;
+  font-size: 16.5pt; line-height: 1.6; color: var(--c-text); opacity: 0.85; }
+.meta { position: absolute; left: 185px; top: 845px; width: 500px;
+  font-size: 18pt; line-height: 1.55; color: var(--c-text); }
+.meta .lbl { color: var(--c-muted); font-size: 13pt; letter-spacing: 2pt;
+  text-transform: uppercase; font-family: 'Inter', 'FreeSerif', sans-serif; }
+.footer { position: absolute; left: 185px; bottom: 132px; width: 500px;
+  font-size: 16pt; letter-spacing: 3pt; text-transform: uppercase;
+  color: var(--c-muted); opacity: 0.6; font-family: 'Inter', 'FreeSerif', sans-serif; }
+</style>
+</head>
+<body>
+<div class="cover">
+  <div class="layer1"><div class="grid-bg"></div></div>
+  <div class="layer2"><div class="anchor-line"></div></div>
+  <div class="layer3">
+    <div class="kicker">Operations Guide · Domain Release and Launch</div>
+    <div class="hero">KEJA APP</div>
+    <div class="summary">The stale Netlify team claim on keja.app: what the error means given the verified DNS state, the two release paths, the ten-minute attach procedure, and the eight checks that prove the canonical launch.</div>
+    <div class="meta">Operations guide<br><span class='lbl'>A Chacadom Investments venture</span><br><span class='lbl'>10 September 2026</span></div>
+    <div class="footer">Keja AI &nbsp;·&nbsp; keja.app</div>
+  </div>
+</div>
+</body>
+</html>

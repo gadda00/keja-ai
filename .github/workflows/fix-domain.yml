@@ -1,0 +1,60 @@
+name: Fix keja.app domain (Netlify)
+
+# Manually-triggered maintenance workflow that uses the repo's
+# NETLIFY_AUTH_TOKEN to find and release stale keja.app domain claims
+# (e.g. a forgotten link on another site such as an old "chacadom"
+# project), then attaches keja.app + www.keja.app to the keja-ai site
+# and waits for the Let's Encrypt certificate.
+#
+#   mode=discover  read-only inventory: teams, sites, keja.app claims, DNS zones
+#   mode=fix       release stale claims -> attach to keja-ai -> SSL -> verify
+#
+# Run it from GitHub: Actions tab -> "Fix keja.app domain (Netlify)" ->
+# Run workflow -> pick mode. Default is the safe "discover".
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "discover = report only (safe), fix = apply changes"
+        required: true
+        default: "discover"
+        type: choice
+        options:
+          - discover
+          - fix
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fix-domain
+  cancel-in-progress: false
+
+jobs:
+  fix-domain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check Netlify credentials
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
+            echo "::error::NETLIFY_AUTH_TOKEN / NETLIFY_SITE_ID secrets are not set."
+            exit 1
+          fi
+
+      - name: Run domain fix script
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          MODE: ${{ inputs.mode }}
+        run: node scripts/netlify-domain-fix.mjs

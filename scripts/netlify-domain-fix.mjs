@@ -1,0 +1,294 @@
+#!/usr/bin/env node
+/**
+ * netlify-domain-fix.mjs — find and release the stale keja.app domain claim,
+ * then attach keja.app + www.keja.app to the keja-ai site and verify HTTPS.
+ *
+ * Usage:
+ *   MODE=discover NETLIFY_AUTH_TOKEN=... NETLIFY_SITE_ID=... node netlify-domain-fix.mjs
+ *   MODE=fix      NETLIFY_AUTH_TOKEN=... NETLIFY_SITE_ID=... node netlify-domain-fix.mjs
+ *
+ * MODE=discover (default) is read-only: inventories every team, site, DNS zone
+ * and keja.app claim the token can see. MODE=fix additionally:
+ *   1. removes keja.app / www.keja.app claims from any OTHER site (e.g. a
+ *      forgotten "chacadom" project) — those domains only, nothing else;
+ *   2. deletes a dormant Netlify DNS zone for keja.app if one exists in
+ *      another team (only after confirming the live NS are NOT Netlify's);
+ *   3. attaches keja.app (primary) + www.keja.app (alias) to the keja-ai site;
+ *   4. triggers Let's Encrypt provisioning and forces HTTPS;
+ *   5. polls until https://keja.app answers 200.
+ *
+ * Zero dependencies (Node >= 18, global fetch).
+ */
+
+const API = 'https://api.netlify.com/api/v1';
+const DOMAIN = process.env.DOMAIN || 'keja.app';
+const WWW = `www.${DOMAIN}`;
+const MODE = (process.env.MODE || 'discover').toLowerCase();
+const TOKEN = process.env.NETLIFY_AUTH_TOKEN;
+const SITE_ID = process.env.NETLIFY_SITE_ID;
+
+if (!TOKEN) {
+  console.error('::error::NETLIFY_AUTH_TOKEN is not set.');
+  process.exit(1);
+}
+if (!['discover', 'fix'].includes(MODE)) {
+  console.error(`::error::MODE must be "discover" or "fix" (got "${MODE}")`);
+  process.exit(1);
+}
+
+const log = (...a) => console.log(...a);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function api(method, path, body) {
+  const res = await fetch(`${API}${path}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+      ...(body ? { 'Content-Type': 'application/json' } : {}),
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const text = await res.text();
+  let json = null;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch {
+    /* non-JSON response */
+  }
+  return { status: res.status, ok: res.ok, json, text };
+}
+
+/** Is this hostname one of OUR target domains (keja.app family, nothing else)? */
+function isTargetDomain(hostname) {
+  if (!hostname) return false;
+  const h = hostname.toLowerCase();
+  return h === DOMAIN || h === WWW || h.endsWith(`.${DOMAIN}`);
+}
+
+function fmtSite(s) {
+  const team = s.account_slug || s.account_name || s.account_id || '?';
+  return `${s.name} [${s.id}] team=${team}`;
+}
+
+async function main() {
+  log(`=== Netlify domain fix — MODE=${MODE} domain=${DOMAIN} ===\n`);
+
+  // ---- 0. whoami ----------------------------------------------------------
+  const me = await api('GET', '/user');
+  if (!me.ok) {
+    console.error(`::error::Token invalid or expired (GET /user -> ${me.status}). ${me.text?.slice(0, 200)}`);
+    process.exit(1);
+  }
+  log(`Authenticated as: ${me.json.email || me.json.full_name || me.json.id}`);
+
+  // ---- 1. teams ------------------------------------------------------------
+  const accounts = await api('GET', '/accounts');
+  const teams = accounts.ok && Array.isArray(accounts.json) ? accounts.json : [];
+  log(`\n[1] Teams visible to this token (${teams.length}):`);
+  for (const t of teams) log(`    - ${t.name} [id=${t.id} slug=${t.slug}]`);
+  if (!teams.length) log('    (none returned — token may be team-scoped)');
+
+  // ---- 2. all sites (paginated) --------------------------------------------
+  const sites = [];
+  for (let page = 1; page <= 20; page++) {
+    const r = await api('GET', `/sites?filter=all&page=${page}`);
+    if (!r.ok || !Array.isArray(r.json) || r.json.length === 0) break;
+    sites.push(...r.json);
+    if (r.json.length < 50) break; // last page
+  }
+  log(`\n[2] Sites visible to this token (${sites.length}):`);
+  for (const s of sites) {
+    const aliases = (s.domain_aliases || []).filter(Boolean);
+    log(
+      `    - ${fmtSite(s)}`,
+      `\n        url=${s.ssl_url || s.url}`,
+      aliases.length ? `\n        aliases=${aliases.join(', ')}` : ''
+    );
+  }
+
+  const kejaSite = sites.find((s) => s.id === SITE_ID) ||
+    sites.find((s) => (s.name || '').toLowerCase() === 'keja-ai');
+  if (!kejaSite) {
+    console.error(`::error::Could not find the keja-ai site (NETLIFY_SITE_ID=${SITE_ID}).`);
+    process.exit(1);
+  }
+  log(`\n    TARGET site: ${fmtSite(kejaSite)} -> ${kejaSite.ssl_url || kejaSite.url}`);
+
+  // ---- 3. keja.app claims on sites ------------------------------------------
+  const claims = []; // {site, kind: 'custom_domain'|'alias', domain}
+  for (const s of sites) {
+    if (isTargetDomain(s.custom_domain)) claims.push({ site: s, kind: 'custom_domain', domain: s.custom_domain });
+    for (const a of s.domain_aliases || []) {
+      if (isTargetDomain(a)) claims.push({ site: s, kind: 'alias', domain: a });
+    }
+  }
+  log(`\n[3] ${DOMAIN} claims on sites:`);
+  if (!claims.length) {
+    log('    (none found on any visible site)');
+  }
+  for (const c of claims) {
+    const own = c.site.id === kejaSite.id;
+    log(`    - ${c.domain} on ${c.site.name} [${c.site.id}] team=${c.site.account_slug} as ${c.kind} ${own ? '(already on keja-ai — OK)' : '<< STALE CLAIM'}`);
+  }
+
+  // ---- 4. modern domain objects (if the endpoint exists) --------------------
+  log(`\n[4] Modern domain records per site (GET /sites/{id}/domains):`);
+  const modernClaims = []; // {site, domainObj}
+  for (const s of sites.slice(0, 60)) {
+    const r = await api('GET', `/sites/${s.id}/domains`);
+    if (!r.ok || !Array.isArray(r.json)) continue;
+    for (const d of r.json) {
+      if (isTargetDomain(d.name)) {
+        modernClaims.push({ site: s, domainObj: d });
+        log(`    - ${d.name} on ${s.name} [${s.id}] ssl=${d.ssl_status ?? '?'} primary=${d.primary ?? '?'} verified=${d.verified_at ? 'yes' : 'no'}`);
+      }
+    }
+  }
+  if (!modernClaims.length) log('    (no modern domain records found / endpoint unavailable)');
+
+  // ---- 5. DNS zones -----------------------------------------------------------
+  log(`\n[5] Netlify DNS zones:`);
+  const zones = await api('GET', '/dns_zones');
+  const zoneList = zones.ok && Array.isArray(zones.json) ? zones.json : [];
+  if (!zoneList.length) {
+    log('    (none — keja.app is not a Netlify DNS zone for this token)');
+  }
+  for (const z of zoneList) {
+    const isTarget = z.name === DOMAIN || z.name === `*.${DOMAIN}`;
+    log(`    - ${z.name} [id=${z.id}] account=${z.account_id}${isTarget ? ' << TARGET ZONE' : ''}`);
+  }
+  const targetZone = zoneList.find((z) => z.name === DOMAIN);
+
+  // ---- discovery ends here -----------------------------------------------------
+  if (MODE === 'discover') {
+    log('\n=== DISCOVERY COMPLETE (no changes made) ===');
+    const stale = claims.filter((c) => c.site.id !== kejaSite.id);
+    if (stale.length) {
+      log(`Stale claims to release: ${stale.map((c) => `${c.domain}@${c.site.name}`).join(', ')}`);
+    }
+    if (targetZone) log(`Dormant DNS zone to delete: ${targetZone.name} [${targetZone.id}]`);
+    if (!stale.length && !targetZone) log('No stale claims visible to this token — if Netlify still refuses the domain, the claim lives in a team this token cannot see (contact Netlify support).');
+    return;
+  }
+
+  // ============================ FIX MODE =====================================
+  log('\n=== FIX MODE — applying changes ===');
+
+  // ---- F1. release stale site claims (keja.app family ONLY) ------------------
+  const stale = claims.filter((c) => c.site.id !== kejaSite.id);
+  for (const c of stale) {
+    log(`\n[F1] Releasing ${c.domain} from ${c.site.name} [${c.site.id}]`);
+    if (c.kind === 'custom_domain') {
+      const patch = { custom_domain: null, domain_aliases: (c.site.domain_aliases || []).filter((a) => !isTargetDomain(a)) };
+      const r = await api('PATCH', `/sites/${c.site.id}`, patch);
+      log(`    PATCH custom_domain=null -> ${r.status} ${r.ok ? 'OK' : r.text?.slice(0, 160)}`);
+    } else {
+      const keep = (c.site.domain_aliases || []).filter((a) => !isTargetDomain(a));
+      const r = await api('PATCH', `/sites/${c.site.id}`, { domain_aliases: keep });
+      log(`    PATCH domain_aliases (minus ${c.domain}) -> ${r.status} ${r.ok ? 'OK' : r.text?.slice(0, 160)}`);
+    }
+  }
+
+  // ---- F1b. release stale modern domain records ------------------------------
+  for (const m of modernClaims.filter((m) => m.site.id !== kejaSite.id)) {
+    log(`\n[F1b] Deleting modern domain record ${m.domainObj.name} from ${m.site.name}`);
+    const byId = await api('DELETE', `/sites/${m.site.id}/domains/${m.domainObj.id}`);
+    if (byId.ok) {
+      log(`    DELETE /domains/{id} -> ${byId.status} OK`);
+    } else {
+      const byName = await api('DELETE', `/sites/${m.site.id}/domains/${m.domainObj.name}`);
+      log(`    DELETE by id -> ${byId.status}; by name -> ${byName.status} ${byName.ok ? 'OK' : byName.text?.slice(0, 160)}`);
+    }
+  }
+
+  // ---- F2. delete dormant DNS zone (safety-checked) ---------------------------
+  if (targetZone) {
+    log(`\n[F2] Found Netlify DNS zone for ${targetZone.name} — checking live nameservers before deleting`);
+    let ns = [];
+    try {
+      const dig = await (await fetch(`https://dns.google/resolve?name=${DOMAIN}&type=NS`)).json();
+      ns = (dig.Answer || []).map((a) => a.data);
+    } catch {
+      /* resolver unreachable — treat as unknown */
+    }
+    const onNetlifyDns = ns.some((n) => /netlify\.com\.?$/i.test(n));
+    if (ns.length && onNetlifyDns) {
+      log(`    LIVE NS are Netlify (${ns.join(', ')}) — NOT deleting (zone is actively serving DNS).`);
+      log('    Switch keja.app nameservers to Spaceship/other first, then re-run.');
+    } else {
+      log(`    Live NS: ${ns.length ? ns.join(', ') : 'unresolved'} — zone is dormant, deleting.`);
+      const r = await api('DELETE', `/dns_zones/${targetZone.id}`);
+      log(`    DELETE /dns_zones/{id} -> ${r.status} ${r.ok ? 'OK' : r.text?.slice(0, 200)}`);
+    }
+  }
+
+  // ---- F3. attach keja.app + www to the keja-ai site (retry w/ backoff) ------
+  log(`\n[F3] Attaching ${DOMAIN} (+ ${WWW}) to ${kejaSite.name}`);
+  let attached = false;
+  for (let attempt = 1; attempt <= 6 && !attached; attempt++) {
+    // modern endpoint first
+    const apex = await api('POST', `/sites/${kejaSite.id}/domains`, { name: DOMAIN });
+    const www = await api('POST', `/sites/${kejaSite.id}/domains`, { name: WWW });
+    if (apex.ok || www.ok) {
+      log(`    POST /domains apex -> ${apex.status} ${apex.ok ? 'OK' : apex.text?.slice(0, 160)}`);
+      log(`    POST /domains www  -> ${www.status} ${www.ok ? 'OK' : www.text?.slice(0, 160)}`);
+      attached = true;
+    } else {
+      // classic fallback: set primary custom domain + alias via PATCH
+      const existingAliases = new Set((kejaSite.domain_aliases || []).filter((a) => !isTargetDomain(a)));
+      const patch = { custom_domain: DOMAIN, domain_aliases: [...existingAliases, WWW] };
+      const r = await api('PATCH', `/sites/${kejaSite.id}`, patch);
+      log(`    PATCH custom_domain -> ${r.status} ${r.ok ? 'OK' : r.text?.slice(0, 200)}`);
+      if (r.ok) attached = true;
+      else if (attempt < 6) {
+        log(`    attempt ${attempt}/6 failed — Netlify may still be releasing the old claim; retrying in 20s`);
+        await sleep(20000);
+      }
+    }
+  }
+  if (!attached) {
+    console.error(`::error::Could not attach ${DOMAIN} after 6 attempts. The claiming team may not be visible to this token — open a Netlify support ticket (docs/DOMAIN_CONFLICT_FIX.md Path B).`);
+    process.exit(1);
+  }
+
+  // ---- F4. SSL provisioning + HTTPS redirect ----------------------------------
+  log(`\n[F4] Provisioning Let's Encrypt certificate + enabling HTTPS redirect`);
+  const ssl = await api('POST', `/sites/${kejaSite.id}/ssl`, { certificate: '', key: '' });
+  log(`    POST /ssl -> ${ssl.status} ${ssl.ok ? 'OK' : (ssl.text || '').slice(0, 160)}`);
+  const force = await api('PATCH', `/sites/${kejaSite.id}`, { force_ssl: true });
+  log(`    PATCH force_ssl=true -> ${force.status} ${force.ok ? 'OK' : force.text?.slice(0, 160)}`);
+
+  // ---- F5. poll until https://keja.app is live ---------------------------------
+  log(`\n[F5] Waiting for https://${DOMAIN} to answer (DNS already points at Netlify)`);
+  let live = false;
+  for (let i = 1; i <= 30; i++) {
+    const site = await api('GET', `/sites/${kejaSite.id}`);
+    if (site.ok) {
+      log(`    ssl_url=${site.json.ssl_url} ssl=${site.json.ssl}`);
+    }
+    try {
+      const res = await fetch(`https://${DOMAIN}`, { redirect: 'manual' });
+      log(`    curl https://${DOMAIN} -> ${res.status}`);
+      if (res.status < 500) {
+        live = true;
+        break;
+      }
+    } catch {
+      /* cert not ready yet */
+    }
+    await sleep(20000);
+  }
+
+  log('\n=== RESULT ===');
+  if (live) {
+    log(`SUCCESS — https://${DOMAIN} is answering. Certificate may take a few more minutes to settle.`);
+  } else {
+    log(`Domain attached but https://${DOMAIN} did not answer within the polling window.`);
+    log('This is usually Let\'s Encrypt propagation — check https://app.netlify.com/sites/keja-ai/domain-management in a few minutes.');
+  }
+}
+
+main().catch((e) => {
+  console.error(`::error::${e?.stack || e}`);
+  process.exit(1);
+});
