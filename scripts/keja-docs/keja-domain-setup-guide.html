@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Connecting keja.app — Domain Setup Guide (Vercel)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+@page {
+    size: 720px 1020px;
+    margin: 0;
+}
+:root {
+    --page-bg: #f4f4f5;
+    --section-bg: #ebeced;
+    --card-bg: #edeff0;
+    --table-stripe: #e8ebec;
+    --header-fill: #506672;
+    --border: #b3c3cb;
+    --accent: #3b8cb4;
+    --accent-soft: rgba(59, 140, 180, 0.09);
+    --text: #1d1f20;
+    --muted: #80868a;
+    --ok: #37804f;
+    --warn: #a68b57;
+    --warn-soft: rgba(166, 139, 87, 0.10);
+    --code-bg: #23282b;
+    --code-text: #e6edf0;
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 720px;
+    background: var(--page-bg);
+    color: var(--text);
+    font-family: 'Inter', 'Noto Sans SC', sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    overflow-wrap: break-word;
+}
+@media screen {
+    html {
+        height: auto;
+        display: flex;
+        justify-content: center;
+        background: #d8dcde;
+    }
+    body {
+        transform-origin: top center;
+        scale: min(1, calc(100vw / 720));
+        margin: 20px auto;
+        box-shadow: 0 0 40px rgba(0,0,0,0.18);
+    }
+}
+
+/* ============ COVER ============ */
+.cover {
+    width: 720px;
+    height: 1020px;
+    box-sizing: border-box;
+    position: relative;
+    break-after: page;
+    overflow: hidden; /* cover only — clips decorative bleed */
+    background: var(--page-bg);
+}
+.cover-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 1;
+}
+.cover-arc {
+    position: absolute;
+    width: 1900px;
+    height: 1900px;
+    border-radius: 50%;
+    background: rgba(29, 31, 32, 0.030);
+    left: -950px;
+    top: 640px;
+}
+.cover-struct {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+}
+.anchor-line {
+    position: absolute;
+    left: 44px;
+    top: 150px;
+    bottom: 190px;
+    width: 6px;
+    background: var(--accent);
+}
+.cover-content {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+}
+.cover-kicker {
+    position: absolute;
+    left: 140px;
+    top: 153px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.85;
+}
+.cover-title {
+    position: absolute;
+    left: 140px;
+    top: 250px;
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1.12;
+    letter-spacing: -1px;
+    max-width: 540px;
+    color: var(--text);
+}
+.cover-title-2 {
+    position: absolute;
+    left: 140px;
+    top: 332px;
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1.12;
+    letter-spacing: -1px;
+    max-width: 540px;
+    color: var(--accent);
+}
+.cover-summary {
+    position: absolute;
+    left: 140px;
+    top: 512px;
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--text);
+    opacity: 0.85;
+    max-width: 440px;
+}
+.cover-meta {
+    position: absolute;
+    left: 140px;
+    top: 724px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    max-width: 500px;
+}
+.meta-chip {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 10px 16px;
+    min-width: 130px;
+    max-width: 100%;
+    flex: 1 1 auto;
+    box-sizing: border-box;
+}
+.meta-chip .k {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 3px;
+}
+.meta-chip .v {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text);
+    font-family: 'Liberation Mono', 'DejaVu Sans Mono', monospace;
+}
+.cover-footer {
+    position: absolute;
+    left: 140px;
+    right: 72px;
+    bottom: 118px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+/* ============ CONTENT FLOW ============ */
+.main-content {
+    padding: 58px 64px 46px 64px;
+}
+.chapter-header {
+    break-after: avoid;
+    break-inside: avoid;
+    margin-top: 26px;
+    margin-bottom: 16px;
+}
+.chapter-header:first-child { margin-top: 0; }
+.section-tag {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+}
+.section-title {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.3px;
+    color: var(--text);
+    margin-bottom: 14px;
+}
+.section-title::after {
+    content: '';
+    display: block;
+    width: 64px;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    margin-top: 10px;
+}
+h1, h2, h3, h4, .section-title {
+    break-after: avoid;
+    page-break-after: avoid;
+}
+p { margin: 0 0 12px 0; text-align: left; }
+.body-text { color: var(--text); }
+.lead {
+    font-size: 15.5px;
+    color: var(--text);
+}
+
+/* Steps */
+.step-card {
+    break-inside: avoid;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px 14px 18px;
+    margin-bottom: 12px;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.step-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.step-num {
+    flex: 0 0 auto;
+    min-width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--header-fill);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+}
+.step-title {
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--text);
+}
+.step-card p { margin-bottom: 8px; }
+.step-card p:last-child { margin-bottom: 0; }
+.ui-path {
+    font-size: 13px;
+    color: var(--text);
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 7px 12px;
+    margin: 8px 0;
+    font-family: 'Liberation Mono', 'DejaVu Sans Mono', monospace;
+}
+
+/* Callouts */
+.callout {
+    break-inside: avoid;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 12px 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.callout .co-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+.callout p { margin-bottom: 6px; }
+.callout p:last-child { margin-bottom: 0; }
+.callout-info {
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+}
+.callout-info .co-label { color: var(--accent); }
+.callout-warn {
+    background: var(--warn-soft);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--warn);
+}
+.callout-warn .co-label { color: var(--warn); }
+
+/* Code blocks */
+pre {
+    break-inside: avoid;
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 12px 0;
+    font-family: 'Liberation Mono', 'DejaVu Sans Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+pre .cmt { color: #8fa3ad; }
+code {
+    font-family: 'Liberation Mono', 'DejaVu Sans Mono', monospace;
+    font-size: 12.5px;
+    background: var(--table-stripe);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--text);
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 13px;
+    table-layout: fixed;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+thead { display: table-header-group; }
+tr { break-inside: avoid; page-break-inside: avoid; }
+th {
+    background: var(--header-fill);
+    color: #ffffff;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.4px;
+    padding: 9px 12px;
+}
+td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+tbody tr:nth-child(even) { background: var(--table-stripe); }
+tbody tr:last-child td { border-bottom: none; }
+td .mono, .mono {
+    font-family: 'Liberation Mono', 'DejaVu Sans Mono', monospace;
+    font-size: 12px;
+}
+
+/* Flow diagram */
+.flow-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: 100%;
+    margin: 14px 0;
+    align-items: stretch;
+}
+.flow-step {
+    flex: 1 1 auto;
+    min-width: 118px;
+    max-width: 100%;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 10px 12px;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+}
+.flow-step .fs-t {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 3px;
+    color: var(--text);
+}
+.flow-step .fs-d {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.45;
+}
+
+/* Checklists */
+.check-list { list-style: none; padding: 0; margin: 10px 0; }
+.sub-head {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 16px 0 6px 0;
+    break-after: avoid;
+    page-break-after: avoid;
+}
+.sub-head::before {
+    content: '▸ ';
+    color: var(--accent);
+}
+.check-list li {
+    break-inside: avoid;
+    position: relative;
+    padding: 0 0 10px 30px;
+    margin-bottom: 2px;
+}
+.check-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 2px solid var(--accent);
+    background: var(--accent-soft);
+}
+.check-list li b { color: var(--text); }
+
+/* Ending */
+.ending {
+    width: 720px;
+    height: 1020px;
+    box-sizing: border-box;
+    break-before: page;
+    overflow: hidden;
+    position: relative;
+    background: var(--page-bg);
+}
+.ending-arc {
+    position: absolute;
+    width: 1700px;
+    height: 1700px;
+    border-radius: 50%;
+    background: rgba(29, 31, 32, 0.030);
+    right: -850px;
+    top: -1050px;
+}
+.ending-content {
+    position: absolute;
+    left: 96px;
+    right: 96px;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.ending-kicker {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+.ending-big {
+    font-size: 44px;
+    font-weight: 900;
+    line-height: 1.18;
+    letter-spacing: -0.5px;
+    margin-bottom: 26px;
+    color: var(--text);
+}
+.ending-text {
+    font-size: 15.5px;
+    line-height: 1.7;
+    color: var(--text);
+    opacity: 0.85;
+    max-width: 470px;
+    margin-bottom: 34px;
+}
+.ending-meta {
+    border-top: 2px solid var(--accent);
+    padding-top: 16px;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.8;
+}
+.ending-meta b { color: var(--text); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ================= COVER ================= -->
+<div class="cover">
+    <div class="cover-bg"><div class="cover-arc"></div></div>
+    <div class="cover-struct"><div class="anchor-line"></div></div>
+    <div class="cover-content">
+        <div class="cover-kicker">Keja AI · Domain Configuration Guide</div>
+        <div class="cover-title">Connecting</div>
+        <div class="cover-title-2">keja.app</div>
+        <div class="cover-summary">
+            Keja AI now runs on Vercel. The domain is already attached on the Vercel
+            side — this guide covers the single remaining step: pointing the two DNS
+            records at Spaceship at Vercel's edge network, then verifying that
+            everything resolves correctly worldwide.
+        </div>
+        <div class="cover-meta">
+            <div class="meta-chip">
+                <div class="k">Production URL</div>
+                <div class="v">keja-ai-rho.vercel.app</div>
+            </div>
+            <div class="meta-chip">
+                <div class="k">Canonical URL</div>
+                <div class="v">https://keja.app</div>
+            </div>
+            <div class="meta-chip">
+                <div class="k">Platform</div>
+                <div class="v">Vercel Edge</div>
+            </div>
+        </div>
+        <div class="cover-footer">
+            <span>Keja AI · Chacadom Ecosystem</span>
+            <span>September 2026</span>
+        </div>
+    </div>
+</div>
+
+<!-- ================= BODY ================= -->
+<div class="main-content">
+
+    <!-- ============ SECTION 1: OVERVIEW ============ -->
+    <div class="chapter-header">
+        <div class="section-tag">Section 01</div>
+        <div class="section-title">Overview — What This Guide Does</div>
+    </div>
+    <p class="lead">
+        The Keja AI application is built as a static export from the Next.js 16 codebase
+        and served from Vercel's global edge network. On 10 September 2026 production
+        moved from Netlify to Vercel, and the site is live today at
+        <code>keja-ai-rho.vercel.app</code>. This guide walks through the final step of
+        that migration: making the custom domain <code>keja.app</code> (and
+        <code>www.keja.app</code>) serve the exact same deployment at a clean, branded
+        web address.
+    </p>
+    <p>
+        Because the Vercel side is already fully configured — the project exists, the
+        production deployment is live, and both hostnames are attached to it — the only
+        remaining work is a <b>two-record DNS change</b> at Spaceship, the registrar
+        where keja.app is registered. DNS is the internet's address book: it translates
+        <code>keja.app</code> into server addresses. Right now those addresses still
+        point at the retired Netlify setup; they need to point at Vercel's anycast edge
+        instead. Nothing in this guide touches the application code — the build pipeline
+        already treats <code>https://keja.app</code> as the canonical URL, so no code
+        changes are needed at any point.
+    </p>
+    <p>
+        How a visitor reaches the site after configuration:
+    </p>
+    <div class="flow-bar">
+        <div class="flow-step">
+            <div class="fs-t">1 · Browser</div>
+            <div class="fs-d">User types keja.app</div>
+        </div>
+        <div class="flow-step">
+            <div class="fs-t">2 · DNS lookup</div>
+            <div class="fs-d">Spaceship resolves the name to Vercel's edge (76.76.21.21)</div>
+        </div>
+        <div class="flow-step">
+            <div class="fs-t">3 · Vercel edge</div>
+            <div class="fs-d">CDN matches keja.app to the keja-ai project</div>
+        </div>
+        <div class="flow-step">
+            <div class="fs-t">4 · Keja AI</div>
+            <div class="fs-d">App served over HTTPS with auto-SSL</div>
+        </div>
+    </div>
+    <div class="callout callout-info">
+        <div class="co-label">Why the move from Netlify</div>
+        <p>
+            Two Netlify-side blockers made the old setup impossible to finish: the
+            keja.app apex was claimed by a second Netlify login (a dormant account
+            conflict), and the account was hit by a platform bug that paused production
+            deploys. Vercel needs neither a claim release nor a support ticket — the
+            domain simply points at Vercel's edge via the two DNS records in this guide.
+            The Netlify keja-ai site has been deleted as part of the migration.
+        </p>
+    </div>
+
+    <!-- ============ SECTION 2: PREREQUISITES ============ -->
+    <div class="chapter-header">
+        <div class="section-tag">Section 02</div>
+        <div class="section-title">Before You Start</div>
+    </div>
+    <p>
+        Completing this checklist first avoids the most common causes of stalled domain
+        setups. Each item takes a couple of minutes to verify, and every one of them has
+        stopped a real deployment at some point, so it is worth being honest about each
+        before touching any DNS settings.
+    </p>
+    <ul class="check-list">
+        <li>
+            <b>The Vercel deployment is live.</b> Open
+            <code>https://keja-ai-rho.vercel.app</code> in a browser and confirm the
+            Keja AI app loads. This is the project's public production URL; the deploy
+            pipeline (GitHub Actions → Vercel CLI prebuilt deploys) ships every push to
+            <code>main</code> automatically. If it does not load, fix the deployment
+            first — domain linking cannot help an unpublished site.
+        </li>
+        <li>
+            <b>You can sign in to Spaceship</b> (spaceship.com) as the owner of
+            keja.app, with permission to edit the domain's DNS records. The domain's
+            nameservers are <code>launch1.spaceship.net</code> and
+            <code>launch2.spaceship.net</code> — DNS is managed in the Spaceship
+            dashboard, and those nameservers stay exactly as they are.
+        </li>
+        <li>
+            <b>You can sign in to Vercel</b> (vercel.com, team
+            <i>Victor's projects</i>) to watch the domain status turn green. Viewing is
+            enough — no Vercel-side changes are needed; both domains are already
+            attached to the <code>keja-ai</code> project.
+        </li>
+        <li>
+            <b>You know whether keja.app currently has live email</b> (MX records for
+            Google Workspace, Zoho, etc.). This guide only changes the <code>A</code>
+            and <code>www CNAME</code> records, so email is untouched — but check
+            anyway, so nothing on the account surprises you.
+        </li>
+        <li>
+            <b>You have up to a few hours of patience.</b> DNS changes usually
+            propagate in minutes, but TTL caching can extend the wait. The
+            <code>.app</code> top-level domain is HTTPS-only (HSTS preloaded), so
+            during propagation browsers will refuse plain HTTP — that is expected
+            behaviour, not a misconfiguration.
+        </li>
+    </ul>
+
+    <!-- ============ SECTION 3: ALREADY CONFIGURED ============ -->
+    <div class="chapter-header">
+        <div class="section-tag">Section 03</div>
+        <div class="section-title">What Is Already Configured on Vercel</div>
+    </div>
+    <p>
+        Everything on the Vercel side was set up during the migration and verified with
+        live smoke tests. The table below is the current state — if you ever need to
+        re-check it, the Vercel dashboard shows all of it under the
+        <code>keja-ai</code> project:
+    </p>
+    <table>
+        <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+        <thead>
+            <tr><th>Setting</th><th>State</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><b>Project</b></td>
+                <td><span class="mono">keja-ai</span> — static export, deployed from GitHub Actions on every push to <span class="mono">main</span></td>
+            </tr>
+            <tr>
+                <td><b>Production deployment</b></td>
+                <td>Live and promoted — serving at <span class="mono">keja-ai-rho.vercel.app</span></td>
+            </tr>
+            <tr>
+                <td><b>keja.app</b></td>
+                <td>Attached as the primary custom domain — status "Pending" until DNS points at Vercel</td>
+            </tr>
+            <tr>
+                <td><b>www.keja.app</b></td>
+                <td>Attached as a redirect domain: 308 → <span class="mono">https://keja.app</span></td>
+            </tr>
+            <tr>
+                <td><b>HTTPS</b></td>
+                <td>Automatic Let's Encrypt certificates, provisioned the moment DNS resolves — nothing to request or renew by hand</td>
+            </tr>
+            <tr>
+                <td><b>Routing &amp; headers</b></td>
+                <td>SPA rewrite, service-worker no-cache and security headers compiled from <span class="mono">vercel.json</span></td>
+            </tr>
+        </tbody>
+    </table>
+    <p>
+        The "Pending" status on keja.app is expected and healthy: Vercel verifies
+        domain ownership by observing where DNS actually points. Until the records in
+        the next section are changed, verification cannot succeed — and the moment they
+        resolve to Vercel, the domain activates with no further clicks.
+    </p>
+
+    <!-- ============ SECTION 4: DNS RECORDS ============ -->
+    <div class="chapter-header">
+        <div class="section-tag">Section 04</div>
+        <div class="section-title">Step 1 — Update the Two DNS Records at Spaceship</div>
+    </div>
+    <p>
+        This is the only part of the process that happens outside Vercel, in the
+        Spaceship dashboard. Exactly two records change: the apex <code>A</code> record
+        that currently points at the retired Netlify load balancer, and the
+        <code>www</code> CNAME that currently points at the deleted Netlify subdomain.
+        Both get replaced with Vercel's targets:
+    </p>
+    <table>
+        <colgroup><col style="width:13%"><col style="width:17%"><col style="width:38%"><col style="width:32%"></colgroup>
+        <thead>
+            <tr><th>Type</th><th>Name / Host</th><th>New Value (Vercel)</th><th>Replaces (old, Netlify)</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="mono">A</span></td>
+                <td><span class="mono">@</span> (apex)</td>
+                <td><span class="mono">76.76.21.21</span></td>
+                <td><span class="mono">75.2.60.5</span></td>
+            </tr>
+            <tr>
+                <td><span class="mono">CNAME</span></td>
+                <td><span class="mono">www</span></td>
+                <td><span class="mono">cname.vercel-dns.com</span></td>
+                <td><span class="mono">keja-ai.netlify.app</span></td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="step-card">
+        <div class="step-head">
+            <div class="step-num">1</div>
+            <div class="step-title">Open the DNS editor for keja.app</div>
+        </div>
+        <p>
+            Sign in to Spaceship and navigate to the DNS management page for the
+            keja.app domain. The record list shows the current Netlify-era entries.
+        </p>
+        <div class="ui-path">spaceship.com → Domains → keja.app → DNS records</div>
+    </div>
+    <div class="step-card">
+        <div class="step-head">
+            <div class="step-num">2</div>
+            <div class="step-title">Edit the apex A record</div>
+        </div>
+        <p>
+            Find the <code>A</code> record for host <code>@</code> (the apex, sometimes
+            displayed as the bare domain <code>keja.app</code>). Change its value from
+            <code>75.2.60.5</code> to <code>76.76.21.21</code> — Vercel's anycast
+            address, which routes visitors to the nearest edge region. Keep the record
+            type as <code>A</code>; do not convert it to a CNAME (DNS does not allow
+            CNAMEs at the apex).
+        </p>
+    </div>
+    <div class="step-card">
+        <div class="step-head">
+            <div class="step-num">3</div>
+            <div class="step-title">Edit the www CNAME record</div>
+        </div>
+        <p>
+            Find the <code>CNAME</code> record for host <code>www</code> and change its
+            target from <code>keja-ai.netlify.app</code> to
+            <code>cname.vercel-dns.com</code>. If the editor shows a trailing dot
+            (<code>cname.vercel-dns.com.</code>), that is fine — registrars treat both
+            spellings identically. If the editor rejects the change, look for a
+            conflicting pre-existing A or AAAA record on <code>www</code> and delete it
+            first.
+        </p>
+    </div>
+    <div class="step-card">
+        <div class="step-head">
+            <div class="step-num">4</div>
+            <div class="step-title">Save and leave everything else alone</div>
+        </div>
+        <p>
+            Save both edits. Do <b>not</b> change the nameservers
+            (<code>launch1/launch2.spaceship.net</code> stay), and do not remove other
+            records (email MX, SPF TXT, and so on) — this migration only repoints web
+            traffic. TTL can be left at its default; lowering it beforehand only helps
+            if you expect to roll back quickly.
+        </p>
+    </div>
+    <div class="callout callout-info">
+        <div class="co-label">Why only these two records</div>
+        <p>
+            The apex domain cannot be a CNAME (DNS does not allow it), so it points at
+            Vercel's edge IP <span class="mono">76.76.21.21</span>. The
+            <span class="mono">www</span> subdomain can be an alias, so it points at
+            Vercel's CNAME target. Vercel also publishes a TXT verification record
+            (<span class="mono">_vercel.keja.app</span>) as an alternative ownership
+            proof — it is not needed when the A record points at Vercel, so you can
+            ignore it.
+        </p>
+    </div>
+
+    <!-- ============ SECTION 5: VERIFY ============ -->
+    <div class="chapter-header">
+        <div class="section-tag">Section 05</div>
+        <div class="section-title">Step 2 — Verify Propagation</div>
+    </div>
+    <p>
+        DNS changes ripple outward from Spaceship's nameservers, usually within
+        minutes. Verification is a pure read-only operation — run these commands from
+        any terminal (or use an online dig tool) and compare against the expected
+        values:
+    </p>
+    <pre><span class="cmt"># 1. The apex must resolve to Vercel's anycast address</span>
+dig +short keja.app A
+<span class="cmt"># expected: 76.76.21.21</span>
+
+<span class="cmt"># 2. www must alias to Vercel's CNAME target</span>
+dig +short www.keja.app CNAME
+<span class="cmt"># expected: cname.vercel-dns.com.</span>
+
+<span class="cmt"># 3. The site must answer over HTTPS with Vercel headers</span>
+curl -I https://keja.app
+<span class="cmt"># expected: HTTP/2 200 + an x-vercel-id response header</span>
+
+<span class="cmt"># 4. www must redirect to the apex (308)</span>
+curl -I https://www.keja.app
+<span class="cmt"># expected: HTTP/2 308 + location: https://keja.app/</span></pre>
+    <p>
+        In the Vercel dashboard, open <b>keja-ai → Settings → Domains</b>: the status
+        next to <code>keja.app</code> and <code>www.keja.app</code> changes from
+        "Pending" / "Invalid Configuration" to a green <b>Valid Configuration</b> once
+        the records resolve from Vercel's point of view. The certificate is issued at
+        the same time — if the dashboard still shows pending but <code>dig</code> is
+        correct, give it a few more minutes; Vercel re-checks automatically.
+    </p>
+    <div class="callout callout-warn">
+        <div class="co-label">Certificates need a little time</div>
+        <p>
+            In the minutes right after the switch you may see a TLS warning on
+            keja.app — the DNS has moved but Let's Encrypt is still provisioning the
+            certificate. This self-heals within about an hour and usually within
+            minutes. Do not "fix" it by changing DNS again; just re-test after a short
+            wait.
+        </p>
+    </div>
+
+    <!-- ============ SECTION 6: AUTOMATIC ============ -->
+    <div class="chapter-header">
+        <div class="section-tag">Section 06</div>
+        <div class="section-title">What Vercel Handles Automatically</div>
+    </div>
+    <p>
+        Once the two records resolve, no further configuration exists anywhere — the
+        remaining behaviour is baked into the project. It helps to know what to expect,
+        so none of the following comes as a surprise:
+    </p>
+    <ul class="check-list">
+        <li>
+            <b>HTTPS everywhere, always.</b> Let's Encrypt certificates for keja.app
+            and www.keja.app are issued automatically and renewed behind the scenes —
+            no expiry warnings, nothing to schedule. Plain-HTTP requests are upgraded
+            to HTTPS at the edge.
+        </li>
+        <li>
+            <b>www folds into the apex.</b> www.keja.app is configured as a redirect
+            domain: it answers with a permanent 308 to <code>https://keja.app</code>,
+            keeping a single canonical URL in search results and analytics.
+        </li>
+        <li>
+            <b>Every deploy updates the domain.</b> Each green deployment is promoted
+            to production and instantly serves from keja.app — no alias updates to run.
+            <code>keja-ai-rho.vercel.app</code> keeps working as a permanent fallback
+            URL.
+        </li>
+        <li>
+            <b>Monitoring is already watching.</b> The repository's
+            <code>production-check</code> workflow smoke-tests keja.app hourly once it
+            is live — its Actions badge turns green for the domain when the switch has
+            propagated.
+        </li>
+    </ul>
+
+    <!-- ============ SECTION 7: POST-LAUNCH CHECKLIST ============ -->
+    <div class="chapter-header">
+        <div class="section-tag">Section 07</div>
+        <div class="section-title">Post-Launch Checklist</div>
+    </div>
+    <p>
+        After <code>curl -I https://keja.app</code> answers 200, run through this list
+        once to confirm the whole surface works end to end. It takes about five
+        minutes and covers everything the domain switch could possibly affect:
+    </p>
+    <ul class="check-list">
+        <li>
+            <b>App loads.</b> Browse <code>https://keja.app</code> — search, listings,
+            and the AI advisor all work; deep links like
+            <code>https://keja.app/#/properties/KJA-001</code> open the right views.
+        </li>
+        <li>
+            <b>Redirect works.</b> <code>https://www.keja.app</code> lands on
+            <code>https://keja.app</code> with a padlock in the address bar.
+        </li>
+        <li>
+            <b>PWA installs.</b> On Android, Chrome offers "Install app"; on iOS,
+            Safari → Share → Add to Home Screen. The installed app launches
+            full-screen with the Keja splash.
+        </li>
+        <li>
+            <b>Offline shell works.</b> With the app installed, airplane-mode launch
+            still shows the cached shell (the service worker version is stamped per
+            build, so the next online visit picks up updates within a day).
+        </li>
+        <li>
+            <b>Repo monitors go green.</b> GitHub → Actions → <i>Production check</i>
+            shows both matrix entries passing (production alias + keja.app).
+        </li>
+    </ul>
+
+    <!-- ============ SECTION 8: TROUBLESHOOTING ============ -->
+    <div class="chapter-header">
+        <div class="section-tag">Section 08</div>
+        <div class="section-title">Troubleshooting</div>
+    </div>
+    <p>
+        Almost every failure mode of this setup is a propagation or stale-cache
+        variant. Work down these tables before changing anything — most rows resolve
+        by waiting, and unnecessary edits to DNS only extend the outage. The first
+        table covers the DNS layer (records, certificates, Vercel's view); the second
+        covers what users see on their devices after the DNS is already correct.
+    </p>
+    <div class="sub-head">DNS &amp; propagation</div>
+    <table>
+        <colgroup><col style="width:30%"><col style="width:33%"><col style="width:37%"></colgroup>
+        <thead>
+            <tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>keja.app does not load yet</td>
+                <td>DNS still cached on the old values</td>
+                <td>Confirm with <span class="mono">dig +short keja.app A</span> from a different network; wait out the TTL (usually minutes)</td>
+            </tr>
+            <tr>
+                <td>TLS warning on keja.app</td>
+                <td>Certificate provisioning in progress</td>
+                <td>Wait up to an hour; Vercel issues the Let's Encrypt certificate automatically</td>
+            </tr>
+            <tr>
+                <td>www does not redirect</td>
+                <td>www CNAME still points at the old target</td>
+                <td>Re-check the record: host <span class="mono">www</span> → <span class="mono">cname.vercel-dns.com</span></td>
+            </tr>
+            <tr>
+                <td>Dashboard shows "Invalid Configuration"</td>
+                <td>Vercel has not re-checked since the change</td>
+                <td>Give it a few minutes; Vercel polls automatically — or click "Refresh" on the domain row</td>
+            </tr>
+            <tr>
+                <td>Cannot find the DNS editor in Spaceship</td>
+                <td>Dashboard navigation differs per account state</td>
+                <td>Domains → keja.app → DNS records; if the domain was just added, wait a moment for the DNS tab to appear</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="sub-head">Client-side &amp; app-level</div>
+    <table>
+        <colgroup><col style="width:30%"><col style="width:33%"><col style="width:37%"></colgroup>
+        <thead>
+            <tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>keja-ai.vercel.app shows a different app</td>
+                <td>That alias belongs to a different Vercel account (a second login)</td>
+                <td>Nothing to fix — use <span class="mono">keja-ai-rho.vercel.app</span>; keja.app is the canonical domain</td>
+            </tr>
+            <tr>
+                <td>Works on desktop, not on phone</td>
+                <td>Mobile carrier DNS cache</td>
+                <td>Toggle airplane mode or switch networks; mobile caches are the slowest to clear</td>
+            </tr>
+            <tr>
+                <td>Site loads but shows old content</td>
+                <td>Browser or edge cache still holding the previous response</td>
+                <td>Hard-refresh (Ctrl/Cmd+Shift+R); service-worker installs update themselves on the next online visit</td>
+            </tr>
+            <tr>
+                <td>Installed PWA still opens the old URL</td>
+                <td>The home-screen shortcut kept the previous start URL</td>
+                <td>Reinstall once from https://keja.app — Android shows the install prompt again, iOS re-adds via Share menu</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="callout callout-info">
+        <div class="co-label">Rollback path</div>
+        <p>
+            If anything needs undoing, the change is fully reversible: point the A
+            record back and the www CNAME back to their previous values. Vercel keeps
+            every production deployment, so code-level rollbacks never touch DNS —
+            dashboard → keja-ai → Deployments → any green build → Promote to
+            Production.
+        </p>
+    </div>
+    <p>
+        If a problem persists beyond this table, the fastest escalation paths are, in
+        order: the repository's engineering runbook (<code>docs/DEPLOYMENT.md</code>)
+        which documents the exact live configuration this guide mirrors; the Vercel
+        dashboard's deployment and domain logs, which show edge-side errors that DNS
+        tools cannot see; and Vercel support itself, reachable from the dashboard's
+        help menu — the Hobby plan includes it for exactly this kind of
+        account-level question. In practice, though, every issue seen so far with
+        this setup has been a propagation window that closed on its own.
+    </p>
+
+</div>
+
+<!-- ================= ENDING ================= -->
+<div class="ending">
+    <div class="ending-arc"></div>
+    <div class="ending-content">
+        <div class="ending-kicker">Domain Setup · Complete</div>
+        <div class="ending-big">Two records, one<br>canonical home.</div>
+        <div class="ending-text">
+            Point the A record and the www CNAME at Vercel, and keja.app becomes the
+            single, branded, HTTPS-everywhere home of Keja AI — with certificates,
+            redirects and deployments all handled automatically from that moment on.
+        </div>
+        <div class="ending-meta">
+            <b>Keja AI</b> · Africa's Real Estate Intelligence &amp; Trust Infrastructure<br>
+            Production: keja-ai-rho.vercel.app · Canonical: https://keja.app<br>
+            Companion runbook: docs/DEPLOYMENT.md
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
