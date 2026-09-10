@@ -87,6 +87,12 @@ export + service-worker version stamp, then deploy to Netlify via API using the
 
 Auto-Pilot commits (6-hour cron) flow through the same quality gate and trigger the deploy.
 
+A second manual workflow, `.github/workflows/fix-domain.yml` (**Fix keja.app domain
+(Netlify)**), manages the keja.app custom-domain lifecycle through the same token:
+`discover` (read-only inventory), `fix` (release stale claims → attach keja.app + www →
+provision SSL → verify), and `probe` (raw diagnostics). See `docs/DOMAIN_CONFLICT_FIX.md`
+for the full runbook and the current domain status.
+
 ## Regulatory readiness — CMA Regulatory Sandbox
 
 - **[Testing Plan (PDF)](docs/cma/Chacadom_CMA_Sandbox_Testing_Plan.pdf)** — twelve-month,

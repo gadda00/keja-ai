@@ -1,45 +1,49 @@
 # Resolving the keja.app Netlify Domain Conflict
 
-> PDF edition: `docs/pdf/keja-domain-conflict-fix.pdf`. Companion: `docs/pdf/keja-domain-setup-guide.pdf` (general setup). State verified 10 September 2026.
+> PDF edition: `docs/pdf/keja-domain-conflict-fix.pdf`. Companion: `docs/pdf/keja-domain-setup-guide.pdf` (general setup). State re-verified 10 September 2026 with API-level forensics — see the diagnosis below.
 
-## 1. What the Error Actually Means
+## 1. What the Error Actually Means — and the Confirmed Diagnosis
 
 Netlify verification fails with:
 
 > "keja.app or one of its subdomains is already managed by Netlify DNS on another team."
 
-Netlify enforces a **one-zone rule**: an apex domain can exist as a managed domain/DNS zone in only one team at a time. The claim is an internal Netlify record — usually left behind when the domain was once added to a site in another team, registered through Netlify under another account, or given a Netlify DNS zone that was later abandoned. **The claim does not need active nameservers to keep blocking you.**
+Netlify enforces a **one-owner rule**: an apex domain can be claimed by only one Netlify account at a time. The claim is an internal Netlify record — usually left behind when the domain was once added to a site in another account, or given a Netlify DNS zone that was later abandoned. **The claim does not need active nameservers to keep blocking you.**
 
-Verified current state:
+### What the API forensics found (10 Sep 2026)
 
-| Record | Current value | Meaning |
-|---|---|---|
-| NS | launch1/launch2.spaceship.net | Registrar is Spaceship; DNS is NOT on Netlify |
-| A @ | 75.2.60.5 | Already pointed at Netlify's load balancer |
-| Site | keja-ai.netlify.app | Live, deploying green from main |
-| Blocker | Netlify team claim on keja.app | Internal Netlify record, another team |
+A full API sweep (every team, site, site field, DNS zone and audit entry reachable by the deploy token `torv54@gmail.com`, team "Victor"/`gadda00`, account `68331ef7ea60d8e7aedec052`) confirmed:
 
-DNS is already correctly configured. The only blocker is the stale team claim inside Netlify — an administrative fix with two resolution paths.
+| Check | Result |
+|---|---|
+| Sites visible to the token | 4: keja-ai, chacadom, ecoawardsafrica, busara-ai |
+| keja.app on any site (`custom_domain`, `domain_aliases`, branch/preview fields) | **None** — chacadom only holds `chacadom.com`; busara-ai only `busaraai.com` |
+| Netlify DNS zones in this account | Only `busaraai.com` — no keja.app zone |
+| Attaching keja.app via `PATCH /sites/{id}` | `422 — "is owned by another account", "must be unique (keja.app, fb3b99bc-55cd-4552-a3a4-4b378448aa47)"` |
 
-## 2. Path A — You Control the Other Team (~10 minutes)
+**Conclusion:** keja.app is claimed by Netlify account **`fb3b99bc-55cd-4552-a3a4-4b378448aa47`** — a *different Netlify login* from the one that owns the keja-ai site. This is almost certainly a second account of yours: GitHub-OAuth, Google and email/password sign-ins each create **separate Netlify accounts even for the same email address**. The domain (registered 8 Sep 2026 at Spaceship, NS `launch1/launch2.spaceship.net`, A → `75.2.60.5`, www CNAME → `keja-ai.netlify.app`) is otherwise fully configured — DNS is ready; only the Netlify-side claim needs releasing.
 
-1. **Find the team.** Check the team switcher at app.netlify.com; check other email accounts you may have used.
-2. **Remove the domain from any site.** Old team → site → Site configuration → Domain management → Domains → keja.app → Options → Remove domain. Same for www if listed.
-3. **Delete the DNS zone.** Old team → team-level Domains → keja.app → Options → **Delete DNS zone**. This is the step people miss: removing a domain from a site does not delete the team-level zone, and the zone alone keeps the claim alive.
-4. **Wait, then verify.** Usually effective within minutes → proceed to Chapter 4.
+## 2. Path A — Release It Yourself (~5 minutes, recommended)
 
-> If the domain was **purchased through Netlify** on the old team, do not delete the zone — transfer the registration instead (Domain settings → Transfer), or the domain could get locked to a team you cannot reach.
+1. **Find the other login.** At app.netlify.com log out, then try each identity you own: *Continue with GitHub*, *Continue with Google*, and any other email/password. In each, check Teams — you are looking for the account whose team is **not** "Victor". (Team settings → General shows the account ID; the claiming one ends in `…8448aa47`.)
+2. **Check that account's DNS zones.** In the claiming account: team → **Domains** (app.netlify.com/dns or Teams → *your team* → DNS). If `keja.app` is listed, open it → Options → **Delete DNS zone**. The zone is dormant (live NS are Spaceship's), so deleting it breaks nothing.
+3. **Check that account's sites too.** If any site there lists `keja.app` or `www.keja.app` in Domain management → Domains → Options → **Remove domain**.
+4. **Re-run the fix workflow.** Repo → Actions → **Fix keja.app domain (Netlify)** → Run workflow → mode `fix`. It attaches `keja.app` (primary) + `www.keja.app`, provisions the Let's Encrypt certificate, enables Force HTTPS and polls until https://keja.app answers 200. (Steps 1–2 there are the same removals, automated — it can also be run with a token from the claiming account: set a `NETLIFY_CLAIM_TOKEN` secret, run with `use_claim_token` + `release_only`, then re-run normally.)
 
-## 3. Path B — You Do Not Control the Other Team
+If you cannot find the other login (or it turns out not to be yours), continue to Path B.
 
-1. **Open a support ticket.** Support → contact form. Subject: "Domain claimed by another team — release request for keja.app".
-2. **Prove registrar ownership.** WHOIS registrant info, purchase date/method, screenshot of the Spaceship dashboard showing the domain in your account. With WHOIS privacy, the dashboard screenshot + ability to make on-demand DNS changes is the standard proof.
-3. **Demonstrate live DNS control.** Offer to add any TXT record Netlify specifies (e.g. `netlify-challenge=...`) at your Spaceship panel on request — conclusive ownership evidence that typically shortens the process to a few business days.
-4. **Ask for the release explicitly.** Netlify contacts the other team holder, then releases the claim if they do not respond or cannot justify it.
+## 3. Path B — Netlify Support Releases It (a few business days)
 
-While waiting, nothing is blocked: the site serves on keja-ai.netlify.app, deploys run green, and the A record already targets Netlify. Escalate after a week by replying on the same thread, citing the verified DNS state in the table above.
+1. **Open a support ticket.** app.netlify.com/support → contact form. Subject: *"Domain claimed by another account — release request for keja.app"*. Include the claiming account id `fb3b99bc-55cd-4552-a3a4-4b378448aa47` — it lets support locate the stale claim instantly.
+2. **Prove registrar ownership.** Spaceship dashboard screenshot showing keja.app in your account, purchase date (8 Sep 2026), and WHOIS/RDAP registrant info.
+3. **Demonstrate live DNS control.** Offer to add any TXT record Netlify specifies at Spaceship on request — conclusive ownership evidence that typically shortens the process.
+4. **Ask for the release explicitly.** Netlify contacts the claiming account, then releases the claim if there is no justification.
+
+While waiting, nothing is blocked: the site serves on keja-ai.netlify.app, deploys run green, and DNS already targets Netlify.
 
 ## 4. Attaching keja.app After the Release
+
+Prefer the automated route — Actions → **Fix keja.app domain (Netlify)** → mode `fix` — or do it manually:
 
 1. **Add the apex.** keja-ai site → Site configuration → Domain management → Add a domain → `keja.app` → make primary.
 2. **Add www.** Add `www.keja.app`; set it to redirect to the apex.
@@ -70,3 +74,10 @@ Staying on Spaceship nameservers is fully supported and keeps registrar independ
 | 8 | Offline after first load | App shell and visited views still open in airplane mode |
 
 If items 1-2 fail: DNS propagation — re-run dig after 30 minutes. Item 4/8 on a previously-visited device: hard refresh + one re-open (cache version is content-hashed and self-evicts). Everything else already passed the same checks on keja-ai.netlify.app during the September 2026 verification pass.
+
+## 6. Tooling Reference
+
+| Artifact | Purpose |
+|---|---|
+| `scripts/netlify-domain-fix.mjs` | Zero-dep Node script: `MODE=discover` (read-only inventory), `MODE=fix` (release → attach → SSL → verify), `MODE=probe` (raw endpoint diagnostics), `RELEASE_ONLY=1` (release without attaching, for the claiming account's token) |
+| `.github/workflows/fix-domain.yml` | Manual runner with the above modes; uses `NETLIFY_AUTH_TOKEN` / `NETLIFY_SITE_ID`, optional `NETLIFY_CLAIM_TOKEN` for cross-account release |

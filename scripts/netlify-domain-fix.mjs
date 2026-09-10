@@ -17,6 +17,9 @@
  *   4. triggers Let's Encrypt provisioning and forces HTTPS;
  *   5. polls until https://keja.app answers 200.
  *
+ *   RELEASE_ONLY=1 (with MODE=fix) stops after the release steps — run it with
+ *   a token from the CLAIMING account to free keja.app without attaching.
+ *
  * Zero dependencies (Node >= 18, global fetch).
  */
 
@@ -108,11 +111,12 @@ async function main() {
 
   const kejaSite = sites.find((s) => s.id === SITE_ID) ||
     sites.find((s) => (s.name || '').toLowerCase() === 'keja-ai');
-  if (!kejaSite) {
+  if (!kejaSite && process.env.RELEASE_ONLY !== '1') {
     console.error(`::error::Could not find the keja-ai site (NETLIFY_SITE_ID=${SITE_ID}).`);
+    console.error('::error::If this token belongs to the CLAIMING account, set RELEASE_ONLY=1 to release keja.app without attaching.');
     process.exit(1);
   }
-  log(`\n    TARGET site: ${fmtSite(kejaSite)} -> ${kejaSite.ssl_url || kejaSite.url}`);
+  if (kejaSite) log(`\n    TARGET site: ${fmtSite(kejaSite)} -> ${kejaSite.ssl_url || kejaSite.url}`);
 
   // ---- 3. keja.app claims on sites ------------------------------------------
   const claims = []; // {site, kind: 'custom_domain'|'alias', domain}
@@ -173,8 +177,8 @@ async function main() {
   // ---- discovery ends here -----------------------------------------------------
   if (MODE === 'probe') {
     log('\n=== PROBE: raw responses from candidate domain endpoints ===');
-    const suspects = sites.filter((s) => s.id !== kejaSite.id);
-    const probeTargets = [kejaSite, ...suspects];
+    const suspects = sites.filter((s) => !kejaSite || s.id !== kejaSite.id);
+    const probeTargets = kejaSite ? [kejaSite, ...suspects] : sites;
     for (const s of probeTargets) {
       const paths = [
         `/sites/${s.id}/domains`,
@@ -252,7 +256,7 @@ async function main() {
   log('\n=== FIX MODE — applying changes ===');
 
   // ---- F1. release stale site claims (keja.app family ONLY) ------------------
-  const stale = claims.filter((c) => c.site.id !== kejaSite.id);
+  const stale = claims.filter((c) => !kejaSite || c.site.id !== kejaSite.id);
   for (const c of stale) {
     log(`\n[F1] Releasing ${c.domain} from ${c.site.name} [${c.site.id}]`);
     if (c.kind === 'custom_domain') {
@@ -267,7 +271,7 @@ async function main() {
   }
 
   // ---- F1b. release stale modern domain records ------------------------------
-  for (const m of modernClaims.filter((m) => m.site.id !== kejaSite.id)) {
+  for (const m of modernClaims.filter((m) => !kejaSite || m.site.id !== kejaSite.id)) {
     log(`\n[F1b] Deleting modern domain record ${m.domainObj.name} from ${m.site.name}`);
     const byId = await api('DELETE', `/sites/${m.site.id}/domains/${m.domainObj.id}`);
     if (byId.ok) {
@@ -300,8 +304,15 @@ async function main() {
   }
 
   // ---- F3. attach keja.app + www to the keja-ai site (retry w/ backoff) ------
+  if (process.env.RELEASE_ONLY === '1') {
+    log('\n=== RELEASE_ONLY=1 — skipping attach. Now re-run this workflow with the');
+    log('    keja-ai token (mode=fix) to attach keja.app + www and provision SSL. ===');
+    return;
+  }
+
   log(`\n[F3] Attaching ${DOMAIN} (+ ${WWW}) to ${kejaSite.name}`);
   let attached = false;
+  let lastErr = '';
   for (let attempt = 1; attempt <= 6 && !attached; attempt++) {
     // modern endpoint first
     const apex = await api('POST', `/sites/${kejaSite.id}/domains`, { name: DOMAIN });
@@ -315,16 +326,27 @@ async function main() {
       const existingAliases = new Set((kejaSite.domain_aliases || []).filter((a) => !isTargetDomain(a)));
       const patch = { custom_domain: DOMAIN, domain_aliases: [...existingAliases, WWW] };
       const r = await api('PATCH', `/sites/${kejaSite.id}`, patch);
-      log(`    PATCH custom_domain -> ${r.status} ${r.ok ? 'OK' : r.text?.slice(0, 200)}`);
+      log(`    PATCH custom_domain -> ${r.status} ${r.ok ? 'OK' : (r.text || '').slice(0, 600)}`);
       if (r.ok) attached = true;
-      else if (attempt < 6) {
-        log(`    attempt ${attempt}/6 failed — Netlify may still be releasing the old claim; retrying in 20s`);
-        await sleep(20000);
+      else {
+        lastErr = r.text || '';
+        const ownerId = (lastErr.match(/must be unique \([^)]*?,\s*([0-9a-f-]{36})\)/) || [])[1];
+        if (ownerId) {
+          log(`\n    !! ${DOMAIN} is claimed by Netlify account ${ownerId} (this token's team: ${kejaSite.account_id}).`);
+          log('    !! Log into THAT Netlify account (check your other logins: GitHub / Google / other email),');
+          log('    !! remove the keja.app DNS zone / domain there (or run this workflow with a token from it),');
+          log('    !! then re-run this workflow with mode=fix.');
+        }
+        if (attempt < 6) {
+          log(`    attempt ${attempt}/6 failed — retrying in 20s`);
+          await sleep(20000);
+        }
       }
     }
   }
   if (!attached) {
-    console.error(`::error::Could not attach ${DOMAIN} after 6 attempts. The claiming team may not be visible to this token — open a Netlify support ticket (docs/DOMAIN_CONFLICT_FIX.md Path B).`);
+    console.error(`::error::Could not attach ${DOMAIN} after 6 attempts. ${lastErr.slice(0, 400)}`);
+    console.error('::error::The claiming account must release the domain first — see docs/DOMAIN_CONFLICT_FIX.md.');
     process.exit(1);
   }
 

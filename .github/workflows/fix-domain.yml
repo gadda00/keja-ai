@@ -8,6 +8,17 @@ name: Fix keja.app domain (Netlify)
 #
 #   mode=discover  read-only inventory: teams, sites, keja.app claims, DNS zones
 #   mode=fix       release stale claims -> attach to keja-ai -> SSL -> verify
+#   mode=probe     raw endpoint diagnostics + account audit trail
+#
+# Optional inputs:
+#   release_only   "true" = stop after releasing claims (use together with
+#                  NETLIFY_CLAIM_TOKEN below)
+#   use_claim_token "true" = authenticate with NETLIFY_CLAIM_TOKEN instead of
+#                  NETLIFY_AUTH_TOKEN. Set NETLIFY_CLAIM_TOKEN to a personal
+#                  access token from the Netlify account that currently CLAIMS
+#                  keja.app (owner id fb3b99bc-... as reported by mode=fix),
+#                  then run with mode=fix + release_only=true to free the
+#                  domain. Finally re-run mode=fix with the normal token.
 #
 # Run it from GitHub: Actions tab -> "Fix keja.app domain (Netlify)" ->
 # Run workflow -> pick mode. Default is the safe "discover".
@@ -24,6 +35,16 @@ on:
           - discover
           - fix
           - probe
+      release_only:
+        description: "Release claims only (for use with the claiming account's token)"
+        required: false
+        default: false
+        type: boolean
+      use_claim_token:
+        description: "Use NETLIFY_CLAIM_TOKEN secret instead of NETLIFY_AUTH_TOKEN"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -47,15 +68,23 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          NETLIFY_CLAIM_TOKEN: ${{ secrets.NETLIFY_CLAIM_TOKEN }}
+          USE_CLAIM_TOKEN: ${{ inputs.use_claim_token }}
         run: |
-          if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
+          if [ "$USE_CLAIM_TOKEN" = "true" ]; then
+            if [ -z "$NETLIFY_CLAIM_TOKEN" ]; then
+              echo "::error::NETLIFY_CLAIM_TOKEN secret is not set (add it in Repo Settings -> Secrets and variables -> Actions)."
+              exit 1
+            fi
+          elif [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
             echo "::error::NETLIFY_AUTH_TOKEN / NETLIFY_SITE_ID secrets are not set."
             exit 1
           fi
 
       - name: Run domain fix script
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_AUTH_TOKEN: ${{ inputs.use_claim_token == true && secrets.NETLIFY_CLAIM_TOKEN || secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
           MODE: ${{ inputs.mode }}
+          RELEASE_ONLY: ${{ inputs.release_only == true && '1' || '0' }}
         run: node scripts/netlify-domain-fix.mjs

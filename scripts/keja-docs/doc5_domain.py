@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Doc 5 — Resolving the keja.app Netlify Domain Conflict (fix guide)."""
+"""Doc 5 — Resolving the keja.app Netlify Domain Conflict (fix guide, v2 with API forensics)."""
 import sys
 sys.path.insert(0, "/home/z/my-project/scripts/keja-docs")
 from keja_pdf_kit import (  # noqa: E402
@@ -11,120 +11,136 @@ BODY = "/home/z/my-project/download/keja-domain-body.pdf"
 FINAL = "/home/z/my-project/download/keja-domain-conflict-fix.pdf"
 story = []
 
-# 1 ─ What the error means
+# 1 ─ What the error means + confirmed diagnosis
 p = lead(
     "When adding keja.app to the Netlify site, verification fails with: <i>'keja.app or "
     "one of its subdomains is already managed by Netlify DNS on another team.'</i> This "
-    "guide explains exactly what that means in your case, walks both resolution paths, "
-    "and finishes with attaching the domain and verifying the result. It is written "
-    "against the verified state of 10 September 2026—nothing here is hypothetical.")
-story += h1_block("What the Error Actually Means", "1", p)
+    "guide now carries a confirmed, API-level diagnosis of exactly which account holds "
+    "the claim, the five-minute self-service release path, and the one-command automated "
+    "finish. It is written against the verified state of 10 September 2026.")
+story += h1_block("What the Error Means — and the Confirmed Diagnosis", "1", p)
 story.append(body(
-    "The message says a <b>different Netlify team</b> already holds a claim on keja.app. "
-    "Netlify enforces a one-zone rule: an apex domain can exist as a managed domain or "
-    "DNS zone in only one team at a time, no matter who owns the registrar account. The "
-    "claim is an internal Netlify record—most often left behind when the domain was once "
-    "added to a site in another team, registered through Netlify under another account, "
-    "or given a Netlify DNS zone that was later abandoned. Crucially, the claim does not "
-    "need active nameservers to keep blocking you: it lives in Netlify's database, not "
-    "in the DNS system."))
+    "The message says a <b>different Netlify account</b> already holds a claim on "
+    "keja.app. Netlify enforces a one-owner rule: an apex domain can be claimed by only "
+    "one Netlify account at a time, no matter who owns the registrar account. The claim "
+    "is an internal Netlify record—most often left behind when the domain was once added "
+    "to a site or DNS zone in another account. Crucially, the claim does not need active "
+    "nameservers to keep blocking you: it lives in Netlify's database, not in the DNS "
+    "system. Your DNS side is already perfect—nameservers are Spaceship's (launch1 and "
+    "launch2.spaceship.net), the apex A record points to 75.2.60.5 (Netlify's load "
+    "balancer), and www is a CNAME to keja-ai.netlify.app."))
+story += h2_block("The API forensics (what was checked and found)")
 story.append(body(
-    "Important context from the verified state: your domain is <b>not</b> delegated to "
-    "Netlify DNS today. The nameservers of record are Spaceship's (launch1 and "
-    "launch2.spaceship.net), and the apex A record already points to 75.2.60.5—"
-    "Netlify's load balancer. In other words, the DNS side is already correctly "
-    "configured for a Netlify site; the only thing standing between you and keja.app "
-    "is the stale team claim inside Netlify. That is an administrative fix, not a "
-    "technical one, and it has exactly two resolution paths."))
+    "A full sweep was run through the Netlify API with the deploy token of the account "
+    "that owns keja-ai (login torv54@gmail.com, team 'Victor' / gadda00, account id "
+    "68331ef7ea60d8e7aedec052). Every team, every site, every domain-bearing field on "
+    "each site object, every DNS zone and the account audit trail were enumerated. The "
+    "account contains four sites—keja-ai, chacadom, ecoawardsafrica and busara-ai—and "
+    "<b>none of them claims keja.app</b>: chacadom holds only chacadom.com, busara-ai "
+    "holds only busaraai.com, and no keja.app DNS zone exists in this account. The "
+    "attach attempt itself returned the decisive answer:"))
+story.append(code_block(
+    "PATCH /api/v1/sites/{keja-ai}  { \"custom_domain\": \"keja.app\" }\n"
+    "422 Unprocessable Entity\n"
+    "{ \"custom_domain\": [ \"is owned by another account\",\n"
+    "    \"must be unique (keja.app, fb3b99bc-55cd-4552-a3a4-4b378448aa47)\" ] }"))
+story.append(body(
+    "Netlify itself names the owner: keja.app is claimed by account "
+    "<b>fb3b99bc-55cd-4552-a3a4-4b378448aa47</b>—a different login from the one that "
+    "owns keja-ai. This is almost certainly a <b>second account of yours</b>: GitHub "
+    "OAuth, Google and email/password sign-ins each create separate Netlify accounts, "
+    "even for the same email address. When the domain was first being linked, the "
+    "'Add domain' step ran while the browser was logged into that other identity, "
+    "creating a zone there. The table below summarises the verified state."))
 story += make_table(
-    ["Record", "Current value", "Meaning"],
+    ["Check", "Result"],
     [
-        ["NS (nameservers)", "launch1/launch2.spaceship.net", "Registrar is Spaceship; DNS is NOT on Netlify"],
-        ["A @ (apex)", "75.2.60.5", "Already pointed at Netlify's load balancer"],
-        ["Site", "keja-ai.netlify.app", "Live and deploying green from main"],
-        ["Blocker", "Netlify team claim on keja.app", "Internal Netlify record held by another team"],
+        ["Sites visible to the deploy token", "4: keja-ai, chacadom, ecoawardsafrica, busara-ai"],
+        ["keja.app on any site (custom_domain, aliases, branch/preview)", "None — chacadom only holds chacadom.com"],
+        ["Netlify DNS zones in this account", "Only busaraai.com — no keja.app zone"],
+        ["DNS for keja.app (registrar side)", "NS launch1/launch2.spaceship.net; A 75.2.60.5; www CNAME keja-ai.netlify.app"],
+        ["Claiming account (from the 422 error)", "fb3b99bc-55cd-4552-a3a4-4b378448aa47 — a second login"],
     ],
-    ratios=[0.24, 0.34, 0.42],
-    caption="Table 1.1 — Verified state of the domain as of 10 September 2026.")
+    ratios=[0.42, 0.58],
+    caption="Table 1.1 — Confirmed state as of 10 September 2026.")
 
 # 2 ─ Path A
-story += h1_block("Path A — You Control the Other Team", "2", lead(
-    "If keja.app was ever added to a Netlify site you or a colleague created—under a "
-    "different account, an old workspace, or a client team you can access—this path "
-    "takes about ten minutes and needs nobody's permission."))
+story += h1_block("Path A — Release It Yourself (~5 minutes)", "2", lead(
+    "Because the claiming account is almost certainly your own second login, this is "
+    "the recommended path and needs nobody's permission but yours."))
 story += bullets([
-    "<b>Step 1 — Find the team.</b> Log in to app.netlify.com and check the team "
-    "switcher (top-left). Old or forgotten teams appear there. If you cannot see one, "
-    "check other email accounts you may have used—the claim belongs to whichever "
-    "account first added the domain.",
-    "<b>Step 2 — Remove the domain from any site.</b> In the old team, open the site "
-    "that has keja.app attached: Site configuration → Domain management → Domains. "
-    "Open the keja.app entry and choose Options → Remove domain. Do the same for "
-    "www.keja.app if listed separately.",
-    "<b>Step 3 — Delete the DNS zone.</b> Still in the old team: Domains (team-level) "
-    "→ select keja.app → Options/Manage → Delete DNS zone. This is the step people "
-    "miss: removing a domain from a site does not delete the team-level zone, and the "
-    "zone alone keeps the claim alive.",
-    "<b>Step 4 — Wait, then verify.</b> Zone deletion is usually effective within "
-    "minutes. Return to the keja-ai team and proceed to Chapter 4 to attach keja.app.",
+    "<b>Step 1 — Find the other login.</b> At app.netlify.com, log out, then try each "
+    "identity you own: Continue with GitHub, Continue with Google, and any other "
+    "email/password. In each, check the Teams you land in—you are looking for one "
+    "that is <b>not</b> 'Victor' (the keja-ai team). Team settings → General shows the "
+    "account id; the claiming one ends in 8448aa47.",
+    "<b>Step 2 — Delete the DNS zone there.</b> In the claiming account: team → "
+    "Domains (the team-level DNS page). If keja.app is listed, open it → Options → "
+    "<b>Delete DNS zone</b>. The zone is dormant—live nameservers are Spaceship's—so "
+    "deleting it breaks nothing.",
+    "<b>Step 3 — Check that account's sites too.</b> If any site there lists keja.app "
+    "or www.keja.app in Site configuration → Domain management, remove those entries "
+    "(Options → Remove domain).",
+    "<b>Step 4 — Run the automated finish.</b> Repo → Actions → <b>Fix keja.app "
+    "domain (Netlify)</b> → Run workflow → mode <b>fix</b>. It attaches keja.app "
+    "(primary) + www.keja.app, provisions the Let's Encrypt certificate, enables "
+    "Force HTTPS and polls until https://keja.app answers 200.",
 ])
 story.append(quote_box(
-    "If Step 3 shows the domain was purchased through Netlify on the old team, do not "
-    "delete the zone—transfer the registration instead (Domain settings → Transfer), "
-    "or the domain could end up locked to a team you cannot reach."))
+    "Fully automated alternative for Step 1-3: create a Netlify personal access token "
+    "in the claiming account, add it as the NETLIFY_CLAIM_TOKEN secret in the repo, "
+    "then run the same workflow with use_claim_token + release_only checked (it "
+    "releases the claim via API), and finally re-run with mode=fix using the normal "
+    "token. No browser needed."))
 
 # 3 ─ Path B
-story += h1_block("Path B — You Do Not Control the Other Team", "3", lead(
-    "If the claim belongs to a team you cannot log into—a former agency, a previous "
-    "collaborator, a lost account—Netlify support must release it. This is a routine "
-    "request for them; domains get claimed and abandoned constantly, and they have a "
-    "defined process for exactly this situation."))
+story += h1_block("Path B — Netlify Support Releases It", "3", lead(
+    "If the claiming account turns out not to be yours—cannot be found among your "
+    "logins—Netlify support must release it. This is a routine request with a defined "
+    "process."))
 story += bullets([
-    "<b>Step 1 — Open a support ticket.</b> From the app: Support → contact form (or "
-    "support@netlify.com). Subject: 'Domain claimed by another team — release "
-    "request for keja.app'.",
-    "<b>Step 2 — Prove registrar ownership.</b> Attach or state: the WHOIS registrant "
-    "information for keja.app (Spaceship account in your name), the date and method of "
-    "purchase, and a screenshot of your Spaceship dashboard showing the domain in your "
-    "account. If WHOIS privacy redacts the record, the registrar dashboard screenshot "
-    "plus the ability to make on-demand DNS changes is the standard proof.",
+    "<b>Step 1 — Open a support ticket.</b> From the app: Support → contact form. "
+    "Subject: 'Domain claimed by another account — release request for keja.app'. "
+    "Include the claiming account id fb3b99bc-55cd-4552-a3a4-4b378448aa47 so support "
+    "can locate the stale claim instantly.",
+    "<b>Step 2 — Prove registrar ownership.</b> The WHOIS/RDAP registrant information "
+    "for keja.app (registered 8 September 2026 at Spaceship), the purchase date and "
+    "method, and a screenshot of the Spaceship dashboard showing the domain in your "
+    "account.",
     "<b>Step 3 — Demonstrate live DNS control.</b> Offer to add a temporary TXT record "
-    "Netlify specifies (e.g. netlify-challenge=...) at your Spaceship DNS panel on "
-    "request. Being able to change DNS at will is conclusive ownership evidence and "
-    "typically shortens the process to a few business days.",
-    "<b>Step 4 — Ask for the release.</b> Request explicitly: 'Please release the "
-    "keja.app zone / domain claim held by the other team so I can add it to my site "
-    "in my current team.' Netlify will attempt to contact the other team holder, then "
-    "release the claim if they do not respond or cannot justify it.",
+    "Netlify specifies at your Spaceship DNS panel on request. Being able to change "
+    "DNS at will is conclusive ownership evidence and typically shortens the process "
+    "to a few business days.",
+    "<b>Step 4 — Ask for the release explicitly.</b> Netlify will attempt to contact "
+    "the claiming account, then release the claim if they do not respond or cannot "
+    "justify it.",
 ])
 story.append(body(
     "While you wait, nothing is blocked operationally: the site serves correctly on "
     "keja-ai.netlify.app, deploys run green on every push, and the DNS A record is "
     "already aimed at Netlify's load balancer. The moment the claim is released, "
     "Chapter 4 completes in under ten minutes. If support stalls beyond a week, "
-    "escalate by replying on the same thread—threads keep the context—and cite the "
-    "verified DNS state in Table 1.1, which shows the domain already pointing at "
-    "Netlify infrastructure under your control."))
+    "escalate by replying on the same thread and cite the verified DNS state in "
+    "Table 1.1."))
 
 # 4 ─ Attaching the domain
 story += h1_block("Attaching keja.app After the Release", "4", lead(
-    "With the claim gone, adding the domain is routine. Your DNS is already 90% "
-    "correct—only the www record and the Netlify-side configuration remain."))
+    "The automated route is one click: Actions → Fix keja.app domain (Netlify) → mode "
+    "fix. It performs every step below, retries with backoff, and verifies the result. "
+    "The manual equivalent:"))
 story += bullets([
     "<b>Step 1 — Add the apex domain.</b> Netlify → keja-ai site → Site configuration "
     "→ Domain management → Add a domain → keja.app. Accept the prompt to make it the "
     "primary domain.",
     "<b>Step 2 — Add www.</b> Add www.keja.app to the same site, then in Domain "
-    "management set www to redirect to the apex (or vice versa, if you prefer www "
-    "as primary—apex is recommended for a brand like keja.app).",
+    "management set www to redirect to the apex (apex-primary is recommended for a "
+    "brand like keja.app).",
     "<b>Step 3 — Confirm DNS records at Spaceship.</b> Keep the apex A record "
-    "75.2.60.5, and set www as a CNAME to keja-ai.netlify.app. Netlify's DNS-check "
-    "panel will show green checks as each record verifies—usually within minutes for "
-    "A records, up to an hour for the CNAME.",
+    "75.2.60.5, and set www as a CNAME to keja-ai.netlify.app. Green checks appear "
+    "within minutes for the A record, up to an hour for the CNAME.",
     "<b>Step 4 — HTTPS.</b> Let's Encrypt certificates are provisioned automatically "
-    "once the domain verifies. Do not upload custom certificates; wait for the "
-    "automatic ones, then force HTTPS (Domain management → HTTPS → ensure 'Force "
-    "HTTPS' is enabled).",
+    "once the domain verifies; then force HTTPS (Domain management → HTTPS → Force "
+    "HTTPS).",
 ])
 story.append(code_block(
     "# Verification commands (any terminal):\n"
@@ -134,11 +150,11 @@ story.append(code_block(
     "curl -I https://keja.app        # HTTP/2 200 + netlify edge headers"))
 story.append(body(
     "One subtlety worth knowing: because you are staying on Spaceship nameservers "
-    "(Path B-style DNS) rather than delegating to Netlify DNS, the Netlify DNS-check "
-    "screen may show a gentle recommendation to 'use Netlify DNS'. That is optional. "
-    "Keeping Spaceship DNS with A and CNAME records is fully supported, keeps your "
-    "registrar independence, and matches the already-verified configuration in "
-    "Table 1.1. Change nothing unless you have a reason."))
+    "rather than delegating to Netlify DNS, the Netlify DNS-check screen may show a "
+    "gentle recommendation to 'use Netlify DNS'. That is optional. Keeping Spaceship "
+    "DNS with A and CNAME records is fully supported, keeps registrar independence, "
+    "and matches the already-verified configuration in Table 1.1. Change nothing "
+    "unless you have a reason."))
 
 # 5 ─ Post-launch checklist
 story += h1_block("Post-Launch Verification Checklist", "5", lead(
@@ -167,10 +183,24 @@ story.append(body(
     "checks on the keja-ai.netlify.app domain during the September 2026 verification "
     "pass, so the canonical domain inherits a known-good bundle."))
 
+# 6 ─ Tooling reference
+story += h1_block("Tooling Reference", "6", lead(
+    "Everything described above is wired into the repository as repeatable tooling—no "
+    "step depends on tribal knowledge or a one-off terminal session."))
+story += make_table(
+    ["Artifact", "Purpose"],
+    [
+        ["scripts/netlify-domain-fix.mjs", "Zero-dependency Node script. MODE=discover inventories teams, sites, zones and claims (read-only). MODE=fix releases stale claims, attaches keja.app + www, provisions SSL and verifies. MODE=probe dumps raw endpoint diagnostics. RELEASE_ONLY=1 releases without attaching, for use with the claiming account's token."],
+        [".github/workflows/fix-domain.yml", "Manual workflow runner exposing the modes above, with optional NETLIFY_CLAIM_TOKEN secret for the cross-account release flow."],
+        ["docs/DOMAIN_CONFLICT_FIX.md", "This guide in markdown, kept current with the repo."],
+    ],
+    ratios=[0.32, 0.68],
+    caption="Table 6.1 — Domain tooling shipped in the repository.")
+
 mark_body_start(story)
 build_doc(story, BODY,
           "Resolving the keja.app Netlify Domain Conflict",
-          "Fix guide: releasing the stale Netlify team claim and launching the canonical domain")
+          "Fix guide v2: confirmed API-level diagnosis, self-service release, and the automated finish")
 
 HTML = "/home/z/my-project/scripts/keja-docs/doc5_cover.html"
 COVER_PDF = "/home/z/my-project/scripts/keja-docs/doc5_cover.pdf"
@@ -178,15 +208,15 @@ write_cover(
     HTML,
     kicker="Operations Guide · Domain Release and Launch",
     hero="KEJA APP",
-    summary="The stale Netlify team claim on keja.app: what the error means given the "
-            "verified DNS state, the two release paths, the ten-minute attach procedure, "
-            "and the eight checks that prove the canonical launch.",
-    meta="Operations guide<br>"
+    summary="The keja.app domain claim, confirmed at the API level: which Netlify "
+            "account holds it, the five-minute self-service release, the support "
+            "fallback, and the one-command automated finish.",
+    meta="Operations guide (v2 — confirmed diagnosis)<br>"
          "<span class='lbl'>A Chacadom Investments venture</span><br>"
          "<span class='lbl'>10 September 2026</span>",
 )
 render_cover(HTML, COVER_PDF)
 merge_cover(COVER_PDF, BODY, FINAL,
             "Resolving the keja.app Netlify Domain Conflict",
-            "Fix guide: releasing the stale Netlify team claim and launching the canonical domain")
+            "Fix guide v2: confirmed API-level diagnosis, self-service release, and the automated finish")
 print("FINAL:", FINAL)
