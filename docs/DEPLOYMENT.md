@@ -10,7 +10,7 @@
 |---|---|---|
 | Hosting / CDN | Vercel edge network | Static export — no server functions |
 | Build & deploy | GitHub Actions → `vercel` CLI prebuilt deploys | `.github/workflows/deploy-vercel.yml` on every push to `main` |
-| Production URLs | `keja-ai-rho.vercel.app` · `keja-ai-victors-projects-37d86841.vercel.app` | keja.app attaches via DNS (§4) |
+| Production URLs | **`keja-ai-rho.vercel.app`** (public) · `keja-ai-victors-projects-37d86841.vercel.app` (team alias — behind Vercel Authentication on Hobby) | keja.app attaches via DNS (§4) |
 | Install | `bun install --frozen-lockfile` | Lockfile is `bun.lock` — never `npm ci` |
 | Build command | `NEXT_STATIC=1 npx next build && node scripts/sw-version.mjs` | Emits `out/` + stamps the service-worker cache version |
 | Runtime | 100% client-side SPA | Hash routing (`#/properties/KJA-001`), localStorage, offline shell |
@@ -58,8 +58,9 @@ favour of automatic Git deploys.
    `vercel pull` (fetch project settings) → `vercel build --prod` (runs the static build +
    SW stamp, compiles `vercel.json` routing) → `vercel deploy --prebuilt --prod`
    (uploads the bundle — unchanged files are skipped via content hashing).
-3. The workflow prints the deployment URL and smoke-tests it (HTTP 200, manifest, `sw.js`
-   no-cache header, security headers).
+3. The workflow prints the deployment URL and smoke-tests the public production alias
+   (`keja-ai-rho.vercel.app`): HTTP 200, manifest, `sw.js` no-cache header, security
+   headers. (Raw deployment URLs are Vercel-auth-gated on Hobby — never test those.)
 4. `.github/workflows/production-check.yml` re-runs that smoke test hourly against the
    production alias.
 
@@ -131,8 +132,10 @@ What changed in the repo:
 **Known quirk:** the bare `keja-ai.vercel.app` alias is owned by a *different* Vercel
 account (the same second login that held the Netlify keja.app claim and that carries the
 GitHub connection). It serves an unrelated/older deployment and is not used by this
-project — the production aliases are `keja-ai-rho.vercel.app` and
-`keja-ai-victors-projects-37d86841.vercel.app`, and the canonical domain is keja.app.
+project — the public production URL is **`keja-ai-rho.vercel.app`** (the project's assigned
+production domain), and the canonical domain is keja.app. The `{project}-{team}.vercel.app`
+team alias and all raw deployment URLs sit behind Vercel Authentication (standard Hobby
+behaviour); use `keja-ai-rho.vercel.app` or keja.app for public access.
 
 What was **not** deleted: the other Netlify sites on the account (`chacadom`,
 `ecoawardsafrica`, `busara-ai`) are unrelated projects and were left untouched.

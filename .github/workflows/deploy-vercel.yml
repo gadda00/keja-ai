@@ -82,15 +82,26 @@ jobs:
             exit 1
           fi
           echo "url=$url" >> "$GITHUB_OUTPUT"
-          echo "Deployment URL: $url"
+          echo "Deployment URL: $url (raw URL is Vercel-auth-gated; the smoke test
+               below hits the public production alias.)"
 
-      - name: Smoke-test the deployment
+      # Raw deployment URLs are behind Vercel Authentication on Hobby — only
+      # the project's assigned production domain (and custom domains) are
+      # public. Smoke-test the production alias, which reflects the build that
+      # was just promoted.
+      - name: Smoke-test the production alias
         env:
-          URL: ${{ steps.deploy.outputs.url }}
+          URL: https://keja-ai-rho.vercel.app
         run: |
+          # Give the alias propagation a moment, then check with retries.
           fail=0
-          code=$(curl -s --max-time 30 -o /dev/null -w "%{http_code}" "$URL/" || echo 000)
-          echo "GET /                    -> $code"; [ "$code" = "200" ] || fail=1
+          for attempt in 1 2 3 4 5; do
+            code=$(curl -s --max-time 30 -o /dev/null -w "%{http_code}" "$URL/" || echo 000)
+            echo "attempt $attempt: GET / -> $code"
+            [ "$code" = "200" ] && break
+            sleep 15
+          done
+          [ "$code" = "200" ] || { echo "Production alias did not return 200"; exit 1; }
           headers=$(curl -sI --max-time 30 "$URL/sw.js" || true)
           echo "$headers" | grep -qi "^cache-control: public, max-age=0, must-revalidate" \
             && echo "GET /sw.js cache-control -> OK" || { echo "GET /sw.js cache-control -> FAIL"; fail=1; }
