@@ -22,6 +22,7 @@ concurrency:
 env:
   VERCEL_ORG_ID: team_VQjzdNuqoqHf2Yr93IBcJD6b
   VERCEL_PROJECT_ID: prj_XnyidS1Fw1Go6a3btvnAs5knexPR
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
 jobs:
   deploy:
@@ -40,8 +41,6 @@ jobs:
           bun-version: 1.3.14
 
       - name: Check Vercel credentials
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           if [ -z "$VERCEL_TOKEN" ]; then
             echo "::error::VERCEL_TOKEN secret is not set."

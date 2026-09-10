@@ -1,0 +1,54 @@
+# One-off cleanup: delete the retired keja-ai site on Netlify.
+#
+# Run manually (Actions → Netlify cleanup (one-off) → Run workflow) AFTER the
+# Vercel deployment is verified green. Deletes ONLY the site named "keja-ai"
+# — chacadom, ecoawardsafrica, busara-ai and every other site on the account
+# are untouched. This workflow is removed from the repo once it has run.
+name: Netlify cleanup (one-off)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  delete-keja-ai-site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete the keja-ai Netlify site (nothing else)
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$NETLIFY_AUTH_TOKEN" ]; then
+            echo "::error::NETLIFY_AUTH_TOKEN secret is not set."
+            exit 1
+          fi
+          sites=$(curl -sf -H "Authorization: Bearer $NETLIFY_AUTH_TOKEN" \
+            "https://api.netlify.com/api/v1/sites")
+          target=$(echo "$sites" | jq -r '.[] | select(.name == "keja-ai") | .id')
+          if [ -z "$target" ] || [ "$target" = "null" ]; then
+            echo "No Netlify site named keja-ai found — nothing to delete."
+            exit 0
+          fi
+          # Safety: confirm the site really is the keja-ai production site.
+          ssl_url=$(echo "$sites" | jq -r --arg id "$target" '.[] | select(.id == $id) | .ssl_url // .default_domain')
+          echo "Target: $target ($ssl_url)"
+          if [ "$ssl_url" != "https://keja-ai.netlify.app" ]; then
+            echo "::error::Refusing to delete — site does not serve keja-ai.netlify.app."
+            exit 1
+          fi
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
+            -H "Authorization: Bearer $NETLIFY_AUTH_TOKEN" \
+            "https://api.netlify.com/api/v1/sites/$target")
+          echo "DELETE /sites/$target -> HTTP $code"
+          [ "$code" = "204" ] || [ "$code" = "200" ] || { echo "::error::Delete failed."; exit 1; }
+          # Verify it is gone.
+          remaining=$(curl -sf -H "Authorization: Bearer $NETLIFY_AUTH_TOKEN" \
+            "https://api.netlify.com/api/v1/sites" | jq -r '.[].name')
+          echo "Sites remaining on the account:"; echo "$remaining"
+          if echo "$remaining" | grep -qx "keja-ai"; then
+            echo "::error::keja-ai still listed."; exit 1
+          fi
+          echo "keja-ai deleted. The other sites are untouched."
