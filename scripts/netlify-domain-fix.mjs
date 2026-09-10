@@ -237,6 +237,19 @@ async function main() {
         log(`    - ${e.created_at || '?'} ${e.action || '?'} actor=${e.actor?.email || e.actor_id || '?'} ${JSON.stringify(e.payload || {}).slice(0, 220).replace(/\s+/g, ' ')}`);
       }
     }
+
+    // plan / billing / usage state (why are deploys blocked?)
+    log('\n=== PROBE: account plan + usage ===');
+    for (const t of teams) {
+      const acc = await api('GET', `/accounts/${t.id}`);
+      const caps = acc.json?.capabilities || acc.json;
+      log(`  GET /accounts/${t.id} -> ${acc.status}`);
+      log(`    ${JSON.stringify(caps).slice(0, 900).replace(/\s+/g, ' ')}`);
+      for (const p of [`/accounts/${t.id}/usage`, `/accounts/${t.id}/billing`, `/accounts/${t.id}/plan`]) {
+        const r = await api('GET', p);
+        log(`  GET ${p} -> ${r.status} ${(r.text || '(empty)').slice(0, 400).replace(/\s+/g, ' ')}`);
+      }
+    }
     log('\n=== PROBE COMPLETE (read-only) ===');
     return;
   }
