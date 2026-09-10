@@ -1,7 +1,40 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-09T00:08:23.933Z",
+  "generatedAt": "2026-09-10T00:08:44.707Z",
   "runs": [
+    {
+      "id": "run-2026-09-10-24680",
+      "startedAt": "2026-09-10T00:08:44.707Z",
+      "ingested": 4,
+      "published": 4,
+      "queued": 0,
+      "rejected": 0,
+      "deduped": 9,
+      "sources": {
+        "scanner": 4,
+        "feeds": 0
+      },
+      "feedStatus": [
+        {
+          "feed": "diaspora-property.xml",
+          "format": "XML",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "horizon-realtors.csv",
+          "format": "CSV",
+          "items": 3,
+          "state": "ok"
+        },
+        {
+          "feed": "skyline-agents.json",
+          "format": "JSON",
+          "items": 3,
+          "state": "ok"
+        }
+      ]
+    },
     {
       "id": "run-2026-09-09-03746",
       "startedAt": "2026-09-09T00:08:23.933Z",
@@ -1288,42 +1321,277 @@
           "state": "ok"
         }
       ]
-    },
-    {
-      "id": "run-2026-08-30-21659",
-      "startedAt": "2026-08-30T09:47:01.675Z",
-      "ingested": 5,
-      "published": 5,
-      "queued": 0,
-      "rejected": 0,
-      "deduped": 9,
-      "sources": {
-        "scanner": 5,
-        "feeds": 0
-      },
-      "feedStatus": [
-        {
-          "feed": "diaspora-property.xml",
-          "format": "XML",
-          "items": 3,
-          "state": "ok"
-        },
-        {
-          "feed": "horizon-realtors.csv",
-          "format": "CSV",
-          "items": 3,
-          "state": "ok"
-        },
-        {
-          "feed": "skyline-agents.json",
-          "format": "JSON",
-          "items": 3,
-          "state": "ok"
-        }
-      ]
     }
   ],
   "listings": [
+    {
+      "id": "KJA-A0192",
+      "title": "Sunny 6-Bedroom Family Villa in Ruaka",
+      "type": "villa",
+      "purpose": ["buy", "invest"],
+      "area": "Ruaka",
+      "county": "Nairobi",
+      "price": 34200000,
+      "rentEstimate": 228000,
+      "grossYieldEstimate": 8,
+      "bedrooms": 6,
+      "bathrooms": 3,
+      "sizeSqm": 411,
+      "amenities": ["Solar backup", "Guest wing", "Staff quarters", "Borehole + storage tanks"],
+      "images": ["/images/props/townhouse_1.jpg", "/images/props/interior_0.jpg"],
+      "description": "This 411 sqm villa in Ruaka has been finished to a practical standard and priced with discipline. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 83k/sqm the pricing sits within the Ruaka band, and the area yield band of 8% supports a solid income case.",
+      "agency": "Skyline Agents Kenya",
+      "agent": {
+        "name": "Peter Kariuki",
+        "phone": "+254 720 811 340"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-10T06:56:00.000Z",
+      "appreciationForecast": 4.7,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 83k/sqm — within the Ruaka band",
+        "Close to Ruaka town centre",
+        "Est. gross yield ~8% p.a. (area band 8%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-10T06:56:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 8,
+        "areaPpsmBand": [65000, 95000],
+        "areaAcreBand": [10, 28],
+        "qualityScore": 93,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 83k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "54-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0194",
+      "title": "Refined Commercial Unit in Kileleshwa",
+      "type": "commercial",
+      "purpose": ["buy", "invest"],
+      "area": "Kileleshwa",
+      "county": "Nairobi",
+      "price": 76050000,
+      "rentEstimate": 532000,
+      "grossYieldEstimate": 8.4,
+      "bathrooms": 1,
+      "sizeSqm": 714,
+      "amenities": [
+        "Central A/C",
+        "Ample parking bays",
+        "Conference facilities",
+        "100% backup power"
+      ],
+      "images": ["/images/props/interior_2.jpg", "/images/props/office_1.jpg"],
+      "description": "A well-presented commercial unit in Kileleshwa, Nairobi, offering 714 sqm of bright, efficiently planned space. Infrastructure — power backup, connectivity and parking — supports immediate occupation. At KES 107k/sqm the pricing sits within the Kileleshwa band, and the area yield band of 8.4% supports a solid income case.",
+      "agency": "Horizon Realtors",
+      "agent": {
+        "name": "Dennis Otieno",
+        "phone": "+254 701 644 087"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-10T04:53:00.000Z",
+      "appreciationForecast": 7.5,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 107k/sqm — within the Kileleshwa band",
+        "Close to Gitanga Road shops",
+        "Est. gross yield ~8.4% p.a. (area band 8.4%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-10T04:53:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 8.4,
+        "areaPpsmBand": [85000, 125000],
+        "areaAcreBand": [70, 140],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 107k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "48-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0193",
+      "title": "Contemporary 2-Bedroom Garden Bungalow in Runda",
+      "type": "bungalow",
+      "purpose": ["buy"],
+      "area": "Runda",
+      "county": "Nairobi",
+      "price": 5600000,
+      "rentEstimate": 28000,
+      "grossYieldEstimate": 6,
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "sizeSqm": 61,
+      "amenities": ["Solar water heating", "Quiet cul-de-sac", "Mature garden"],
+      "images": ["/images/props/townhouse_0.jpg", "/images/props/interior_1.jpg"],
+      "description": "This 61 sqm bungalow in Runda has been finished to a practical standard and priced with discipline. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. At KES 92k/sqm the pricing sits above the Runda band, and the area yield band of 6% supports a solid income case.",
+      "agency": "Horizon Realtors",
+      "agent": {
+        "name": "Dennis Otieno",
+        "phone": "+254 701 644 087"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-10T03:39:00.000Z",
+      "appreciationForecast": 6.9,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 92k/sqm — above the Runda band",
+        "Close to Village Market",
+        "Est. gross yield ~6% p.a. (area band 6%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-10T03:39:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "above",
+        "areaYieldBand": 6,
+        "areaPpsmBand": [60000, 95000],
+        "areaAcreBand": [15, 40],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 92k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "53-word description · 2 photos · 3 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0191",
+      "title": "Contemporary 6-Bedroom Family Villa in Kileleshwa",
+      "type": "villa",
+      "purpose": ["buy", "invest"],
+      "area": "Kileleshwa",
+      "county": "Nairobi",
+      "price": 37100000,
+      "rentEstimate": 260000,
+      "grossYieldEstimate": 8.4,
+      "bedrooms": 6,
+      "bathrooms": 3,
+      "sizeSqm": 316,
+      "amenities": ["Swimming pool", "Staff quarters", "Gated community", "Half-acre garden"],
+      "images": ["/images/props/townhouse_1.jpg", "/images/props/villa_1.jpg"],
+      "description": "A well-presented villa in Kileleshwa, Nairobi, offering 316 sqm of bright, efficiently planned space. The property sits on a mature, well-kept compound with room for family life and entertaining. The Kileleshwa market band and 8.4% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Prestige Homes KE",
+      "agent": {
+        "name": "Brian Mutua",
+        "phone": "+254 738 220 776"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-10T03:12:00.000Z",
+      "appreciationForecast": 7.2,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 117k/sqm — within the Kileleshwa band",
+        "Close to Gitanga Road shops",
+        "Est. gross yield ~8.4% p.a. (area band 8.4%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-10T03:12:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 8.4,
+        "areaPpsmBand": [85000, 125000],
+        "areaAcreBand": [70, 140],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 117k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "45-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
     {
       "id": "KJA-A0188",
       "title": "Refined Retail Space in Milimani",
@@ -5193,279 +5461,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "KJA-A0127",
-      "title": "Sunny 3-Bedroom City Apartment in Nanyuki",
-      "type": "apartment",
-      "purpose": ["buy", "invest"],
-      "area": "Nanyuki",
-      "county": "Laikipia",
-      "price": 5050000,
-      "rentEstimate": 27000,
-      "grossYieldEstimate": 6.4,
-      "bedrooms": 3,
-      "bathrooms": 1,
-      "sizeSqm": 147,
-      "amenities": ["Fibre internet ready", "Secure parking", "Balcony", "Gym"],
-      "images": [
-        "/images/props/interior_1.jpg",
-        "/images/props/bedroom_0.jpg",
-        "/images/props/apartment_2.jpg"
-      ],
-      "description": "An honest, well-maintained apartment in Nanyuki — 147 sqm of sensible layout for owners and investors alike. Interiors are clean and neutral, ready for immediate occupation or a light personal refresh. Benchmarked against comparable stock in Nanyuki, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Nairobi Prime Properties",
-      "agent": {
-        "name": "Samuel Kiptoo",
-        "phone": "+254 710 259 664"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-04T09:42:00.000Z",
-      "appreciationForecast": 6.4,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 34k/sqm — within the Nanyuki band",
-        "Close to Mount Kenya foothills",
-        "Est. gross yield ~6.4% p.a. (area band 6.4%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-04T09:42:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 6.4,
-        "areaPpsmBand": [20000, 45000],
-        "areaAcreBand": [0.8, 4],
-        "qualityScore": 92,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 34k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "47-word description · 3 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0129",
-      "title": "Bright Commercial Unit in Syokimau",
-      "type": "commercial",
-      "purpose": ["buy"],
-      "area": "Syokimau",
-      "county": "Machakos",
-      "price": 18000000,
-      "rentEstimate": 117000,
-      "grossYieldEstimate": 7.8,
-      "bathrooms": 1,
-      "sizeSqm": 403,
-      "amenities": ["Ample parking bays", "Fibre backbone", "Conference facilities", "Central A/C"],
-      "images": ["/images/props/office_1.jpg", "/images/props/interior_2.jpg"],
-      "description": "Rarely available: a commercial unit in Syokimau combining space (403 sqm), light and a convenient address. Infrastructure — power backup, connectivity and parking — supports immediate occupation. At KES 45k/sqm the pricing sits within the Syokimau band, and the area yield band of 7.8% supports a solid income case.",
-      "agency": "Horizon Realtors",
-      "agent": {
-        "name": "Dennis Otieno",
-        "phone": "+254 701 644 087"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-04T09:39:00.000Z",
-      "appreciationForecast": 7.2,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 45k/sqm — within the Syokimau band",
-        "Close to Mlolongo interchange",
-        "Est. gross yield ~7.8% p.a. (area band 7.8%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-04T09:39:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 7.8,
-        "areaPpsmBand": [35000, 60000],
-        "areaAcreBand": [3, 9],
-        "qualityScore": 90,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 45k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "49-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0110",
-      "title": "Charming 4-Bedroom Family Villa in Nanyuki",
-      "type": "villa",
-      "purpose": ["buy", "invest"],
-      "area": "Nanyuki",
-      "county": "Laikipia",
-      "price": 6400000,
-      "rentEstimate": 34000,
-      "grossYieldEstimate": 6.4,
-      "bedrooms": 4,
-      "bathrooms": 3,
-      "sizeSqm": 175,
-      "amenities": [
-        "Half-acre garden",
-        "Gated community",
-        "Swimming pool",
-        "Borehole + storage tanks"
-      ],
-      "images": ["/images/props/villa_1.jpg", "/images/props/villa_0.jpg"],
-      "description": "An honest, well-maintained villa in Nanyuki — 175 sqm of sensible layout for owners and investors alike. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 37k/sqm the pricing sits above the Nanyuki band, and the area yield band of 6.4% supports a solid income case.",
-      "agency": "Skyline Agents Kenya",
-      "agent": {
-        "name": "Mercy Wanjiru",
-        "phone": "+254 712 400 118"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-04T08:59:00.000Z",
-      "appreciationForecast": 8.5,
-      "offPlan": true,
-      "furnished": false,
-      "highlights": [
-        "KES 37k/sqm — above the Nanyuki band",
-        "Close to Nanyuki town",
-        "Est. gross yield ~6.4% p.a. (area band 6.4%)",
-        "Off-plan with staged payment plan"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-04T08:59:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "above",
-        "areaYieldBand": 6.4,
-        "areaPpsmBand": [20000, 45000],
-        "areaAcreBand": [0.8, 4],
-        "qualityScore": 93,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 37k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "54-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0120",
-      "title": "Bright 6-Bedroom Family Villa in Nanyuki",
-      "type": "villa",
-      "purpose": ["buy", "invest"],
-      "area": "Nanyuki",
-      "county": "Laikipia",
-      "price": 6500000,
-      "rentEstimate": 35000,
-      "grossYieldEstimate": 6.5,
-      "bedrooms": 6,
-      "bathrooms": 3,
-      "sizeSqm": 285,
-      "amenities": ["Half-acre garden", "Borehole + storage tanks", "Guest wing", "Staff quarters"],
-      "images": ["/images/props/townhouse_1.jpg", "/images/props/villa_1.jpg"],
-      "description": "An honest, well-maintained villa in Nanyuki — 285 sqm of sensible layout for owners and investors alike. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 23k/sqm the pricing sits below the Nanyuki band, and the area yield band of 6.4% supports a solid income case.",
-      "agency": "Skyline Agents Kenya",
-      "agent": {
-        "name": "Mercy Wanjiru",
-        "phone": "+254 712 400 118"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-04T08:49:00.000Z",
-      "appreciationForecast": 7.7,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 23k/sqm — below the Nanyuki band",
-        "Close to Nanyuki town",
-        "Est. gross yield ~6.5% p.a. (area band 6.4%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-04T08:49:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 6.4,
-        "areaPpsmBand": [20000, 45000],
-        "areaAcreBand": [0.8, 4],
-        "qualityScore": 93,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 23k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "54-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
     }
   ],
   "pending": [],
@@ -5625,7 +5620,11 @@
     "apartment|Athi River|4br|7",
     "commercial|Milimani|0br|9",
     "apartment|Milimani|4br|10",
-    "apartment|Kitengela|3br|9"
+    "apartment|Kitengela|3br|9",
+    "villa|Kileleshwa|6br|37",
+    "villa|Ruaka|6br|34",
+    "bungalow|Runda|2br|6",
+    "commercial|Kileleshwa|0br|76"
   ],
   "rejected": []
 }
