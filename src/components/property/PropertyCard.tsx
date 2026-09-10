@@ -1,208 +1,234 @@
-import {
-  Bath,
-  BedDouble,
-  Building2,
-  Eye,
-  Gauge,
-  GitCompareArrows,
-  Heart,
-  Ruler,
-  TrendingUp,
-  Waves,
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
-
-import SmartImg from '@/components/ui/SmartImg';
-import { isNearWaterfront } from '@/data/neighborhoods';
-import type { Property } from '@/data/properties';
-import { track } from '@/lib/analytics';
+'use client';
+/**
+ * Marketplace property card — image, trust badge, price, investment signals,
+ * compare + save actions. Used across Discover, Home, Area guides, AI answers.
+ */
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { ArrowRight, Bath, BedDouble, Heart, Ruler, Tag } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { investmentScore } from '@/lib/investmentScore';
 import { isRentalPrice } from '@/lib/finance';
 import { formatKES } from '@/lib/format';
-import { investmentScore, scoreTone } from '@/lib/investmentScore';
-import { KEYS, useStore } from '@/lib/store';
+import type { Property } from '@/data/properties';
+import { Link, navigate } from '@/lib/router';
+import { cn } from '@/lib/utils';
+import { TrustBadge } from './TrustBadge';
 
-import TrustBadge from './TrustBadge';
-
-/** Auto-Pilot listings carry the KJA-A id prefix — labelled, never hidden. */
-const isAutoPilot = (id: string) => id.startsWith('KJA-A');
-
-/** Listed within the last 7 days. */
-const isNewArrival = (listedAt: string) => Date.now() - +new Date(listedAt) < 7 * 24 * 3600 * 1000;
-
-export default function PropertyCard({ property }: { property: Property }) {
-  const [favorites, setFavorites] = useStore<string[]>(KEYS.favorites, []);
-  const [compare, setCompare] = useStore<string[]>(KEYS.compare, []);
-  const isFav = favorites.includes(property.id);
-  const isRent = isRentalPrice(property.price);
-  const inCompare = compare.includes(property.id);
-  const score = investmentScore(property);
-  const toggleFav = () => {
-    setFavorites(isFav ? favorites.filter((f) => f !== property.id) : [...favorites, property.id]);
-  };
-  const toggleCompare = () => {
-    if (inCompare) setCompare(compare.filter((c) => c !== property.id));
-    else {
-      setCompare([...compare, property.id].slice(-4));
-      track({ event: 'compare_add', propertyId: property.id });
-    }
-  };
+export function PropertyCard({
+  property: p,
+  compact = false,
+  compareActive,
+  onCompare,
+  saved,
+  onSave,
+  index = 0,
+}: {
+  property: Property;
+  compact?: boolean;
+  compareActive?: boolean;
+  onCompare?: (p: Property) => void;
+  saved?: boolean;
+  onSave?: (p: Property) => void;
+  index?: number;
+}) {
+  const [imgOk, setImgOk] = useState(true);
+  const isRent = p.purpose.includes('rent') || isRentalPrice(p.price);
+  const score = investmentScore(p);
 
   return (
-    <div className="card-luxe card-luxe-hover group relative flex flex-col overflow-hidden">
-      <div className="relative h-56 overflow-hidden">
-        <Link to={`/properties/${property.id}`}>
-          <SmartImg
-            src={property.images[0]}
-            alt={property.title}
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+    <motion.article
+      initial={{ opacity: 0, y: 14 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.4, delay: Math.min(index * 0.04, 0.3) }}
+      className={cn(
+        'group card-lift relative flex flex-col overflow-hidden rounded-2xl border bg-card',
+        compareActive && 'ring-2 ring-primary',
+      )}
+    >
+      <Link
+        to={`/properties/${p.id}`}
+        ariaLabel={`${p.title} — view property passport`}
+        className="relative block aspect-[4/3] overflow-hidden bg-muted"
+      >
+        {imgOk ? (
+          <img
+            src={p.images[0]}
+            alt={p.title}
+            loading="lazy"
+            onError={() => setImgOk(false)}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
           />
-        </Link>
-        <div className="absolute left-3 top-3 flex flex-col gap-1.5">
-          <TrustBadge score={property.trustScore} size="sm" />
-          {isNearWaterfront(property) && (
-            <Link
-              to="/areas/waterfront-karen"
-              className="inline-flex items-center gap-1 rounded-full bg-gold-gradient px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-gold-sm"
-              title="This listing is near The Waterfront Karen — see the neighbourhood guide"
-            >
-              <Waves className="h-3 w-3" aria-hidden="true" /> Waterfront
-            </Link>
-          )}
-          {isNewArrival(property.listedAt) && (
-            <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-              Fresh
-            </span>
-          )}
-          {isAutoPilot(property.id) && (
-            <span className="rounded-full bg-sky-600/90 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-              Auto-Pilot
-            </span>
-          )}
-          {property.offPlan ? (
-            <span className="rounded-full bg-ink/85 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gold-300">
-              Off-Plan
-            </span>
-          ) : null}
-          {property.availability === 'reserved' && (
-            <span className="rounded-full bg-ink/85 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-              Reserved
-            </span>
-          )}
-        </div>
-        <button
-          onClick={toggleFav}
-          aria-label={
-            isFav
-              ? `Remove ${property.title} from favourites`
-              : `Save ${property.title} to favourites`
-          }
-          aria-pressed={isFav}
-          className={`absolute right-3 top-3 rounded-full p-2 shadow-sm transition ${
-            isFav ? 'bg-gold-500 text-white' : 'bg-white/90 text-ink-muted hover:text-gold-600'
-          }`}
-        >
-          <Heart className="h-4 w-4" fill={isFav ? 'currentColor' : 'none'} />
-        </button>
-        <button
-          onClick={toggleCompare}
-          aria-label={
-            inCompare
-              ? `Remove ${property.title} from comparison`
-              : `Add ${property.title} to comparison`
-          }
-          aria-pressed={inCompare}
-          className={`absolute right-14 top-3 rounded-full p-2 shadow-sm transition ${
-            inCompare ? 'bg-ink text-gold-300' : 'bg-white/90 text-ink-muted hover:text-gold-700'
-          }`}
-        >
-          <GitCompareArrows className="h-4 w-4" />
-        </button>
-        <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-medium text-ink-muted">
-          <Eye className="h-3 w-3" /> {property.views}
-        </div>
-      </div>
-
-      <div className="flex flex-1 flex-col p-5">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-gold-700">
-              {property.area} · {property.county}
-            </p>
-            <Link to={`/properties/${property.id}`}>
-              <h3 className="mt-1 truncate font-display text-lg font-semibold text-ink transition-colors hover:text-gold-700">
-                {property.title}
-              </h3>
-            </Link>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-emerald-deep/10">
+            <span className="text-4xl" aria-hidden>🏠</span>
+          </div>
+        )}
+        <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">
+          <TrustBadge score={p.trustScore} size="sm" className="drop-shadow-md" />
+          <div className="flex gap-1.5">
+            {p.offPlan && (
+              <Badge className="border-0 bg-gold/90 text-[10px] font-bold text-gold-foreground drop-shadow-md">
+                Off-Plan
+              </Badge>
+            )}
+            {p.availability === 'sold' && (
+              <Badge variant="secondary" className="text-[10px] font-bold drop-shadow-md">
+                Sold
+              </Badge>
+            )}
           </div>
         </div>
+        <div className="absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-gradient-to-t from-black/70 to-transparent p-3 pt-8">
+          <Badge
+            variant="secondary"
+            className={cn(
+              'border-0 text-[10px] font-bold capitalize text-white',
+              isRent ? 'bg-primary/80' : 'bg-black/50 backdrop-blur-sm',
+            )}
+          >
+            {isRent ? 'For Rent' : 'For Sale'}
+          </Badge>
+          <span className="text-[11px] font-semibold text-white/90">
+            {p.area}, {p.county}
+          </span>
+        </div>
+      </Link>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-ink-muted">
-          {property.bedrooms ? (
-            <span className="inline-flex items-center gap-1.5">
-              <BedDouble className="h-4 w-4 text-gold-500" /> {property.bedrooms} bed
-            </span>
-          ) : null}
-          {property.bathrooms ? (
-            <span className="inline-flex items-center gap-1.5">
-              <Bath className="h-4 w-4 text-gold-500" /> {property.bathrooms} bath
-            </span>
-          ) : null}
-          {property.sizeSqm > 0 ? (
-            <span className="inline-flex items-center gap-1.5">
-              <Ruler className="h-4 w-4 text-gold-500" /> {property.sizeSqm.toLocaleString()} sqm
+      <div className="flex flex-1 flex-col gap-2.5 p-4">
+        <div className="flex items-start justify-between gap-2">
+          <Link
+            to={`/properties/${p.id}`}
+            className="line-clamp-1 text-[15px] font-bold leading-snug hover:text-primary"
+          >
+            {p.title}
+          </Link>
+          {onSave && (
+            <button
+              aria-label={saved ? 'Remove from saved' : 'Save property'}
+              onClick={() => onSave(p)}
+              className={cn(
+                'shrink-0 rounded-full p-1.5 transition-colors',
+                saved ? 'bg-gold/15 text-gold' : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+              )}
+            >
+              <Heart className={cn('h-4 w-4', saved && 'fill-current')} />
+            </button>
+          )}
+        </div>
+
+        <div className="flex items-baseline gap-2">
+          {p.priceOnApplication ? (
+            <span className="flex items-center gap-1.5 text-sm font-bold text-primary">
+              <Tag className="h-3.5 w-3.5" aria-hidden /> Price on application
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5">
-              <Ruler className="h-4 w-4 text-gold-500" /> Unit mix on application
-            </span>
+            <>
+              <span className="text-lg font-black tracking-tight">
+                {isRent ? `${formatKES(p.price)}${'/mo'}` : formatKES(p.price)}
+              </span>
+              {!isRent && p.rentEstimate ? (
+                <span className="text-[11px] text-muted-foreground">
+                  ~{formatKES(p.rentEstimate, { monthly: true })}
+                </span>
+              ) : null}
+            </>
           )}
-          <span className="inline-flex items-center gap-1.5">
-            <Building2 className="h-4 w-4 text-gold-500" /> {property.agency}
-          </span>
         </div>
 
-        {property.grossYieldEstimate ? (
-          <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
-            <TrendingUp className="h-4 w-4" /> Est. gross yield ~{property.grossYieldEstimate}% p.a.
-          </p>
-        ) : null}
+        {!compact && (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            {p.bedrooms ? (
+              <span className="inline-flex items-center gap-1">
+                <BedDouble className="h-3.5 w-3.5" aria-hidden /> {p.bedrooms} bed
+              </span>
+            ) : null}
+            {p.bathrooms ? (
+              <span className="inline-flex items-center gap-1">
+                <Bath className="h-3.5 w-3.5" aria-hidden /> {p.bathrooms} bath
+              </span>
+            ) : null}
+            <span className="inline-flex items-center gap-1">
+              <Ruler className="h-3.5 w-3.5" aria-hidden /> {p.sizeSqm.toLocaleString('en-KE')} m²
+            </span>
+          </div>
+        )}
 
-        {/* KEJA Investment Score™ */}
-        <div className="mt-3 flex items-center justify-between rounded-xl bg-ink px-3.5 py-2.5">
-          <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-gold-300">
-            <Gauge className="h-3.5 w-3.5" /> Investment Score™
-          </span>
-          <span className="flex items-baseline gap-1.5">
+        {!compact && p.purpose.includes('invest') && (
+          <div className="mt-auto flex items-center justify-between rounded-lg bg-accent/60 px-2.5 py-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              Investment Score
+            </span>
             <span
-              className={`rounded-md px-2 py-0.5 font-display text-sm font-bold ${scoreTone(score.overall).chip}`}
+              className={cn(
+                'text-sm font-black tabular-nums',
+                score.overall >= 8 ? 'text-primary' : score.overall >= 6.5 ? 'text-foreground' : 'text-gold',
+              )}
             >
               {score.overall.toFixed(1)}
+              <span className="text-[10px] font-bold text-muted-foreground">/10</span>
             </span>
-            <span className="text-[10px] text-white/60">/ 10 · {score.band}</span>
-          </span>
-        </div>
-
-        <div className="mt-auto flex items-end justify-between border-t border-gold-100 pt-4">
-          <div>
-            <p className="font-display text-xl font-bold text-ink">
-              {property.priceOnApplication
-                ? 'Price on application'
-                : formatKES(property.price, { monthly: isRent })}
-            </p>
-            {property.rentEstimate && !isRent && !property.priceOnApplication ? (
-              <p className="text-xs text-ink-faint">
-                Est. rent {formatKES(property.rentEstimate, { monthly: true })}
-              </p>
-            ) : null}
           </div>
-          <Link
-            to={`/properties/${property.id}`}
-            className="text-sm font-semibold text-gold-700 transition hover:text-gold-600"
+        )}
+
+        {onCompare && (
+          <button
+            onClick={() => onCompare(p)}
+            className={cn(
+              'mt-auto inline-flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-bold transition-colors',
+              compareActive
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border text-muted-foreground hover:border-primary hover:text-primary',
+            )}
           >
-            View →
-          </Link>
-        </div>
+            {compareActive ? 'In comparison' : 'Compare'}
+            <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+          </button>
+        )}
       </div>
+    </motion.article>
+  );
+}
+
+/** Compact horizontal row variant for lists inside answers/drawers. */
+export function PropertyRow({ property: p, onSave }: { property: Property; onSave?: (p: Property) => void }) {
+  const [imgOk, setImgOk] = useState(true);
+  return (
+    <div className="group flex items-center gap-3 rounded-xl border bg-card p-2.5 transition-colors hover:border-primary/40">
+      <button
+        className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-muted"
+        onClick={() => navigate(`/properties/${p.id}`)}
+        aria-label={`Open ${p.title}`}
+      >
+        {imgOk ? (
+          <img
+            src={p.images[0]}
+            alt=""
+            loading="lazy"
+            onError={() => setImgOk(false)}
+            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-2xl" aria-hidden>🏠</div>
+        )}
+      </button>
+      <div className="min-w-0 flex-1">
+        <p className="line-clamp-1 text-sm font-bold">{p.title}</p>
+        <p className="text-xs text-muted-foreground">
+          {p.area} · {p.priceOnApplication ? 'POA' : formatKES(p.price)}
+        </p>
+        <TrustBadge score={p.trustScore} size="sm" className="mt-1" />
+      </div>
+      {onSave && (
+        <button
+          aria-label="Save property"
+          onClick={() => onSave(p)}
+          className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+        >
+          <Heart className="h-4 w-4" />
+        </button>
+      )}
     </div>
   );
 }

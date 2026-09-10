@@ -17,7 +17,9 @@ export function useFocusTrap(
 ) {
   // keep the latest callback without re-running the trap effect on every render
   const escRef = useRef(onEscape);
-  escRef.current = onEscape;
+  useEffect(() => {
+    escRef.current = onEscape;
+  }, [onEscape]);
 
   useEffect(() => {
     if (!active) return;

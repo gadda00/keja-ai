@@ -12,7 +12,7 @@
  * activate. No-content deploys keep the same version (no needless cache
  * churn). Zero npm dependencies — runs in any CI job after the build.
  *
- * Usage:  node scripts/sw-version.mjs          (expects dist/ to exist)
+ * Usage:  node scripts/sw-version.mjs          (expects the build output dir, default out/, to exist)
  */
 import { createHash } from 'node:crypto'
 import { readdirSync, readFileSync, statSync, writeFileSync, existsSync } from 'node:fs'
@@ -20,7 +20,7 @@ import { resolve, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const DIST = resolve(ROOT, 'dist')
+const DIST = resolve(ROOT, process.env.BUILD_DIR ?? 'out')
 const SW = resolve(DIST, 'sw.js')
 
 function walk(dir, acc = []) {

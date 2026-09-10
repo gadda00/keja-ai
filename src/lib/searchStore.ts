@@ -214,6 +214,6 @@ export function useAlertSweep(properties: Property[]) {
   useEffect(() => {
     const t = window.setTimeout(() => runAlertSweep(properties), 1500);
     return () => window.clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [properties.length]);
 }

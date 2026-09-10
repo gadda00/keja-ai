@@ -1,55 +1,88 @@
+'use client';
+/**
+ * Comparison tray — pick up to four properties anywhere in the marketplace,
+ * then open the side-by-side comparison view.
+ */
+
+import { AnimatePresence, motion } from 'framer-motion';
 import { GitCompareArrows, X } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { useStore } from '@/lib/store';
+import { useAllProperties, findProperty } from '@/lib/inventory';
+import { Link } from '@/lib/router';
 
-import type { Property } from '@/data/properties';
-import { useAllProperties } from '@/lib/inventory';
-import { KEYS, useStore } from '@/lib/store';
+const MAX_COMPARE = 4;
 
-/** Floating bar shown when 1+ properties are queued for comparison. */
-export default function CompareBar() {
-  const [compare, setCompare] = useStore<string[]>(KEYS.compare, []);
+export function useCompare() {
+  const [ids, setIds] = useStore<string[]>('compare', []);
+  const toggle = (id: string) =>
+    setIds((prev) => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
+      if (prev.length >= MAX_COMPARE) return [...prev.slice(1), id];
+      return [...prev, id];
+    });
+  const remove = (id: string) => setIds((prev) => prev.filter((x) => x !== id));
+  const clear = () => setIds([]);
+  return { ids, toggle, remove, clear };
+}
+
+export function CompareBar({ onOpen }: { onOpen: () => void }) {
+  const { ids, remove, clear } = useCompare();
   const all = useAllProperties();
-  const { pathname } = useLocation();
-  if (!compare.length || pathname.startsWith('/compare')) return null;
-  const items = compare
-    .map((id) => all.find((p) => p.id === id))
-    .filter((p): p is Property => p != null);
+  if (ids.length === 0) return null;
+
+  const picked = ids.map((id) => findProperty(all, id)).filter(Boolean);
+
   return (
-    <div className="fixed inset-x-0 bottom-16 z-40 border-t border-gold-200 bg-white/95 shadow-[0_-8px_30px_rgba(25,22,18,0.12)] backdrop-blur md:bottom-0">
-      <div className="container-luxe flex items-center gap-3 py-3">
-        <GitCompareArrows className="h-5 w-5 shrink-0 text-gold-600" aria-hidden="true" />
-        <p className="shrink-0 text-sm font-semibold text-ink">
-          {compare.length} {compare.length === 1 ? 'property' : 'properties'} queued
-        </p>
-        <ul className="hidden min-w-0 flex-1 items-center gap-2 sm:flex">
-          {items.map((p) => (
-            <li
-              key={p.id}
-              className="flex max-w-[220px] items-center gap-1.5 truncate rounded-full bg-gold-50 px-3 py-1 text-xs font-medium text-ink-soft ring-1 ring-gold-100"
-            >
-              <span className="truncate">{p.title}</span>
-              <button
-                onClick={() => setCompare(compare.filter((c) => c !== p.id))}
-                aria-label={`Remove ${p.title} from comparison`}
-                className="shrink-0 text-ink-muted hover:text-red-600"
+    <AnimatePresence>
+      <motion.div
+        initial={{ y: 80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 80, opacity: 0 }}
+        transition={{ type: 'spring', damping: 26, stiffness: 300 }}
+        className="fixed inset-x-0 bottom-16 z-40 mx-auto w-fit max-w-[94vw] md:bottom-6"
+        role="region"
+        aria-label="Comparison tray"
+      >
+        <div className="flex items-center gap-3 rounded-2xl border bg-card/95 p-3 shadow-2xl backdrop-blur-xl">
+          <div className="flex items-center gap-2">
+            {picked.map((p) => (
+              <div key={p!.id} className="group relative">
+                <Link
+                  to={`/properties/${p!.id}`}
+                  className="block h-11 w-16 overflow-hidden rounded-lg border-2 border-primary/30"
+                  ariaLabel={p!.title}
+                >
+                  <img src={p!.images[0]} alt="" className="h-full w-full object-cover" />
+                </Link>
+                <button
+                  onClick={() => remove(p!.id)}
+                  aria-label={`Remove ${p!.title} from comparison`}
+                  className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+                >
+                  <X className="h-3 w-3" aria-hidden />
+                </button>
+              </div>
+            ))}
+            {Array.from({ length: MAX_COMPARE - picked.length }).map((_, i) => (
+              <div
+                key={i}
+                className="flex h-11 w-16 items-center justify-center rounded-lg border-2 border-dashed border-border text-[10px] font-bold text-muted-foreground"
               >
-                <X className="h-3 w-3" />
-              </button>
-            </li>
-          ))}
-        </ul>
-        <div className="ml-auto flex items-center gap-2">
-          <button
-            onClick={() => setCompare([])}
-            className="hidden text-xs font-semibold text-ink-muted hover:text-red-600 sm:block"
-          >
-            Clear
-          </button>
-          <Link to={`/compare?ids=${compare.join(',')}`} className="btn-gold !px-4 !py-2 !text-xs">
-            Compare now
-          </Link>
+                {picked.length + i + 1}
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-2 border-l pl-3">
+            <Button size="sm" className="font-bold" onClick={onOpen} disabled={picked.length < 2}>
+              <GitCompareArrows className="mr-1 h-4 w-4" aria-hidden /> Compare {picked.length}
+            </Button>
+            <Button size="sm" variant="ghost" onClick={clear} aria-label="Clear comparison">
+              <X className="h-4 w-4" aria-hidden />
+            </Button>
+          </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }

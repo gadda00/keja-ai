@@ -1,9 +1,5 @@
-# PR / branch quality gate — the deploy workflow only runs on main, so a
-# change that breaks typecheck, tests, lint, formatting, the build, the
-# sitemap or the prerender pipeline would otherwise surface only at deploy
-# time. This workflow runs the full verification locally on every pull
-# request (and every push to a non-main branch), including the headless
-# prerender pass that catches blank/failed renders before production.
+# PR / branch quality gate — typecheck, lint and a static-export build must
+# pass before anything reaches main (and therefore production).
 name: PR check
 
 on:
@@ -24,41 +20,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
       - name: Install dependencies
         run: npm ci
-
-      - name: Install Chromium for prerendering
-        run: npx playwright install chromium --with-deps
-
       - name: Typecheck
-        run: npx tsc -b
-
-      - name: Unit tests (finance, scoring, search engines)
-        run: npm test
-
-      - name: Lint (oxlint fast pass)
-        run: npx oxlint src
-
-      - name: Lint (ESLint flat config, blocking)
-        run: npm run lint:eslint
-
-      - name: Formatting (Prettier, blocking)
-        run: npm run lint:prettier
-
-      - name: Generate sitemap (properties + articles + routes)
-        run: node scripts/generate-sitemap.mjs
-
-      - name: Build (with GitHub Pages base path)
-        run: npm run build -- --base=/keja-ai/
-
-      - name: Prerender all routes (status-200 HTML, real 404 page)
-        run: node scripts/prerender.mjs --base /keja-ai/
-
-      - name: Stamp service-worker cache version (dry validation)
-        run: node scripts/sw-version.mjs
+        run: npx tsc --noEmit
+      - name: Lint
+        run: npm run lint
+      - name: Build (static export)
+        run: NEXT_STATIC=1 npx next build

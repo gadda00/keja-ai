@@ -3,18 +3,18 @@ import type { CapacitorConfig } from '@capacitor/cli';
 /**
  * Keja.ai — Capacitor native-shell configuration.
  *
- * The web app (Vite build → dist/) runs inside a native Android + iOS shell:
+ * The web app (Next.js static export → out/) runs inside a native Android + iOS shell:
  * full feature parity with the PWA, app-store presence, hardware back button,
  * and a keja.app deep-link scheme. The build flow:
  *
- *   npm run build         (VITE_BASE=/ — see scripts.cap)
- *   npx cap sync          (copy dist/ into both native projects)
+ *   NEXT_STATIC=1 next build   (static export → out/)
+ *   npx cap sync               (copy out/ into both native projects)
  *   npx cap open android  (Android Studio)  ·  npx cap open ios (Xcode)
  */
 const config: CapacitorConfig = {
   appId: 'com.chacadom.keja',
   appName: 'Keja AI',
-  webDir: 'dist',
+  webDir: 'out',
   android: {
     allowMixedContent: false,
     backgroundColor: '#FFFFFF',

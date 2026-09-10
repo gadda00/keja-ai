@@ -6,7 +6,7 @@
    Cache version is stamped mechanically by scripts/sw-version.mjs from a
    hash of the deployed files — no manual bumping, stale caches self-evict.
 */
-const VERSION = 'v4'
+const VERSION = 'nextjs-v1'
 const ASSET_CACHE = `${VERSION}-assets`
 const IMG_CACHE = `${VERSION}-images`
 const PAGE_CACHE = `${VERSION}-pages`

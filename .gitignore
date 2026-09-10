@@ -1,31 +1,34 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+# dependencies
+node_modules/
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# build artifacts
+.next/
+out/
+dist/
+dist-ssr/
 *.tsbuildinfo
 
-# tsc -b composite emit for vite/vitest configs (redirected, but just in case)
-vite.config.js
-vite.config.d.ts
-vitest.config.js
-vitest.config.d.ts
+# sandbox / local-only
+dev.log
+server.log
+.zscripts/
+db/
+examples/
+skills/
+upload/
+download/
+worklog.md
+.env
+.env.local
+*.local
+
+# logs & editor
+logs/
+*.log
+npm-debug.log*
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.sw?

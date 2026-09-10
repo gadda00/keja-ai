@@ -91,7 +91,7 @@ function persist(next: StoredEvent[]) {
 export function track(payload: AnalyticsEvent): void {
   if (typeof window === 'undefined') return;
   if (!EVENT_TAXONOMY.includes(payload.event as never)) {
-    if (import.meta.env.DEV) console.warn('[analytics] unknown event', payload);
+    if (process.env.NODE_ENV === "development") console.warn('[analytics] unknown event', payload);
     return;
   }
   const entry: StoredEvent = { t: new Date().toISOString(), e: payload };

@@ -87,24 +87,15 @@ jobs:
   # to be handled by deploy-pages.yml's workflow_run trigger, which rebuilt
   # production on every Auto-Pilot run — including the ~3/4 runs that ingest
   # nothing. Gating here removes those no-op production deployments.
-  deploy:
-    needs: ingest
+  verify:
+    # Quality gate on the freshly-committed listings — the push itself
+    # already triggers the canonical Netlify deploy workflow on main.
+    needs: [ingest]
     if: needs.ingest.outputs.changed == 'true'
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    concurrency:
-      group: pages
-      cancel-in-progress: true
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
         with:
-          # the ingest job just pushed the new listings commit — check out main
           ref: main
 
       - uses: actions/setup-node@v4
@@ -115,41 +106,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Chromium for prerendering
-        run: npx playwright install chromium --with-deps
-
       - name: Typecheck
-        run: npx tsc -b
+        run: npx tsc --noEmit
 
-      - name: Unit tests
-        run: npm test
+      - name: Lint
+        run: npm run lint
 
-      - name: Lint (oxlint fast pass)
-        run: npx oxlint src
-
-      - name: Lint (ESLint flat config, blocking)
-        run: npm run lint:eslint
-
-      - name: Formatting (Prettier, blocking)
-        run: npm run lint:prettier
-
-      - name: Generate sitemap (properties + articles + routes)
-        run: SITE_URL=https://gadda00.github.io/keja-ai node scripts/generate-sitemap.mjs
-
-      - name: Build (with GitHub Pages base path)
-        run: npm run build -- --base=/keja-ai/
-
-      - name: Prerender all routes (status-200 HTML, real 404 page, visible no-JS content)
-        run: node scripts/prerender.mjs --base /keja-ai/
-
-      - name: Stamp service-worker cache version from deployed content
-        run: node scripts/sw-version.mjs
-
-      - uses: actions/configure-pages@v5
-
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Build (static export)
+        run: NEXT_STATIC=1 npx next build

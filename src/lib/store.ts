@@ -61,7 +61,7 @@ export function useStore<T>(key: string, fallback: T): [T, (v: T | ((prev: T) =>
     };
     window.addEventListener('keja-store-change', onChange);
     return () => window.removeEventListener('keja-store-change', onChange);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [key]);
   const set = (v: T | ((prev: T) => T)) => {
     const next = typeof v === 'function' ? (v as (prev: T) => T)(read(key, fallback)) : v;

@@ -720,7 +720,9 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
       ? Math.min(...heldLive.map((p) => cycleLengthMs(p.distributionFreq)))
       : MONTH_CYCLE_MS;
     const nowMs = Date.now() + state.clockOffsetMs + step;
-    const baseMs = state.lastAccrual ? +new Date(state.lastAccrual) : nowMs;
+    // First accrual (no lastAccrual yet): anchor one full cycle back so the
+    // initial fast-forward credits the cycle it just advanced through.
+    const baseMs = state.lastAccrual ? +new Date(state.lastAccrual) : nowMs - step;
     const entries = computeAccruedDistributions(state.investments, properties, baseMs, nowMs);
     const credited = entries.reduce((a, e) => a + e.amountUsd, 0);
     setState((s) => ({
@@ -764,7 +766,7 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
       );
       if (entries.length > 0) void accrue(nowMs);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const value = useMemo<TokenizeStore>(

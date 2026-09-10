@@ -1,117 +1,122 @@
-# Keja.ai — Intelligent Real Estate. Verified Trust.
+# Keja AI — Africa's Real Estate Intelligence & Trust Infrastructure
 
-Kenya's AI real-estate advisor and cross-agency trust layer — a product of **Chacadom Investments**.
-Canonical home: **https://keja.app** (Netlify) · mirror: https://gadda00.github.io/keja-ai/ · native apps: `docs/MOBILE.md`
+**Discover. Verify. Analyse. Finance. Invest. Transact. Manage.**
 
-## Regulatory readiness — CMA Regulatory Sandbox
+Kenya's AI real-estate ecosystem for every stakeholder — buyers, sellers, landlords, tenants,
+investors, developers, banks and institutions. A product of **Chacadom Investments**.
+Canonical home: **https://keja.app** (Netlify) · native apps: `docs/MOBILE.md`
 
-Application pack for the **Keja.ai Tokenization Pilot** (applicant: Chacadom Investments), prepared per the CMA sandbox requirements (sandbox.cma.or.ke):
+## The ecosystem (nine products)
 
-- **[Testing Plan (PDF)](docs/cma/Chacadom_CMA_Sandbox_Testing_Plan.pdf)** — a twelve-month, four-phase live test: hard participation and exposure caps, suitability screening before subscription, segregated client money, phase gates reported to the Authority, and a rehearsed exit (full licence / letter of no objection / wind-down).
-- **[Safeguards & Risk-Management Plan (PDF)](docs/cma/Chacadom_CMA_Sandbox_Safeguards_Risk_Management_Plan.pdf)** — three-lines governance, a twelve-risk register with named owners, KYC/AML controls, Kenya Data Protection Act compliance, incident classes with CMA notification times, and a wind-down that ranks investors' capital ahead of the applicant's recovery.
+| Product | Purpose | Status |
+| --- | --- | --- |
+| **Keja Home** | Property discovery and listings — search, facets, comparison, saved-search alerts | Live |
+| **Keja Verify** | Verification, the KEJA Trust Score™ (12 labelled factors) and the Property Passport | Live |
+| **Keja AI** | AI property advisor (EN/SW/FR) + the AI Deal Analyst (document pre-screening) | Live |
+| **Keja Invest** | Investment calculator, Investment Score™ and the investor dashboard (downloadable report) | Live |
+| **Keja Finance** | Mortgage calculator, eligibility (CBK 33% DTI), bank comparison, financing types | Pilot |
+| **Keja Transact** | Transaction milestones, stakeholder payments and the professional panel | Pilot |
+| **Keja Token** | Fractional ownership — **TRIAL MODE** with fictional assets and a virtual wallet | Trial |
+| **Keja Manage** | Property & rental management — rent, tenants, maintenance, AI alerts | Pilot |
+| **Keja Data** | Market intelligence — natural-language questions answered from live inventory | Live |
+
+Plus the stakeholder portals: **Diaspora** (remittance comparison, timezone engine),
+**Developers** (project profiles + the Development Score), **Institutional** (banks, pension
+funds, REITs, SACCOs, insurers) and **Partners** (partnership deck requests).
 
 ## What's inside
 
-| Area                      | Highlights                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Marketplace**           | 85+ live listings (seed + Auto-Pilot ingested), 80+ trust-verified (score ≥ 75), trust scores, Investment Score™ (7 weighted factors, FACT/ESTIMATE/ASSUMPTION labels), price-on-application support, SVG Kenya map view, saved searches + alert matching, 4-property comparison                                                                                                                                                                                                                                                                                                                                                               |
-| **AI advisor**            | Conversational engine (EN/SW/FR) covering search, yields, mortgages, buying costs, process timelines, affordability, area guides, qualification — plus intent routing to every stakeholder workspace                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| **Calculators**           | Rental ROI + 5/10-yr projections, mortgage, affordability (CBK 33% DTI), buying-cost stack · developer feasibility + cashflow + sensitivity · remittance cost comparison                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| **Keja Tokenize (TRIAL)** | Fractional-ownership **trial mode**: $25,000 virtual trial wallet, per-card fictional-asset labels, KYC-gated flows, simulated ledger, two-sided secondary market with walking-book order matching (VWAP fills, market impact), distribution engine on a fast-forwardable trial clock, offering lifecycle (FUNDING→FUNDED→LIVE), mark-to-market portfolio, issuer post-issuance console                                                                                                                                                                                                                                                        |
-| **Accounts**              | Google Sign-In (demo picker — wire a real client ID in `auth.tsx` when the backend ships) + email/password, 12h/30d sliding sessions, RBAC (user/agent/admin), brute-force throttle                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| **Admin console**         | Users, verification queue with trust-by-design anomaly flags, bulk approve/reject, CSV exports, partner applications + global feed connections, audit trail, settings                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| **Auto-Pilot**            | AI automatic listing engine — market scanner + partner feed adapters (JSON/CSV/XML) → enrichment → dedupe → quality gate → publish, on a 6-hour cron. Admin "Auto-Pilot" tab shows run log, feed health and per-listing machine screens                                                                                                                                                                                                                                                                                                                                                                                                        |
-| **Supply**                | 4-step listing wizard (draft auto-save, purpose validation) with live anomaly detection, 5-channel global listing acquisition strategy                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| **Content**               | Six long-form market guides (`/insights`), Trust Center methodology, ecosystem map (8 products)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| **Neighbourhood guides**  | The Waterfront Karen flagship location — `/areas/waterfront-karen`: photo/video guide, FACT/REPORTED/ESTIMATE-labelled investment thesis, live Karen inventory join, homepage spotlight, Waterfront badge on Karen listing cards, AI-engine intent ("tell me about the waterfront")                                                                                                                                                                                                                                                                                                                                                            |
-| **Truth layer**           | **Claims register** (`/trust#claims`): every public capability declared with live/simulated/partner-dependent/planned status, evidence and path-to-live · **Evidence panels** on listings: scope, method, check date, 90-day expiry, freshness states, report-an-issue + human-review paths · **Admin adjudication queue** for user reports · **Persistent demo banner** on sensitive routes · **AI escalation guard** (legal/tax/valuation/lending/suitability questions route to humans, never improvised) · privacy-first local analytics bus (11-event taxonomy, no third parties) · first-visit role picker (buy/rent/invest/list/manage) |
-| **Native apps**           | Android + iOS via Capacitor (`com.chacadom.keja`): app-style bottom tab bar, splash/icons, `keja://` + `https://keja.app` deep links — see `docs/MOBILE.md`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| **Platform**              | PWA (installable, offline shell), per-route SEO meta + JSON-LD (RealEstateListing/Article/FAQPage/BreadcrumbList) + auto-generated sitemap, **prerendered status-200 HTML for every sitemap route (109 pages + a real 404 page)** (crawlers + social unfurls with absolute og:image URLs), reduced-motion support, WCAG-AA focus management, error boundary + real 404, 124 unit tests + CI gates (typecheck, ESLint flat config + oxlint, Prettier, vitest) — enforced on PRs AND deploys                                                                                                                                                     |
+- **Marketplace** — 85+ listings (seed + Auto-Pilot ingested), Trust Scores on every card,
+  the Property Passport (KEJA-XXX-000000 identity, ownership/title/encumbrance/rates/zoning
+  status, valuation band, fraud risk) and evidence panels with 90-day freshness.
+- **Trust layer** — the claims register (`/trust#claims`): every capability declared live /
+  simulated / partner-dependent / planned with evidence and path-to-live. The site cannot
+  claim what is not declared there.
+- **AI advisor** — trilingual conversational engine covering search, yields, mortgages,
+  affordability, area guides and process — with intent routing to every workspace and a
+  professional-advice escalation guard (legal/tax/valuation/suitability questions go to humans).
+- **AI Deal Analyst** — describe the deal, attach documents (processed on-device, never
+  uploaded), receive investment score, market-value comparison, yields, red flags and a
+  Proceed/Negotiate/Investigate/High-Risk recommendation.
+- **Keja Token (TRIAL)** — $25,000 virtual wallet, KYC-gated subscriptions, simulated ledger,
+  order-matched secondary trading with market impact, distribution accrual on a
+  fast-forwardable trial clock, issuer console and the nine-step issuance journey. Fictional
+  assets only — no real securities.
+- **Investor dashboard** — portfolio value, yields, occupancy, cash flow, financing snapshot,
+  allocation charts, token positions and a downloadable HTML investor report.
+- **Keja Data** — "Which neighbourhood has the highest yield?" / "Where should I invest
+  KSh 20M?" answered live from inventory with sample sizes and sourcing declared.
+- **Keja Manage** — units, tenants & screening, rent collection ledger, arrears engine,
+  maintenance tickets and transparent rule-based AI alerts.
+- **Accounts** — demo sign-in, 12h/30d sliding sessions, RBAC (user/agent/admin).
+- **Admin console** — verification queue, listing-report adjudication, partner applications,
+  feed health, audit trail, settings.
+- **Auto-Pilot** — the AI listing engine (scanner → enrich → dedupe → quality gate → publish)
+  on a 6-hour cron; commits grow the marketplace and trigger the gated deploy.
+- **Platform** — PWA (installable, offline shell), light/dark themes, EN/SW/FR UI language,
+  app-style mobile tab bar, reduced-motion support, WCAG-minded focus management.
 
 ## Stack
 
-React 19 · Vite 8 · TypeScript (strict, zero `any`) · Tailwind 3.4 · React Router 7 · local stores (localStorage, backend-upgradeable) · recharts (lazy) · vitest (+ jsdom for React-level tests).
+Next.js 16 (App Router, single-route client SPA with hash deep links) · React 19 · TypeScript
+(strict) · Tailwind CSS 4 + shadcn/ui · recharts · local stores (localStorage —
+backend-upgradeable) · Capacitor 8 native shells (Android + iOS).
+
+**Architecture note** — the whole platform mounts on the Next.js `/` route and navigates with
+hash paths (`#/properties/KJA-001`). That serves identically behind the sandbox preview
+gateway, on the Netlify CDN and inside the Capacitor shells, and keeps the app fully
+functional offline. The `NEXT_STATIC=1` build emits `out/` for Netlify and `cap sync`.
 
 ## Develop
 
 ```bash
 npm install
-npm run dev        # local dev server
-npm test           # unit tests (finance, scoring, search, AI engine, tokenize ledger, anomaly gate)
-npm run typecheck  # tsc -b (same gate as CI)
-npm run lint:eslint  # ESLint 9 flat config (same gate as CI)
-npm run lint       # oxlint (fast pass)
-npm run verify     # typecheck + eslint + tests + build — the full CI pipeline locally
-npm run build      # production build (base /keja-ai/ baked into vite.config)
-npm run prerender  # after build: status-200 HTML for all sitemap routes (needs `npx playwright install chromium`)
-node scripts/generate-data-dictionary.mjs  # regenerate docs/DATA_DICTIONARY.md after dataset changes
+npm run dev            # local dev server
+npm run typecheck      # tsc --noEmit (same gate as CI)
+npm run lint           # ESLint (same gate as CI)
+npm run build:static   # static export → out/ (what Netlify builds)
+npm run mobile:sync    # static build + cap sync into android/ + ios/
+node scripts/auto-listings/run.mjs   # Auto-Pilot pipeline (zero npm deps)
 ```
 
-`base` is set in `vite.config.ts`, so local builds match CI; CI additionally passes `--base` explicitly.
+## Deploy
 
-## Architecture notes
+Pushes to `main` run `.github/workflows/deploy-netlify.yml`: typecheck + lint + static
+export + service-worker version stamp, then deploy to Netlify via API using the
+`NETLIFY_AUTH_TOKEN` / `NETLIFY_SITE_ID` repo secrets. keja.app is the canonical domain.
 
-- `src/lib/` — engines: `finance.ts` (investment/mortgage/affordability math), `investmentScore.ts`, `ai/engine.ts` (intent parser + professional-advice escalation), `auth.tsx`, `adminStore.ts` (verification queue + listing-report adjudication), `tokenizeStore.tsx` (holdings/FIFO ledger), `searchStore.ts` (saved searches/notifications), `inventory.ts` (merged marketplace), `seo.ts` (per-route meta), `useFocusTrap.ts`, `verification.ts` (evidence model: scope/dates/expiry/freshness), `analytics.ts` (local-only event bus + taxonomy), `roleStore.ts` (first-visit role picker)
-- `src/data/` — properties (27 seed listings + area insights), tokenize assets, long-form articles, **claims.ts (the capability claims register — the site cannot claim what is not declared there)**
-- `docs/` — `REVIEW_ACTIONS.md` (external-review recommendation tracker), `DATA_DICTIONARY.md` (generated)
-- `src/components/tokenize/` — the tokenization module (marketplace, trade, portfolio, issuer, learn)
-- `public/sw.js` — versioned service worker (cache-first assets, network-first pages, offline fallback)
+Auto-Pilot commits (6-hour cron) flow through the same quality gate and trigger the deploy.
 
-## Keja Auto-Pilot — the AI automatic listing engine
+## Regulatory readiness — CMA Regulatory Sandbox
 
-The marketplace grows itself, end to end, fully automated by code:
+- **[Testing Plan (PDF)](docs/cma/Chacadom_CMA_Sandbox_Testing_Plan.pdf)** — twelve-month,
+  four-phase live test: participation and exposure caps, suitability screening, segregated
+  client money, phase gates, and a rehearsed exit.
+- **[Safeguards & Risk-Management Plan (PDF)](docs/cma/Chacadom_CMA_Sandbox_Safeguards_Risk_Management_Plan.pdf)** —
+  three-lines governance, twelve-risk register, KYC/AML controls, Kenya DPA compliance,
+  incident classes with CMA notification times.
 
-```
-.github/workflows/auto-listings.yml   cron every 6h (+ manual dispatch)
-  └─ scripts/auto-listings/run.mjs    orchestrator (zero npm deps)
-       ├─ scanner.mjs                 market scanner: demand-weighted areas, type mix,
-       │                              per-acre land pricing, bed-consistent sizing
-       ├─ feeds.mjs                   partner feed adapters — JSON, CSV, XML
-       │                              (feeds/ directory = contracted partner sources)
-       ├─ enrich.mjs                  AI enrichment: grammar-based descriptions,
-       │                              rent/yield estimates from area economics,
-       │                              deterministic photo assignment, highlights
-       ├─ dedupe.mjs                  cross-source fuzzy signatures + title-token overlap
-       ├─ quality.mjs                 type-aware anomaly screens (price/sqm vs area band,
-       │                              price/acre vs acreage band, completeness, content)
-       │                              → publish (Q≥80) / review (60–79) / reject (<60)
-       └─ publish.mjs                 src/data/auto-listings.json (capped, run log)
-  → git commit by keja-autopilot[bot] → gated deploy job (same workflow, only
-    when listings actually changed) → live marketplace grows
-```
+Tokenization runs in trial mode with fictional assets. Digital tokens are clearly
+distinguished from legal ownership of underlying real estate; live issuance awaits the full
+regulatory pathway.
 
-Runtime: `src/lib/autoListings.ts` adapts entries into the marketplace — IDs `KJA-A0001+`,
-trust capped at 88 with `titleCheck: pending` (machine-screened, never human-verified),
-visible **AUTO-PILOT** chips on cards and detail pages. Admin console → Auto-Pilot tab
-for run history, feed health, review queue and per-listing screens.
+## Native apps
 
-Try it locally:
+Android + iOS via Capacitor (`com.chacadom.keja`): app-style bottom tab bar, splash/icons,
+`keja://` + `https://keja.app` deep links — see `docs/MOBILE.md`.
 
 ```bash
-node scripts/auto-listings/run.mjs --dry --count 6   # preview a run
-node scripts/auto-listings/run.mjs --count 6         # write the data file
-node scripts/generate-sitemap.mjs                    # regenerate sitemap
+npm run mobile:apk     # debug APK
+npm run mobile:android # Android Studio
+npm run mobile:ios     # Xcode
 ```
 
-## Demo accounts
+## The honesty standard
 
-Google demo picker (Amina / Victor / Clive) from the sign-in dialog, or the seeded email accounts (`admin@`, `agent@`, `investor@keja.ai`).
-All data is client-side demo data — no production backend, no real securities.
+Keja labels every number: **FACT** (verified on-platform evidence), **ESTIMATE**
+(model-derived), **ASSUMPTION** (default), **REPORTED** (publicly reported). AI analyses are
+decision support and never replace legal, valuation, financial or regulatory advice. Only
+auditable metrics are displayed. The claims register is the machine-readable contract between
+the product and its promises.
 
-> **Security note:** this is the MVP auth layer for a static demo deployment —
-> roles, sessions and password hashes live in the visitor's own browser
-> (localStorage) and are therefore client-trust only. Before any real launch,
-> the admin console and account layer MUST move to server-side verification
-> (see `src/lib/auth.tsx` header). No real user data should ever be entered.
-
-## Deployment
-
-**Canonical: keja.app (Netlify).** `git push origin main` → `deploy-netlify.yml` runs the full quality pipeline (typecheck, tests, ESLint, sitemap), builds with `VITE_BASE=/ VITE_SITE_URL=https://keja.app`, prerenders every sitemap route, stamps the service-worker cache version and ships to Netlify (`keja-ai.netlify.app`, custom domain `keja.app`).
-
-**Mirror: GitHub Pages.** `deploy-pages.yml` builds with `--base=/keja-ai/` and prerenders every sitemap route to status-200 HTML (including a real, noindex `404.html` captured from the router's NotFound page).
-
-**Native apps.** `npm run mobile:sync` then Android Studio / Xcode — see `docs/MOBILE.md`.
-
-## Roadmap
-
-Real backend (accounts, listings, payments via M-Pesa/bank), licensed KYC provider, ERC-3643 tokenization with CMA sandbox approval, agent portal (KEJA PRO), multilingual full-site i18n.
+— *Chacadom Investments · Nairobi, Kenya · "Keja" is Swahili for home.*

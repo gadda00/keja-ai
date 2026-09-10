@@ -13,14 +13,17 @@ export function formatNumber(n: number): string {
   return n.toLocaleString('en-KE');
 }
 
+// KEJA Trust Score interpretation bands (platform standard, proposal §4).
+// 90–100 Exceptional · 80–89 Strong · 70–79 Moderate · 60–69 High Risk · <60 Significant DD.
 export function trustTier(score: number): {
   label: string;
   tone: 'high' | 'good' | 'watch' | 'avoid';
 } {
-  if (score >= 90) return { label: 'Highly Verified', tone: 'high' };
-  if (score >= 75) return { label: 'Verified', tone: 'good' };
-  if (score >= 60) return { label: 'Under Review', tone: 'watch' };
-  return { label: 'Flagged — Exercise Caution', tone: 'avoid' };
+  if (score >= 90) return { label: 'Exceptional', tone: 'high' };
+  if (score >= 80) return { label: 'Strong', tone: 'high' };
+  if (score >= 70) return { label: 'Moderate', tone: 'good' };
+  if (score >= 60) return { label: 'High Risk', tone: 'watch' };
+  return { label: 'Requires Significant Due Diligence', tone: 'avoid' };
 }
 
 export function timeAgo(dateStr: string): string {
