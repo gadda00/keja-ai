@@ -129,9 +129,10 @@ td:first-child{font-weight:600;color:var(--ink);}
   <div class="grid-dots"></div>
   <div class="kicker">Keja.app &middot; Operator's Edition</div>
   <h1>The Site<br/><em>Guide</em></h1>
-  <p class="sub">Everything you need to run Keja AI in one sitting — live URLs, accounts and
-  passwords, the admin console, app installs for Android &amp; iOS, the deployment
-  pipeline, and where every credential lives. Brief by design, complete by intent.</p>
+  <p class="sub">Everything you need to run Keja AI in one sitting — live URLs, the Google
+  account sign-in, two-factor with Google Authenticator, the admin console, app installs for
+  Android &amp; iOS, the deployment pipeline, and where every credential lives. Brief by design,
+  complete by intent.</p>
   <div class="chips">
     <span class="chip">ACCESS &amp; URLS</span><span class="chip">ACCOUNTS</span>
     <span class="chip">ADMIN</span><span class="chip">PWA INSTALL</span>
@@ -139,7 +140,7 @@ td:first-child{font-weight:600;color:var(--ink);}
   </div>
   <div class="foot">
     <div class="brand">KEJA<span>AI</span></div>
-    <div class="meta">Chacadom Investments<br/>Edition 2 &middot; September 2026</div>
+    <div class="meta">Chacadom Investments<br/>Edition 3 &middot; September 2026</div>
   </div>
 </div>
 
@@ -168,40 +169,41 @@ td:first-child{font-weight:600;color:var(--ink);}
   <div class="kpis">
     <div class="kpi"><div class="v">85+</div><div class="k">Live listings</div></div>
     <div class="kpi"><div class="v">95</div><div class="k">Prerendered pages</div></div>
-    <div class="kpi"><div class="v">233</div><div class="k">Unit tests gating deploys</div></div>
+    <div class="kpi"><div class="v">241</div><div class="k">Unit tests gating deploys</div></div>
     <div class="kpi"><div class="v">3</div><div class="k">Languages EN / SW / FR</div></div>
   </div>
 
   <!-- 02 Accounts -->
   <div class="chapter-header">
-    <div class="sec-tag">02 &middot; Accounts &amp; Passwords</div>
+    <div class="sec-tag">02 &middot; Accounts &amp; Two-Factor</div>
     <div class="sec-title">Signing in</div>
     <div class="divider"></div>
   </div>
-  <p class="lead">Two doors in: one-tap demo accounts (fastest for demos and QA) and email +
-  password — plus <strong>Google Sign-In, now live</strong>: any Google account works from the
-  same sign-in modal, with allowlisted emails becoming admins.</p>
+  <p class="lead">One door in: <strong>Google Sign-In</strong> — the only sign-in method. The demo
+  accounts and email/password paths were retired on 11 September 2026: one identity provider,
+  one trust path. Any Google account can sign in; the admin email below is the platform
+  administrator.</p>
 
   <table>
-    <tr><th style="width:31%">Email account</th><th style="width:26%">Password</th><th>Role &amp; use</th></tr>
-    <tr><td class="mono">admin@demo.keja.app</td><td><span class="pw">admin123</span></td><td><strong>Admin</strong> — full console: verification queue, reports, partners, audit trail</td></tr>
-    <tr><td class="mono">agent@demo.keja.app</td><td><span class="pw">agent123</span></td><td><strong>Agent</strong> — Chacadom Premier Properties workspace</td></tr>
-    <tr><td class="mono">investor@demo.keja.app</td><td><span class="pw">investor123</span></td><td><strong>User</strong> — investor dashboard, favourites, Keja Token trial</td></tr>
+    <tr><th style="width:34%">Account</th><th style="width:30%">Type</th><th>Role &amp; use</th></tr>
+    <tr><td class="mono">torv54@gmail.com</td><td>Google &middot; allowlisted</td><td><strong>Admin</strong> — full console: verification queue, reports, partners, audit trail</td></tr>
+    <tr><td>Any other Google account</td><td>Google &middot; self-serve</td><td><strong>User</strong> — investor dashboard, favourites, Keja Token trial</td></tr>
+    <tr><td>Agent workspace</td><td>Google &middot; granted by admin</td><td><strong>Agent</strong> — Chacadom Premier Properties tools (KEJA PRO)</td></tr>
   </table>
-  <p class="body-text">One-tap demo accounts mirror the same roles — <span class="mono">clive@demo.keja.app</span> (admin),
-  <span class="mono">victor.ndunda@demo.keja.app</span> (agent) and <span class="mono">amina.otieno@demo.keja.app</span>
-  (investor). Sessions last <strong>12 hours</strong>, or <strong>30 days</strong> with "remember me", refreshing on activity.
-  Passwords are hashed on-device with PBKDF2-SHA-256 — never transmitted, never on any server.</p>
+  <p class="body-text">Sessions last <strong>12 hours</strong>, or <strong>30 days</strong> with "remember me",
+  refreshing on activity. Google verifies the identity (ID-token checks: issuer, audience,
+  expiry, verified email) — Keja never sees your Google password. Sessions and 2FA enrolment
+  live on the device only, in this static build.</p>
 
   <div class="callout green">
-    <h4>Google Sign-In — active in production</h4>
-    <p>The OAuth client <span class="mono">794306876985-…apps.googleusercontent.com</span> is configured
-    as <span class="mono">NEXT_PUBLIC_GOOGLE_CLIENT_ID</span> in Vercel (production, preview and
-    development), so the real Google button already renders in the sign-in modal on keja.app.
-    Sign-in verifies the Google ID token on-device (issuer, audience, expiry, verified email).
-    The only optional step left: set <span class="mono">NEXT_PUBLIC_ADMIN_EMAILS</span> (comma-separated)
-    to grant admin to specific Google accounts — the demo admin below keeps working either way.
-    Runbook: <span class="mono">docs/GOOGLE_AUTH_SETUP.md</span>.</p>
+    <h4>Google Authenticator — two-factor, required for admins</h4>
+    <p>Admin accounts verify a <strong>6-digit code</strong> from Google Authenticator (RFC 6238 TOTP)
+    on every new session. First admin visit shows a one-time enrolment wizard: scan the QR with
+    the app (or type the setup key), enter the code it shows, then <strong>save the 8 single-use
+    recovery codes</strong>. Everyone else can switch 2FA on from
+    <span class="mono">keja.app/#/account &rarr; Preferences &amp; security</span>. Codes refresh
+    every 30 seconds; &plusmn;30&nbsp;s clock drift is tolerated. Runbook:
+    <span class="mono">docs/GOOGLE_AUTH_SETUP.md</span>.</p>
   </div>
 
   <!-- 03 Admin -->
@@ -210,8 +212,9 @@ td:first-child{font-weight:600;color:var(--ink);}
     <div class="sec-title">The admin side</div>
     <div class="divider"></div>
   </div>
-  <p class="lead">The console lives at <span class="mono" style="font-weight:700">keja.app/#/admin</span> and opens only for
-  admin-role accounts — everyone else hits a sign-in wall or an explicit 403.</p>
+  <p class="lead">The console lives at <span class="mono" style="font-weight:700">keja.app/#/admin</span> and opens only
+  behind three walls: Google sign-in &rarr; the admin-role allowlist &rarr; a verified two-factor code.
+  Everyone else hits a sign-in wall or an explicit 403.</p>
   <div class="grid2">
     <div class="card"><h3><span class="dot"></span>Verification queue</h3>
       <p>Approve, reject or flag incoming listing submissions with review notes and completeness scores.</p></div>
@@ -229,8 +232,9 @@ td:first-child{font-weight:600;color:var(--ink);}
   <div class="callout gold">
     <h4>Honest scope, stated plainly</h4>
     <p>On today's static build the gate is a UI gate — the console shows demo data that already
-    ships in the browser bundle. No admin-only server data exists yet. The Phase-2 backend
-    moves every check server-side; until then, treat the console as the operations rehearsal.</p>
+    ships in the browser bundle, and the 2FA secret lives on the enrolling device. No admin-only
+    server data exists yet. The Phase-2 backend moves every check server-side; until then,
+    treat the console as the operations rehearsal.</p>
   </div>
 
   <!-- 04 PWA -->
@@ -265,7 +269,7 @@ td:first-child{font-weight:600;color:var(--ink);}
     <div class="step"><div class="n"></div><div><b>Push to main</b>
       <span><span class="mono">github.com/gadda00/keja-ai</span> — any commit triggers "Deploy to Vercel (keja.app)".</span></div></div>
     <div class="step"><div class="n"></div><div><b>Quality gates run</b>
-      <span>TypeScript strict typecheck &rarr; ESLint &rarr; 233 unit tests &rarr; static export with sitemap + service-worker version stamp. A red gate stops the deploy.</span></div></div>
+      <span>TypeScript strict typecheck &rarr; ESLint &rarr; 241 unit tests &rarr; static export with sitemap + service-worker version stamp. A red gate stops the deploy.</span></div></div>
     <div class="step"><div class="n"></div><div><b>Vercel builds and serves</b>
       <span>Prebuilt static deploy to the <span class="mono">keja-ai</span> project; keja.app and www.keja.app serve it globally on the CDN edge.</span></div></div>
     <div class="step"><div class="n"></div><div><b>Smoke test + watchers</b>
@@ -283,8 +287,9 @@ td:first-child{font-weight:600;color:var(--ink);}
     <div class="sec-title">Security and credentials</div>
     <div class="divider"></div>
   </div>
-  <p class="lead">Nothing sensitive ships inside the site — the demo passwords above are QA fixtures,
-  committed openly by design. Real credentials live in exactly three places:</p>
+  <p class="lead">Nothing sensitive ships inside the site — there are no passwords at all anymore
+  (Google handles identity; 2FA secrets live only on each enrolling device). Real credentials
+  live in exactly three places:</p>
   <table>
     <tr><th style="width:30%">Credential</th><th style="width:34%">Where it lives</th><th>What it does</th></tr>
     <tr><td>VERCEL_TOKEN</td><td>GitHub repo secret</td><td>Authenticates the deploy workflow to Vercel</td></tr>
@@ -334,9 +339,9 @@ td:first-child{font-weight:600;color:var(--ink);}
   <div class="kicker">Quick reference &middot; the five you'll forget</div>
   <div class="big" style="margin-top:20px;">Karibu<br/><em>nyumbani.</em></div>
   <div class="rule"></div>
-  <div class="qr"><b>Admin console</b><span>keja.app/#/admin &middot; admin@demo.keja.app / admin123 (or allowlisted Google)</span></div>
+  <div class="qr"><b>Admin console</b><span>keja.app/#/admin &middot; sign in with torv54@gmail.com + Google Authenticator code</span></div>
   <div class="qr"><b>Deploy</b><span>Push to main on github.com/gadda00/keja-ai — gates + deploy run themselves</span></div>
-  <div class="qr"><b>Google Sign-In</b><span>Live — client ID set in Vercel; add admin emails via NEXT_PUBLIC_ADMIN_EMAILS</span></div>
+  <div class="qr"><b>Admin allowlist</b><span>NEXT_PUBLIC_ADMIN_EMAILS in Vercel — currently torv54@gmail.com</span></div>
   <div class="qr"><b>Rollback</b><span>Vercel &rarr; keja-ai &rarr; Deployments &rarr; Promote last known-good</span></div>
   <div class="qr"><b>This guide</b><span>docs/pdf/keja-site-guide.pdf in the repo — always the latest edition</span></div>
   <div class="foot"><span>Keja AI &middot; Chacadom Investments</span><span>keja.app</span></div>
