@@ -1,5 +1,6 @@
 /**
- * Privacy-first analytics event bus.
+ * Privacy-first analytics event bus — now the typed façade over the
+ * governed event layer (audit Sprint 1+2).
  *
  * Review feedback: define an event taxonomy for search, result view,
  * calculator completion, save, compare, chat qualification, viewing request
@@ -8,15 +9,24 @@
  * should stay that way. So the bus is local-only:
  *
  *   - dev:   events print to the console for debugging
- *   - prod:  events append to an in-device ring buffer (capped, inspectable)
+ *   - prod: events append to an in-device ring buffer (capped, inspectable)
  *   - never: no network calls, no cookies, no fingerprinting
  *
- * The taxonomy below is the single source of truth; `track()` refuses events
- * outside it (compile-time via the union, runtime via console warning in dev).
+ * Every call now flows through src/lib/events (the governed layer): the
+ * legacy unversioned names below map to versioned `namespace.verb.v1`
+ * events, payloads are validated against strict Zod schemas, free text is
+ * mechanically redacted, and the stored records carry the full envelope
+ * (session id, request id, release, platform, actor class) so the
+ * data-quality report and metric registry stay executable.
  */
 
-// Cookieless remote mirror (no-op until NEXT_PUBLIC_ANALYTICS_ENDPOINT is set).
-import { captureEvent } from '@/lib/telemetry';
+import {
+  emit,
+  eventLog,
+  clearEventLog,
+  type EventName,
+  LEGACY_NAMES,
+} from '@/lib/events';
 
 export type AnalyticsEvent =
   | { event: 'search'; query: string; results: number }
@@ -31,6 +41,7 @@ export type AnalyticsEvent =
   | { event: 'issue_reported'; propertyId: string; reason: string }
   | { event: 'evidence_reviewed'; propertyId: string };
 
+/** @deprecated — use the versioned names from '@/lib/events' in new code. */
 export const EVENT_TAXONOMY = [
   'search',
   'result_view',
@@ -45,6 +56,7 @@ export const EVENT_TAXONOMY = [
   'evidence_reviewed',
 ] as const;
 
+/** @deprecated — documentation moved to the governed taxonomy. */
 export const EVENT_TAXONOMY_DOC: Record<string, string> = {
   search: 'A search query completed with its result count.',
   result_view: 'A listing detail page was opened.',
@@ -59,60 +71,29 @@ export const EVENT_TAXONOMY_DOC: Record<string, string> = {
   evidence_reviewed: 'A user expanded the evidence panel on a listing.',
 };
 
-const BUFFER_KEY = 'keja.analytics.v1';
-const BUFFER_MAX = 200;
-
-interface StoredEvent {
-  t: string; // ISO timestamp
-  e: AnalyticsEvent;
-}
-
-let buffer: StoredEvent[] | null = null;
-
-function loadBuffer(): StoredEvent[] {
-  if (!buffer) {
-    try {
-      const raw = localStorage.getItem(BUFFER_KEY);
-      buffer = raw ? (JSON.parse(raw) as StoredEvent[]) : [];
-    } catch {
-      buffer = [];
-    }
-  }
-  return buffer;
-}
-
-function persist(next: StoredEvent[]) {
-  buffer = next;
-  try {
-    localStorage.setItem(BUFFER_KEY, JSON.stringify(next));
-  } catch {
-    /* storage full or blocked — analytics must never break the app */
-  }
-}
-
-/** Record an analytics event. Fire-and-forget; total failure is acceptable.
+/** Record an analytics event through the governed layer.
  *
- *  Local ring buffer always; when NEXT_PUBLIC_ANALYTICS_ENDPOINT is set the
- *  same event is mirrored off-device through the cookieless telemetry
- *  channel (audit F-11 / P1-5) — sendBeacon, no cookies, no PII beyond the
- *  taxonomy payload, tagged with the build release. */
+ *  Fire-and-forget; total failure is acceptable and counted. Local ring
+ *  buffer always; when NEXT_PUBLIC_ANALYTICS_ENDPOINT is set the same
+ *  event is mirrored off-device through the cookieless telemetry channel
+ *  (audit F-11 / P1-5) — sendBeacon, no cookies, no PII, tagged with the
+ *  build release. */
 export function track(payload: AnalyticsEvent): void {
   if (typeof window === 'undefined') return;
-  if (!EVENT_TAXONOMY.includes(payload.event as never)) {
-    if (process.env.NODE_ENV === "development") console.warn('[analytics] unknown event', payload);
+  const { event: legacy, ...props } = payload;
+  const governed: EventName | undefined = LEGACY_NAMES[legacy];
+  if (!governed) {
+    if (process.env.NODE_ENV === 'development') console.warn('[analytics] unknown event', legacy);
     return;
   }
-  const entry: StoredEvent = { t: new Date().toISOString(), e: payload };
-  const next = [...loadBuffer(), entry].slice(-BUFFER_MAX);
-  persist(next);
-  captureEvent(payload.event, payload as unknown as Record<string, unknown>);
+  emit(governed, props);
 }
 
-/** Read-only access for debugging / future dashboards. */
-export function recentEvents(): readonly StoredEvent[] {
-  return loadBuffer();
+/** Read-only access for debugging / dashboards (governed envelopes). */
+export function recentEvents(): readonly ReturnType<typeof eventLog>[number][] {
+  return eventLog();
 }
 
 export function clearEvents(): void {
-  persist([]);
+  clearEventLog();
 }
