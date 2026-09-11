@@ -6,12 +6,13 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calculator, MessageCircle, Send, Sparkles, User } from 'lucide-react';
+import { BookOpen, Calculator, MessageCircle, Send, Sparkles, User } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { kejaAI, type AIResponse } from '@/lib/ai/engine';
+import { askKeja } from '@/lib/ai/gateway';
 import { useAllProperties } from '@/lib/inventory';
 import { useStore } from '@/lib/store';
 import { useI18n } from '@/lib/i18n';
@@ -28,6 +29,8 @@ interface ChatMessage {
   ts: string;
   meta?: AIResponse['meta'];
   quickReplies?: string[];
+  /** Corpus citations attached by the intelligence gateway (slim, serializable). */
+  sources?: { ref: string; title: string; kind: 'property' | 'area-insight' | 'policy'; asOf: string }[];
   propertyIds?: string[];
   action?: AIResponse['action'];
 }
@@ -106,7 +109,10 @@ export default function AskKejaView() {
       setThinking(true);
       // small delay so the advisor feels conversational, not instant-cheap
       setTimeout(() => {
-        const res = kejaAI.respond(text);
+        // every turn goes through the intelligence gateway: policy
+        // classification → retrieval → generation → post-generation review
+        // → governed audit event (src/lib/ai/gateway.ts)
+        const { response: res, sources } = askKeja(text);
         const kejaMsg: ChatMessage = {
           id: newId('k'),
           role: 'keja',
@@ -114,6 +120,12 @@ export default function AskKejaView() {
           ts: new Date().toISOString(),
           meta: res.meta,
           quickReplies: res.quickReplies,
+          sources: sources.map((s) => ({
+            ref: s.entry.id,
+            title: s.entry.title,
+            kind: s.entry.kind,
+            asOf: s.entry.asOf,
+          })),
           propertyIds: res.propertyIds,
           action: res.action,
         };
@@ -186,6 +198,22 @@ export default function AskKejaView() {
                         className="inline-flex items-center gap-1.5 rounded-full border bg-background px-2.5 py-1 text-[10px] font-semibold text-muted-foreground"
                       >
                         <MetaChip label={mm.label} /> {mm.text}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {m.role === 'keja' && m.sources && m.sources.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5" aria-label="Sources consulted">
+                    <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/70">Sources</span>
+                    {m.sources.slice(0, 6).map((s) => (
+                      <span
+                        key={s.ref}
+                        title={`${s.ref} — checked ${s.asOf}`}
+                        className="inline-flex max-w-[14rem] items-center truncate rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-[10px] font-semibold text-primary/80"
+                      >
+                        <BookOpen className="mr-1 h-3 w-3 shrink-0" aria-hidden />
+                        <span className="truncate">{s.title}</span>
                       </span>
                     ))}
                   </div>

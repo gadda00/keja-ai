@@ -14,7 +14,7 @@
  * surface. Anything private (KYC evidence, user drafts, audit metadata)
  * never enters this module at all, so the retrieval layer cannot leak it.
  */
-import { areaInsights, properties } from '@/data/properties';
+import { areaInsights, PROPERTIES } from '@/data/properties';
 
 export type CorpusKind = 'property' | 'area-insight' | 'policy';
 
@@ -69,7 +69,7 @@ const POLICY_DOCS: { id: string; title: string; text: string; ref: string }[] = 
   },
 ];
 
-function propertyToEntry(p: (typeof properties)[number]): CorpusEntry {
+function propertyToEntry(p: (typeof PROPERTIES)[number]): CorpusEntry {
   const facts: string[] = [
     `${p.title} — a ${p.type} in ${p.area}, ${p.county}.`,
     p.priceOnApplication
@@ -113,7 +113,7 @@ function insightsToEntries(): CorpusEntry[] {
 
 /** The approved public corpus — built once, deterministically, at load. */
 export const CORPUS: readonly CorpusEntry[] = [
-  ...properties.map(propertyToEntry),
+  ...PROPERTIES.map(propertyToEntry),
   ...insightsToEntries(),
   ...POLICY_DOCS.map((d) => ({
     id: `corpus:${d.id}`,

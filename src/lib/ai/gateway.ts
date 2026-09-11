@@ -28,7 +28,7 @@ import { retrieve, isSufficient, type RetrievedChunk } from './retrieval';
 import { localProvider } from './providers/local';
 import type { GroundedAnswer, IntelligenceProvider } from './providers/types';
 import { emit } from '@/lib/events';
-import { captureException } from '@/lib/telemetry';
+import { captureError } from '@/lib/telemetry';
 
 export type GatewaySurface = 'ask-keja' | 'deal-analyst' | 'valuation';
 
@@ -91,16 +91,23 @@ export function askKeja(question: string, surface: GatewaySurface = 'ask-keja'):
     };
   }
 
-  /* 2 — redaction (nothing sensitive leaves the question path) */
-  const { redacted, removed } = redactForProvider(question);
-  const sanitized = removed.length > 0 ? redacted : question;
+  /* 2 — redaction is enforced at every provider *egress* seam
+   *     (providers/deepseek.ts redacts server-bound text itself), not here:
+   *     the on-device engine and the local corpus never leave the device,
+   *     and blanket pre-redaction would corrupt price/budget parsing
+   *     (e.g. a 50,000,000 KES budget is an 8-digit number). The gateway
+   *     computes the redaction preview so callers and tests can observe
+   *     what a remote provider would see. */
+  const { redacted: providerSafe, removed } = redactForProvider(question);
+  void providerSafe;
+  void removed; // observable via the provider-side audit when the server tier lands
 
   /* 3 — retrieval (authorization-first, freshness-gated) */
-  const sources = retrieve(sanitized, { topK: 4 });
+  const sources = retrieve(question, { topK: 4 });
 
   /* 4 — the deterministic engine always produces the conversational layer
    *     (intents, qualification, finance math, existing escalation UX). */
-  const engineResponse = kejaAI.respond(sanitized);
+  const engineResponse = kejaAI.respond(question);
 
   if (!isSufficient(sources)) {
     /* The corpus cannot support an evidence-sensitive answer → abstain on
@@ -129,7 +136,7 @@ export function askKeja(question: string, surface: GatewaySurface = 'ask-keja'):
 
   /* 5 — grounded generation + post-generation policy review */
   const context = {
-    question: sanitized,
+    question,
     chunks: sources.map((s) => ({
       ref: s.entry.id,
       title: s.entry.title,
@@ -249,5 +256,5 @@ function syncGroundedAnswer(
 
 /** Wire for the future server-side DeepSeek tier (kept for the API service). */
 export function withProvider(provider: IntelligenceProvider): void {
-  captureException?.(new Error(`provider override attempted: ${provider.name} — reserved for the server tier`));
+  captureError(new Error(`provider override attempted: ${provider.name} — reserved for the server tier`));
 }

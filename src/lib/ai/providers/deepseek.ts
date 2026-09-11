@@ -31,6 +31,7 @@ import type {
   IntelligenceProvider,
   ProviderError,
   RetrievalContext,
+  SummarizationInput,
 } from './types';
 import { ProviderFailure } from './types';
 import { redactForProvider, reviewGeneration } from '../policy';
