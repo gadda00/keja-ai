@@ -1,29 +1,75 @@
 'use client';
 /**
- * AuthModal — the sign-in surface (Google-only edition).
+ * AuthModal — the sign-in + registration surface (Google-only edition).
  *
  * Flows:
- *  1. "Sign in with Google" (Google Identity Services) — the only sign-in
- *     method since the demo accounts + email/password paths were retired
- *     (2026-09-11). The returned ID token is validated (issuer / audience /
+ *  1. "Sign in / Create account with Google" (Google Identity Services) —
+ *     the only entry. The returned ID token is validated (issuer / audience /
  *     expiry / verified email) before a session is created.
- *  2. Two-factor step — when the signed-in account requires it (admins
+ *  2. Registration — first-time Google sign-ins continue to a one-screen
+ *     "what brings you to Keja" step (account group, phone, company) so
+ *     every journey — renter, landlord, developer, agent, investor — lands
+ *     on the surface built for it.
+ *  3. Two-factor step — when the signed-in account requires it (admins
  *     always; everyone else if enrolled), the modal advances to the
  *     Google Authenticator challenge / enrolment wizard instead of closing.
  *
+ * Operational note (2026-09-11): Google sign-in used to stall on
+ * accounts.google.com/gsi/transform because the site served
+ * `Cross-Origin-Opener-Policy: same-origin`, which severs window.opener in
+ * the GIS popup. The header is now `same-origin-allow-popups` (vercel.json)
+ * and the button surfaces a small troubleshooting note if the popup never
+ * completes (blocked popups / third-party cookies / unregistered origin).
+ *
  * Pending intents (requireAuth reason + onDone) are surfaced and executed
- * on success, so gated actions (admin console, saving while signed-out, …)
+ * on success, so gated actions (admin console, posting a listing, …)
  * continue where the user left off.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ShieldCheck, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, Check, LifeBuoy, ShieldCheck, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { TwoFactorChallenge } from '@/components/common/TwoFactorChallenge';
 import { useAuth } from '@/lib/auth';
 import { useFocusTrap } from '@/lib/useFocusTrap';
 import { loadGoogleIdentity } from '@/lib/googleAuth';
-import { GOOGLE_CLIENT_ID } from '@/config';
+import { navigate } from '@/lib/router';
+import { useToast } from '@/hooks/use-toast';
+import { GOOGLE_CLIENT_ID, SITE_URL } from '@/config';
+import {
+  ACCOUNT_TYPES,
+  accountTypeInfo,
+  type AccountType,
+} from '@/lib/accountTypes';
+import type { UserAccount } from '@/lib/auth';
+import { cn } from '@/lib/utils';
+
+/* ------------------------------------------------------------------ */
+/* Canonical-origin hint                                                */
+/* ------------------------------------------------------------------ */
+
+/** The OAuth client is registered for the canonical origin (keja.app). A
+ *  mirrored host (e.g. www.keja.app or a preview URL) will render the
+ *  button but Google refuses to return a credential — surface a hint.
+ *  The origin cannot change during a page session, so this is a constant,
+ *  not state. */
+function useOriginMismatch(): boolean {
+  return useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      const canonical = new URL(SITE_URL);
+      const localDev = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname);
+      return !localDev && window.location.origin !== canonical.origin;
+    } catch {
+      return false;
+    }
+  }, []);
+}
+
+/* ------------------------------------------------------------------ */
+/* Google sign-in button                                                */
+/* ------------------------------------------------------------------ */
 
 /** Real "Sign in with Google" — GIS button rendered into a container div.
  *  Falls back to an error message if the script cannot load (offline /
@@ -68,7 +114,7 @@ function GoogleSignInButton({ onCredential }: { onCredential: (c: string) => voi
 
   return (
     <div className="grid justify-items-center gap-2">
-      <div ref={holder} aria-label="Sign in with Google" />
+      <div ref={holder} aria-label="Continue with Google" />
       {error && (
         <div role="alert" className="grid justify-items-center gap-2 text-center">
           <p className="text-xs font-semibold text-destructive">{error}</p>
@@ -90,6 +136,122 @@ function GoogleSignInButton({ onCredential }: { onCredential: (c: string) => voi
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* Registration step (first Google sign-in)                             */
+/* ------------------------------------------------------------------ */
+
+function RegistrationStep({ onDone }: { onDone: () => void }) {
+  const { user, completeRegistration } = useAuth();
+  const { toast } = useToast();
+  const [type, setType] = useState<AccountType | null>(null);
+  const [phone, setPhone] = useState(user?.phone ?? '');
+  const [company, setCompany] = useState(user?.company ?? '');
+  const [name, setName] = useState(user?.name ?? '');
+  // company only makes sense for the professional groups
+  const pro = type === 'landlord' || type === 'developer' || type === 'agent';
+
+  const finishRegistration = () => {
+    if (!type) return;
+    completeRegistration({ accountType: type, phone, company: pro ? company : '', name });
+    toast({
+      title: `Welcome to Keja, ${name.split(' ')[0] || 'friend'} 🎉`,
+      description: `Your ${accountTypeInfo(type).label.toLowerCase()} workspace is ready.`,
+    });
+    onDone();
+    // land the new member on the surface built for their group
+    window.setTimeout(() => navigate(accountTypeInfo(type).to), 60);
+  };
+
+  return (
+    <div className="grid gap-5">
+      <div>
+        <h3 className="text-sm font-black">What brings you to Keja?</h3>
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+          Signed in as <span className="font-semibold">{user?.email}</span>. Pick your lane —
+          you can change it any time from your account page.
+        </p>
+      </div>
+
+      <div className="grid gap-2" role="radiogroup" aria-label="Account type">
+        {ACCOUNT_TYPES.map((t) => (
+          <button
+            key={t.value}
+            type="button"
+            role="radio"
+            aria-checked={type === t.value}
+            onClick={() => setType(t.value)}
+            className={cn(
+              'flex items-center gap-3 rounded-2xl border p-3.5 text-left transition-all',
+              type === t.value
+                ? 'border-primary bg-primary/5 shadow-sm'
+                : 'hover:border-primary/40',
+            )}
+          >
+            <span className="text-xl" aria-hidden>{t.emoji}</span>
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center gap-1.5 text-sm font-black">{t.label}</span>
+              <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{t.blurb}</span>
+            </span>
+            <span
+              className={cn(
+                'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2',
+                type === t.value ? 'border-primary bg-primary text-primary-foreground' : 'border-border',
+              )}
+              aria-hidden
+            >
+              {type === t.value && <Check className="h-3 w-3" />}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      <div className="grid gap-2.5">
+        <label className="grid gap-1.5">
+          <span className="text-xs font-bold">Display name</span>
+          <Input value={name} onChange={(e) => setName(e.target.value)} className="h-9" />
+        </label>
+        <label className="grid gap-1.5">
+          <span className="text-xs font-bold">Phone <span className="font-normal text-muted-foreground">(optional)</span></span>
+          <Input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+254…"
+            inputMode="tel"
+            className="h-9"
+          />
+        </label>
+        {pro && (
+          <label className="grid gap-1.5">
+            <span className="text-xs font-bold">
+              Company / agency <span className="font-normal text-muted-foreground">(optional)</span>
+            </span>
+            <Input
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              placeholder={type === 'developer' ? 'e.g. Section Homes Ltd' : 'e.g. Keja Properties'}
+              className="h-9"
+            />
+          </label>
+        )}
+      </div>
+
+      <Button className="font-black" disabled={!type} onClick={finishRegistration}>
+        Create my Keja account
+      </Button>
+      <button
+        className="text-xs font-bold text-muted-foreground hover:underline"
+        onClick={onDone}
+      >
+        Skip for now
+      </button>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Modal shell                                                          */
+/* ------------------------------------------------------------------ */
+
 export function AuthModal() {
   const {
     authModalOpen,
@@ -100,16 +262,20 @@ export function AuthModal() {
     accountRequiresTwoFactor,
     loading,
   } = useAuth();
+  const originMismatch = useOriginMismatch();
 
   const dialogRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState('');
-  const [step, setStep] = useState<'google' | 'challenge'>('google');
+  const [step, setStep] = useState<'google' | 'register' | 'challenge'>('google');
+  /** account that just signed in — drives register → challenge chaining */
+  const [signedInAccount, setSignedInAccount] = useState<UserAccount | null>(null);
 
   /** Close and reset transient form state so a reopen starts clean. */
   const close = () => {
     setAuthModalOpen(false);
     setError('');
     setStep('google');
+    setSignedInAccount(null);
     clearIntent();
   };
 
@@ -129,9 +295,12 @@ export function AuthModal() {
       setError('');
       try {
         const account = await loginWithGoogleCredential(credential);
-        // admins (and enrolled accounts) continue to the 2FA step;
-        // everyone else is done
-        if (accountRequiresTwoFactor(account)) setStep('challenge');
+        setSignedInAccount(account);
+        // first-time sign-ins register (pick their group) before anything
+        // else; enrolled/admin accounts continue to the 2FA step; everyone
+        // else is done
+        if (!account.accountType) setStep('register');
+        else if (accountRequiresTwoFactor(account)) setStep('challenge');
         else finish();
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Something went wrong.');
@@ -142,6 +311,32 @@ export function AuthModal() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [loginWithGoogleCredential, accountRequiresTwoFactor, pendingIntent, setAuthModalOpen, clearIntent]
   );
+
+  /** After registration (or skip): admins + enrolled accounts continue
+   *  to the 2FA challenge, everyone else is done. */
+  const afterRegistration = useCallback(() => {
+    if (signedInAccount && accountRequiresTwoFactor(signedInAccount)) setStep('challenge');
+    else finish();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signedInAccount, accountRequiresTwoFactor, pendingIntent, setAuthModalOpen, clearIntent]);
+
+  const heading = useMemo(
+    () =>
+      step === 'challenge'
+        ? 'One more step'
+        : step === 'register'
+          ? 'Almost there'
+          : 'Welcome to Keja',
+    [step]
+  );
+
+  const subheading = useMemo(() => {
+    if (step === 'challenge') return 'Your account is protected with two-factor authentication.';
+    if (step === 'register') return 'One quick screen to set up your Keja account.';
+    return pendingIntent?.reason
+      ? `Sign in to continue: ${pendingIntent.reason}.`
+      : 'Sign in with your Google account to sync favourites, searches and portfolio on this device.';
+  }, [step, pendingIntent]);
 
   if (!authModalOpen) return null;
 
@@ -158,16 +353,8 @@ export function AuthModal() {
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-black">
-              {step === 'challenge' ? 'One more step' : 'Welcome to Keja'}
-            </h2>
-            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-              {step === 'challenge'
-                ? 'Your account is protected with two-factor authentication.'
-                : pendingIntent?.reason
-                  ? `Sign in to continue: ${pendingIntent.reason}.`
-                  : 'Sign in with your Google account to sync favourites, searches and portfolio on this device.'}
-            </p>
+            <h2 className="text-lg font-black">{heading}</h2>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{subheading}</p>
           </div>
           <button
             aria-label="Close"
@@ -187,6 +374,10 @@ export function AuthModal() {
             >
               <ArrowLeft className="h-3.5 w-3.5" aria-hidden /> Use a different account
             </button>
+          </div>
+        ) : step === 'register' ? (
+          <div className="mt-5">
+            <RegistrationStep onDone={afterRegistration} />
           </div>
         ) : (
           <>
@@ -219,17 +410,38 @@ export function AuthModal() {
               </p>
             )}
 
+            {originMismatch && (
+              <div className="mt-4 rounded-xl border border-gold/50 bg-gold-soft p-3 text-[11px] leading-relaxed text-gold-foreground" role="note">
+                You are on <span className="font-mono font-semibold">{typeof window !== 'undefined' ? window.location.origin : ''}</span>.
+                Google Sign-In is registered for <span className="font-mono font-semibold">{SITE_URL}</span> —{' '}
+                <a className="font-bold underline" href={SITE_URL}>open the canonical site</a> to sign in.
+              </div>
+            )}
+
+            {/* Stuck-popup troubleshooter (2026-09-11 gsi/transform incident) */}
+            <details className="mt-3 rounded-xl border bg-background/60 p-3 text-[11px] leading-relaxed text-muted-foreground">
+              <summary className="flex cursor-pointer items-center gap-1.5 font-bold text-foreground">
+                <LifeBuoy className="h-3.5 w-3.5 text-gold" aria-hidden /> Google window not completing?
+              </summary>
+              <ul className="mt-2 grid gap-1.5 pl-4">
+                <li className="list-disc">Allow pop-ups for this site, then retry.</li>
+                <li className="list-disc">In Safari / Firefox, allow third-party cookies for accounts.google.com (or use Chrome, where the modern sign-in flow needs no cookies).</li>
+                <li className="list-disc">Still stuck? Sign out of Google in this browser first, or try another browser — and make sure you are on <span className="font-mono">keja.app</span>.</li>
+              </ul>
+            </details>
+
             {/* Trust note — one honest paragraph about the account model */}
             <div
-              className="mt-6 rounded-xl border border-gold/40 bg-gold-soft p-3 text-[11px] leading-relaxed text-gold-foreground"
+              className="mt-4 rounded-xl border border-gold/40 bg-gold-soft p-3 text-[11px] leading-relaxed text-gold-foreground"
               role="note"
             >
               <p className="flex items-center gap-1.5 font-bold">
                 <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> Keja accounts are Google accounts
               </p>
               <p className="mt-1">
-                Sign-in is handled by Google; Keja never sees your password. Admin and 2FA-protected
-                accounts additionally verify a 6-digit code from Google Authenticator. Sessions and
+                Sign-in is handled by Google; Keja never sees your password. New here? The same
+                button creates your account in one tap. Admin and 2FA-protected accounts
+                additionally verify a 6-digit code from Google Authenticator. Sessions and
                 2FA enrolment live on this device only — see the{' '}
                 <a className="font-semibold underline" href="#/trust">Trust Center</a> for what is real today.
               </p>

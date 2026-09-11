@@ -173,6 +173,15 @@ export default function DeveloperPortalView() {
           location, demand, pricing, competition, rental market, infrastructure, population growth
           and developer track record.
         </p>
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <Button className="font-black" onClick={() => navigate('/sell')}>
+            <HardHat className="mr-1.5 h-4 w-4" aria-hidden /> Post a property
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            Publish units to the marketplace in four guided steps — posted under your Google account,
+            visible under <span className="font-semibold">My listings</span>.
+          </p>
+        </div>
       </div>
 
       <Tabs defaultValue="projects" className="mt-8">

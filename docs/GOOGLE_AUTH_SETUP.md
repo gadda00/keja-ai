@@ -7,6 +7,12 @@ path. On top of Google sign-in, admin (and opt-in) accounts verify a
 **second factor: a 6-digit RFC 6238 TOTP code from Google Authenticator**
 (or any authenticator app).
 
+New since 2026-09-11 (evening): **first-time sign-ins complete a one-screen
+registration** (account group — renter / landlord / developer / agent /
+investor, phone, company) that tailors the workspace, and **posting a
+property is account-backed** — listings are attributed to the signed-in
+Google account and appear under **My listings** in the account page.
+
 Production activation is a one-time, ~5-minute job:
 
 ```
@@ -34,6 +40,9 @@ build time.
    - Application type: **Web application**
    - **Authorised JavaScript origins** — add every origin you serve:
      - `https://keja.app`
+     - `https://www.keja.app` (if the www mirror is reachable — the app
+       redirects www → apex automatically, but register it anyway so the
+       button never dead-ends during that first load)
      - `https://keja-ai-rho.vercel.app` (Vercel preview/production URL)
      - `http://localhost:3000` (local dev, optional)
    - No redirect URIs are needed (GIS uses a popup / One Tap).
@@ -135,10 +144,22 @@ JWKS) before any privileged server action.
 
 | Symptom | Fix |
 |---|---|
+| **Sign-in stuck on `accounts.google.com/gsi/transform`** (the popup never returns) | This was a real production incident (2026-09-11): the site sent `Cross-Origin-Opener-Policy: same-origin`, which **severs `window.opener` in the GIS popup** so Google can never deliver the credential back. `vercel.json` now sends `same-origin-allow-popups` — keep it that way. If it ever recurs: (1) check the header with `curl -sI https://keja.app/ | grep -i opener`, (2) allow pop-ups + third-party cookies for accounts.google.com in the browser, (3) confirm the origin is in the client's **Authorised JavaScript origins**. |
 | Button doesn't render | Client ID not set at build time — check Vercel env var, then **redeploy**; confirm with `view-source:` that the build picked it up. |
 | "Token was issued for a different app" | The client ID in `NEXT_PUBLIC_GOOGLE_CLIENT_ID` doesn't match the one that issued the token — usually a stale build. |
 | Popup blocked | The GIS button uses `ux_mode: 'popup'`; browsers require it be opened from a user gesture — it is (a tap on the Google button). |
-| Origin rejected in console | The origin is missing from the OAuth client's **Authorised JavaScript origins**. |
+| Origin rejected in console | The origin is missing from the OAuth client's **Authorised JavaScript origins**. The app shows a gold hint in the sign-in modal when you are on a non-canonical origin, and www → apex redirect keeps sessions on `keja.app`. |
 | Admin console 403 after Google sign-in | Email not in `NEXT_PUBLIC_ADMIN_EMAILS` — add it and redeploy. |
 | 2FA code always rejected | Check the device clock (codes are time-based, ±30 s drift allowed). Re-enrol if the device changed. |
 | Lost the authenticator device | Sign in with a recovery code, then re-enrol. All codes used? Clearing Keja data on the device resets the local enrolment (Google sign-in still works — admin re-enrols on next visit). |
+
+### The registration step (new accounts)
+
+After a **first** Google sign-in the modal advances to a one-screen
+registration: pick the group (renter / landlord / developer / agent /
+investor), optional phone + company (company only for the professional
+groups). Completing it stamps `accountType` + `onboardedAt` on the account
+and lands the member on the surface built for that group (landlords and
+developers go straight to the listing wizard). Skipping is fine — the
+account page keeps an inline “Finish setting up your account” card, and
+the group can be changed any time under **Overview → Profile → Edit**.

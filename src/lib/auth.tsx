@@ -49,6 +49,7 @@ import {
   roleForEmail,
   validateIdTokenClaims,
 } from '@/lib/googleAuth';
+import type { AccountType } from '@/lib/accountTypes';
 import {
   buildOtpauthUri,
   generateTotpSecret,
@@ -59,6 +60,7 @@ import { ADMIN_EMAILS, GOOGLE_CLIENT_ID, SITE } from '@/config';
 
 export type Role = 'user' | 'agent' | 'admin';
 export type AuthMethod = 'google';
+export type { AccountType } from '@/lib/accountTypes';
 
 export interface UserAccount {
   id: string;
@@ -70,6 +72,11 @@ export interface UserAccount {
   status: 'active' | 'suspended';
   phone?: string;
   company?: string;
+  /** Registration group (renter / landlord / developer / agent / investor) —
+   *  absent until the user completes the post-Google registration step. */
+  accountType?: AccountType;
+  /** Set once the registration wizard completed (ISO date-time). */
+  onboardedAt?: string;
   createdAt: string;
   lastLoginAt: string;
   loginCount: number;
@@ -126,6 +133,15 @@ interface AuthContextValue extends AuthState {
   disableTwoFactor: (code: string) => Promise<boolean>;
   /** Require auth for an action — opens the auth modal if not signed in. */
   requireAuth: (reason: string, onDone: () => void) => void;
+  /** Complete (or redo) registration for the signed-in account. */
+  completeRegistration: (info: {
+    accountType: AccountType;
+    phone?: string;
+    company?: string;
+    name?: string;
+  }) => void;
+  /** True when the signed-in account has not finished registration. */
+  needsRegistration: boolean;
   /** Pending auth intent set by requireAuth, consumed by the auth modal. */
   pendingIntent: { reason: string; onDone: () => void } | null;
   clearIntent: () => void;
@@ -290,6 +306,8 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const myEnrolment = user ? enrolments[user.id] : undefined;
   // Admins always need the second factor; everyone else only once enrolled.
   const needsTwoFactor = !!user && (user.role === 'admin' || !!myEnrolment);
+  // Registration (group personalisation) is pending until accountType is set.
+  const needsRegistration = !!user && !user.accountType;
   const accountRequiresTwoFactor = useCallback(
     (account: UserAccount) => account.role === 'admin' || !!readEnrolments()[account.id],
     []
@@ -577,6 +595,30 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setAuthModalOpen(true);
   }, []);
 
+  /** Finish the post-Google registration: stamp the group + profile fields. */
+  const completeRegistration = useCallback(
+    (info: { accountType: AccountType; phone?: string; company?: string; name?: string }) => {
+      if (!user) return;
+      const patch: Partial<UserAccount> = {
+        accountType: info.accountType,
+        onboardedAt: new Date().toISOString(),
+      };
+      if (info.phone?.trim()) patch.phone = info.phone.trim();
+      if (info.company?.trim()) patch.company = info.company.trim();
+      if (info.name?.trim()) patch.name = info.name.trim();
+      updateUser(patch);
+      logAudit({
+        actor: user.name,
+        actorEmail: user.email,
+        action: 'account.registered',
+        target: user.email,
+        detail: `Registered as ${info.accountType}`,
+        severity: 'info',
+      });
+    },
+    [user, updateUser]
+  );
+
   const clearIntent = useCallback(() => setPendingIntent(null), []);
 
   // sliding session refresh on window focus
@@ -608,6 +650,8 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       verifyTwoFactor,
       disableTwoFactor,
       requireAuth,
+      completeRegistration,
+      needsRegistration,
       pendingIntent,
       clearIntent,
       authModalOpen,
@@ -629,6 +673,8 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       verifyTwoFactor,
       disableTwoFactor,
       requireAuth,
+      completeRegistration,
+      needsRegistration,
       pendingIntent,
       clearIntent,
       authModalOpen,

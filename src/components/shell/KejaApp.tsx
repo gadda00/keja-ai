@@ -19,6 +19,7 @@ import { AdminGate } from '@/components/admin/AdminGate';
 import { AuthModal } from '@/components/shell/AuthModal';
 import { usePageMeta } from '@/lib/seo';
 import { installGlobalErrorHandlers } from '@/lib/telemetry';
+import { SITE_URL } from '@/config';
 import { Home } from '@/components/home/Home';
 import { useToast } from '@/hooks/use-toast';
 
@@ -335,6 +336,28 @@ function PathToHashBridge() {
   return null;
 }
 
+/** Keep sessions, service workers and Google Sign-In on the single
+ *  canonical origin (keja.app). The OAuth client is registered for the
+ *  apex — on a www mirror Google refuses to return a credential (the
+ *  stuck-popup failure mode), so we bounce to the canonical origin once,
+ *  preserving the current path + hash. Dev hosts are exempt. */
+function CanonicalOriginRedirect() {
+  useEffect(() => {
+    try {
+      const canonical = new URL(SITE_URL);
+      const here = window.location;
+      if (here.protocol !== 'https:') return; // local dev / file preview
+      if (here.hostname === canonical.hostname) return;
+      if (!here.hostname.endsWith('.keja.app')) return; // only our own mirrors
+      const target = `${canonical.origin}${here.pathname}${here.search}${here.hash}`;
+      window.location.replace(target);
+    } catch {
+      /* malformed env — never trap the user */
+    }
+  }, []);
+  return null;
+}
+
 /** Global error telemetry install (audit F-10). */
 function TelemetryBootstrap() {
   useEffect(() => {
@@ -347,6 +370,7 @@ export default function KejaApp() {
   return (
     <MotionConfig reducedMotion="user">
       <HashRouter>
+        <CanonicalOriginRedirect />
         <PathToHashBridge />
         <TelemetryBootstrap />
         <RouteMeta />

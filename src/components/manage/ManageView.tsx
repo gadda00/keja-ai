@@ -44,6 +44,7 @@ import {
   type NewUnit,
 } from '@/lib/landlordStore';
 import { formatKES } from '@/lib/format';
+import { navigate } from '@/lib/router';
 import { cn } from '@/lib/utils';
 
 const STATUS_CLASS = {
@@ -124,6 +125,9 @@ export default function ManageView() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button className="font-bold" onClick={() => navigate('/sell')}>
+            <Building2 className="mr-1.5 h-4 w-4" aria-hidden /> Post a property
+          </Button>
           <Button variant="outline" className="font-bold" onClick={resetDemo}>
             <RotateCcw className="mr-1.5 h-4 w-4" aria-hidden /> Reset demo data
           </Button>

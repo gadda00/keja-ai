@@ -34,6 +34,11 @@ export interface ListingSubmission {
   submitterEmail: string;
   submitterPhone?: string;
   agency?: string;
+  /** Account attribution (2026-09-11): signed-in posters get their Google
+   *  email + name stamped so “My listings” and admin review can trace
+   *  ownership. Absent for legacy/guest-era submissions. */
+  ownerEmail?: string;
+  ownerName?: string;
   title: string;
   type: string;
   purpose: string[];
@@ -515,6 +520,9 @@ export interface UserListing {
   id: string;
   /** the submission that produced this listing (publish/rollback idempotence) */
   submissionId?: string;
+  /** Google account that posted it (device-local attribution). */
+  ownerEmail?: string;
+  ownerName?: string;
   title: string;
   type: string;
   purpose: string[];
@@ -566,12 +574,19 @@ export function submissionToListing(s: ListingSubmission): UserListing {
     description: s.description,
     agency: s.agency ?? 'Keja Verified Partner',
     agent: { name: s.submitterName, phone: s.submitterPhone ?? '' },
+    ownerEmail: s.ownerEmail,
+    ownerName: s.ownerName,
     availability: 'available',
     listedAt: s.createdAt,
     source: s.source,
     userSubmitted: true,
     views: 0,
   };
+}
+
+/** Owner label for admin consoles / account views. */
+export function listingOwnerLabel(l: UserListing): string {
+  return l.ownerName ?? l.agent.name ?? l.agency ?? 'Unknown poster';
 }
 
 /* ------------------------------------------------------------------ */

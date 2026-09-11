@@ -1,7 +1,15 @@
 'use client';
-/** List property — the 4-step supply wizard with live anomaly feedback. */
-import { useState } from 'react';
-import { CheckCircle2, CloudUpload, Home, ListPlus, ShieldCheck, Sparkles } from 'lucide-react';
+/**
+ * List property — the 4-step supply wizard with live anomaly feedback.
+ *
+ * 2026-09-11: posting is account-backed. The contact step prefills from the
+ * signed-in Google account, submission requires sign-in (requireAuth → the
+ * auth modal, including first-time registration), and every published listing
+ * is stamped with the poster's account (ownerEmail / ownerName) so it shows
+ * in “My listings” and carries attribution through the review desk.
+ */
+import { useEffect, useRef, useState } from 'react';
+import { CheckCircle2, CloudUpload, Home, ListPlus, ShieldCheck, Sparkles, UserRoundCheck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,11 +19,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { useAllProperties } from '@/lib/inventory';
 import { useSubmissions, useUserListings, submissionToListing } from '@/lib/adminStore';
+import { useAuth, initials } from '@/lib/auth';
 import { areaInsights } from '@/data/properties';
 import { formatKES } from '@/lib/format';
 import { navigate } from '@/lib/router';
 import { cn } from '@/lib/utils';
 import { newId } from '@/lib/uuid';
+import { isPictureUrl } from '@/lib/googleAuth';
 
 const STEPS = ['The property', 'Pricing & purpose', 'Description & photos', 'Review & submit'];
 const AREAS = Object.keys(areaInsights).sort();
@@ -24,12 +34,18 @@ export default function ListPropertyView() {
   const all = useAllProperties();
   const [submissions, setSubmissions] = useSubmissions();
   const [, setUserListings] = useUserListings();
+  const { user, requireAuth } = useAuth();
   const [step, setStep] = useState(0);
-  const [form, setForm] = useState({
+  // contact step prefills from the signed-in account at mount (the wizard
+  // loads lazily on navigation, so the session is already resolved); guests
+  // who sign in mid-wizard publish under the fresh account anyway — see
+  // publishRef below.
+  const [form, setForm] = useState(() => ({
     title: '', type: 'apartment', area: 'Kilimani', county: 'Nairobi',
     bedrooms: 2, bathrooms: 2, sizeSqm: 100, price: 10_000_000, rentEstimate: 80_000,
-    purpose: ['buy'] as string[], description: '', phone: '', email: '', name: '',
-  });
+    purpose: ['buy'] as string[], description: '',
+    phone: user?.phone ?? '', email: user?.email ?? '', name: user?.name ?? '',
+  }));
 
   // live anomaly feedback (price vs area band)
   const insight = areaInsights[form.area];
@@ -46,14 +62,22 @@ export default function ListPropertyView() {
       })()
     : null;
 
-  const submit = () => {
+  /** Publish — reads the signed-in account from this render's closure.
+   *  Always invoked either directly (signed in) or through publishRef after
+   *  a requireAuth intent completed (the ref then points at a fresh closure
+   *  with the newly signed-in account). */
+  const publish = () => {
+    const poster = user;
+    if (!poster) return;
     const id = newId("UL").toUpperCase().replace("_", "-");
     const submission = {
       id,
-      submitterName: form.name || 'Platform user',
-        submitterEmail: form.email,
-        submitterPhone: form.phone,
-        agency: 'Direct owner / agent',
+      submitterName: poster.name || 'Platform user',
+        submitterEmail: poster.email,
+        submitterPhone: form.phone || poster.phone,
+        agency: poster.company || 'Direct owner / agent',
+        ownerEmail: poster.email,
+        ownerName: poster.name,
         title: form.title,
         type: form.type,
         purpose: form.purpose as never,
@@ -76,9 +100,28 @@ export default function ListPropertyView() {
     setSubmissions([submission, ...submissions]);
     // auto-publish for demo velocity (trial platform), flagged for review
     setUserListings((prev) => [...prev, submissionToListing(submission)]);
-    toast({ title: 'Listing submitted', description: 'The verification desk screens it next — trust-by-design, every listing.' });
+    toast({
+      title: 'Listing published',
+      description: `Posted as ${poster.name} (${poster.email}) — the verification desk screens it next. Find it under My listings in your account.`,
+    });
     navigate(`/properties/${id}`);
     void all;
+  };
+
+  // latest publish closure, so a requireAuth intent that fires after
+  // sign-in + registration still sees the fresh account state
+  const publishRef = useRef(publish);
+  useEffect(() => {
+    publishRef.current = publish;
+  });
+
+  const onSubmit = () => {
+    if (!user) {
+      // sign in (or register) first — the fresh publish closure runs after
+      requireAuth('Publishing a property to the Keja marketplace', () => publishRef.current());
+      return;
+    }
+    publish();
   };
 
   return (
@@ -91,6 +134,34 @@ export default function ListPropertyView() {
           and inherit the Trust Score.
         </p>
       </div>
+
+      {/* posting-as chip — attribution is always an account */}
+      {user ? (
+        <div className="mt-5 flex items-center gap-3 rounded-2xl border bg-card p-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-primary text-xs font-black text-primary-foreground">
+            {isPictureUrl(user.picture) ? (
+              <img src={user.picture} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" loading="lazy" />
+            ) : (
+              <span aria-hidden>{initials(user.name)}</span>
+            )}
+          </div>
+          <p className="min-w-0 flex-1 text-xs leading-relaxed text-muted-foreground">
+            <span className="font-bold text-foreground">Posting as {user.name}</span> · {user.email}
+            {user.accountType === 'developer' || user.accountType === 'landlord' || user.accountType === 'agent'
+              ? ` · ${user.accountType === 'agent' ? 'agent' : user.accountType} account`
+              : ''}
+            <br />
+            <span className="text-[11px]">Your listing is attributed to this account and appears under My listings in your account page.</span>
+          </p>
+          <UserRoundCheck className="h-5 w-5 shrink-0 text-primary" aria-hidden />
+        </div>
+      ) : (
+        <div className="mt-5 rounded-2xl border border-gold/40 bg-gold-soft p-3 text-xs leading-relaxed text-gold-foreground">
+          <span className="font-bold">You&rsquo;ll publish under your Google account.</span>{' '}
+          When you submit, Keja asks you to sign in (one tap — or register if you&rsquo;re new) so the
+          listing is attributed to you and appears in My listings.
+        </div>
+      )}
 
       {/* stepper */}
       <div className="mt-7 flex items-center gap-2">
@@ -217,7 +288,7 @@ export default function ListPropertyView() {
           <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="grid gap-1.5">
-                <Label htmlFor="lp-name">Your name</Label>
+                <Label htmlFor="lp-name">Contact name</Label>
                 <Input id="lp-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
               </div>
               <div className="grid gap-1.5">
@@ -255,7 +326,7 @@ export default function ListPropertyView() {
               Continue
             </Button>
           ) : (
-            <Button className="font-black" onClick={submit}>
+            <Button className="font-black" onClick={onSubmit}>
               <ListPlus className="mr-1.5 h-4 w-4" aria-hidden /> Submit listing
             </Button>
           )}

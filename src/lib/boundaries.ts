@@ -147,6 +147,10 @@ export const userAccountSchema = z.object({
   picture: z.string().optional(),
   phone: z.string().optional(),
   company: z.string().optional(),
+  // Registration (group personalisation) — optional for backward
+  // compatibility with accounts created before the registration step.
+  accountType: z.enum(['renter', 'landlord', 'developer', 'agent', 'investor']).optional(),
+  onboardedAt: z.string().optional(),
   createdAt: z.string(),
   lastLoginAt: z.string(),
   loginCount: z.number(),
