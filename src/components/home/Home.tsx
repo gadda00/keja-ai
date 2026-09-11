@@ -34,7 +34,7 @@ import { Link, navigate } from '@/lib/router';
 import { ECOSYSTEM } from '@/lib/ecosystem';
 import { useI18n } from '@/lib/i18n';
 import { useAllProperties } from '@/lib/inventory';
-import { useStore } from '@/lib/store';
+import { useFavorites } from '@/lib/store';
 import { PropertyCard } from '@/components/property/PropertyCard';
 import { cn } from '@/lib/utils';
 
@@ -282,7 +282,7 @@ function EcosystemGrid() {
 
 function FeaturedProperties() {
   const all = useAllProperties();
-  const [favorites, setFavorites] = useStore<string[]>('favorites', []);
+  const [favorites, setFavorites] = useFavorites();
   const featured = useMemo(
     () =>
       [...all]

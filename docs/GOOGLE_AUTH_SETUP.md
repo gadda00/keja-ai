@@ -107,8 +107,9 @@ is required once after setting them:
 | Admin accounts | 2FA **required** — the admin console (and the sign-in flow) demands a valid code; first visit runs the enrolment wizard |
 | Regular accounts | 2FA **optional** — enable/disable from `#/account → Preferences & security` |
 | Codes | RFC 6238 TOTP, SHA-1, 6 digits, 30-second step, ±1 step clock drift accepted |
-| Recovery | 8 single-use `XXXXX-XXXXX` codes shown once at enrolment; each unlocks one sign-in |
-| Storage | Enrolment secret + remaining recovery codes live on this device (`localStorage`), never transmitted |
+| Brute force | Consecutive failed verifications escalate into timed lockouts (5 → 30 s, 10 → 5 min, 20 → 15 min, persisted per account and audit-logged as `auth.2fa.lockout`); a correct code resets the counter |
+| Recovery | 8 single-use `XXXXX-XXXXX` codes shown once at enrolment; each unlocks one sign-in. Only their **SHA-256 hashes** are stored (wave 10); wrong recovery-code guesses count toward the same lockout |
+| Storage | Enrolment secret + remaining recovery-code hashes live on this device (`localStorage`), never transmitted. Enrolments written before hashing are migrated in place on load — the paper copies keep working |
 | Session | Every fresh session starts `mfaVerified: false`; a valid code flips it for that session |
 
 What this is (honest scope): a device-local second factor that hardens the

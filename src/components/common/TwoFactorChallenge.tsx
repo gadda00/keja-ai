@@ -18,6 +18,7 @@ import { KeyRound, LifeBuoy, QrCode, ShieldCheck, Smartphone } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/lib/auth';
+import { formatLockout } from '@/lib/twoFactorGuard';
 import { cn } from '@/lib/utils';
 
 type Mode = 'verify' | 'enrol';
@@ -108,6 +109,14 @@ export function TwoFactorChallenge({
       }
       const res = await verifyTwoFactor(recoveryMode ? code.trim() : code.replace(/\D/g, ''));
       if (!res.ok) {
+        if (res.lockoutRemainingSeconds) {
+          setError(
+            `Too many incorrect codes — verification is paused for ${formatLockout(
+              res.lockoutRemainingSeconds,
+            )}. Try again later.`,
+          );
+          return;
+        }
         setError(
           recoveryMode
             ? 'That recovery code was not accepted (or already used).'

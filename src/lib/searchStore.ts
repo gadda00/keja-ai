@@ -7,7 +7,8 @@ import { useCallback, useEffect } from 'react';
 import type { Property } from '@/data/properties';
 import { isRentalPrice } from '@/lib/finance';
 import { matchesFreeQuery, parseFreeQuery } from '@/lib/queryParser';
-import { KEYS, store, useStore } from '@/lib/store';
+import { KEYS, store, useValidatedStore } from '@/lib/store';
+import { notificationsSchema, savedSearchesSchema } from '@/lib/boundaries';
 import { newId } from '@/lib/uuid';
 
 export interface SavedSearch {
@@ -79,7 +80,7 @@ export function areaCoords(area: string, county?: string): { lat: number; lng: n
 /* ------------------------------ saved searches ----------------------------- */
 
 export function useSavedSearches() {
-  const [searches, setSearches] = useStore<SavedSearch[]>(KEYS.searches, []);
+  const [searches, setSearches] = useValidatedStore<SavedSearch[]>(KEYS.searches, savedSearchesSchema, []);
   const save = useCallback(
     (filters: SavedSearch['filters'], label: string) => {
       const id = newId('ss');
@@ -194,7 +195,11 @@ export function notify(n: Omit<Notification, 'id' | 'createdAt' | 'read'>) {
 }
 
 export function useNotifications() {
-  const [notifs, setNotifs] = useStore<Notification[]>(KEYS.notifications, []);
+  const [notifs, setNotifs] = useValidatedStore<Notification[]>(
+    KEYS.notifications,
+    notificationsSchema,
+    []
+  );
   const unread = notifs.filter((n) => !n.read).length;
   const markAllRead = useCallback(
     () => setNotifs(notifs.map((n) => ({ ...n, read: true }))),

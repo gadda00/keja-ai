@@ -9,7 +9,8 @@
  * a static host; every collection is designed to map 1:1 onto an API table
  * in the Phase-2 backend migration.
  */
-import { store, useStore } from '@/lib/store';
+import { store, useStore, useValidatedStore } from '@/lib/store';
+import { userListingsSchema } from '@/lib/boundaries';
 
 /* ------------------------------------------------------------------ */
 /* Types                                                               */
@@ -545,7 +546,8 @@ export interface UserListing {
   views: number;
 }
 
-export const useUserListings = () => useStore<UserListing[]>('user-listings', []);
+export const useUserListings = () =>
+  useValidatedStore<UserListing[]>('user-listings', userListingsSchema, []);
 
 export function submissionToListing(s: ListingSubmission): UserListing {
   return {

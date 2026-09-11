@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TwoFactorChallenge } from '@/components/common/TwoFactorChallenge';
 import { useAuth, initials } from '@/lib/auth';
 import { isPictureUrl } from '@/lib/googleAuth';
-import { useStore } from '@/lib/store';
+import { useFavorites } from '@/lib/store';
 import { useSavedSearches } from '@/lib/searchStore';
 import { useAllProperties } from '@/lib/inventory';
 import { useUserListings } from '@/lib/adminStore';
@@ -414,7 +414,7 @@ export default function AccountView() {
     disableTwoFactor,
   } = useAuth();
   const all = useAllProperties();
-  const [favorites] = useStore<string[]>('favorites', []);
+  const [favorites] = useFavorites();
   const { searches, remove, toggleAlerts } = useSavedSearches();
   const { lang, setLang } = useI18n();
 

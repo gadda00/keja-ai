@@ -22,7 +22,7 @@ import { PropertyCard } from '@/components/property/PropertyCard';
 import { CompareBar, useCompare } from '@/components/property/CompareBar';
 import MapPanel from '@/components/property/MapPanel';
 import { navigate, useRouter } from '@/lib/router';
-import { useStore } from '@/lib/store';
+import { useFavorites } from '@/lib/store';
 import { useSavedSearches } from '@/lib/searchStore';
 import { cn } from '@/lib/utils';
 
@@ -47,7 +47,7 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
 
-  const [favorites, setFavorites] = useStore<string[]>('favorites', []);
+  const [favorites, setFavorites] = useFavorites();
   const { ids: compareIds, toggle } = useCompare();
   const { save: addSavedSearch } = useSavedSearches();
 

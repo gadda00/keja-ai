@@ -3,7 +3,9 @@
  * Uses localStorage so all features work without a backend — MVP-ready and
  * upgradeable to a real API later (roadmap Phase 2/3).
  */
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
+
+import { chatHistorySchema, idListSchema } from '@/lib/boundaries';
 
 const PREFIX = 'keja:';
 
@@ -27,11 +29,16 @@ export interface ChatMessage {
   role: 'user' | 'keja';
   text: string;
   ts: string;
-  meta?: string[];
+  /** Epistemic labels attached to AI answers (see AIResponse.meta). */
+  meta?: { label: 'FACT' | 'ESTIMATE' | 'ASSUMPTION' | 'REPORTED'; text: string }[];
   /** Engine-provided follow-up chips (persisted so history keeps them). */
   quickReplies?: string[];
   /** Engine-provided property cards for this answer. */
   propertyIds?: string[];
+  /** Corpus citations attached by the intelligence gateway. */
+  sources?: { ref: string; title: string; kind: 'property' | 'area-insight' | 'policy'; asOf: string }[];
+  /** Engine-suggested next action for this answer. */
+  action?: 'start-qualification' | 'open-calculator' | 'whatsapp';
 }
 
 function read<T>(key: string, fallback: T): T {
@@ -103,6 +110,126 @@ export const KEYS = {
   compare: 'compare-list',
   notifications: 'notifications',
 };
+
+/* ------------------------- validated reads (wave 10) ------------------------ */
+/**
+ * Boundary validation for persisted domain state (audit F-19, extended from
+ * auth/tokenize/auto-listings to the every-visitor stores). useStore trusts
+ * `JSON.parse(raw) as T`, so one corrupted write (partial write, quota hit,
+ * stale shape from an older build, devtools edit) crashed the view that read
+ * it. useValidatedStore adds a zod schema at the read seam:
+ *
+ *   - a value that fails the schema falls back to `fallback`
+ *   - an ARRAY whose shape fails element-wise is filtered to the valid
+ *     entries (the same drop-loudly-never-crash policy as auto-listings)
+ *   - whenever the stored value changes (fallback or filtering), it is
+ *     repaired in storage so subsequent reads are stable
+ *
+ * The drop is logged once in development, never silent in production code.
+ */
+export function useValidatedStore<T>(
+  key: string,
+  schema: { safeParse: (v: unknown) => { success: true; data: T } | { success: false } },
+  fallback: T,
+): [T, (v: T | ((prev: T) => T)) => void] {
+  const validatedRead = useCallback(
+    (fb: T): { value: T; repaired: T | null } => {
+      try {
+        const raw = localStorage.getItem(PREFIX + key);
+        if (!raw) return { value: fb, repaired: null };
+        let parsed: unknown;
+        try {
+          parsed = JSON.parse(raw);
+        } catch {
+          return { value: fb, repaired: fb };
+        }
+        const whole = schema.safeParse(parsed);
+        if (whole.success) return { value: whole.data, repaired: null };
+        if (Array.isArray(parsed) && Array.isArray(fb)) {
+          // element-wise salvage: keep the valid entries, drop the rest
+          const kept = parsed.filter((e) => schema.safeParse([e]).success);
+          if (kept.length || parsed.length === 0) {
+            const arr = kept as unknown as T;
+            return { value: arr, repaired: kept.length === parsed.length ? null : arr };
+          }
+        }
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`[store] '${key}' failed its schema — falling back`);
+        }
+        return { value: fb, repaired: fb };
+      } catch {
+        return { value: fb, repaired: null };
+      }
+    },
+    [key, schema],
+  );
+
+  const [value, setValue] = useState<T>(() => {
+    const { value: v, repaired } = validatedRead(fallback);
+    if (repaired !== null) write(key, repaired);
+    return v;
+  });
+
+  const fallbackRef = useRef(fallback);
+  useEffect(() => {
+    fallbackRef.current = fallback;
+  }, [fallback]);
+
+  // repair also when another tab (storage) or this tab (keja-store-change)
+  // delivers an invalid payload — the listener is the same seam useStore uses
+  useEffect(() => {
+    const validate = () => {
+      const { value: v, repaired } = validatedRead(fallbackRef.current);
+      if (repaired !== null) write(key, repaired);
+      setValue(v);
+    };
+    const onChange = (e: Event) => {
+      if ((e as CustomEvent).detail === key) validate();
+    };
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === PREFIX + key) validate();
+    };
+    window.addEventListener('keja-store-change', onChange);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('keja-store-change', onChange);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, [key, validatedRead]);
+
+  const set = useCallback(
+    (v: T | ((prev: T) => T)) => {
+      setValidated(key, v, fallbackRef, validatedRead, setValue);
+    },
+    [key, validatedRead],
+  );
+  return [value, set];
+}
+
+/** The validated setter: function-updaters seed from the validated value,
+ *  never from a raw (possibly corrupted) storage read. */
+const setValidated = <T,>(
+  key: string,
+  v: T | ((prev: T) => T),
+  fallbackRef: { current: T },
+  validatedRead: (fb: T) => { value: T; repaired: T | null },
+  setValue: Dispatch<SetStateAction<T>>,
+) => {
+  const seed = validatedRead(fallbackRef.current).value;
+  const next = typeof v === 'function' ? (v as (prev: T) => T)(seed) : v;
+  write(key, next);
+  setValue(next);
+};
+
+/* ------------------- shared validated hooks (wave 10) ---------------------- */
+/** One validated read per key per app — these hooks replace the scattered
+ *  `useStore<string[]>('favorites', [])` call sites so the schema lives in
+ *  exactly one place. */
+
+export const useFavorites = () => useValidatedStore<string[]>(KEYS.favorites, idListSchema, []);
+export const useCompareList = () => useValidatedStore<string[]>('compare', idListSchema, []);
+export const useChatHistory = () =>
+  useValidatedStore<ChatMessage[]>(KEYS.chat, chatHistorySchema, []);
 
 export const seedLeads: Lead[] = [
   {

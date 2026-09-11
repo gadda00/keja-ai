@@ -50,7 +50,7 @@ import { calculateMortgage } from '@/lib/finance';
 import { formatKES, timeAgo, trustTier } from '@/lib/format';
 import { areaInsights, type Property } from '@/data/properties';
 import { navigate } from '@/lib/router';
-import { useStore } from '@/lib/store';
+import { useFavorites } from '@/lib/store';
 import { whatsappLink } from '@/config';
 import { PropertyCard } from './PropertyCard';
 import { TrustDial } from './TrustBadge';
@@ -408,7 +408,7 @@ function Gallery({ images, title }: { images: string[]; title: string }) {
 export default function PropertyDetailView({ id }: { id: string }) {
   const all = useAllProperties();
   const p = useMemo(() => all.find((x) => x.id === id), [all, id]);
-  const [favorites, setFavorites] = useStore<string[]>('favorites', []);
+  const [favorites, setFavorites] = useFavorites();
   const saved = p ? favorites.includes(p.id) : false;
 
   // Entity SEO (2026-09-12): re-apply the prerendered meta after hydration so

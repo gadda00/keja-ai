@@ -206,7 +206,56 @@ export interface TotpEnrolment {
   secret: string;
   /** When the enrolment was confirmed by a first verified code. */
   confirmedAt: string;
-  /** Recovery codes (single-use, hashed) — set at enrolment. */
+  /** SHA-256 hashes of the recovery codes (single-use). The plaintext
+   *  codes exist exactly once — on screen at enrolment; only these hashes
+   *  are persisted, so a device snoop cannot read a usable code. */
   recoveryCodes: string[];
+  /** Consecutive failed verifications (brute-force throttle state). */
+  failCount?: number;
+  /** ISO timestamp — verification attempts are rejected until this moment. */
+  lockedUntil?: string;
   createdAt: string;
+}
+
+/* ------------------------------------------------------------------ */
+/* Recovery-code hashing (storage hardening)                           */
+/* ------------------------------------------------------------------ */
+
+/** Match the plaintext recovery-code form ("XXXXX-XXXXX"). */
+export const RECOVERY_CODE_FORMAT = /^[A-Z2-9]{5}-[A-Z2-9]{5}$/;
+/** SHA-256 hex digest form (what is actually persisted). */
+export const RECOVERY_HASH_FORMAT = /^[0-9a-f]{64}$/;
+
+/** SHA-256 hex digest of a normalised recovery code — the stored form. */
+export async function hashRecoveryCode(code: string): Promise<string> {
+  const data = new TextEncoder().encode(code.trim().toUpperCase());
+  const digest = await crypto.subtle.digest('SHA-256', data as unknown as BufferSource);
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Hash every plaintext recovery code in an enrolment map (one-time
+ * migration for records written before hashing shipped). Idempotent:
+ * entries already in hash form are left untouched.
+ */
+export async function hashLegacyRecoveryCodes(
+  map: Record<string, TotpEnrolment>,
+): Promise<Record<string, TotpEnrolment>> {
+  const out: Record<string, TotpEnrolment> = {};
+  for (const [userId, enrolment] of Object.entries(map)) {
+    const needsHashing = enrolment.recoveryCodes.some(
+      (c) => !RECOVERY_HASH_FORMAT.test(c),
+    );
+    out[userId] = needsHashing
+      ? {
+          ...enrolment,
+          recoveryCodes: await Promise.all(
+            enrolment.recoveryCodes.map(async (c) =>
+              RECOVERY_HASH_FORMAT.test(c) ? c : await hashRecoveryCode(c),
+            ),
+          ),
+        }
+      : enrolment;
+  }
+  return out;
 }

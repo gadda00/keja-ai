@@ -11,29 +11,16 @@ import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { kejaAI, type AIResponse } from '@/lib/ai/engine';
+import { kejaAI } from '@/lib/ai/engine';
 import { askKeja } from '@/lib/ai/gateway';
 import { useAllProperties } from '@/lib/inventory';
-import { useStore } from '@/lib/store';
+import { useChatHistory, type ChatMessage } from '@/lib/store';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/router';
 import { whatsappLink } from '@/config';
 import { PropertyRow } from '@/components/property/PropertyCard';
 import { cn } from '@/lib/utils';
 import { newId } from '@/lib/uuid';
-
-interface ChatMessage {
-  id: string;
-  role: 'user' | 'keja';
-  text: string;
-  ts: string;
-  meta?: AIResponse['meta'];
-  quickReplies?: string[];
-  /** Corpus citations attached by the intelligence gateway (slim, serializable). */
-  sources?: { ref: string; title: string; kind: 'property' | 'area-insight' | 'policy'; asOf: string }[];
-  propertyIds?: string[];
-  action?: AIResponse['action'];
-}
 
 const SUGGESTIONS = [
   '2BR apartment in Kilimani under 15M',
@@ -63,7 +50,7 @@ function MetaChip({ label }: { label: string }) {
 export default function AskKejaView() {
   const all = useAllProperties();
   const { lang } = useI18n();
-  const [messages, setMessages] = useStore<ChatMessage[]>('chat-history', []);
+  const [messages, setMessages] = useChatHistory();
   const [input, setInput] = useState('');
   const [thinking, setThinking] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);

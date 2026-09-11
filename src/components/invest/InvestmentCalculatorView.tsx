@@ -15,13 +15,13 @@ import { Slider } from '@/components/ui/slider';
 import { analyzeInvestment, estimateMonthlyExpenses } from '@/lib/finance';
 import { formatKES } from '@/lib/format';
 import { navigate } from '@/lib/router';
-import { useStore } from '@/lib/store';
+import { useFavorites } from '@/lib/store';
 import { useAllProperties } from '@/lib/inventory';
 import { cn } from '@/lib/utils';
 
 export default function InvestmentCalculatorView() {
   const all = useAllProperties();
-  const [favorites] = useStore<string[]>('favorites', []);
+  const [favorites] = useFavorites();
   const [price, setPrice] = useState(12_000_000);
   const [furnishing, setFurnishing] = useState(600_000);
   const [rent, setRent] = useState(95_000);

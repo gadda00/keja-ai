@@ -697,3 +697,53 @@ For questions or issues related to these implementations:
 - [CURRENT_PICTURE.md](./CURRENT_PICTURE.md)
 - [STRATEGY.md](./STRATEGY.md)
 - [DEPLOYMENT.md](./DEPLOYMENT.md)
+
+---
+
+## Wave 10 — Second-Factor Hardening + Data Boundaries (2026-09-12)
+
+**Cycle:** observe → identify (5 impact-ranked defects) → plan → implement → verify → record.
+
+**IMP-006 — 2FA recovery-code storage contradicted its own documented contract.**
+The `TotpEnrolment` interface documented recovery codes as "single-use,
+hashed" since Phase 3.5, but `mintRecoveryCodes()` output was persisted
+verbatim and verified by plaintext `.includes()`. Storage now holds only
+SHA-256 hashes; a one-time mount effect migrates legacy plaintext records
+so users' paper copies keep working. Wrong recovery-code guesses count
+toward the brute-force counter.
+
+**IMP-007 — No brute-force throttle on 2FA verification.**
+Unlimited 6-digit guesses is a viable channel for exactly the borrowed-session
+threat the claims register names. New pure policy module
+(`src/lib/twoFactorGuard.ts`, fully unit-tested with an injected clock)
+escalates lockouts 5→30 s, 10→5 min, 20→15 min; wired into verify and
+disable paths with `auth.2fa.lockout` audit events and a UI lockout message.
+Honest scope unchanged: client-side state can be cleared by a devtools user —
+the throttle raises the bar against the stated threat, and the module moves
+verbatim server-side with the Phase-2 auth service.
+
+**IMP-008 — Listing wizard published unvalidated input into the marketplace.**
+`Number('')`=0/NaN, empty titles and uncapped text flowed through
+`submissionToListing` into `useAllProperties()` (marketplace, home stats,
+AI corpus). The new `listingFormSchema` gate refuses invalid submissions
+with per-field inline errors and first-error step navigation.
+
+**IMP-009 — Every-visitor stores trusted localStorage blindly.**
+`useStore`'s `JSON.parse(raw) as T` crashed views on corrupted writes (F-19
+had covered only auth/tokenize/auto-listings). `useValidatedStore` adds the
+zod read seam with element-wise salvage + storage repair, wired into
+favorites, compare, chat-history, saved-searches, notifications and
+user-listings. Found and fixed while doing this: `ChatMessage.meta` in
+`store.ts` was declared `string[]` — stale against the gateway shape
+(`{label,text}[]` + sources + action) the chat actually persists.
+
+**Verification:** 378 tests / 29 files (52 new) · typecheck clean · lint
+clean · build + artifact verification PASSED (118 static pages, 111 sitemap
+URLs) · working-tree hygiene restored (gutted local `.gitignore` + drifted
+`next-env.d.ts` reset; secrets re-ignored and verified via `git check-ignore`).
+
+**Remaining risks:** the 2FA secret itself remains device-local plaintext by
+TOTP necessity (server-side custody is the Phase-2 milestone); the throttle
+state is client-side like all demo state; zod's default key-stripping means
+future `UserListing` fields must be added to the schema (drift-barrier by
+design, pinned by round-trip tests).

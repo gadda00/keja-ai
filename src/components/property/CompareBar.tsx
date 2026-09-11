@@ -7,7 +7,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { GitCompareArrows, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useStore } from '@/lib/store';
+import { useCompareList } from '@/lib/store';
 import { useAllProperties, findProperty } from '@/lib/inventory';
 import { track } from '@/lib/analytics';
 import { Link } from '@/lib/router';
@@ -15,7 +15,7 @@ import { Link } from '@/lib/router';
 const MAX_COMPARE = 4;
 
 export function useCompare() {
-  const [ids, setIds] = useStore<string[]>('compare', []);
+  const [ids, setIds] = useCompareList();
   const toggle = (id: string) => {
     const wasIncluded = ids.includes(id);
     setIds((prev) => {

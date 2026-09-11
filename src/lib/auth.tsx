@@ -53,9 +53,14 @@ import type { AccountType } from '@/lib/accountTypes';
 import {
   buildOtpauthUri,
   generateTotpSecret,
+  hashLegacyRecoveryCodes,
+  hashRecoveryCode,
+  RECOVERY_CODE_FORMAT,
+  RECOVERY_HASH_FORMAT,
   verifyTotp,
   type TotpEnrolment,
 } from '@/lib/totp';
+import { checkLock, lockoutSecondsFor, recordFailure } from '@/lib/twoFactorGuard';
 import { ADMIN_EMAILS, GOOGLE_CLIENT_ID, SITE } from '@/config';
 
 export type Role = 'user' | 'agent' | 'admin';
@@ -104,7 +109,7 @@ export interface PendingEnrolment {
   otpauthUri: string;
 }
 
-interface AuthContextValue extends AuthState {
+export interface AuthContextValue extends AuthState {
   users: UserAccount[];
   /** Real Google Sign-In: consumes a GIS ID-token credential. */
   loginWithGoogleCredential: (credential: string) => Promise<UserAccount>;
@@ -127,8 +132,14 @@ interface AuthContextValue extends AuthState {
     code: string,
     pendingSecret: string
   ) => Promise<{ ok: boolean; recoveryCodes: string[] }>;
-  /** Verify a TOTP or recovery code → flags the session mfaVerified. */
-  verifyTwoFactor: (code: string) => Promise<{ ok: boolean; usedRecovery?: boolean }>;
+  /** Verify a TOTP or recovery code → flags the session mfaVerified.
+   *  Repeated failures escalate into timed lockouts (twoFactorGuard). */
+  verifyTwoFactor: (code: string) => Promise<{
+    ok: boolean;
+    usedRecovery?: boolean;
+    /** Present while the brute-force throttle is holding the account. */
+    lockoutRemainingSeconds?: number;
+  }>;
   /** Disable 2FA for this account (requires a valid code). */
   disableTwoFactor: (code: string) => Promise<boolean>;
   /** Require auth for an action — opens the auth modal if not signed in. */
@@ -330,6 +341,29 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     };
   }, []);
 
+  // One-time storage hardening (wave 10): enrolments written before
+  // recovery-code hashing hold plaintext codes — hash them in place so the
+  // paper copies users saved keep working while storage stops leaking them.
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const map = readEnrolments();
+        const legacy = Object.values(map).some((e) =>
+          e.recoveryCodes.some((c) => !RECOVERY_HASH_FORMAT.test(c)),
+        );
+        if (!legacy) return;
+        const hardened = await hashLegacyRecoveryCodes(map);
+        if (!cancelled) writeEnrolments(hardened);
+      } catch {
+        /* storage unavailable — nothing to migrate */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const persistLogin = useCallback(
     (account: UserAccount, remember: boolean, usersOverride?: UserAccount[]) => {
       const base = usersOverride ?? users;
@@ -452,11 +486,14 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         return { ok: false, recoveryCodes: [] };
       }
       const recoveryCodes = mintRecoveryCodes();
+      // only SHA-256 hashes are persisted — the plaintext exists on screen
+      // (returned below) exactly once, never in storage
+      const recoveryHashes = await Promise.all(recoveryCodes.map(hashRecoveryCode));
       const map = readEnrolments();
       map[user.id] = {
         secret: pendingSecret,
         confirmedAt: new Date().toISOString(),
-        recoveryCodes,
+        recoveryCodes: recoveryHashes,
         createdAt: new Date().toISOString(),
       };
       writeEnrolments(map);
@@ -479,30 +516,24 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       if (!user) return { ok: false };
       const enrolment = readEnrolments()[user.id];
       if (!enrolment) return { ok: false };
-      const trimmed = code.trim().toUpperCase();
 
-      // recovery codes: single-use, exact match against the stored set
-      if (/^[A-Z2-9]{5}-[A-Z2-9]{5}$/.test(trimmed) && enrolment.recoveryCodes.includes(trimmed)) {
+      // brute-force throttle (src/lib/twoFactorGuard.ts): while locked,
+      // every attempt is rejected without touching the verifier
+      const lock = checkLock(enrolment, Date.now());
+      if (lock.locked) return { ok: false, lockoutRemainingSeconds: lock.remainingSeconds };
+
+      const persistEnrolment = (next: TotpEnrolment) => {
         const map = readEnrolments();
-        map[user.id] = {
-          ...enrolment,
-          recoveryCodes: enrolment.recoveryCodes.filter((c) => c !== trimmed),
-        };
+        map[user.id] = next;
         writeEnrolments(map);
-        flagSessionMfa();
-        logAudit({
-          actor: user.name,
-          actorEmail: user.email,
-          action: 'auth.2fa.recovery_used',
-          target: user.email,
-          detail: 'Signed in with a single-use recovery code',
-          severity: 'warning',
+      };
+      const noteFailure = (): { ok: false; lockoutRemainingSeconds?: number } => {
+        const throttled = recordFailure(enrolment, Date.now());
+        persistEnrolment({
+          ...enrolment,
+          failCount: throttled.failCount,
+          lockedUntil: throttled.lockedUntil,
         });
-        return { ok: true, usedRecovery: true };
-      }
-
-      const result = await verifyTotp(enrolment.secret, code);
-      if (!result.ok) {
         logAudit({
           actor: user.name,
           actorEmail: user.email,
@@ -511,8 +542,54 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
           detail: 'Verification code rejected',
           severity: 'warning',
         });
-        return { ok: false };
+        if (throttled.lockedUntil && throttled.lockedUntil !== enrolment.lockedUntil) {
+          logAudit({
+            actor: user.name,
+            actorEmail: user.email,
+            action: 'auth.2fa.lockout',
+            target: user.email,
+            detail: `Second-factor verification locked for ${lockoutSecondsFor(
+              throttled.failCount,
+            )} s after ${throttled.failCount} failed attempts`,
+            severity: 'warning',
+          });
+          return { ok: false as const, lockoutRemainingSeconds: lockoutSecondsFor(throttled.failCount) };
+        }
+        return { ok: false as const };
+      };
+
+      const trimmed = code.trim().toUpperCase();
+
+      // recovery codes: single-use, hash-compared against the stored hashes
+      if (RECOVERY_CODE_FORMAT.test(trimmed)) {
+        const hash = await hashRecoveryCode(trimmed);
+        if (enrolment.recoveryCodes.includes(hash)) {
+          persistEnrolment({
+            ...enrolment,
+            failCount: 0,
+            lockedUntil: undefined,
+            recoveryCodes: enrolment.recoveryCodes.filter((c) => c !== hash),
+          });
+          flagSessionMfa();
+          logAudit({
+            actor: user.name,
+            actorEmail: user.email,
+            action: 'auth.2fa.recovery_used',
+            target: user.email,
+            detail: 'Signed in with a single-use recovery code',
+            severity: 'warning',
+          });
+          return { ok: true, usedRecovery: true };
+        }
+        // right shape, wrong code — a failed verification like any other
+        return noteFailure();
       }
+
+      const result = await verifyTotp(enrolment.secret, code);
+      if (!result.ok) {
+        return noteFailure();
+      }
+      persistEnrolment({ ...enrolment, failCount: 0, lockedUntil: undefined });
       flagSessionMfa();
       logAudit({
         actor: user.name,
@@ -532,8 +609,29 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       if (!user) return false;
       const enrolment = readEnrolments()[user.id];
       if (!enrolment) return false;
+      // disabling requires passing the same throttle as verifying
+      const lock = checkLock(enrolment, Date.now());
+      if (lock.locked) return false;
       const result = await verifyTotp(enrolment.secret, code);
-      if (!result.ok) return false;
+      if (!result.ok) {
+        const throttled = recordFailure(enrolment, Date.now());
+        const map = readEnrolments();
+        map[user.id] = {
+          ...enrolment,
+          failCount: throttled.failCount,
+          lockedUntil: throttled.lockedUntil,
+        };
+        writeEnrolments(map);
+        logAudit({
+          actor: user.name,
+          actorEmail: user.email,
+          action: 'auth.2fa.failed',
+          target: user.email,
+          detail: 'Disable-2FA code rejected',
+          severity: 'warning',
+        });
+        return false;
+      }
       const map = readEnrolments();
       delete map[user.id];
       writeEnrolments(map);

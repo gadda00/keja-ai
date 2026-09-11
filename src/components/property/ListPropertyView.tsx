@@ -21,6 +21,7 @@ import { useAllProperties } from '@/lib/inventory';
 import { useSubmissions, useUserListings, submissionToListing } from '@/lib/adminStore';
 import { useAuth, initials } from '@/lib/auth';
 import { areaInsights } from '@/data/properties';
+import { validateListingForm } from '@/lib/boundaries';
 import { formatKES } from '@/lib/format';
 import { navigate } from '@/lib/router';
 import { cn } from '@/lib/utils';
@@ -29,6 +30,12 @@ import { isPictureUrl } from '@/lib/googleAuth';
 
 const STEPS = ['The property', 'Pricing & purpose', 'Description & photos', 'Review & submit'];
 const AREAS = Object.keys(areaInsights).sort();
+/** Which wizard step owns which validated field (first-error navigation). */
+const FIELD_STEP: Record<string, number> = {
+  title: 0, type: 0, area: 0, county: 0, bedrooms: 0, bathrooms: 0, sizeSqm: 0,
+  price: 1, rentEstimate: 1, purpose: 1,
+  description: 2, phone: 3,
+};
 
 export default function ListPropertyView() {
   const all = useAllProperties();
@@ -36,6 +43,8 @@ export default function ListPropertyView() {
   const [, setUserListings] = useUserListings();
   const { user, requireAuth } = useAuth();
   const [step, setStep] = useState(0);
+  /** Field-keyed publish errors (first message per field, from the schema). */
+  const [errors, setErrors] = useState<Record<string, string>>({});
   // contact step prefills from the signed-in account at mount (the wizard
   // loads lazily on navigation, so the session is already resolved); guests
   // who sign in mid-wizard publish under the fresh account anyway — see
@@ -50,6 +59,14 @@ export default function ListPropertyView() {
   // live anomaly feedback (price vs area band)
   const insight = areaInsights[form.area];
   const perSqm = form.sizeSqm > 0 ? form.price / form.sizeSqm : 0;
+  /** Clear a field's publish error the moment the user edits it. */
+  const clearFieldError = (key: string) =>
+    setErrors((e) => {
+      if (!(key in e)) return e;
+      const next = { ...e };
+      delete next[key];
+      return next;
+    });
   const bandMatch = insight
     ? (() => {
         const m = insight.avgPricePerSqm.match(/([\d.]+)\s*k\s*[–-]\s*([\d.]+)\s*k/i);
@@ -69,32 +86,51 @@ export default function ListPropertyView() {
   const publish = () => {
     const poster = user;
     if (!poster) return;
+    // The publish boundary (wave 10): nothing enters the marketplace or the
+    // submissions queue without passing the schema — an emptied numeric
+    // field is NaN or 0, an empty title is not a listing.
+    const check = validateListingForm(form);
+    if (!check.ok) {
+      setErrors(check.errors);
+      const firstStep = Math.min(
+        ...Object.keys(check.errors).map((k) => FIELD_STEP[k] ?? 0),
+      );
+      setStep(firstStep);
+      toast({
+        title: 'A few fields need attention',
+        description: 'Fix the highlighted fields, then submit again.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setErrors({});
+    const v = check.value;
     const id = newId("UL").toUpperCase().replace("_", "-");
     const submission = {
       id,
       submitterName: poster.name || 'Platform user',
         submitterEmail: poster.email,
-        submitterPhone: form.phone || poster.phone,
+        submitterPhone: v.phone || poster.phone,
         agency: poster.company || 'Direct owner / agent',
         ownerEmail: poster.email,
         ownerName: poster.name,
-        title: form.title,
-        type: form.type,
-        purpose: form.purpose as never,
-        area: form.area,
+        title: v.title,
+        type: v.type,
+        purpose: v.purpose as never,
+        area: v.area,
         county: form.county,
-        price: form.price,
-        rentEstimate: form.rentEstimate,
-        bedrooms: form.bedrooms,
+        price: v.price,
+        rentEstimate: v.rentEstimate,
+        bedrooms: v.bedrooms,
         bathrooms: form.bathrooms,
-        sizeSqm: form.sizeSqm,
+        sizeSqm: v.sizeSqm,
         amenities: [],
         images: [],
-        description: form.description,
+        description: v.description,
       status: 'pending' as const,
       source: 'wizard' as const,
       flags: [],
-      completeness: Math.min(100, 40 + Math.min(form.description.length / 3, 30) + (form.rentEstimate ? 10 : 0) + 20),
+      completeness: Math.min(100, 40 + Math.min(v.description.length / 3, 30) + (v.rentEstimate ? 10 : 0) + 20),
       createdAt: new Date().toISOString(),
     };
     setSubmissions([submission, ...submissions]);
@@ -190,7 +226,21 @@ export default function ListPropertyView() {
           <div className="grid gap-4">
             <div className="grid gap-1.5">
               <Label htmlFor="lp-title">Listing title</Label>
-              <Input id="lp-title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Sunlit 3BR with garden, Kileleshwa" />
+              <Input
+                id="lp-title"
+                value={form.title}
+                maxLength={120}
+                onChange={(e) => {
+                  setForm({ ...form, title: e.target.value });
+                  clearFieldError('title');
+                }}
+                aria-invalid={!!errors.title}
+                aria-describedby={errors.title ? 'lp-title-err' : undefined}
+                placeholder="e.g. Sunlit 3BR with garden, Kileleshwa"
+              />
+              {errors.title && (
+                <p id="lp-title-err" role="alert" className="text-xs font-medium text-destructive">{errors.title}</p>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="grid gap-1.5">
@@ -213,7 +263,21 @@ export default function ListPropertyView() {
               </div>
               <div className="grid gap-1.5">
                 <Label htmlFor="lp-size">Size (m²)</Label>
-                <Input id="lp-size" type="number" min={1} value={form.sizeSqm} onChange={(e) => setForm({ ...form, sizeSqm: Number(e.target.value) })} />
+                <Input
+                  id="lp-size"
+                  type="number"
+                  min={1}
+                  value={form.sizeSqm}
+                  onChange={(e) => {
+                    setForm({ ...form, sizeSqm: Number(e.target.value) });
+                    clearFieldError('sizeSqm');
+                  }}
+                  aria-invalid={!!errors.sizeSqm}
+                  aria-describedby={errors.sizeSqm ? 'lp-size-err' : undefined}
+                />
+                {errors.sizeSqm && (
+                  <p id="lp-size-err" role="alert" className="text-xs font-medium text-destructive">{errors.sizeSqm}</p>
+                )}
               </div>
             </div>
           </div>
@@ -224,11 +288,39 @@ export default function ListPropertyView() {
             <div className="grid grid-cols-2 gap-3">
               <div className="grid gap-1.5">
                 <Label htmlFor="lp-price">Asking price (KES)</Label>
-                <Input id="lp-price" type="number" step={100_000} value={form.price || ''} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} />
+                <Input
+                  id="lp-price"
+                  type="number"
+                  step={100_000}
+                  value={form.price || ''}
+                  onChange={(e) => {
+                    setForm({ ...form, price: Number(e.target.value) });
+                    clearFieldError('price');
+                  }}
+                  aria-invalid={!!errors.price}
+                  aria-describedby={errors.price ? 'lp-price-err' : undefined}
+                />
+                {errors.price && (
+                  <p id="lp-price-err" role="alert" className="text-xs font-medium text-destructive">{errors.price}</p>
+                )}
               </div>
               <div className="grid gap-1.5">
                 <Label htmlFor="lp-rent">Rent estimate (KES/mo)</Label>
-                <Input id="lp-rent" type="number" step={5_000} value={form.rentEstimate || ''} onChange={(e) => setForm({ ...form, rentEstimate: Number(e.target.value) })} />
+                <Input
+                  id="lp-rent"
+                  type="number"
+                  step={5_000}
+                  value={form.rentEstimate || ''}
+                  onChange={(e) => {
+                    setForm({ ...form, rentEstimate: Number(e.target.value) });
+                    clearFieldError('rentEstimate');
+                  }}
+                  aria-invalid={!!errors.rentEstimate}
+                  aria-describedby={errors.rentEstimate ? 'lp-rent-err' : undefined}
+                />
+                {errors.rentEstimate && (
+                  <p id="lp-rent-err" role="alert" className="text-xs font-medium text-destructive">{errors.rentEstimate}</p>
+                )}
               </div>
             </div>
             <div>
@@ -237,14 +329,16 @@ export default function ListPropertyView() {
                 {['buy', 'rent', 'invest'].map((pp) => (
                   <button
                     key={pp}
-                    onClick={() =>
+                    onClick={() => {
                       setForm({
                         ...form,
                         purpose: form.purpose.includes(pp)
                           ? form.purpose.filter((x) => x !== pp)
                           : [...form.purpose, pp],
-                      })
-                    }
+                      });
+                      clearFieldError('purpose');
+                    }}
+                    aria-pressed={form.purpose.includes(pp)}
                     className={cn(
                       'rounded-full border px-4 py-1.5 text-xs font-bold capitalize transition-colors',
                       form.purpose.includes(pp) ? 'border-primary bg-primary text-primary-foreground' : 'hover:border-primary/50',
@@ -254,6 +348,9 @@ export default function ListPropertyView() {
                   </button>
                 ))}
               </div>
+              {errors.purpose && (
+                <p role="alert" className="mt-1.5 text-xs font-medium text-destructive">{errors.purpose}</p>
+              )}
             </div>
             {bandMatch && (
               <div className={cn('flex items-start gap-2.5 rounded-xl border p-3.5 text-xs leading-relaxed', bandMatch.tone === 'ok' ? 'border-primary/40 bg-primary/5' : 'border-gold/50 bg-gold-soft')}>
@@ -270,7 +367,22 @@ export default function ListPropertyView() {
           <div className="grid gap-4">
             <div className="grid gap-1.5">
               <Label htmlFor="lp-desc">Description</Label>
-              <Textarea id="lp-desc" rows={5} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="What makes this property worth a viewing? Be specific and honest — overstated listings fail screens." />
+              <Textarea
+                id="lp-desc"
+                rows={5}
+                maxLength={5000}
+                value={form.description}
+                onChange={(e) => {
+                  setForm({ ...form, description: e.target.value });
+                  clearFieldError('description');
+                }}
+                aria-invalid={!!errors.description}
+                aria-describedby={errors.description ? 'lp-desc-err' : undefined}
+                placeholder="What makes this property worth a viewing? Be specific and honest — overstated listings fail screens."
+              />
+              {errors.description && (
+                <p id="lp-desc-err" role="alert" className="text-xs font-medium text-destructive">{errors.description}</p>
+              )}
               <p className="text-[10px] text-muted-foreground">{form.description.length} characters · 120+ earns the completeness signal</p>
             </div>
             <div className="rounded-2xl border-2 border-dashed p-6 text-center">
@@ -293,7 +405,21 @@ export default function ListPropertyView() {
               </div>
               <div className="grid gap-1.5">
                 <Label htmlFor="lp-phone">Phone</Label>
-                <Input id="lp-phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+254…" />
+                <Input
+                  id="lp-phone"
+                  value={form.phone}
+                  maxLength={25}
+                  onChange={(e) => {
+                    setForm({ ...form, phone: e.target.value });
+                    clearFieldError('phone');
+                  }}
+                  aria-invalid={!!errors.phone}
+                  aria-describedby={errors.phone ? 'lp-phone-err' : undefined}
+                  placeholder="+254…"
+                />
+                {errors.phone && (
+                  <p id="lp-phone-err" role="alert" className="text-xs font-medium text-destructive">{errors.phone}</p>
+                )}
               </div>
               <div className="col-span-2 grid gap-1.5">
                 <Label htmlFor="lp-email">Email</Label>
