@@ -18,7 +18,7 @@ import { AuthProvider } from '@/lib/auth';
 import { AdminGate } from '@/components/admin/AdminGate';
 import { AuthModal } from '@/components/shell/AuthModal';
 import { usePageMeta } from '@/lib/seo';
-import { SECTION_META_BY_PATH } from '@/lib/sectionMeta';
+import { APP_SECTION_META_BY_PATH, SECTION_META_BY_PATH } from '@/lib/sectionMeta';
 import { installGlobalErrorHandlers } from '@/lib/telemetry';
 import { SITE_URL } from '@/config';
 import { Home } from '@/components/home/Home';
@@ -75,10 +75,11 @@ function ViewFallback() {
 /** Static section metadata. Public sections derive from the shared catalogue
  *  (src/lib/sectionMeta.ts) — the SAME source the prerender pipeline and the
  *  sitemap generator use, so the hydrated <title>, the crawler-facing static
- *  HTML and the sitemap can never drift apart. Dynamic routes
- *  (listing/article/area detail) call usePageMeta themselves with
- *  entity-specific titles + JSON-LD; private routes stay inline with
- *  noindex (they are app state, not crawl-worthy content). */
+ *  HTML and the sitemap can never drift apart. App-workspace sections
+ *  (finance, data, manage, …) also derive from the catalogue — noindexed,
+ *  matching their prerendered shells. Dynamic routes (listing/article/area
+ *  detail) call usePageMeta themselves with entity-specific titles + JSON-LD;
+ *  the remaining private routes stay inline with noindex. */
 export const ROUTE_META: Record<string, { title: string; description: string; robots?: string }> = {
   '/': {
     title: 'Keja AI — Africa\u2019s Real Estate Intelligence & Trust Infrastructure',
@@ -86,41 +87,10 @@ export const ROUTE_META: Record<string, { title: string; description: string; ro
       'Discover. Verify. Analyse. Finance. Invest. Transact. Manage — one intelligent ecosystem for African real estate.',
   },
   ...SECTION_META_BY_PATH,
+  ...APP_SECTION_META_BY_PATH,
   '/areas': {
     title: 'Area guides',
     description: 'Neighbourhood guides for Nairobi, Mombasa and Kenya\u2019s growth areas.',
-  },
-  '/deal-analyst': {
-    title: 'Deal Analyst',
-    description: 'Stress-test an investment deal: yield, cash-flow, downside and exit scenarios.',
-  },
-  '/portfolio': {
-    title: 'Investor dashboard',
-    description: 'Your holdings, distributions and portfolio performance.',
-  },
-  '/data': {
-    title: 'Market data',
-    description: 'Kenyan market data — area price bands, rent medians and yield trends.',
-  },
-  '/finance': {
-    title: 'Finance centre',
-    description: 'Mortgage pre-qualification, affordability and financing partners for Kenyan property.',
-  },
-  '/transact': {
-    title: 'Transaction desk',
-    description: 'Guide a property transaction from offer to closing with escrow-aligned steps.',
-  },
-  '/manage': {
-    title: 'Landlord console',
-    description: 'Manage units, tenants, rent collection and arrears in one console.',
-  },
-  '/tenant': {
-    title: 'Tenant hub',
-    description: 'Rent payments, maintenance requests and lease documents for tenants.',
-  },
-  '/institutional': {
-    title: 'Institutional portal',
-    description: 'For funds, banks and REITs — portfolio tools, data feeds and co-investment.',
   },
   '/account': {
     title: 'Your account',

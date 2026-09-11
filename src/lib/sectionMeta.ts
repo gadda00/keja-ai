@@ -167,3 +167,80 @@ export const SECTION_META: SectionMetaEntry[] = [
 /** Lookup by route path — O(1) access for RouteMeta. */
 export const SECTION_META_BY_PATH: Record<string, { title: string; description: string }> =
   Object.fromEntries(SECTION_META.map((s) => [s.path, { title: s.title, description: s.description }]));
+
+/**
+ * App-workspace sections — prerendered so legacy path URLs (e.g. /finance)
+ * keep booting the SPA instead of 404ing, but deliberately NOT sitemap'd
+ * (crawl budget — audit Ch. 7) and noindexed (they are interactive app
+ * surfaces; organic entry points are the public sections above).
+ *
+ * These replaced the vercel.json SPA rewrites: serving a real file is
+ * filesystem precedence (always works), whereas a regex rewrite source
+ * proved unreliable on Vercel's path-to-regexp engine (2026-09-12 deploy
+ * smoke test caught it — /finance 404'd).
+ */
+export interface AppSectionEntry {
+  path: string;
+  title: string;
+  description: string;
+  noscript: string;
+}
+
+export const APP_SECTION_META: AppSectionEntry[] = [
+  {
+    path: '/finance',
+    title: 'Finance centre',
+    description: 'Mortgage pre-qualification, affordability and financing partners for Kenyan property.',
+    noscript: 'Mortgage pre-qualification, affordability and financing partners for Kenyan property.',
+  },
+  {
+    path: '/data',
+    title: 'Market data',
+    description: 'Kenyan market data — area price bands, rent medians and yield trends.',
+    noscript: 'Kenyan market data — area price bands, rent medians and yield trends.',
+  },
+  {
+    path: '/transact',
+    title: 'Transaction desk',
+    description: 'Guide a property transaction from offer to closing with escrow-aligned steps.',
+    noscript: 'Guide a property transaction from offer to closing with escrow-aligned steps.',
+  },
+  {
+    path: '/manage',
+    title: 'Landlord console',
+    description: 'Manage units, tenants, rent collection and arrears in one console.',
+    noscript: 'Manage units, tenants, rent collection and arrears in one console.',
+  },
+  {
+    path: '/tenant',
+    title: 'Tenant hub',
+    description: 'Rent payments, maintenance requests and lease documents for tenants.',
+    noscript: 'Rent payments, maintenance requests and lease documents for tenants.',
+  },
+  {
+    path: '/institutional',
+    title: 'Institutional portal',
+    description: 'For funds, banks and REITs — portfolio tools, data feeds and co-investment.',
+    noscript: 'For funds, banks and REITs — portfolio tools, data feeds and co-investment.',
+  },
+  {
+    path: '/deal-analyst',
+    title: 'Deal Analyst',
+    description: 'Stress-test an investment deal: yield, cash-flow, downside and exit scenarios.',
+    noscript: 'Stress-test an investment deal: yield, cash-flow, downside and exit scenarios.',
+  },
+  {
+    path: '/portfolio',
+    title: 'Investor dashboard',
+    description: 'Your holdings, distributions and portfolio performance.',
+    noscript: 'Your holdings, distributions and portfolio performance.',
+  },
+];
+
+/** Lookup for RouteMeta — noindex matches the prerendered shells exactly. */
+export const APP_SECTION_META_BY_PATH: Record<
+  string,
+  { title: string; description: string; robots: string }
+> = Object.fromEntries(
+  APP_SECTION_META.map((s) => [s.path, { title: s.title, description: s.description, robots: 'noindex' }]),
+);

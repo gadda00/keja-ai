@@ -123,8 +123,17 @@ const SECTION_PATHS = [
   "ecosystem", "partners", "sell", "valuation", "develop", "diaspora",
   "about", "contact", "compare", "legal",
 ];
+/* 6c — the app-workspace sections are prerendered as noindexed shells:
+   their path URLs boot the SPA (legacy links keep working) without any
+   vercel.json rewrite — the regex rewrite proved unreliable on Vercel's
+   path-to-regexp engine (2026-09-12 deploy smoke test caught /finance
+   404ing), so serving real files replaced rewrites entirely. */
+const APP_SECTION_PATHS = [
+  "finance", "data", "transact", "manage", "tenant",
+  "institutional", "deal-analyst", "portfolio",
+];
 let sectionPages = 0;
-for (const s of SECTION_PATHS) {
+for (const s of [...SECTION_PATHS, ...APP_SECTION_PATHS]) {
   const f = join(out, s, "index.html");
   if (existsSync(f)) {
     sectionPages++;
@@ -132,17 +141,25 @@ for (const s of SECTION_PATHS) {
     fail(`${s}/index.html missing — section prerender incomplete`);
   }
 }
-if (sectionPages === SECTION_PATHS.length) {
-  ok(`all ${SECTION_PATHS.length} catalogue sections prerendered`);
+if (sectionPages === SECTION_PATHS.length + APP_SECTION_PATHS.length) {
+  ok(`all ${SECTION_PATHS.length} catalogue + ${APP_SECTION_PATHS.length} app sections prerendered`);
   // and each carries its own <title>, not the generic shell's
   const generic = "Africa&#x27;s Real Estate Intelligence";
   let untitled = 0;
-  for (const s of SECTION_PATHS) {
+  for (const s of [...SECTION_PATHS, ...APP_SECTION_PATHS]) {
     const html = readFileSync(join(out, s, "index.html"), "utf8");
     if (html.includes(generic) && html.indexOf(generic) < html.indexOf("</title>")) untitled++;
   }
   if (untitled === 0) ok("section pages carry per-section titles");
   else fail(`${untitled} section page(s) still ship the generic home title`);
+  // the app sections must be noindexed (their SPA route meta agrees)
+  let notNoindexed = 0;
+  for (const s of APP_SECTION_PATHS) {
+    const html = readFileSync(join(out, s, "index.html"), "utf8");
+    if (!/<meta name="robots" content="noindex" \/>/.test(html)) notNoindexed++;
+  }
+  if (notNoindexed === 0) ok("app-workspace sections are noindexed");
+  else fail(`${notNoindexed} app section page(s) missing noindex`);
 }
 
 console.log(

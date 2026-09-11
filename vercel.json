@@ -4,12 +4,7 @@
   "installCommand": "bun install --frozen-lockfile",
   "buildCommand": "npx next build --webpack && bun scripts/generate-sitemap.mjs && bun scripts/prerender.ts && node scripts/sw-version.mjs && node scripts/verify-artifacts.mjs",
   "outputDirectory": "out",
-  "rewrites": [
-    {
-      "source": "^/(data|finance|transact|manage|tenant|institutional|deal-analyst|portfolio)(/.*)?$",
-      "destination": "/index.html"
-    }
-  ],
+  "rewrites": [],
   "headers": [
     {
       "source": "/.well-known/assetlinks.json",

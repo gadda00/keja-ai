@@ -35,7 +35,7 @@ import {
   articleMeta,
   areaMeta,
 } from '../src/lib/detailMeta';
-import { SECTION_META } from '../src/lib/sectionMeta';
+import { SECTION_META, APP_SECTION_META } from '../src/lib/sectionMeta';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = resolve(ROOT, 'out');
@@ -75,6 +75,8 @@ interface PageSpec {
   title: string;
   description: string;
   ogImage?: string;
+  /** app-workspace shells are noindexed (not sitemap'd, interactive-only) */
+  noindex?: boolean;
   jsonLd?: object[];
   /** inner HTML for the <noscript> block */
   noscript: string;
@@ -87,6 +89,7 @@ function render(page: PageSpec): string {
   const head = [
     // (description is replaced in-place on the original tag — see render())
     `<link rel="canonical" href="${canonical}" />`,
+    ...(page.noindex ? ['<meta name="robots" content="noindex" />'] : []),
     `<meta property="og:title" content="${escapeAttr(page.title)}" />`,
     `<meta property="og:description" content="${escapeAttr(page.description)}" />`,
     `<meta property="og:type" content="website" />`,
@@ -203,7 +206,14 @@ const listings = [...PROPERTIES, ...AUTO_PROPERTIES];
  *  gets a real crawler-facing page: per-section <title>, description,
  *  canonical, OG tags and a <noscript> summary. Previously only /properties
  *  was prerendered, so the other 16 sitemap'd section URLs served the
- *  generic home shell (duplicate content; wasted crawl budget). */
+ *  generic home shell (duplicate content; wasted crawl budget).
+ *
+ *  The app-workspace sections (finance, data, …) are prerendered as noindexed
+ *  shells: their path URLs keep booting the SPA for legacy links, but they
+ *  are not sitemap'd and search engines are told not to index them — serving
+ *  a real file replaced the vercel.json SPA rewrites (regex sources proved
+ *  unreliable on Vercel's path-to-regexp engine; the 2026-09-12 deploy smoke
+ *  test caught /finance 404ing). */
 const STATIC_PAGES: PageSpec[] = [
   ...SECTION_META.map((s): PageSpec => ({
     path: s.path,
@@ -212,6 +222,15 @@ const STATIC_PAGES: PageSpec[] = [
     noscript: `<div style="${NOSCRIPT_STYLE}"><h1>${escapeHtml(s.title)}</h1>
 <p>${escapeHtml(s.noscript)}</p>
 <p><a href="${SITE_URL}${s.path === '/' ? '/' : `${s.path}/`}">Open this section</a></p></div>`,
+  })),
+  ...APP_SECTION_META.map((s): PageSpec => ({
+    path: s.path,
+    title: s.title,
+    description: s.description,
+    noindex: true,
+    noscript: `<div style="${NOSCRIPT_STYLE}"><h1>${escapeHtml(s.title)}</h1>
+<p>${escapeHtml(s.noscript)}</p>
+<p><a href="${SITE_URL}${s.path}/">Open this workspace</a></p></div>`,
   })),
 ];
 
