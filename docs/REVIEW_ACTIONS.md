@@ -118,3 +118,14 @@ DOM was verified in-browser — canonical, og:url and breadcrumb items all read
 `https://keja.app/…/` post-fix. The 404-vs-rewrite behaviour on Vercel is
 asserted by the post-deploy smoke test (a local static server always rewrites
 to the shell, so it cannot reproduce that behaviour).
+
+## 2026-09-12 — wave 9: route-scoped sign-in modal (cycle 2)
+
+| Finding | Severity | What was done |
+| --- | --- | --- |
+| The sign-in modal — a full-screen overlay that intercepts every click — followed the user across route navigation indefinitely, keeping its stale "sign in to continue: X" intent until manually closed. Observed live: it blocked the contact form's Send button three routes later. | P1 (UX) | `AuthModal` is now route-scoped: navigating away closes it and clears the pending intent (the gated action belongs to the route that opened it; the Google popup flow is unaffected — no route change during OAuth). Backdrop click now dismisses too (same as Escape / Close). Pinned by `tests/authModal.test.tsx` (3 cases, incl. the jsdom async-hashchange flush the tests taught us about). |
+
+Verified in a fresh browser session against the rebuilt artifact (an earlier
+false negative came from the long-lived test session's stale chunk cache —
+recorded as a testing lesson: verify DOM behavior against a fresh context
+after a rebuild).
