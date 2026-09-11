@@ -9,8 +9,8 @@
  * - Provides loading and error states
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { motion, AnimatePresence, type Transition } from 'framer-motion';
 import { Skeleton } from './LoadingSkeleton';
 import { prefersReducedMotion, isSlowConnection } from '@/lib/performance';
 
@@ -28,21 +28,6 @@ interface ProgressiveImageProps {
   skeletonClassName?: string;
   onLoad?: () => void;
   onError?: () => void;
-}
-
-/**
- * Generate a blurhash placeholder URL from a blurhash string
- * Blurhash is a compact representation of a placeholder for an image
- */
-function getBlurhashUrl(blurhash: string, width: number, height: number): string {
-  if (!blurhash) return '';
-  // Use blurhash decoder if available, otherwise return empty
-  // In production, you'd use a library like blurhash or implement the decoder
-  return `data:image/svg+xml;base64,${btoa(`
-    <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-      <rect width="100%" height="100%" fill="#e0e0e0"/>
-    </svg>
-  `)}`;
 }
 
 /**
@@ -102,7 +87,7 @@ export function ProgressiveImage({
   }, []);
 
   // Determine the actual source to use
-  const actualSrc = useWebP && webpSrc ? webpSrc : src;
+  const actualSrc = useMemo(() => useWebP && webpSrc ? webpSrc : src, [useWebP, webpSrc, src]);
 
   // Handle image loading
   const handleLoad = useCallback(() => {
@@ -136,23 +121,20 @@ export function ProgressiveImage({
     }
   }, [actualSrc, loadingPriority, status, handleLoad]);
 
-  // Adaptive loading based on network conditions
-  const shouldShowPlaceholder = isSlowConnection() && !hasPlaceholder;
-
   // Animation configuration
-  const animationConfig = prefersReducedMotion()
-    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.1 } }
+  const animationConfig = useMemo(() => prefersReducedMotion()
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.1 } as Transition }
     : {
         initial: { opacity: 0, scale: 0.98 },
         animate: { opacity: 1, scale: 1 },
-        transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
-      };
+        transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as Transition['ease'] },
+      }, []);
 
   // Render different states
   if (status === 'loading') {
     if (showSkeleton) {
       return (
-        <div className={className} style={{ width, height }}>
+        <div className={className} style={{ width, height } as React.CSSProperties}>
           <Skeleton
             className={`w-full h-full ${skeletonClassName}`}
             variant="rectangular"
@@ -163,33 +145,17 @@ export function ProgressiveImage({
 
     // Show placeholder if available
     if (placeholder) {
-      if (isDataUrl(placeholder)) {
-        return (
-          <motion.div
-            className={className}
-            style={{ width, height }}
-            {...animationConfig}
-          >
-            <img
-              src={placeholder}
-              alt={alt}
-              className="w-full h-full object-cover"
-              style={{ filter: 'blur(8px)' }}
-            />
-          </motion.div>
-        );
-      }
       return (
         <motion.div
           className={className}
-          style={{ width, height }}
+          style={{ width, height } as React.CSSProperties}
           {...animationConfig}
         >
           <img
             src={placeholder}
             alt={alt}
             className="w-full h-full object-cover"
-            style={{ filter: 'blur(8px)' }}
+            style={{ filter: 'blur(8px)' } as React.CSSProperties['filter']}
           />
         </motion.div>
       );
@@ -197,7 +163,7 @@ export function ProgressiveImage({
 
     // Default loading state
     return (
-      <div className={className} style={{ width, height }}>
+      <div className={className} style={{ width, height } as React.CSSProperties}>
         <Skeleton className="w-full h-full" variant="rectangular" />
       </div>
     );
@@ -207,7 +173,7 @@ export function ProgressiveImage({
     return (
       <div
         className={className}
-        style={{ width, height }}
+        style={{ width, height } as React.CSSProperties}
         role="img"
         aria-label={alt}
       >
@@ -234,7 +200,7 @@ export function ProgressiveImage({
   return (
     <motion.div
       className={className}
-      style={{ width, height }}
+      style={{ width, height } as React.CSSProperties}
       {...animationConfig}
     >
       <AnimatePresence mode="wait">
@@ -246,8 +212,8 @@ export function ProgressiveImage({
             className="w-full h-full object-cover"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            loading={loadingPriority}
+            transition={{ duration: 0.3 } as Transition}
+            loading={loadingPriority === 'high' ? 'eager' : 'lazy'}
             ref={imgRef}
             sizes={sizes}
             onLoad={handleLoad}
@@ -280,18 +246,20 @@ export function ResponsiveImage({
   ...props
 }: ResponsiveImageProps) {
   // Build srcset for WebP if available
-  const webpSrcSet = srcSet?.webp
-    ? breakpoints
-        .map((bp, i) => `${srcSet.webp[i] || srcSet.webp[srcSet.webp.length - 1]} ${bp}w`)
-        .join(', ')
-    : undefined;
+  const webpSrcSet = useMemo(() => {
+    if (!srcSet?.webp) return undefined;
+    return breakpoints
+      .map((bp, i) => `${srcSet.webp?.[i] || srcSet.webp?.[srcSet.webp.length - 1] || ''} ${bp}w`)
+      .join(', ');
+  }, [srcSet?.webp, breakpoints]);
 
   // Build srcset for fallback
-  const fallbackSrcSet = srcSet?.fallback
-    ? breakpoints
-        .map((bp, i) => `${srcSet.fallback[i] || srcSet.fallback[srcSet.fallback.length - 1]} ${bp}w`)
-        .join(', ')
-    : undefined;
+  const fallbackSrcSet = useMemo(() => {
+    if (!srcSet?.fallback) return undefined;
+    return breakpoints
+      .map((bp, i) => `${srcSet.fallback?.[i] || srcSet.fallback?.[srcSet.fallback.length - 1] || ''} ${bp}w`)
+      .join(', ');
+  }, [srcSet?.fallback, breakpoints]);
 
   // Generate sizes attribute if not provided
   const sizesAttr = props.sizes || '(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw';
@@ -345,10 +313,10 @@ export function BackgroundImage({
     setUseWebP(supportsWebP());
   }, []);
 
-  const actualSrc = useWebP && webpSrc ? webpSrc : src;
+  const actualSrc = useMemo(() => useWebP && webpSrc ? webpSrc : src, [useWebP, webpSrc, src]);
 
-  const handleLoad = () => setStatus('loaded');
-  const handleError = () => setStatus('error');
+  const handleLoad = useCallback(() => setStatus('loaded'), []);
+  const handleError = useCallback(() => setStatus('error'), []);
 
   return (
     <div
@@ -358,7 +326,7 @@ export function BackgroundImage({
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         filter: placeholder ? 'blur(8px)' : undefined,
-      }}
+      } as React.CSSProperties}
     >
       {/* Background Image */}
       <AnimatePresence mode="wait">
@@ -368,12 +336,12 @@ export function BackgroundImage({
             className="absolute inset-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.5 } as Transition}
             style={{
               backgroundImage: `url(${actualSrc})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-            }}
+            } as React.CSSProperties}
           >
             {/* Actual image for better quality */}
             <img
@@ -392,7 +360,7 @@ export function BackgroundImage({
         <div
           className={`absolute inset-0 ${overlayClassName} transition-opacity duration-500 ${
             status === 'loaded' ? 'opacity-100' : 'opacity-0'
-          }`}
+          }` as string}
         />
       )}
 

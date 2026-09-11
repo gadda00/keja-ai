@@ -14,13 +14,13 @@
  * Debounce a function to prevent it from being called too frequently.
  * Useful for search inputs, window resize, etc.
  */
-export function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
+export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number = 300
-): (...args: Parameters<T>) => void {
+): (...args: any[]) => void {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-  return (...args: Parameters<T>) => {
+  return (...args: any[]) => {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
@@ -35,14 +35,14 @@ export function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
  * Throttle a function to ensure it's called at most once per specified time period.
  * Useful for scroll handlers, animations, etc.
  */
-export function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
+export function throttle<T extends (...args: any[]) => any>(
   func: T,
   limit: number = 100
-): (...args: Parameters<T>) => void {
+): (...args: any[]) => void {
   let inThrottle = false;
-  let lastArgs: Parameters<T> | null = null;
+  let lastArgs: any[] | null = null;
 
-  return (...args: Parameters<T>) => {
+  return (...args: any[]) => {
     if (!inThrottle) {
       func(...args);
       inThrottle = true;
@@ -63,35 +63,35 @@ export function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
  * Memoize a function to cache its results.
  * Useful for expensive computations with pure inputs.
  */
-export function memoize<T extends (...args: Parameters<T>) => ReturnType<T>>(
+export function memoize<T extends (...args: any[]) => any>(
   func: T,
-  keyFn?: (...args: Parameters<T>) => string
-): (...args: Parameters<T>) => ReturnType<T> {
-  const cache = new Map<string, ReturnType<T>>();
+  keyFn?: (...args: any[]) => string
+): T {
+  const cache = new Map<string, any>();
 
-  return (...args: Parameters<T>) => {
+  return ((...args: any[]) => {
     const key = keyFn ? keyFn(...args) : JSON.stringify(args);
     if (cache.has(key)) {
-      return cache.get(key)!;
+      return cache.get(key);
     }
     const result = func(...args);
     cache.set(key, result);
     return result;
-  };
+  }) as T;
 }
 
 /**
  * Create a memoized version of a function with a TTL (time-to-live).
  * Useful for caching API responses or computed values that need periodic refresh.
  */
-export function memoizeWithTTL<T extends (...args: Parameters<T>) => ReturnType<T>>(
+export function memoizeWithTTL<T extends (...args: any[]) => any>(
   func: T,
   ttl: number = 5 * 60 * 1000, // 5 minutes default
-  keyFn?: (...args: Parameters<T>) => string
-): (...args: Parameters<T>) => ReturnType<T> {
-  const cache = new Map<string, { value: ReturnType<T>; timestamp: number }>();
+  keyFn?: (...args: any[]) => string
+): T {
+  const cache = new Map<string, { value: any; timestamp: number }>();
 
-  return (...args: Parameters<T>) => {
+  return ((...args: any[]) => {
     const key = keyFn ? keyFn(...args) : JSON.stringify(args);
     const cached = cache.get(key);
     
@@ -102,7 +102,7 @@ export function memoizeWithTTL<T extends (...args: Parameters<T>) => ReturnType<
     const result = func(...args);
     cache.set(key, { value: result, timestamp: Date.now() });
     return result;
-  };
+  }) as T;
 }
 
 /**
@@ -198,7 +198,7 @@ export function generatePerformanceReport(): PerformanceReport {
   // Get standard Web Vitals if available
   if (typeof window !== 'undefined') {
     // First Contentful Paint
-    const fcp = window.performance?.getEntriesByName?.('first-contentful-paint')?.[0];
+    const fcp = window.performance?.getEntriesByName?.('first-contentful-paint')?.[0] as PerformanceEntry | undefined;
     if (fcp) {
       metrics.push(trackPerformanceMetric(
         'FCP',
@@ -208,7 +208,7 @@ export function generatePerformanceReport(): PerformanceReport {
     }
 
     // Largest Contentful Paint
-    const lcp = window.performance?.getEntriesByName?.('largest-contentful-paint')?.[0];
+    const lcp = window.performance?.getEntriesByName?.('largest-contentful-paint')?.[0] as PerformanceEntry | undefined;
     if (lcp) {
       metrics.push(trackPerformanceMetric(
         'LCP',
@@ -218,7 +218,7 @@ export function generatePerformanceReport(): PerformanceReport {
     }
 
     // First Input Delay
-    const fid = window.performance?.getEntriesByName?.('first-input')?.[0];
+    const fid = window.performance?.getEntriesByName?.('first-input')?.[0] as PerformanceEntry | undefined;
     if (fid) {
       metrics.push(trackPerformanceMetric(
         'FID',
@@ -228,10 +228,10 @@ export function generatePerformanceReport(): PerformanceReport {
     }
 
     // Cumulative Layout Shift
-    const clsEntries = window.performance?.getEntriesByName?.('layout-shift');
+    const clsEntries = window.performance?.getEntriesByName?.('layout-shift') as any[] | undefined;
     if (clsEntries && clsEntries.length > 0) {
       const clsValue = clsEntries.reduce(
-        (sum, entry: any) => sum + (entry.value || 0),
+        (sum, entry) => sum + (entry.value || 0),
         0
       );
       metrics.push(trackPerformanceMetric(
@@ -242,13 +242,16 @@ export function generatePerformanceReport(): PerformanceReport {
     }
 
     // Time to Interactive
-    const tti = window.performance?.timing?.domInteractive - window.performance?.timing?.navigationStart;
-    if (tti) {
-      metrics.push(trackPerformanceMetric(
-        'TTI',
-        tti,
-        { good: 3800, poor: 7300 } // 3.8s good, 7.3s poor
-      ));
+    const timing = window.performance?.timing;
+    if (timing) {
+      const tti = timing.domInteractive - timing.navigationStart;
+      if (tti) {
+        metrics.push(trackPerformanceMetric(
+          'TTI',
+          tti,
+          { good: 3800, poor: 7300 } // 3.8s good, 7.3s poor
+        ));
+      }
     }
   }
 

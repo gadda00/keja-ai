@@ -6,6 +6,7 @@
  */
 
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 
 /**
  * Base skeleton component with shimmer effect
@@ -193,17 +194,19 @@ export function SearchResultsSkeleton() {
  * Skeleton for charts and statistics
  */
 export function ChartSkeleton() {
+  // Pre-compute heights to avoid Math.random in render
+  const heights = useMemo(() => {
+    return Array.from({ length: 12 }).map((_, i) => `${(i % 7) * 10 + 30}%`);
+  }, []);
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 animate-pulse">
       <Skeleton className="w-1/3 h-6 mb-6" variant="text" />
       <div className="h-64 flex items-end gap-2">
-        {Array.from({ length: 12 }).map((_, index) => (
-          <Skeleton
-            key={index}
-            className="flex-1"
-            style={{ height: `${Math.random() * 80 + 20}%` }}
-            variant="rectangular"
-          />
+        {heights.map((height, index) => (
+          <div key={index} className="flex-1" style={{ height } as React.CSSProperties['height']}>
+            <Skeleton className="w-full h-full" variant="rectangular" />
+          </div>
         ))}
       </div>
     </div>
