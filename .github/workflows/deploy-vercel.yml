@@ -111,6 +111,18 @@ jobs:
             && echo "GET /sw.js security hdrs -> OK" || { echo "GET /sw.js security hdrs -> FAIL"; fail=1; }
           code=$(curl -s --max-time 30 -o /dev/null -w "%{http_code}" "$URL/manifest.webmanifest" || echo 000)
           echo "GET /manifest.webmanifest-> $code"; [ "$code" = "200" ] || fail=1
+          # Routing contract (2026-09-12): unknown paths must return a real
+          # 404 (no more catch-all rewrite serving the home shell with HTTP
+          # 200 — soft-404s), prerendered sections serve their own HTML, and
+          # the non-prerendered user sections keep booting the SPA.
           code=$(curl -s --max-time 30 -o /dev/null -w "%{http_code}" "$URL/__smoke_deep_link__" || echo 000)
-          echo "GET /__smoke_deep_link__ -> $code (SPA rewrite)"; [ "$code" = "200" ] || fail=1
+          echo "GET /__smoke_deep_link__ -> $code (expect 404, no soft-404)"; [ "$code" = "404" ] || fail=1
+          code=$(curl -s --max-time 30 -o /dev/null -w "%{http_code}" "$URL/tokenize/" || echo 000)
+          echo "GET /tokenize/ -> $code (prerendered section)"; [ "$code" = "200" ] || fail=1
+          section_title=$(curl -s --max-time 30 "$URL/tokenize/" | grep -oE "<title>[^<]*</title>" | head -n 1)
+          echo "GET /tokenize/ title -> $section_title"
+          echo "$section_title" | grep -qi "tokenize" \
+            || { echo "prerendered section carries the generic home title"; fail=1; }
+          code=$(curl -s --max-time 30 -o /dev/null -w "%{http_code}" "$URL/finance" || echo 000)
+          echo "GET /finance -> $code (SPA rewrite kept)"; [ "$code" = "200" ] || fail=1
           if [ "$fail" = 0 ]; then echo "Smoke test PASSED — production is live."; else echo "Smoke test FAILED"; exit 1; fi

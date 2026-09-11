@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000 2>&1 | tee dev.log",
-    "build": "next build --webpack && node scripts/generate-sitemap.mjs && bun scripts/prerender.ts && node scripts/sw-version.mjs && node scripts/verify-artifacts.mjs",
+    "build": "next build --webpack && bun scripts/generate-sitemap.mjs && bun scripts/prerender.ts && node scripts/sw-version.mjs && node scripts/verify-artifacts.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "db:push": "prisma db push --accept-data-loss",
@@ -15,7 +15,7 @@
     "mobile:android": "npm run mobile:sync && npx cap open android",
     "mobile:ios": "npm run mobile:sync && npx cap open ios",
     "mobile:apk": "npm run build && npx cap sync android && cd android && ./gradlew assembleDebug",
-    "sitemap": "node scripts/generate-sitemap.mjs",
+    "sitemap": "bun scripts/generate-sitemap.mjs",
     "prerender": "bun scripts/prerender.ts",
     "test": "vitest run",
     "test:watch": "vitest",

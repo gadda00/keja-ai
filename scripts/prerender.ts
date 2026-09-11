@@ -35,6 +35,7 @@ import {
   articleMeta,
   areaMeta,
 } from '../src/lib/detailMeta';
+import { SECTION_META } from '../src/lib/sectionMeta';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = resolve(ROOT, 'out');
@@ -198,15 +199,20 @@ function areaSpec(g: (typeof NEIGHBORHOOD_GUIDES)[number]): PageSpec {
 
 const listings = [...PROPERTIES, ...AUTO_PROPERTIES];
 
+/** Shared section catalogue (src/lib/sectionMeta.ts) — every public section
+ *  gets a real crawler-facing page: per-section <title>, description,
+ *  canonical, OG tags and a <noscript> summary. Previously only /properties
+ *  was prerendered, so the other 16 sitemap'd section URLs served the
+ *  generic home shell (duplicate content; wasted crawl budget). */
 const STATIC_PAGES: PageSpec[] = [
-  {
-    path: '/properties',
-    title: 'Properties for sale & rent in Kenya',
-    description:
-      'Verified houses, apartments and land across Nairobi, Mombasa and Kenya\u2019s growth corridors — trust scores, evidence panels and honest pricing.',
-    noscript: `<div style="${NOSCRIPT_STYLE}"><h1>Properties for sale &amp; rent in Kenya</h1>
-<p>Browse ${listings.length} verified listings with Keja Trust Scores, evidence panels and honest pricing. <a href="${SITE_URL}/properties/">Open the marketplace</a></p></div>`,
-  },
+  ...SECTION_META.map((s): PageSpec => ({
+    path: s.path,
+    title: s.title,
+    description: s.description,
+    noscript: `<div style="${NOSCRIPT_STYLE}"><h1>${escapeHtml(s.title)}</h1>
+<p>${escapeHtml(s.noscript)}</p>
+<p><a href="${SITE_URL}${s.path === '/' ? '/' : `${s.path}/`}">Open this section</a></p></div>`,
+  })),
 ];
 
 /* ------------------------------ run -------------------------------------- */
@@ -223,6 +229,36 @@ for (const page of [...STATIC_PAGES, ...dynamic]) {
   write(page);
   count++;
 }
+
+/* ------------------------------ 404 page ---------------------------------- */
+
+/** The static export's 404.html (Next's not-found route) ships with the
+ *  HOME title as its first <title> element and no link back to the site.
+ *  Now that unknown paths actually fall through to it (vercel.json no
+ *  longer rewrites everything to the SPA shell), make it honest and
+ *  useful: one clear title, noindex, a branded body with a way back. */
+function fix404() {
+  const p = join(DIST, '404.html');
+  if (!existsSync(p)) return;
+  let html = readFileSync(p, 'utf8');
+  // strip every <title> and the shell's robots/googlebot metas (a specific
+  // googlebot directive would override a generic robots:noindex), then
+  // insert exactly one of each
+  html = html.replace(/<title>[^<]*<\/title>/g, '');
+  html = html.replace(/<meta name="(?:robots|googlebot)" content="[^"]*"\s*\/>/g, '');
+  html = html.replace(
+    '</head>',
+    `<title>Page not found · Keja AI</title>\n<meta name="robots" content="noindex" />\n</head>`,
+  );
+  // a way back, no JS needed (Keja teal on Next's plain error shell)
+  html = html.replace(
+    'This page could not be found.',
+    'This page could not be found.<div style="margin-top:28px"><a href="/" style="color:#0f766e;font-weight:600;text-decoration:none">&larr; Back to Keja AI</a></div>',
+  );
+  writeFileSync(p, html, 'utf8');
+  console.log('[prerender] 404.html re-titled (noindex + way back)');
+}
+fix404();
 
 console.log(
   `[prerender] wrote ${count} static pages ` +

@@ -1,14 +1,19 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 /**
  * Sitemap generator — keeps public/sitemap.xml complete automatically.
  *
  * Extracts route data (property IDs incl. Auto-Pilot listings, article slugs)
  * from the source data files and emits the full URL set. Runs in CI before
  * every deploy so the sitemap never rots when inventory grows.
+ *
+ * Runs under Bun (like scripts/prerender.ts) so it can import the shared
+ * section catalogue (src/lib/sectionMeta.ts) — the sitemap's static set and
+ * the prerendered pages can never drift apart.
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { SECTION_META } from '../src/lib/sectionMeta.ts'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 // Canonical origin is keja.app; GitHub Pages CI overrides via SITE_URL.
@@ -39,30 +44,16 @@ function extractAutoIds(path) {
   return (data.listings ?? []).map((l) => l.id)
 }
 
+// Static sections derive from the shared catalogue (src/lib/sectionMeta.ts),
+// which also drives the prerendered HTML and the SPA's RouteMeta. Home is
+// always present. Private / crawl-budget-wasting routes are deliberately NOT
+// listed (account, admin, pro, manage, tenant, finance, transact,
+// deal-analyst, portfolio) — robots.txt also disallows the admin surfaces,
+// and none of them render meaningful content to a crawler (audit Ch. 7).
 const STATIC_ROUTES = [
   { loc: '/', priority: '1.0', changefreq: 'daily' },
-  { loc: '/properties', priority: '0.9', changefreq: 'hourly' },
-  { loc: '/tokenize', priority: '0.9', changefreq: 'daily' },
-  { loc: '/ask', priority: '0.8', changefreq: 'weekly' },
-  { loc: '/invest', priority: '0.8', changefreq: 'weekly' },
-  { loc: '/trust', priority: '0.8', changefreq: 'weekly' },
-  { loc: '/insights', priority: '0.8', changefreq: 'weekly' },
-  { loc: '/ecosystem', priority: '0.7', changefreq: 'weekly' },
-  { loc: '/partners', priority: '0.7', changefreq: 'weekly' },
-  { loc: '/sell', priority: '0.7', changefreq: 'weekly' },
-  { loc: '/valuation', priority: '0.6', changefreq: 'weekly' },
-  { loc: '/develop', priority: '0.6', changefreq: 'weekly' },
-  { loc: '/diaspora', priority: '0.6', changefreq: 'weekly' },
-  { loc: '/about', priority: '0.6', changefreq: 'monthly' },
-  { loc: '/contact', priority: '0.6', changefreq: 'monthly' },
-  { loc: '/compare', priority: '0.5', changefreq: 'weekly' },
-  { loc: '/legal', priority: '0.3', changefreq: 'yearly' },
+  ...SECTION_META.map((s) => ({ loc: s.path, priority: s.priority, changefreq: s.changefreq })),
 ]
-
-// Private / crawl-budget-wasting routes are deliberately NOT listed here
-// (account, admin, pro, manage, tenant, finance, transact, deal-analyst,
-// portfolio) — robots.txt also disallows the admin surfaces, and none of
-// them render meaningful content to a crawler (audit Ch. 7).
 
 const propertyIds = [
   ...extractAutoIds('src/data/auto-listings.json'),

@@ -18,6 +18,7 @@ import { AuthProvider } from '@/lib/auth';
 import { AdminGate } from '@/components/admin/AdminGate';
 import { AuthModal } from '@/components/shell/AuthModal';
 import { usePageMeta } from '@/lib/seo';
+import { SECTION_META_BY_PATH } from '@/lib/sectionMeta';
 import { installGlobalErrorHandlers } from '@/lib/telemetry';
 import { SITE_URL } from '@/config';
 import { Home } from '@/components/home/Home';
@@ -71,38 +72,27 @@ function ViewFallback() {
 /* Per-route SEO meta (audit F-09, P0-4)                               */
 /* ------------------------------------------------------------------ */
 
-/** Static section metadata — dynamic routes (listing/article/area detail)
- *  call usePageMeta themselves with entity-specific titles + JSON-LD. */
-const ROUTE_META: Record<string, { title: string; description: string; robots?: string }> = {
+/** Static section metadata. Public sections derive from the shared catalogue
+ *  (src/lib/sectionMeta.ts) — the SAME source the prerender pipeline and the
+ *  sitemap generator use, so the hydrated <title>, the crawler-facing static
+ *  HTML and the sitemap can never drift apart. Dynamic routes
+ *  (listing/article/area detail) call usePageMeta themselves with
+ *  entity-specific titles + JSON-LD; private routes stay inline with
+ *  noindex (they are app state, not crawl-worthy content). */
+export const ROUTE_META: Record<string, { title: string; description: string; robots?: string }> = {
   '/': {
     title: 'Keja AI — Africa\u2019s Real Estate Intelligence & Trust Infrastructure',
     description:
       'Discover. Verify. Analyse. Finance. Invest. Transact. Manage — one intelligent ecosystem for African real estate.',
   },
-  '/properties': {
-    title: 'Properties for sale & rent in Kenya',
-    description:
-      'Verified houses, apartments and land across Nairobi, Mombasa and Kenya\u2019s growth corridors — with trust scores, evidence panels and honest pricing.',
-  },
-  '/compare': {
-    title: 'Compare properties',
-    description: 'Side-by-side comparison of up to four properties — price, yield, trust and evidence.',
-  },
-  '/sell': {
-    title: 'List a property',
-    description: 'Publish a property to the Keja marketplace with AI-assisted pricing and verification-ready evidence.',
-  },
-  '/ask': {
-    title: 'Ask Keja AI',
-    description: 'Your AI property advisor for Kenya — search, qualify and hand off to a human expert.',
+  ...SECTION_META_BY_PATH,
+  '/areas': {
+    title: 'Area guides',
+    description: 'Neighbourhood guides for Nairobi, Mombasa and Kenya\u2019s growth areas.',
   },
   '/deal-analyst': {
     title: 'Deal Analyst',
     description: 'Stress-test an investment deal: yield, cash-flow, downside and exit scenarios.',
-  },
-  '/invest': {
-    title: 'Investment calculators',
-    description: 'ROI, mortgage and affordability calculators tuned to Kenyan market realities.',
   },
   '/portfolio': {
     title: 'Investor dashboard',
@@ -120,10 +110,6 @@ const ROUTE_META: Record<string, { title: string; description: string; robots?: 
     title: 'Transaction desk',
     description: 'Guide a property transaction from offer to closing with escrow-aligned steps.',
   },
-  '/tokenize': {
-    title: 'Tokenize — fractional real estate',
-    description: 'Learn how Keja tokenizes income-producing Kenyan real estate — trial marketplace, journey and regulatory readiness.',
-  },
   '/manage': {
     title: 'Landlord console',
     description: 'Manage units, tenants, rent collection and arrears in one console.',
@@ -132,49 +118,9 @@ const ROUTE_META: Record<string, { title: string; description: string; robots?: 
     title: 'Tenant hub',
     description: 'Rent payments, maintenance requests and lease documents for tenants.',
   },
-  '/diaspora': {
-    title: 'Diaspora hub',
-    description: 'Buy and oversee Kenyan property from abroad — verified evidence and remote processes.',
-  },
-  '/develop': {
-    title: 'Developer portal',
-    description: 'Partner with Keja to move inventory with data-backed pricing and reach.',
-  },
   '/institutional': {
     title: 'Institutional portal',
     description: 'For funds, banks and REITs — portfolio tools, data feeds and co-investment.',
-  },
-  '/partners': {
-    title: 'Partners',
-    description: 'The Keja partner ecosystem — agencies, valuers, lawyers and financiers.',
-  },
-  '/trust': {
-    title: 'Trust Center',
-    description: 'How Keja verifies listings, scores trust and stays honest — claims, evidence and methodology.',
-  },
-  '/ecosystem': {
-    title: 'Ecosystem',
-    description: 'The full Keja platform map — every product surface and how they connect.',
-  },
-  '/insights': {
-    title: 'Insights',
-    description: 'Long-form guides to buying, financing and investing in Kenyan real estate.',
-  },
-  '/areas': {
-    title: 'Area guides',
-    description: 'Neighbourhood guides for Nairobi, Mombasa and Kenya\u2019s growth areas.',
-  },
-  '/about': {
-    title: 'About Keja AI',
-    description: 'The team and mission behind Keja — trusted African real estate infrastructure.',
-  },
-  '/contact': {
-    title: 'Contact',
-    description: 'Talk to the Keja team — WhatsApp, email or visit the Nairobi office.',
-  },
-  '/legal': {
-    title: 'Legal & privacy',
-    description: 'Terms of use and privacy policy — Kenya Data Protection Act aligned.',
   },
   '/account': {
     title: 'Your account',
@@ -190,10 +136,6 @@ const ROUTE_META: Record<string, { title: string; description: string; robots?: 
     title: 'Pro workspace',
     description: 'Agent and pro tooling — leads, pipeline and client management.',
     robots: 'noindex',
-  },
-  '/valuation': {
-    title: 'Valuation desk',
-    description: 'Instant property valuations anchored to Kenyan comparables.',
   },
 };
 

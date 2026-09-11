@@ -26,6 +26,21 @@ export const DEFAULT_OG_IMAGE = `${SITE_URL}${asset('og-image.jpg')}`;
 export const absoluteImage = (path: string): string =>
   path.startsWith('http') ? path : `${SITE_URL}/${path.replace(/^\//, '')}`;
 
+/** Absolute canonical URL for a route path, in the trailing-slash form the
+ *  build-time prerender (scripts/prerender.ts) and the sitemap both use —
+ *  ('/' → origin; '/tokenize' → 'https://keja.app/tokenize/'). The hydrated
+ *  canonical, the static HTML canonical and the sitemap <loc> must never
+ *  disagree: same content, same URL, or crawlers get conflicting signals.
+ *  (Regression guard for the missing-slash bug that produced
+ *  'https://keja.apptokenize' — the same class as the og:image bug in
+ *  CURRENT_PICTURE §4.) */
+export const absoluteUrl = (path: string): string =>
+  path.startsWith('http')
+    ? path
+    : path === '/' || path === ''
+      ? `${SITE_URL}/`
+      : `${SITE_URL}/${path.replace(/^\/+/, '').replace(/\/+$/, '')}/`;
+
 function upsertMeta(attr: 'name' | 'property', key: string, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
   if (!el) {
@@ -105,8 +120,9 @@ export function usePageMeta(opts: PageMetaOptions, routePath: string) {
     }
     if (robots) upsertMeta('name', 'robots', robots);
     else document.head.querySelector<HTMLMetaElement>('meta[name="robots"]')?.remove();
-    // Canonical matches the sitemap and the prerendered path URLs.
-    const canonical = `${SITE_URL}${routePath === '/' ? '/' : routePath.replace(/^\//, '')}`;
+    // Canonical matches the sitemap and the prerendered path URLs (trailing
+    // slash — see absoluteUrl).
+    const canonical = absoluteUrl(routePath);
     upsertLink('canonical', canonical);
     upsertMeta('property', 'og:url', canonical);
     setRouteJsonLd(jsonLd ?? null);
@@ -124,7 +140,7 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
       '@type': 'ListItem',
       position: i + 1,
       name: it.name,
-      item: `${SITE_URL}${it.path.replace(/^\//, '')}`,
+      item: absoluteUrl(it.path),
     })),
   };
 }

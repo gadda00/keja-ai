@@ -115,6 +115,36 @@ for (const f of [
   else fail(`${f} missing — prerender.ts did not run`);
 }
 
+/* 6b — every public section in the sitemap must have a real prerendered
+   page (src/lib/sectionMeta.ts drives both). Previously 16 sitemap'd
+   section URLs served the generic home shell — duplicate content. */
+const SECTION_PATHS = [
+  "properties", "tokenize", "ask", "invest", "trust", "insights",
+  "ecosystem", "partners", "sell", "valuation", "develop", "diaspora",
+  "about", "contact", "compare", "legal",
+];
+let sectionPages = 0;
+for (const s of SECTION_PATHS) {
+  const f = join(out, s, "index.html");
+  if (existsSync(f)) {
+    sectionPages++;
+  } else {
+    fail(`${s}/index.html missing — section prerender incomplete`);
+  }
+}
+if (sectionPages === SECTION_PATHS.length) {
+  ok(`all ${SECTION_PATHS.length} catalogue sections prerendered`);
+  // and each carries its own <title>, not the generic shell's
+  const generic = "Africa&#x27;s Real Estate Intelligence";
+  let untitled = 0;
+  for (const s of SECTION_PATHS) {
+    const html = readFileSync(join(out, s, "index.html"), "utf8");
+    if (html.includes(generic) && html.indexOf(generic) < html.indexOf("</title>")) untitled++;
+  }
+  if (untitled === 0) ok("section pages carry per-section titles");
+  else fail(`${untitled} section page(s) still ship the generic home title`);
+}
+
 console.log(
   failures === 0
     ? "\nArtifact verification PASSED.\n"

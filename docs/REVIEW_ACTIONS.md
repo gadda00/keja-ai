@@ -98,3 +98,22 @@ pattern — external recommendations AND internal findings — stays auditable.
 | Entry bundle grew to ~611 kB (wave-5/6 features) — over the 500 kB audit line | P1       | LazyMotion+`m` migration (async motionFeatures chunk), Properties route + AuthModal lazy-split, TokenizeProvider moved inside lazy /tokenize and /admin route boundaries → entry ~491 kB |
 | Client desk holds two further live mandates not represented in inventory      | P1       | KJA-024 Daykio Bustani 5BR (KES 67M, Kiganjo Road, Ruiru) + KJA-025 Kantafu 30 acres (KES 5.5M/acre) added with owner photos; verification honestly `pending`                            |
 | Kantafu absent from area insights                                             | P3       | Added Kangundo-corridor land-banking insight                                                                                                                                             |
+
+## 2026-09-12 — wave 8: crawler & share correctness (observe–fix–verify cycle)
+
+A full observe→identify→plan→implement→verify cycle over the built artifact (not
+just the code) found three defects in how search engines and share scrapers see
+the platform. Every fix is test-pinned.
+
+| Finding | Severity | What was done |
+| --- | --- | --- |
+| Hydrated canonical + og:url + breadcrumb JSON-LD URLs were malformed (`https://keja.appproperties/…`) — the same missing-slash class as the previously-fixed og:image bug, surviving in the two remaining `SITE_URL` concatenations in `seo.ts` | P1 (SEO) | New `absoluteUrl()` helper builds the trailing-slash canonical form the prerender and sitemap use; canonical, og:url and `breadcrumbJsonLd` items all route through it; regression tests pin the exact URL forms (glued-host guard included) |
+| The sitemap advertised 17 static routes but only `/properties` had prerendered HTML — 16 sitemap'd section URLs served the generic home shell (duplicate content, wasted crawl budget) | P1 (SEO) | New shared section catalogue `src/lib/sectionMeta.ts` (title / description / sitemap fields / noscript summary per section) is now the single source for (1) the SPA's `RouteMeta`, (2) `scripts/prerender.ts` — 16 new prerendered section pages, 110 static pages total, (3) `scripts/generate-sitemap.mjs` (now runs under Bun to import the TS catalogue). `verify-artifacts.mjs` asserts all 16 sections exist and carry per-section titles; 9 parity tests pin the catalogue contract |
+| `vercel.json`'s catch-all rewrite served HTTP 200 + the home shell for **every** unknown path (soft-404s across an infinite URL space; dead links looked like the homepage) | P1 (SEO/UX) | Catch-all replaced with one regex rewrite for the non-prerendered user sections (`data|finance|transact|manage|tenant|institutional|deal-analyst|portfolio`); everything else falls through to `out/404.html`. The 404 page was also fixed up (one honest title instead of the home title, `noindex` with the conflicting `googlebot` meta removed, a "Back to Keja AI" link). The deploy smoke test now asserts: unknown path → 404, `/tokenize/` → 200 with its own title, `/finance` → 200 |
+
+Evidence: 318 tests pass (16 new); typecheck + lint clean; artifact verification
+green ("all 16 catalogue sections prerendered"); the hydrated `#/properties/KJA-001`
+DOM was verified in-browser — canonical, og:url and breadcrumb items all read
+`https://keja.app/…/` post-fix. The 404-vs-rewrite behaviour on Vercel is
+asserted by the post-deploy smoke test (a local static server always rewrites
+to the shell, so it cannot reproduce that behaviour).
