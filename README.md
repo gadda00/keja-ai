@@ -74,6 +74,7 @@ bun install --frozen-lockfile   # the lockfile is bun.lock (CI installs the same
 npm run dev            # local dev server
 npm run typecheck      # tsc --noEmit (same gate as CI)
 npm run lint           # ESLint (same gate as CI)
+npm test               # vitest unit suite — 161 tests / 16 files (same gate as CI)
 npm run build:static   # static export → out/ (what Vercel builds)
 npm run mobile:sync    # static build + cap sync into android/ + ios/
 node scripts/auto-listings/run.mjs   # Auto-Pilot pipeline (zero npm deps)
@@ -128,7 +129,9 @@ Engineering, business and operations documents — PDF editions in `docs/pdf/`, 
 
 | Document | Markdown | PDF |
 | --- | --- | --- |
-| The Repository Picture (engineering dossier) | `docs/REPO_PICTURE.md` | `docs/pdf/keja-repo-picture.pdf` |
+| **Current picture (post-Phase-2)** | `docs/CURRENT_PICTURE.md` | — |
+| Phase-2 technical audit (~100 pp) | source: `scripts/phase2_audit/` | `scripts/phase2_audit/final.pdf` |
+| The Repository Picture (engineering dossier, pre-audit) | `docs/REPO_PICTURE.md` | `docs/pdf/keja-repo-picture.pdf` |
 | Marketing playbook | `docs/MARKETING_PLAYBOOK.md` | `docs/pdf/keja-marketing-playbook.pdf` |
 | Strategy | `docs/STRATEGY.md` | `docs/pdf/keja-strategy.pdf` |
 | Kenya partner proposals (20 targets) | `docs/KENYA_PARTNER_PROPOSALS.md` | `docs/pdf/keja-kenya-partner-proposals.pdf` |
