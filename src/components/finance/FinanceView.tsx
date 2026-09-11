@@ -115,7 +115,7 @@ function MortgageCalculator({ initialPrice }: { initialPrice: number }) {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis dataKey="year" stroke="var(--muted-foreground)" fontSize={11} />
                 <YAxis stroke="var(--muted-foreground)" fontSize={11} tickFormatter={(v: number) => `${Math.round(v / 1e6)}M`} />
-                <Tooltip formatter={(v: number) => formatKES(v)} contentStyle={{ background: 'var(--popover)', border: '1px solid var(--border)', borderRadius: 12, fontSize: 12 }} />
+                <Tooltip formatter={(v) => formatKES(Number(v ?? 0))} contentStyle={{ background: 'var(--popover)', border: '1px solid var(--border)', borderRadius: 12, fontSize: 12 }} />
                 <Area type="monotone" dataKey="balance" stroke="var(--chart-1)" strokeWidth={2.5} fill="url(#gBal)" />
               </AreaChart>
             </ResponsiveContainer>

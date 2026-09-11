@@ -183,7 +183,7 @@ export default function ManageView() {
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                     <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={11} />
                     <YAxis stroke="var(--muted-foreground)" fontSize={11} tickFormatter={(v: number) => `${Math.round(v / 1000)}k`} />
-                    <Tooltip formatter={(v: number) => [formatKES(v), 'Collected']} contentStyle={{ background: 'var(--popover)', border: '1px solid var(--border)', borderRadius: 12, fontSize: 12 }} />
+                    <Tooltip formatter={(v) => [formatKES(Number(v ?? 0)), 'Collected']} contentStyle={{ background: 'var(--popover)', border: '1px solid var(--border)', borderRadius: 12, fontSize: 12 }} />
                     <Bar dataKey="income" fill="var(--chart-1)" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>

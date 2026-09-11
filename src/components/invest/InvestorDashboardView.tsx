@@ -274,7 +274,7 @@ export default function InvestorDashboardView() {
                   tickFormatter={(v: number) => `${Math.round(v / 1_000_000)}M`}
                 />
                 <Tooltip
-                  formatter={(v: number, n: string) => [formatKES(v), n === 'value' ? 'Portfolio value' : 'Cumulative net income']}
+                  formatter={(v, n) => [formatKES(Number(v ?? 0)), n === 'value' ? 'Portfolio value' : 'Cumulative net income']}
                   contentStyle={{ background: 'var(--popover)', border: '1px solid var(--border)', borderRadius: 12, fontSize: 12 }}
                 />
                 <Area type="monotone" dataKey="value" stroke="var(--chart-1)" strokeWidth={2.5} fill="url(#gValue)" />
@@ -297,7 +297,7 @@ export default function InvestorDashboardView() {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(v: number) => formatKES(v)}
+                  formatter={(v) => formatKES(Number(v ?? 0))}
                   contentStyle={{ background: 'var(--popover)', border: '1px solid var(--border)', borderRadius: 12, fontSize: 12 }}
                 />
               </PieChart>
@@ -445,7 +445,7 @@ export default function InvestorDashboardView() {
               <XAxis dataKey="name" stroke="var(--muted-foreground)" fontSize={11} />
               <YAxis stroke="var(--muted-foreground)" fontSize={11} tickFormatter={(v: number) => `${Math.round(v / 1000)}k`} />
               <Tooltip
-                formatter={(v: number) => [formatKES(v), 'Effective rent']}
+                formatter={(v) => [formatKES(Number(v ?? 0)), 'Effective rent']}
                 contentStyle={{ background: 'var(--popover)', border: '1px solid var(--border)', borderRadius: 12, fontSize: 12 }}
               />
               <Bar dataKey="rent" fill="var(--chart-1)" radius={[6, 6, 0, 0]} />

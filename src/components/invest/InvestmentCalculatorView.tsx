@@ -172,11 +172,11 @@ export default function InvestmentCalculatorView() {
                   <XAxis dataKey="year" stroke="var(--muted-foreground)" fontSize={11} tickFormatter={(y: number) => `Y${y}`} />
                   <YAxis stroke="var(--muted-foreground)" fontSize={11} tickFormatter={(v: number) => `${Math.round(v / 1e6)}M`} />
                   <Tooltip
-                    formatter={(v: number, n: string) => [formatKES(v), n === 'propertyValue' ? 'Property value' : 'Cumulative net income']}
+                    formatter={(v, n) => [formatKES(Number(v ?? 0)), n === 'propertyValue' ? 'Property value' : 'Cumulative net income']}
                     labelFormatter={(y) => `Year ${y}`}
                     contentStyle={{ background: 'var(--popover)', border: '1px solid var(--border)', borderRadius: 12, fontSize: 12 }}
                   />
-                  <Legend formatter={(v: string) => (v === 'propertyValue' ? 'Property value' : 'Cumulative net income')} wrapperStyle={{ fontSize: 11 }} />
+                  <Legend formatter={(v) => (v === 'propertyValue' ? 'Property value' : 'Cumulative net income')} wrapperStyle={{ fontSize: 11 }} />
                   <Area type="monotone" dataKey="propertyValue" stroke="var(--chart-1)" strokeWidth={2.5} fill="url(#icV)" />
                   <Area type="monotone" dataKey="cumulativeNet" stroke="var(--chart-2)" strokeWidth={2} fill="url(#icI)" />
                 </AreaChart>

@@ -12,7 +12,7 @@
  */
 import type { ReactNode } from 'react';
 import { validateTokenizePersisted } from '@/lib/boundaries';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 
 import type {
   Investment,
@@ -110,10 +110,84 @@ function load(): PersistedState {
     // or hand-edited value falls back to field defaults instead of crashing
     // deep inside the trial wallet maths.
     const parsed = validateTokenizePersisted(JSON.parse(raw)) as Partial<PersistedState>;
-    return { ...EMPTY, ...parsed, walletUsd: parsed.walletUsd ?? TRIAL_START_BALANCE_USD };
+    const base: PersistedState = {
+      ...EMPTY,
+      ...parsed,
+      walletUsd: parsed.walletUsd ?? TRIAL_START_BALANCE_USD,
+    };
+    // Mount accrual folded into the initializer (audit SEC-201): cycles that
+    // came due while the app was closed are credited in the FIRST rendered
+    // state instead of a setState-in-effect after mount. Pure derivation of
+    // `computeAccruedDistributions` — idempotent via `lastAccrual`.
+    if (base.lastAccrual) {
+      const nowMs = Date.now() + base.clockOffsetMs;
+      const entries = computeAccruedDistributions(
+        base.investments,
+        deriveProperties(
+          base.soldDelta,
+          base.customProperties,
+          base.statusOverrides,
+          base.investorCountDelta
+        ),
+        +new Date(base.lastAccrual),
+        nowMs
+      );
+      if (entries.length > 0) {
+        const credited = entries.reduce((a, e) => a + e.amountUsd, 0);
+        return {
+          ...base,
+          lastAccrual: new Date(nowMs).toISOString(),
+          walletUsd: base.walletUsd + credited,
+          receivedDistributions: [...entries, ...base.receivedDistributions],
+        };
+      }
+    }
+    return base;
   } catch {
     return EMPTY;
   }
+}
+
+/**
+ * Stable no-op subscription for the render-time clock snapshot above —
+ * module-level so its identity never changes (a new closure each render
+ * would tear down and re-run the subscription every pass).
+ */
+function neverNotify(_onStoreChange: () => void) {
+  return () => {};
+}
+
+/**
+ * Seed + runtime-overridden property view — pure function of persisted
+ * state, shared by the provider memo and the mount accrual in `load()`
+ * so both see exactly the same LIVE/overridden world (audit SEC-201).
+ */
+function deriveProperties(
+  soldDelta: Record<string, number>,
+  customProperties: TokenizedProperty[],
+  statusOverrides: Record<string, string>,
+  investorCountDelta: Record<string, number>
+): TokenizedProperty[] {
+  const seeded = TOKENIZED_PROPERTIES.map((p) => {
+    const sold = Math.min(p.totalTokens, p.tokensSold + (soldDelta[p.id] ?? 0));
+    // Lifecycle: a FUNDING offering that sells out becomes FUNDED; an
+    // explicit override (issuer "open trading") then promotes it to LIVE.
+    let { status } = p;
+    if (p.status === 'FUNDING' && sold >= p.totalTokens) status = 'FUNDED';
+    const override = statusOverrides[p.id];
+    if (override === 'LIVE') status = 'LIVE';
+    return {
+      ...p,
+      tokensSold: sold,
+      status,
+      investorCount: p.investorCount + (investorCountDelta[p.id] ?? 0),
+    };
+  });
+  const custom = customProperties.map((p) => {
+    const override = statusOverrides[p.id];
+    return override === 'LIVE' ? { ...p, status: 'LIVE' as const } : p;
+  });
+  return [...seeded, ...custom];
 }
 
 export interface TokenizeStore {
@@ -258,28 +332,16 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
 
   /** seeded properties with runtime sold deltas, lifecycle overrides,
    *  investor-count deltas + custom issued properties */
-  const properties = useMemo<TokenizedProperty[]>(() => {
-    const seeded = TOKENIZED_PROPERTIES.map((p) => {
-      const sold = Math.min(p.totalTokens, p.tokensSold + (state.soldDelta[p.id] ?? 0));
-      // Lifecycle: a FUNDING offering that sells out becomes FUNDED; an
-      // explicit override (issuer "open trading") then promotes it to LIVE.
-      let { status } = p;
-      if (p.status === 'FUNDING' && sold >= p.totalTokens) status = 'FUNDED';
-      const override = state.statusOverrides[p.id];
-      if (override === 'LIVE') status = 'LIVE';
-      return {
-        ...p,
-        tokensSold: sold,
-        status,
-        investorCount: p.investorCount + (state.investorCountDelta[p.id] ?? 0),
-      };
-    });
-    const custom = state.customProperties.map((p) => {
-      const override = state.statusOverrides[p.id];
-      return override === 'LIVE' ? { ...p, status: 'LIVE' as const } : p;
-    });
-    return [...seeded, ...custom];
-  }, [state.soldDelta, state.customProperties, state.statusOverrides, state.investorCountDelta]);
+  const properties = useMemo<TokenizedProperty[]>(
+    () =>
+      deriveProperties(
+        state.soldDelta,
+        state.customProperties,
+        state.statusOverrides,
+        state.investorCountDelta
+      ),
+    [state.soldDelta, state.customProperties, state.statusOverrides, state.investorCountDelta]
+  );
 
   const openProperty = useCallback((id: string) => {
     setSelectedPropertyId(id);
@@ -703,24 +765,6 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
     [properties, state.investments, state.marketPrices, state.clockOffsetMs]
   );
 
-  /** Accrue distributions for cycles elapsed on the trial clock. */
-  const accrue = useCallback(
-    (nowMs: number): AccrualResult => {
-      const baseMs = state.lastAccrual ? +new Date(state.lastAccrual) : nowMs;
-      const entries = computeAccruedDistributions(state.investments, properties, baseMs, nowMs);
-      const credited = entries.reduce((a, e) => a + e.amountUsd, 0);
-      setState((s) => ({
-        ...s,
-        lastAccrual: new Date(nowMs).toISOString(),
-        walletUsd: s.walletUsd + credited,
-        receivedDistributions:
-          credited > 0 ? [...entries, ...s.receivedDistributions] : s.receivedDistributions,
-      }));
-      return { cyclesAdvanced: entries.length, creditedUsd: credited, entries };
-    },
-    [state.lastAccrual, state.investments, properties]
-  );
-
   const advanceTrialCycle = useCallback((): AccrualResult => {
     // advance the virtual clock by the shortest cycle among held LIVE assets
     // (30 days when nothing is held) so monthly payers credit first and the
@@ -764,25 +808,16 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, statusOverrides: { ...s.statusOverrides, [propertyId]: 'LIVE' } }));
   }, []);
 
-  // auto-accrue on mount for returning users whose real-time clock has passed
-  // full cycles since the last accrual (trial clock unchanged — silent, honest)
-  useEffect(() => {
-    if (state.lastAccrual) {
-      const nowMs = Date.now() + state.clockOffsetMs;
-      const entries = computeAccruedDistributions(
-        state.investments,
-        properties,
-        +new Date(state.lastAccrual),
-        nowMs
-      );
-      if (entries.length > 0) void accrue(nowMs);
-    }
-    // deliberate one-time mount sweep: accrues any distributions that came
-    // due while the app was closed; re-running on state changes would
-    // double-accrue (accrue() itself is idempotent via lastAccrual, but the
-    // effect would thrash on every wallet interaction)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // live trial clock — an intentional "now" snapshot per render (display-only).
+  // useSyncExternalStore with a never-firing subscribe is the React-blessed
+  // escape hatch for reading an impure value during render without tearing
+  // (audit SEC-201): the value is re-read on every re-render triggered by
+  // real state changes, but never causes a re-render of its own.
+  const trialNowMs = useSyncExternalStore(
+    neverNotify,
+    () => Date.now() + state.clockOffsetMs,
+    () => Date.now(),
+  );
 
   const value = useMemo<TokenizeStore>(
     () => ({
@@ -815,9 +850,8 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
       walletUsd: state.walletUsd,
       trades: state.trades,
       clockOffsetMs: state.clockOffsetMs,
-      // live trial clock: an intentional "now" snapshot per render — the
-      // value is display-only and must track wall time
-      trialNowMs: Date.now() + state.clockOffsetMs,
+      // live trial clock snapshot (read above via useSyncExternalStore)
+      trialNowMs,
       topUpTrial,
       buySecondary,
       sellSecondary,
@@ -853,6 +887,7 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
       marketPrice,
       resetTrial,
       openTrading,
+      trialNowMs,
     ]
   );
 
