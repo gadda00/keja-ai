@@ -1,5 +1,8 @@
 # dependencies
 node_modules/
+# bun.lock is the repo lockfile (CI installs with --frozen-lockfile);
+# package-lock.json appears when npm is used locally — never commit it
+package-lock.json
 
 # build artifacts
 .next/
