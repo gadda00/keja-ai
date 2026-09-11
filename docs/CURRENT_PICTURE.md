@@ -1,8 +1,8 @@
 # Keja AI — Current Picture
 
-**Snapshot date: 11 September 2026 · repo `gadda00/keja-ai` · this document is the post-implementation state of the platform after the Phase-2 engineering engagement.**
+**Snapshot date: 11 September 2026 · repo `gadda00/keja-ai` · this document is the post-implementation state of the platform after the Phase-2 engineering engagement (plus the Phase-2.5 access-and-auth hardening below).**
 
-This is the honest, complete picture after: (1) the Phase-1 build (Aug–Sep 2026), (2) the ~100-page Phase-2 technical audit (`scripts/phase2_audit/final.pdf`), and (3) the implementation of the audit's Phase-2 workstreams described below. It replaces `REPO_PICTURE.md` (the pre-audit snapshot) as the authoritative "where are we" document. `src/lib/api/storeTwin.ts` points readers here for the local/remote persistence story.
+This is the honest, complete picture after: (1) the Phase-1 build (Aug–Sep 2026), (2) the ~100-page Phase-2 technical audit (`scripts/phase2_audit/final.pdf`), (3) the implementation of the audit's Phase-2 workstreams described below, and (4) the Phase-2.5 additions — real Google Sign-In, valid `.well-known` app associations, and the operator site guide. It replaces `REPO_PICTURE.md` (the pre-audit snapshot) as the authoritative "where are we" document. `src/lib/api/storeTwin.ts` points readers here for the local/remote persistence story.
 
 ---
 
@@ -18,6 +18,7 @@ This is the honest, complete picture after: (1) the Phase-1 build (Aug–Sep 202
 - Hosting is **Vercel** (project `keja-ai`, API-driven deploys from GitHub Actions — the account has no GitHub app integration; the `VERCEL_TOKEN` secret + prebuilt-deploy pattern is the runbook in `docs/DEPLOYMENT.md`).
 - The Netlify configuration is fully retired; the keja.app domain points at Vercel's nameservers.
 - Build output: static export (`out/`, 95 prerendered pages + 111 sitemap URLs at last build) behind a SPA rewrite, with per-path cache/security headers from `vercel.json`.
+- `/.well-known/assetlinks.json` and `/.well-known/apple-app-site-association` now serve **valid JSON** with `application/json` headers (previously the SPA rewrite answered them with HTML + HTTP 200). They carry empty statements until release signing keys exist — then `scripts/generate-assetlinks.mjs` fills in the real fingerprints.
 - Monitoring: hourly `production-check.yml` smoke test (availability, `sw.js` cache headers, manifest, security headers) plus a post-deploy smoke test inside `deploy-vercel.yml`.
 
 ## 2. What Phase 2 shipped
@@ -54,7 +55,7 @@ The audit's findings were implemented in five workstreams (commit `feat(phase2):
 
 ## 3. Quality gates — the test suite
 
-The audit's Ch. 22 demanded a real test suite before any LLM work. `npm test` runs **vitest, 161 tests across 16 files** (jsdom + Node webcrypto), and is now a gate in **both** `pr-check.yml` and `deploy-vercel.yml` (typecheck → lint → **test** → build).
+The audit's Ch. 22 demanded a real test suite before any LLM work. `npm test` runs **vitest, 179 tests across 17 files** (jsdom + Node webcrypto), and is now a gate in **both** `pr-check.yml` and `deploy-vercel.yml` (typecheck → lint → **test** → build).
 
 | File | Covers |
 | --- | --- |
@@ -71,12 +72,19 @@ The audit's Ch. 22 demanded a real test suite before any LLM work. `npm test` ru
 | `tests/analytics.test.ts` | 11-event taxonomy enforcement, 200-entry ring buffer, corruption recovery |
 | `tests/api-client.test.ts` | unconfigured-seam rejection contract, token custody |
 | `tests/uuid.test.ts`, `tests/format.test.ts`, `tests/areaCoords.test.ts`, `tests/responsive-images.test.ts` | identifiers, KES formatting/trust tiers/time-ago, Kenya bounding-box gazetteer, srcset construction |
+| `tests/googleAuth.test.ts` | GIS ID-token decoder round-trip + malformed rejections, claim validation (issuer/audience/expiry/email_verified), admin-allowlist mapping, Google-photo vs demo-colour pictures |
 
 ## 4. Bugs the verification caught (and fixed)
 
 1. **`verifyPassword` double-skip destructuring (Critical):** `const [, , iterStr, saltB64, hashB64] = stored.split('$')` skipped two elements of a four-field format — the salt was read as the iteration count, `Number(salt)` = NaN, and **every k2 password verification returned false** (demo email sign-in was silently broken). Fixed in `src/lib/password.ts`; pinned by the specimen tests.
 2. **Malformed `og:image` URLs:** `absoluteImage` stripped the leading slash while `SITE_URL` has no trailing slash → `https://keja.appimages/…` on every per-route share card. Fixed in `src/lib/seo.ts`; pinned by the SEO tests.
 3. **Rebase hygiene:** the implementation was re-applied cleanly on top of the Auto-Pilot's 2026-09-11 ingest (newer listing data kept; image references migrated to `.webp`), with the bot's data validated end-to-end rather than trusted.
+
+## 4.5 Phase-2.5 additions (same-day hardening)
+
+- **Real Google Sign-In (Google Identity Services):** `src/lib/googleAuth.ts` (GIS loader, base64url JWT decoder, claim validation, role mapping — pure and unit-tested) + `loginWithGoogleCredential()` in `auth.tsx` (find-or-create, profile refresh, admin allowlist that upgrades but never downgrades) + the real Google button in `AuthModal` whenever `NEXT_PUBLIC_GOOGLE_CLIENT_ID` is set. CSP in `vercel.json` was extended for `accounts.google.com` (script/frame/connect) and `*.googleusercontent.com` profile photos. Activation runbook: `docs/GOOGLE_AUTH_SETUP.md`; the demo accounts remain for QA.
+- **Well-known app associations:** valid empty `assetlinks.json` + `apple-app-site-association` with forced `application/json` headers (fixes the HTML-behind-200 responses).
+- **Operator documentation:** `.env.example` documenting every `NEXT_PUBLIC_*` var, and the designed site guide `docs/pdf/keja-site-guide.pdf` (HTML source: `scripts/keja-docs/doc6_site_guide.html`) — access map, demo credentials, admin console, Android/iOS PWA install, ops pipeline, credential custody and rotation checklist.
 
 ## 5. Architecture — current state
 
@@ -110,4 +118,4 @@ The audit's Ch. 22 demanded a real test suite before any LLM work. `npm test` ru
 3. Turn the hourly production check into the operational baseline; add error telemetry when the backend exists.
 4. Keep the audit's honesty standard: every new capability enters the claims register with a status and evidence before it ships.
 
-*The full findings, scoring and sequencing live in `scripts/phase2_audit/final.pdf`; the document suite (deployment runbook, strategy, marketing, partner proposals) is under `docs/`.*
+*The full findings, scoring and sequencing live in `scripts/phase2_audit/final.pdf`; the document suite (deployment runbook, Google Sign-In activation, strategy, marketing, partner proposals, operator site guide) is under `docs/`.*
