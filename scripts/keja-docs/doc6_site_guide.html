@@ -168,7 +168,7 @@ td:first-child{font-weight:600;color:var(--ink);}
   <div class="kpis">
     <div class="kpi"><div class="v">85+</div><div class="k">Live listings</div></div>
     <div class="kpi"><div class="v">95</div><div class="k">Prerendered pages</div></div>
-    <div class="kpi"><div class="v">179</div><div class="k">Unit tests gating deploys</div></div>
+    <div class="kpi"><div class="v">233</div><div class="k">Unit tests gating deploys</div></div>
     <div class="kpi"><div class="v">3</div><div class="k">Languages EN / SW / FR</div></div>
   </div>
 
@@ -179,7 +179,8 @@ td:first-child{font-weight:600;color:var(--ink);}
     <div class="divider"></div>
   </div>
   <p class="lead">Two doors in: one-tap demo accounts (fastest for demos and QA) and email +
-  password. Real Google Sign-In is wired in and activates the moment a Google client ID is set.</p>
+  password — plus <strong>Google Sign-In, now live</strong>: any Google account works from the
+  same sign-in modal, with allowlisted emails becoming admins.</p>
 
   <table>
     <tr><th style="width:31%">Email account</th><th style="width:26%">Password</th><th>Role &amp; use</th></tr>
@@ -193,14 +194,14 @@ td:first-child{font-weight:600;color:var(--ink);}
   Passwords are hashed on-device with PBKDF2-SHA-256 — never transmitted, never on any server.</p>
 
   <div class="callout green">
-    <h4>Turning on real Google accounts (one-time, ~5 minutes)</h4>
-    <p>1. Google Cloud Console &rarr; create an OAuth client (Web app), authorised origin
-    <span class="mono">https://keja.app</span>.</p>
-    <p>2. Vercel &rarr; project <span class="mono">keja-ai</span> &rarr; Settings &rarr; Environment Variables &rarr; set
-    <span class="mono">NEXT_PUBLIC_GOOGLE_CLIENT_ID</span> and <span class="mono">NEXT_PUBLIC_ADMIN_EMAILS</span>
-    (comma-separated admin emails).</p>
-    <p>3. Redeploy. The real Google button appears in the sign-in modal; allowlisted emails
-    automatically receive the admin role. Full runbook: <span class="mono">docs/GOOGLE_AUTH_SETUP.md</span> in the repo.</p>
+    <h4>Google Sign-In — active in production</h4>
+    <p>The OAuth client <span class="mono">794306876985-…apps.googleusercontent.com</span> is configured
+    as <span class="mono">NEXT_PUBLIC_GOOGLE_CLIENT_ID</span> in Vercel (production, preview and
+    development), so the real Google button already renders in the sign-in modal on keja.app.
+    Sign-in verifies the Google ID token on-device (issuer, audience, expiry, verified email).
+    The only optional step left: set <span class="mono">NEXT_PUBLIC_ADMIN_EMAILS</span> (comma-separated)
+    to grant admin to specific Google accounts — the demo admin below keeps working either way.
+    Runbook: <span class="mono">docs/GOOGLE_AUTH_SETUP.md</span>.</p>
   </div>
 
   <!-- 03 Admin -->
@@ -264,7 +265,7 @@ td:first-child{font-weight:600;color:var(--ink);}
     <div class="step"><div class="n"></div><div><b>Push to main</b>
       <span><span class="mono">github.com/gadda00/keja-ai</span> — any commit triggers "Deploy to Vercel (keja.app)".</span></div></div>
     <div class="step"><div class="n"></div><div><b>Quality gates run</b>
-      <span>TypeScript strict typecheck &rarr; ESLint &rarr; 179 unit tests &rarr; static export with sitemap + service-worker version stamp. A red gate stops the deploy.</span></div></div>
+      <span>TypeScript strict typecheck &rarr; ESLint &rarr; 233 unit tests &rarr; static export with sitemap + service-worker version stamp. A red gate stops the deploy.</span></div></div>
     <div class="step"><div class="n"></div><div><b>Vercel builds and serves</b>
       <span>Prebuilt static deploy to the <span class="mono">keja-ai</span> project; keja.app and www.keja.app serve it globally on the CDN edge.</span></div></div>
     <div class="step"><div class="n"></div><div><b>Smoke test + watchers</b>
@@ -335,7 +336,7 @@ td:first-child{font-weight:600;color:var(--ink);}
   <div class="rule"></div>
   <div class="qr"><b>Admin console</b><span>keja.app/#/admin &middot; admin@demo.keja.app / admin123 (or allowlisted Google)</span></div>
   <div class="qr"><b>Deploy</b><span>Push to main on github.com/gadda00/keja-ai — gates + deploy run themselves</span></div>
-  <div class="qr"><b>Google Sign-In</b><span>Vercel env: NEXT_PUBLIC_GOOGLE_CLIENT_ID + NEXT_PUBLIC_ADMIN_EMAILS, then redeploy</span></div>
+  <div class="qr"><b>Google Sign-In</b><span>Live — client ID set in Vercel; add admin emails via NEXT_PUBLIC_ADMIN_EMAILS</span></div>
   <div class="qr"><b>Rollback</b><span>Vercel &rarr; keja-ai &rarr; Deployments &rarr; Promote last known-good</span></div>
   <div class="qr"><b>This guide</b><span>docs/pdf/keja-site-guide.pdf in the repo — always the latest edition</span></div>
   <div class="foot"><span>Keja AI &middot; Chacadom Investments</span><span>keja.app</span></div>

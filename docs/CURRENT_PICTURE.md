@@ -55,7 +55,7 @@ The audit's findings were implemented in five workstreams (commit `feat(phase2):
 
 ## 3. Quality gates — the test suite
 
-The audit's Ch. 22 demanded a real test suite before any LLM work. `npm test` runs **vitest, 179 tests across 17 files** (jsdom + Node webcrypto), and is now a gate in **both** `pr-check.yml` and `deploy-vercel.yml` (typecheck → lint → **test** → build).
+The audit's Ch. 22 demanded a real test suite before any LLM work. `npm test` runs **vitest, 233 tests across 18 files** (jsdom + Node webcrypto), and is now a gate in **both** `pr-check.yml` and `deploy-vercel.yml` (typecheck → lint → **test** → build).
 
 | File | Covers |
 | --- | --- |
