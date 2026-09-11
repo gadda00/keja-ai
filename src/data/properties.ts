@@ -56,7 +56,7 @@ export interface Property {
   highlights: string[];
 }
 
-const IMG = (n: string) => asset(`/images/props/${n}.jpg`);
+const IMG = (n: string) => asset(`/images/props/${n}.webp`);
 
 export const AGENCIES = [
   { name: 'Chacadom Premier Properties', rating: 4.9, verifiedSince: '2026' },

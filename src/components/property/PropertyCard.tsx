@@ -11,6 +11,7 @@ import { investmentScore } from '@/lib/investmentScore';
 import { isRentalPrice } from '@/lib/finance';
 import { formatKES } from '@/lib/format';
 import type { Property } from '@/data/properties';
+import { srcsetFor, CARD_SIZES } from '@/lib/responsive-images';
 import { Link, navigate } from '@/lib/router';
 import { cn } from '@/lib/utils';
 import { TrustBadge } from './TrustBadge';
@@ -55,6 +56,8 @@ export function PropertyCard({
         {imgOk ? (
           <img
             src={p.images[0]}
+            srcSet={srcsetFor(p.images[0])}
+            sizes={CARD_SIZES}
             alt={p.title}
             loading="lazy"
             onError={() => setImgOk(false)}

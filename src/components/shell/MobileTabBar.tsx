@@ -3,20 +3,28 @@
  * App-style bottom tab bar (mobile + the Capacitor shells).
  * Five primary destinations; the full ecosystem lives behind the hamburger.
  */
-import { BarChart3, Coins, Home, Search, Sparkles, User } from 'lucide-react';
+import { Coins, Home, Search, Sparkles, User } from 'lucide-react';
 import { Link, useRouter } from '@/lib/router';
+import { useI18n } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
-const TABS = [
-  { to: '/', icon: Home, label: 'Home' },
-  { to: '/properties', icon: Search, label: 'Discover' },
-  { to: '/ask', icon: Sparkles, label: 'Ask AI' },
-  { to: '/tokenize', icon: Coins, label: 'Token' },
-  { to: '/account', icon: User, label: 'Account' },
+interface Tab {
+  to: string;
+  icon: typeof Home;
+  /** i18n dictionary key */
+  k: string;
+}
+const TABS: Tab[] = [
+  { to: '/', icon: Home, k: 'nav.home' },
+  { to: '/properties', icon: Search, k: 'nav.discover' },
+  { to: '/ask', icon: Sparkles, k: 'nav.ask' },
+  { to: '/tokenize', icon: Coins, k: 'nav.token' },
+  { to: '/account', icon: User, k: 'nav.account' },
 ];
 
 export function MobileTabBar() {
-  const { section, route } = useRouter();
+  const { route } = useRouter();
+  const { t } = useI18n();
   return (
     <nav
       aria-label="Primary"
@@ -30,7 +38,7 @@ export function MobileTabBar() {
             <Link
               key={tab.to}
               to={tab.to}
-              ariaLabel={tab.label}
+              ariaLabel={t(tab.k)}
               ariaCurrent={active}
               className={cn(
                 'flex flex-col items-center gap-1 py-2.5 text-[10px] font-bold uppercase tracking-wide transition-colors',
@@ -38,7 +46,7 @@ export function MobileTabBar() {
               )}
             >
               <tab.icon className={cn('h-5 w-5', active && 'drop-shadow-sm')} aria-hidden />
-              {tab.label}
+              {t(tab.k)}
               <span
                 className={cn(
                   'h-0.5 w-6 rounded-full transition-all',

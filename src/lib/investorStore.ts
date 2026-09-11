@@ -6,6 +6,7 @@
  */
 import { useCallback, useMemo } from 'react';
 import { useStore } from '@/lib/store';
+import { newId } from '@/lib/uuid';
 
 export interface Holding {
   id: string;
@@ -84,7 +85,7 @@ export function usePortfolio() {
 
   const add = useCallback(
     (h: Omit<Holding, 'id'>) =>
-      setState((prev) => ({ ...prev, holdings: [...prev.holdings, { ...h, id: `h-${Date.now()}` }] })),
+      setState((prev) => ({ ...prev, holdings: [...prev.holdings, { ...h, id: newId('h') }] })),
     [setState],
   );
 
@@ -117,6 +118,8 @@ export function usePortfolio() {
     const netMonthly = grossMonthly - expensesMonthly - debtMonthly;
     const appreciation = totalValue - totalInvested;
     const yearsHeld = (iso: string) =>
+      // intentional "now" snapshot: holding-period maths are display-only
+      // eslint-disable-next-line react-hooks/purity
       Math.max(0.1, (Date.now() - new Date(iso).getTime()) / (365.25 * 24 * 3600 * 1000));
     const avgYears = hs.length ? hs.reduce((s, h) => s + yearsHeld(h.purchaseDate), 0) / hs.length : 0;
     const equity = totalValue - hs.reduce((s, h) => s + h.mortgageBalance, 0);

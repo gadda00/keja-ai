@@ -6,20 +6,15 @@
  * demand, pricing, competition, rental market, infrastructure, population
  * growth and developer track record.
  */
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  ArrowRight,
   Building2,
   CalendarRange,
-  Coins,
   HardHat,
   Home,
-  LineChart,
   MapPin,
   ShieldCheck,
-  TrendingUp,
-  Users,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -27,7 +22,6 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAllProperties } from '@/lib/inventory';
 import { navigate } from '@/lib/router';
-import { useStore } from '@/lib/store';
 import { areaInsights } from '@/data/properties';
 import { formatKES } from '@/lib/format';
 import { cn } from '@/lib/utils';

@@ -6,19 +6,10 @@
  * editable, persisted on-device.
  */
 import { useMemo, useState } from 'react';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, } from '@/components/charts/reexports';
 import {
   AlertTriangle,
   Building2,
-  Calendar,
   CheckCircle2,
   ClipboardList,
   DoorClosed,

@@ -1,6 +1,7 @@
 'use client';
 /** Area guide — neighbourhood deep-dive joined with live inventory. */
 import { ArrowLeft, MapPin, TrendingUp } from 'lucide-react';
+import { srcsetFor, GALLERY_SIZES } from '@/lib/responsive-images';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { NEIGHBORHOOD_GUIDES, getNeighborhoodGuide, guideInventoryCount } from '@/data/neighborhoods';
@@ -32,7 +33,7 @@ export default function AreaGuideView({ slug }: { slug: string }) {
       <div className="relative mt-5 overflow-hidden rounded-3xl border">
         <div className="aspect-[21/8] bg-muted">
           {guide.gallery[0] && (
-            <img src={`${guide.gallery[0].base}.jpg`} alt={guide.gallery[0].alt} className="h-full w-full object-cover" />
+            <img src={`${guide.gallery[0].base}.webp`} srcSet={srcsetFor(`${guide.gallery[0].base}.webp`)} sizes={GALLERY_SIZES} alt={guide.gallery[0].alt} className="h-full w-full object-cover" />
           )}
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" aria-hidden />
@@ -84,7 +85,7 @@ export default function AreaGuideView({ slug }: { slug: string }) {
               <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {guide.gallery.slice(1, 7).map((g) => (
                   <div key={g.base} className="overflow-hidden rounded-xl border">
-                    <img src={`${g.base}.jpg`} alt={g.alt} loading="lazy" className="aspect-[4/3] w-full object-cover" />
+                    <img src={`${g.base}.webp`} srcSet={srcsetFor(`${g.base}.webp`)} sizes={GALLERY_SIZES} alt={g.alt} loading="lazy" className="aspect-[4/3] w-full object-cover" />
                   </div>
                 ))}
               </div>

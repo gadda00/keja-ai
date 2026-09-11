@@ -15,6 +15,7 @@ import { areaInsights } from '@/data/properties';
 import { formatKES } from '@/lib/format';
 import { navigate } from '@/lib/router';
 import { cn } from '@/lib/utils';
+import { newId } from '@/lib/uuid';
 
 const STEPS = ['The property', 'Pricing & purpose', 'Description & photos', 'Review & submit'];
 const AREAS = Object.keys(areaInsights).sort();
@@ -46,7 +47,7 @@ export default function ListPropertyView() {
     : null;
 
   const submit = () => {
-    const id = `UL-${Date.now()}`;
+    const id = newId("UL").toUpperCase().replace("_", "-");
     const submission = {
       id,
       submitterName: form.name || 'Platform user',

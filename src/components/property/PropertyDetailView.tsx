@@ -6,7 +6,7 @@
  * Investment Score™ factors, evidence panels with freshness, and a mortgage
  * quick-quote powered by Keja Finance.
  */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   AlertTriangle,
@@ -39,13 +39,15 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
 import { useAllProperties } from '@/lib/inventory';
+import { track } from '@/lib/analytics';
+import { srcsetFor, GALLERY_SIZES } from '@/lib/responsive-images';
 import { investmentScore } from '@/lib/investmentScore';
 import { trustScore } from '@/lib/trustScore';
 import { evidenceFor, listingFreshness } from '@/lib/verification';
 import { calculateMortgage } from '@/lib/finance';
 import { formatKES, timeAgo, trustTier } from '@/lib/format';
 import { areaInsights, type Property } from '@/data/properties';
-import { Link, navigate } from '@/lib/router';
+import { navigate } from '@/lib/router';
 import { useStore } from '@/lib/store';
 import { whatsappLink } from '@/config';
 import { PropertyCard } from './PropertyCard';
@@ -317,12 +319,13 @@ function EvidencePanel({ p }: { p: Property }) {
         variant="ghost"
         size="sm"
         className="mt-3 w-full text-xs font-bold"
-        onClick={() =>
+        onClick={() => {
+          track({ event: 'issue_reported', propertyId: p.id, reason: 'listing-flag' });
           toast({
             title: 'Issue reported',
             description: 'The verification desk will review this listing. Thank you — trust is a shared effort.',
-          })
-        }
+          });
+        }}
       >
         <ShieldAlert className="mr-1.5 h-3.5 w-3.5" aria-hidden /> Report an issue with this listing
       </Button>
@@ -343,6 +346,8 @@ function Gallery({ images, title }: { images: string[]; title: string }) {
         {ok ? (
           <img
             src={safe[idx]}
+            srcSet={srcsetFor(safe[idx])}
+            sizes={GALLERY_SIZES}
             alt={`${title} — photo ${idx + 1} of ${safe.length}`}
             className="h-full w-full object-cover"
             onError={() => setOk(false)}
@@ -403,6 +408,11 @@ export default function PropertyDetailView({ id }: { id: string }) {
   const p = useMemo(() => all.find((x) => x.id === id), [all, id]);
   const [favorites, setFavorites] = useStore<string[]>('favorites', []);
   const saved = p ? favorites.includes(p.id) : false;
+
+  // Analytics (audit F-11): one result_view per listing open.
+  useEffect(() => {
+    if (p) track({ event: 'result_view', propertyId: p.id });
+  }, [p]);
 
   const similar = useMemo(
     () =>
@@ -503,7 +513,7 @@ export default function PropertyDetailView({ id }: { id: string }) {
 
           <PropertyPassport p={p} />
 
-          <Tabs defaultValue="about" className="w-full">
+          <Tabs defaultValue="about" className="w-full" onValueChange={(v) => { if (v === 'evidence') track({ event: 'evidence_reviewed', propertyId: p.id }); }}>
             <TabsList className="w-full justify-start overflow-x-auto">
               <TabsTrigger value="about" className="font-bold">About</TabsTrigger>
               <TabsTrigger value="amenities" className="font-bold">Amenities</TabsTrigger>
@@ -563,13 +573,20 @@ export default function PropertyDetailView({ id }: { id: string }) {
               </div>
             </div>
             <div className="mt-4 grid gap-2">
-              <Button className="font-bold" onClick={() => toast({ title: 'Enquiry sent', description: `${p.agent.name} will reach out shortly. Reference ${passportId(p)}.` })}>
-                <Phone className="mr-1.5 h-4 w-4" aria-hidden /> Request callback
-              </Button>
-              <Button variant="outline" className="font-bold" onClick={() => toast({ title: 'Viewing requested', description: `A virtual viewing slot for ${p.title} will be confirmed by WhatsApp.` })}>
-                <MessageCircle className="mr-1.5 h-4 w-4" aria-hidden /> Book a viewing
-              </Button>
-              <a href={whatsappLink(`Hello Keja AI — I'm interested in ${p.title} (${passportId(p)}).`)} target="_blank" rel="noopener noreferrer">
+              {/* Conversion honesty (audit F-26 / P1-7): every CTA either
+                  captures a real lead or hands off truthfully to WhatsApp —
+                  no toast-only dead ends. */}
+              <a href={whatsappLink(`Hello Keja AI — please call me back about ${p.title} (${passportId(p)}).`)} target="_blank" rel="noopener noreferrer" onClick={() => track({ event: 'human_handoff', channel: 'whatsapp', context: 'callback' })}>
+                <Button className="w-full font-bold">
+                  <Phone className="mr-1.5 h-4 w-4" aria-hidden /> Request callback
+                </Button>
+              </a>
+              <a href={whatsappLink(`Hello Keja AI — I'd like to book a viewing for ${p.title} (${passportId(p)}).`)} target="_blank" rel="noopener noreferrer" onClick={() => track({ event: 'viewing_request', propertyId: p.id })}>
+                <Button variant="outline" className="w-full font-bold">
+                  <MessageCircle className="mr-1.5 h-4 w-4" aria-hidden /> Book a viewing
+                </Button>
+              </a>
+              <a href={whatsappLink(`Hello Keja AI — I'm interested in ${p.title} (${passportId(p)}).`)} target="_blank" rel="noopener noreferrer" onClick={() => track({ event: 'human_handoff', channel: 'whatsapp', context: 'listing-enquiry' })}>
                 <Button variant="ghost" className="w-full font-bold text-[#25D366] hover:bg-[#25D366]/10 hover:text-[#25D366]">
                   <MessageCircle className="mr-1.5 h-4 w-4" aria-hidden /> WhatsApp the desk
                 </Button>

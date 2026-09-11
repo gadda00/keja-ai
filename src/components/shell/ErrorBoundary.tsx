@@ -1,10 +1,15 @@
 'use client';
 /**
  * Global error boundary — keeps one broken view from taking down the shell.
+ * Production errors are reported through the telemetry layer (audit F-10):
+ * a local ring buffer always, plus the configured Sentry project when
+ * NEXT_PUBLIC_SENTRY_DSN is set. Release is tagged from the service-worker
+ * version stamped into index.html at build time.
  */
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { captureError } from '@/lib/telemetry';
 
 interface State {
   error: Error | null;
@@ -21,6 +26,10 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
     if (process.env.NODE_ENV === 'development') {
       console.error('[keja] view error', error, info.componentStack);
     }
+    captureError(error, {
+      componentStack: info.componentStack ?? undefined,
+      extras: { boundary: 'view' },
+    });
   }
 
   render() {

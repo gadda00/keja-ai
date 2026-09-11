@@ -15,6 +15,9 @@
  * outside it (compile-time via the union, runtime via console warning in dev).
  */
 
+// Cookieless remote mirror (no-op until NEXT_PUBLIC_ANALYTICS_ENDPOINT is set).
+import { captureEvent } from '@/lib/telemetry';
+
 export type AnalyticsEvent =
   | { event: 'search'; query: string; results: number }
   | { event: 'result_view'; propertyId: string }
@@ -87,7 +90,12 @@ function persist(next: StoredEvent[]) {
   }
 }
 
-/** Record an analytics event. Fire-and-forget; total failure is acceptable. */
+/** Record an analytics event. Fire-and-forget; total failure is acceptable.
+ *
+ *  Local ring buffer always; when NEXT_PUBLIC_ANALYTICS_ENDPOINT is set the
+ *  same event is mirrored off-device through the cookieless telemetry
+ *  channel (audit F-11 / P1-5) — sendBeacon, no cookies, no PII beyond the
+ *  taxonomy payload, tagged with the build release. */
 export function track(payload: AnalyticsEvent): void {
   if (typeof window === 'undefined') return;
   if (!EVENT_TAXONOMY.includes(payload.event as never)) {
@@ -97,6 +105,7 @@ export function track(payload: AnalyticsEvent): void {
   const entry: StoredEvent = { t: new Date().toISOString(), e: payload };
   const next = [...loadBuffer(), entry].slice(-BUFFER_MAX);
   persist(next);
+  captureEvent(payload.event, payload as unknown as Record<string, unknown>);
 }
 
 /** Read-only access for debugging / future dashboards. */

@@ -11,6 +11,7 @@
  */
 import { asset } from '@/config';
 import raw from '@/data/auto-listings.json';
+import { validateAutoState } from '@/lib/boundaries';
 import type { Property } from '@/data/properties';
 
 export interface AutoCheck {
@@ -68,7 +69,7 @@ export interface AutoRun {
   feedStatus: { feed: string; format: string; items: number; state: string }[];
 }
 
-interface AutoState {
+interface AutoState {  // shape of src/data/auto-listings.json (validated at the boundary)
   version: number;
   generatedAt: string;
   runs: AutoRun[];
@@ -83,10 +84,23 @@ interface AutoState {
   }[];
 }
 
-export const AUTO_STATE = raw as unknown as AutoState;
-export const AUTO_LISTINGS: AutoListing[] = AUTO_STATE.listings ?? [];
-export const AUTO_PENDING: AutoListing[] = AUTO_STATE.pending ?? [];
-export const AUTO_RUNS: AutoRun[] = AUTO_STATE.runs ?? [];
+// F-20: the generated file is VALIDATED at the boundary — no more
+// `as unknown as` trust cast. Invalid entries are dropped individually
+// (see boundaries.ts) so a bad bot commit cannot crash the marketplace.
+const VALIDATED = validateAutoState(raw);
+
+export const AUTO_STATE: AutoState = {
+  version: VALIDATED.version,
+  generatedAt: VALIDATED.generatedAt,
+  runs: VALIDATED.runs as AutoRun[],
+  listings: VALIDATED.listings as unknown as AutoListing[],
+  pending: VALIDATED.pending as unknown as AutoListing[],
+};
+export const AUTO_LISTINGS: AutoListing[] = AUTO_STATE.listings;
+export const AUTO_PENDING: AutoListing[] = AUTO_STATE.pending;
+export const AUTO_RUNS: AutoRun[] = AUTO_STATE.runs;
+/** Entries dropped by boundary validation (surfaced in the admin console). */
+export const AUTO_DROPPED = VALIDATED.dropped;
 
 /** Quality score → honest trust score band (never above partner ceiling 88). */
 function autoTrustScore(l: AutoListing): number {

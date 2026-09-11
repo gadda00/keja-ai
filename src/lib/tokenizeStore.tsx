@@ -11,6 +11,7 @@
  * fast-forward so the full lifecycle is demonstrable in minutes.
  */
 import type { ReactNode } from 'react';
+import { validateTokenizePersisted } from '@/lib/boundaries';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import type {
@@ -20,6 +21,7 @@ import type {
   ReceivedDistribution,
   TokenizedProperty,
 } from '@/data/tokenize';
+import { newId } from '@/lib/uuid';
 import {
   DEMO_DISTRIBUTIONS,
   DEMO_INVESTMENTS,
@@ -104,7 +106,10 @@ function load(): PersistedState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return EMPTY;
-    const parsed = JSON.parse(raw) as Partial<PersistedState>;
+    // F-19: validate the persisted shape at the read boundary — a corrupted
+    // or hand-edited value falls back to field defaults instead of crashing
+    // deep inside the trial wallet maths.
+    const parsed = validateTokenizePersisted(JSON.parse(raw)) as Partial<PersistedState>;
     return { ...EMPTY, ...parsed, walletUsd: parsed.walletUsd ?? TRIAL_START_BALANCE_USD };
   } catch {
     return EMPTY;
@@ -295,8 +300,14 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
   const closeKyc = useCallback(() => setKycOpen(false), []);
 
   const completeKyc = useCallback((form: KycForm): Investor => {
+    // Privacy-by-design (audit F-02): the KYC identifiers — idNumber and
+    // sourceOfFunds — are deliberately DROPPED here. Only the contact fields
+    // needed to label the trial wallet are persisted, and they stay on this
+    // device. When the Phase-2 API seam ships, this is the exact point where
+    // identifiers will be POSTed once to the KYC service (encrypted at rest,
+    // ODPC-noted) instead of being stored locally.
     const investor: Investor = {
-      id: `inv-${Date.now().toString(36)}`,
+      id: newId('inv'),
       email: form.email,
       fullName: form.fullName,
       phone: form.phone,
@@ -335,7 +346,7 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
       const firstBuy = !state.investments.some((i) => i.propertyId === propertyId);
 
       const investment: Investment = {
-        id: `inv-${Date.now().toString(36)}`,
+        id: newId('inv'),
         propertyId: p.id,
         tokenAmount,
         pricePerTokenUsd: p.tokenPriceUsd,
@@ -450,7 +461,7 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
       const txHash = randomHex(64);
       const blockNumber = nextBlockNumber();
       const prop: TokenizedProperty = {
-        id: `kj-custom-${Date.now().toString(36)}`,
+        id: newId('kj-custom'),
         slug: draft.title
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '-')
@@ -571,7 +582,7 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
       const txHash = randomHex(64);
       const now = new Date(Date.now() + state.clockOffsetMs).toISOString();
       const investment: Investment = {
-        id: `inv-${Date.now().toString(36)}`,
+        id: newId('inv'),
         propertyId,
         tokenAmount: fill.filled,
         pricePerTokenUsd: fill.avgPriceUsd,
@@ -591,7 +602,7 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
         type: 'PURCHASE',
       };
       const trade: Trade = {
-        id: `trd-${Date.now().toString(36)}`,
+        id: newId('trd'),
         propertyId,
         symbol: p.tokenSymbol,
         side: 'BUY',
@@ -645,7 +656,7 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
         type: 'SALE',
       };
       const trade: Trade = {
-        id: `trd-${Date.now().toString(36)}`,
+        id: newId('trd'),
         propertyId,
         symbol: p.tokenSymbol,
         side: 'SELL',
@@ -766,7 +777,11 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
       );
       if (entries.length > 0) void accrue(nowMs);
     }
-     
+    // deliberate one-time mount sweep: accrues any distributions that came
+    // due while the app was closed; re-running on state changes would
+    // double-accrue (accrue() itself is idempotent via lastAccrual, but the
+    // effect would thrash on every wallet interaction)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const value = useMemo<TokenizeStore>(
@@ -800,6 +815,8 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
       walletUsd: state.walletUsd,
       trades: state.trades,
       clockOffsetMs: state.clockOffsetMs,
+      // live trial clock: an intentional "now" snapshot per render — the
+      // value is display-only and must track wall time
       trialNowMs: Date.now() + state.clockOffsetMs,
       topUpTrial,
       buySecondary,
@@ -1020,15 +1037,15 @@ export function portfolioMarkToMarket(
 function pickImage(type: TokenizedProperty['propertyType']): string {
   switch (type) {
     case 'OFFICE':
-      return '/images/props/office_1.jpg';
+      return '/images/props/office_1.webp';
     case 'RESIDENTIAL':
-      return '/images/props/apartment_1.jpg';
+      return '/images/props/apartment_1.webp';
     case 'RETAIL':
-      return '/images/props/interior_1.jpg';
+      return '/images/props/interior_1.webp';
     case 'MIXED_USE':
-      return '/images/props/townhouse_1.jpg';
+      return '/images/props/townhouse_1.webp';
     case 'LOGISTICS':
-      return '/images/props/land_1.jpg';
+      return '/images/props/land_1.webp';
   }
 }
 

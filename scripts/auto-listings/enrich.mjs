@@ -10,7 +10,7 @@
  * Enrichment never invents trust facts — it only formats and computes.
  */
 import {
-  AMENITIES, POI, TENANT_MIX, CORRIDORS, DESCRIPTION_GRAMMAR, titleFor,
+  AMENITIES, POI, TENANT_MIX, DESCRIPTION_GRAMMAR, titleFor,
   makeRng, pick, pickN,
 } from './market.mjs'
 
@@ -75,7 +75,7 @@ export function enrich(sighting, seq) {
     land: ['land_0', 'land_1'],
     commercial: ['office_0', 'office_1', 'interior_2'],
   }
-  const photos = pickN(rng, PHOTO_POOLS[r.type] ?? PHOTO_POOLS.apartment, r.type === 'land' ? 2 : 3).map((p) => `/images/props/${p}.jpg`)
+  const photos = pickN(rng, PHOTO_POOLS[r.type] ?? PHOTO_POOLS.apartment, r.type === 'land' ? 2 : 3).map((p) => `/images/props/${p}.webp`)
 
   const id = `KJA-A${String(seq).padStart(4, '0')}`
   const title = r.feedTitle ?? titleFor(rng, r.type, r.area, r.bedrooms ?? 0)

@@ -310,6 +310,12 @@ function KycModal() {
     idType: 'NATIONAL_ID', idNumber: '', sourceOfFunds: '',
   });
   if (!tk.kycOpen) return null;
+  /** Close and discard — KYC identifiers are NEVER persisted (audit F-02):
+   *  nothing entered here reaches localStorage, the network, or the ledger. */
+  const closeAndDiscard = () => {
+    setForm({ fullName: '', email: '', phone: '', country: '', idType: 'NATIONAL_ID', idNumber: '', sourceOfFunds: '' });
+    tk.closeKyc();
+  };
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Investor KYC">
       <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border bg-card p-6 slim-scroll">
@@ -319,27 +325,47 @@ function KycModal() {
         </div>
         <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
           Trial-mode onboarding: the same KYC/AML steps a live issuance would require — identity,
-          contact and source-of-funds screening. Data stays on this device.
+          contact and source-of-funds screening. Any values work in this trial.
         </p>
+        {/* Data-collection notice (audit F-02 / P0-2, Kenya DPA 2019 aligned) */}
+        <div className="mt-3 rounded-xl border border-primary/25 bg-primary/5 p-3 text-[11px] leading-relaxed text-muted-foreground" role="note">
+          <p className="font-bold text-foreground">Before you type anything real:</p>
+          <ul className="mt-1 list-disc space-y-0.5 pl-4">
+            <li>This trial does <strong>not verify identities</strong> and no issuance is live.</li>
+            <li>Your ID / passport number and source of funds are <strong>used in-memory only and discarded when this dialog closes</strong> — they are never saved to this device, never sent to any server, and never attached to your wallet.</li>
+            <li>Only your name, contact details and country are kept (on this device) to label the trial wallet.</li>
+          </ul>
+          <p className="mt-1.5">
+            Prefer not to share even that? Enter placeholder values — the trial works identically.
+            See <a className="font-semibold underline" href="#/legal" onClick={closeAndDiscard}>privacy policy</a>.
+          </p>
+        </div>
         <div className="mt-4 grid grid-cols-2 gap-3">
           {([
             ['fullName', 'Full name'], ['email', 'Email'], ['phone', 'Phone'], ['country', 'Country of residence'],
-            ['idNumber', 'ID / Passport number'], ['sourceOfFunds', 'Source of funds'],
+            ['idNumber', 'ID / Passport number (any value — not saved)'], ['sourceOfFunds', 'Source of funds (any value — not saved)'],
           ] as const).map(([k, l]) => (
             <div key={k} className="grid gap-1">
               <Label htmlFor={`kyc-${k}`}>{l}</Label>
-              <Input id={`kyc-${k}`} value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} />
+              <Input
+                id={`kyc-${k}`}
+                value={form[k]}
+                autoComplete="off"
+                onChange={(e) => setForm({ ...form, [k]: e.target.value })}
+              />
             </div>
           ))}
         </div>
         <div className="mt-5 flex gap-2">
-          <Button variant="outline" className="flex-1 font-bold" onClick={tk.closeKyc}>Cancel</Button>
+          <Button variant="outline" className="flex-1 font-bold" onClick={closeAndDiscard}>Cancel</Button>
           <Button
             className="flex-1 font-black"
             disabled={!form.fullName || !form.email || !form.idNumber}
             onClick={() => {
+              // completeKyc persists only contact fields; the identifier
+              // fields (idNumber, sourceOfFunds) are deliberately dropped.
               tk.completeKyc(form);
-              tk.closeKyc();
+              closeAndDiscard();
             }}
           >
             Verify & open wallet

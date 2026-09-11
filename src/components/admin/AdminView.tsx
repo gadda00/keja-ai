@@ -1,20 +1,20 @@
 'use client';
 /** Admin console — verification queue, partner applications, listing reports, audit trail, settings. */
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { CheckCircle2, FileSearch, Gavel, Plug, Settings2, ShieldAlert, Users, XCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useSubmissions, usePartners, useFeeds, useSettings, useAuditLog, useListingReports, setReportStatus, type ListingSubmission } from '@/lib/adminStore';
+import { useSubmissions, usePartners, useFeeds, useSettings, useAuditLog, useListingReports, setReportStatus, type ListingSubmission, type SubmissionStatus } from '@/lib/adminStore';
 import { formatKES } from '@/lib/format';
-import { navigate } from '@/lib/router';
 import { cn } from '@/lib/utils';
 
-const SUBMISSION_STATUS = {
+const SUBMISSION_STATUS: Record<SubmissionStatus, string> = {
   pending: 'bg-gold/15 text-gold-foreground',
   approved: 'bg-primary/10 text-primary',
   rejected: 'bg-destructive/10 text-destructive',
-} as const;
+  flagged: 'bg-destructive/15 text-destructive',
+};
 
 export default function AdminView() {
   const [submissions, setSubmissions] = useSubmissions();

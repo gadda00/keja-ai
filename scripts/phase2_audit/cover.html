@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  @page { size: 794px 1123px; margin: 0; }
+  :root {
+    /* Cascade palette (seed 42) - cover aliases */
+    --c-bg: #f4f5f5;
+    --c-accent: #1f6c92;
+    --c-text: #131515;
+    --c-muted: #747b7e;
+    --c-mid: #32454e;
+    --c-surface: #e8eaeb;
+    --c-border: #acbdc5;
+  }
+  html, body {
+    margin: 0; padding: 0; width: 794px; height: 1123px;
+    background: var(--c-bg); color: var(--c-text);
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  }
+  @media screen {
+    html { height: auto; display: flex; justify-content: center; min-height: 100vh; background: var(--c-bg); }
+    body { transform-origin: top center; scale: min(1, calc(100vw / 794), calc(100vh / 1123)); margin: 0 auto; box-shadow: 0 0 60px rgba(0,0,0,0.15); }
+  }
+  .cover { width: 794px; height: 1123px; position: relative; border: none; outline: none; box-shadow: none; }
+
+  /* Layer 1 - background grid (clipped) */
+  .layer-1 {
+    position: absolute; inset: 0; overflow: hidden; z-index: 1;
+    background-image:
+      linear-gradient(rgba(31, 108, 146, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(31, 108, 146, 0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* Layer 2 - structure: ultra-thick vertical anchor line */
+  .layer-2 { position: absolute; inset: 0; z-index: 2; }
+  .anchor-line {
+    position: absolute;
+    left: 95px;             /* 0.12 * W */
+    top: 112px;             /* 0.10 * H */
+    bottom: 112px;          /* to 0.90 * H */
+    width: 6px;
+    background: var(--c-accent);
+  }
+
+  /* Layer 3 - content. Content left edge = 0.12*W + 30px = 131px */
+  .layer-3 { position: absolute; inset: 0; z-index: 3; }
+  .kicker {
+    position: absolute; left: 145px; top: 168px;   /* 0.15 * H */
+    font-size: 16pt; font-weight: 400; color: var(--c-mid);
+    letter-spacing: 3pt; text-transform: uppercase; opacity: 0.6;
+    max-width: 540px;
+  }
+  .hero {
+    position: absolute; left: 145px; top: 340px;
+    font-size: 46pt; font-weight: 900; line-height: 1.15;
+    color: var(--c-text); max-width: 590px;
+    letter-spacing: -0.5pt;
+  }
+  .hero .accent { color: var(--c-accent); }
+  .summary {
+    position: absolute; left: 145px; top: 575px;
+    font-size: 16pt; font-weight: 400; line-height: 1.6;
+    color: var(--c-text); opacity: 0.85; max-width: 476px;  /* W * 0.6 */
+  }
+  .meta {
+    position: absolute; left: 145px; top: 848px;
+    font-size: 17pt; font-weight: 400; color: var(--c-text);
+    line-height: 1.7; max-width: 520px;
+  }
+  .meta .label { color: var(--c-muted); font-size: 13pt; }
+  .footer {
+    position: absolute; left: 145px; bottom: 64px;
+    font-size: 16pt; font-weight: 400; color: var(--c-mid);
+    letter-spacing: 3pt; text-transform: uppercase; opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+  <div class="cover">
+    <div class="layer-1"></div>
+    <div class="layer-2"><div class="anchor-line"></div></div>
+    <div class="layer-3">
+      <div class="kicker">Phase 2 Technical Audit &amp; Codebase Review</div>
+      <div class="hero">Keja AI Platform<br>Audit</div>
+      <div class="summary">
+        A full-depth engineering review of the keja-ai repository: architecture,
+        code quality, security, PWA, performance, SEO, and testing - with a
+        consolidated findings register and a sequenced 90-day improvement roadmap.
+      </div>
+      <div class="meta">
+        <span class="label">Prepared by</span><br>
+        Keja AI Engineering Audit Team<br>
+        <span class="label">Repository</span>&nbsp;&nbsp;gadda00/keja-ai @ 86e2a66<br>
+        <span class="label">Date</span>&nbsp;&nbsp;September 2026
+      </div>
+      <div class="footer">47 Findings &middot; 28 Chapters &middot; 6 Appendices</div>
+    </div>
+  </div>
+</body>
+</html>

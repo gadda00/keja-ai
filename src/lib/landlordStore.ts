@@ -10,6 +10,7 @@
  */
 import { DEFAULT_EXPENSES } from '@/lib/finance';
 import { useStore } from '@/lib/store';
+import { newId } from '@/lib/uuid';
 
 export interface Unit {
   id: string;
@@ -502,7 +503,7 @@ export interface PaymentInput {
 }
 
 function uid(prefix: string): string {
-  return `${prefix}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+  return newId(prefix);
 }
 
 const cloneSeed = (): LandlordData => JSON.parse(JSON.stringify(SEED_LANDLORD)) as LandlordData;

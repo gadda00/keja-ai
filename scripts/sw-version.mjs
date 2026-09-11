@@ -61,3 +61,19 @@ if (prev === version) {
   writeFileSync(SW, src.replace(/const VERSION = '[^']*'/, `const VERSION = '${version}'`), 'utf8')
   console.log(`[sw-version] cache version ${prev} -> ${version} (stale caches will self-evict)`)
 }
+
+// Stamp the release tag into every HTML entry point (index.html + the
+// prerendered route pages). The telemetry layer reads <meta name="keja-release">
+// so every error report / analytics event maps 1:1 to a deployable artifact
+// hash (audit F-10 / P0-6) — same value the service worker versions on.
+const RELEASE_META = `<meta name="keja-release" content="${version}" />`
+for (const f of files.filter((f) => f.endsWith('.html'))) {
+  let html = readFileSync(f, 'utf8')
+  if (html.includes('name="keja-release"')) {
+    html = html.replace(/<meta name="keja-release" content="[^"]*" \/>/, RELEASE_META)
+  } else {
+    html = html.replace('</title>', `</title>\n    ${RELEASE_META}`)
+  }
+  writeFileSync(f, html, 'utf8')
+}
+console.log(`[sw-version] stamped release ${version} into HTML entry points`)

@@ -5,15 +5,7 @@
  * (development · construction · land · diaspora · investment finance).
  */
 import { useMemo, useState } from 'react';
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, } from '@/components/charts/reexports';
 import {
   BadgeCheck,
   Building,
@@ -40,7 +32,6 @@ import {
 } from '@/lib/finance';
 import { formatKES } from '@/lib/format';
 import { useRouter } from '@/lib/router';
-import { cn } from '@/lib/utils';
 
 function MortgageCalculator({ initialPrice }: { initialPrice: number }) {
   const [price, setPrice] = useState(initialPrice || 15_000_000);

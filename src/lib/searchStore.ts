@@ -7,6 +7,7 @@ import { useCallback, useEffect } from 'react';
 import type { Property } from '@/data/properties';
 import { isRentalPrice } from '@/lib/finance';
 import { KEYS, store, useStore } from '@/lib/store';
+import { newId } from '@/lib/uuid';
 
 export interface SavedSearch {
   id: string;
@@ -80,7 +81,7 @@ export function useSavedSearches() {
   const [searches, setSearches] = useStore<SavedSearch[]>(KEYS.searches, []);
   const save = useCallback(
     (filters: SavedSearch['filters'], label: string) => {
-      const id = `ss-${Date.now()}`;
+      const id = newId('ss');
       setSearches(
         [
           { id, label, filters, createdAt: new Date().toISOString(), alerts: true, seenIds: [] },
@@ -160,7 +161,7 @@ export function runAlertSweep(properties: Property[]) {
     s.seenIds = [...s.seenIds, ...hits.map((p) => p.id)].slice(-200);
     for (const p of hits.slice(0, 3)) {
       notifs.unshift({
-        id: `n-${Date.now()}-${p.id}-${s.id}`,
+        id: newId('n'),
         kind: 'match',
         title: 'New match for your saved search',
         body: `"${p.title}" in ${p.area} matches "${s.label}"`,
@@ -183,7 +184,7 @@ export function notify(n: Omit<Notification, 'id' | 'createdAt' | 'read'>) {
   const notifs = store.get<Notification[]>(KEYS.notifications, []);
   notifs.unshift({
     ...n,
-    id: `n-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    id: newId('n'),
     createdAt: new Date().toISOString(),
     read: false,
   });
@@ -214,6 +215,8 @@ export function useAlertSweep(properties: Property[]) {
   useEffect(() => {
     const t = window.setTimeout(() => runAlertSweep(properties), 1500);
     return () => window.clearTimeout(t);
-     
+    // deliberate: fire once when the inventory size settles — depending on
+    // the array identity would re-run the sweep on every parent render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [properties.length]);
 }

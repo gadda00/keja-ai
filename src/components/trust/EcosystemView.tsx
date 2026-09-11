@@ -1,12 +1,11 @@
 'use client';
 /** Ecosystem page (proposal §2 + §20) — the nine-product map and the long-term vision. */
 import { motion } from 'framer-motion';
-import { ArrowDown, ArrowRight, Building2, Coins, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, Building2, Coins, ShieldCheck, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ECOSYSTEM, PORTALS } from '@/lib/ecosystem';
 import { Link, navigate } from '@/lib/router';
 import { SITE } from '@/config';
-import { cn } from '@/lib/utils';
 
 export default function EcosystemView() {
   return (

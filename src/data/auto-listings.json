@@ -1323,9 +1323,9 @@
         "CCTV surveillance"
       ],
       "images": [
-        "/images/props/bedroom_0.jpg",
-        "/images/props/apartment_0.jpg",
-        "/images/props/apartment_2.jpg"
+        "/images/props/bedroom_0.webp",
+        "/images/props/apartment_0.webp",
+        "/images/props/apartment_2.webp"
       ],
       "description": "An honest, well-maintained apartment in Diani — 72 sqm of sensible layout for owners and investors alike. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. A practical choice for anyone seeking a genuine Diani address without overpaying.",
       "agency": "Horizon Realtors",
@@ -1393,8 +1393,8 @@
       "sizeSqm": 159,
       "amenities": ["Fenced compound", "Car porch", "Water storage tanks"],
       "images": [
-        "/images/props/apartment_1.jpg",
-        "/images/props/townhouse_0.jpg"
+        "/images/props/apartment_1.webp",
+        "/images/props/townhouse_0.webp"
       ],
       "description": "A well-presented bungalow in Kileleshwa, Nairobi, offering 159 sqm of bright, efficiently planned space. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. At KES 98k/sqm the pricing sits within the Kileleshwa band, and the area yield band of 8.4% supports a solid income case.",
       "agency": "Skyline Agents Kenya",
@@ -1462,8 +1462,8 @@
       "sizeSqm": 155,
       "amenities": ["Car porch", "Mature garden", "Solar water heating"],
       "images": [
-        "/images/props/apartment_1.jpg",
-        "/images/props/townhouse_0.jpg"
+        "/images/props/apartment_1.webp",
+        "/images/props/townhouse_0.webp"
       ],
       "description": "A well-presented bungalow in Kilimani, Nairobi, offering 155 sqm of bright, efficiently planned space. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. At KES 140k/sqm the pricing sits above the Kilimani band, and the area yield band of 8.2% supports a solid income case.",
       "agency": "Horizon Realtors",
@@ -1531,9 +1531,9 @@
       "sizeSqm": 178,
       "amenities": ["Lift access", "24/7 security", "Borehole water", "Gym"],
       "images": [
-        "/images/props/bedroom_0.jpg",
-        "/images/props/interior_1.jpg",
-        "/images/props/apartment_0.jpg"
+        "/images/props/bedroom_0.webp",
+        "/images/props/interior_1.webp",
+        "/images/props/apartment_0.webp"
       ],
       "description": "An honest, well-maintained apartment in Nanyuki — 178 sqm of sensible layout for owners and investors alike. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Nanyuki, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Coastal Living Estates",
@@ -1607,8 +1607,8 @@
         "Borehole + storage tanks"
       ],
       "images": [
-        "/images/props/townhouse_1.jpg",
-        "/images/props/interior_0.jpg"
+        "/images/props/townhouse_1.webp",
+        "/images/props/interior_0.webp"
       ],
       "description": "This 411 sqm villa in Ruaka has been finished to a practical standard and priced with discipline. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 83k/sqm the pricing sits within the Ruaka band, and the area yield band of 8% supports a solid income case.",
       "agency": "Skyline Agents Kenya",
@@ -1679,7 +1679,7 @@
         "Conference facilities",
         "100% backup power"
       ],
-      "images": ["/images/props/interior_2.jpg", "/images/props/office_1.jpg"],
+      "images": ["/images/props/interior_2.webp", "/images/props/office_1.webp"],
       "description": "A well-presented commercial unit in Kileleshwa, Nairobi, offering 714 sqm of bright, efficiently planned space. Infrastructure — power backup, connectivity and parking — supports immediate occupation. At KES 107k/sqm the pricing sits within the Kileleshwa band, and the area yield band of 8.4% supports a solid income case.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -1746,8 +1746,8 @@
       "sizeSqm": 61,
       "amenities": ["Solar water heating", "Quiet cul-de-sac", "Mature garden"],
       "images": [
-        "/images/props/townhouse_0.jpg",
-        "/images/props/interior_1.jpg"
+        "/images/props/townhouse_0.webp",
+        "/images/props/interior_1.webp"
       ],
       "description": "This 61 sqm bungalow in Runda has been finished to a practical standard and priced with discipline. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. At KES 92k/sqm the pricing sits above the Runda band, and the area yield band of 6% supports a solid income case.",
       "agency": "Horizon Realtors",
@@ -1819,7 +1819,7 @@
         "Gated community",
         "Half-acre garden"
       ],
-      "images": ["/images/props/townhouse_1.jpg", "/images/props/villa_1.jpg"],
+      "images": ["/images/props/townhouse_1.webp", "/images/props/villa_1.webp"],
       "description": "A well-presented villa in Kileleshwa, Nairobi, offering 316 sqm of bright, efficiently planned space. The property sits on a mature, well-kept compound with room for family life and entertaining. The Kileleshwa market band and 8.4% yield environment make this a disciplined income or appreciation play.",
       "agency": "Prestige Homes KE",
       "agent": {
@@ -1889,7 +1889,7 @@
         "Fibre backbone",
         "Raised floors"
       ],
-      "images": ["/images/props/office_0.jpg", "/images/props/interior_2.jpg"],
+      "images": ["/images/props/office_0.webp", "/images/props/interior_2.webp"],
       "description": "An honest, well-maintained commercial unit in Milimani — 133 sqm of sensible layout for owners and investors alike. Infrastructure — power backup, connectivity and parking — supports immediate occupation. At KES 70k/sqm the pricing sits above the Milimani band, and the area yield band of 7.4% supports a solid income case.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -1961,9 +1961,9 @@
         "Balcony"
       ],
       "images": [
-        "/images/props/interior_0.jpg",
-        "/images/props/bedroom_0.jpg",
-        "/images/props/interior_1.jpg"
+        "/images/props/interior_0.webp",
+        "/images/props/bedroom_0.webp",
+        "/images/props/interior_1.webp"
       ],
       "description": "Rarely available: a apartment in Kitengela combining space (157 sqm), light and a convenient address. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. At KES 54k/sqm the pricing sits above the Kitengela band, and the area yield band of 7.6% supports a solid income case.",
       "agency": "Skyline Agents Kenya",
@@ -2037,9 +2037,9 @@
         "CCTV surveillance"
       ],
       "images": [
-        "/images/props/bedroom_0.jpg",
-        "/images/props/interior_1.jpg",
-        "/images/props/apartment_1.jpg"
+        "/images/props/bedroom_0.webp",
+        "/images/props/interior_1.webp",
+        "/images/props/apartment_1.webp"
       ],
       "description": "An honest, well-maintained apartment in Milimani — 180 sqm of sensible layout for owners and investors alike. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. At KES 53k/sqm the pricing sits within the Milimani band, and the area yield band of 7.4% supports a solid income case.",
       "agency": "Skyline Agents Kenya",
@@ -2113,9 +2113,9 @@
         "Secure parking"
       ],
       "images": [
-        "/images/props/interior_1.jpg",
-        "/images/props/apartment_2.jpg",
-        "/images/props/interior_0.jpg"
+        "/images/props/interior_1.webp",
+        "/images/props/apartment_2.webp",
+        "/images/props/interior_0.webp"
       ],
       "description": "Rarely available: a apartment in Athi River combining space (166 sqm), light and a convenient address. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. At KES 40k/sqm the pricing sits above the Athi River band, and the area yield band of 7.2% supports a solid income case.",
       "agency": "Skyline Agents Kenya",
@@ -2187,7 +2187,7 @@
         "Conference facilities",
         "Loading bay"
       ],
-      "images": ["/images/props/office_0.jpg", "/images/props/office_1.jpg"],
+      "images": ["/images/props/office_0.webp", "/images/props/office_1.webp"],
       "description": "An honest, well-maintained commercial unit in Nakuru — 135 sqm of sensible layout for owners and investors alike. Infrastructure — power backup, connectivity and parking — supports immediate occupation. At KES 43k/sqm the pricing sits within the Nakuru band, and the area yield band of 7.8% supports a solid income case.",
       "agency": "Skyline Agents Kenya",
       "agent": {
@@ -2254,7 +2254,7 @@
         "Water on site",
         "Beaconed boundaries"
       ],
-      "images": ["/images/props/land_0.jpg"],
+      "images": ["/images/props/land_0.webp"],
       "description": "This 31107 sqm land parcel in Runda has been finished to a practical standard and priced with discipline. Documentation is available for inspection; the holding is clean and transfer-ready. Convenient, well-connected and realistically priced for the current market.",
       "agency": "Coastal Living Estates",
       "agent": {
@@ -2326,7 +2326,7 @@
         "Ample parking bays",
         "Grade-A finishes"
       ],
-      "images": ["/images/props/office_0.jpg", "/images/props/interior_2.jpg"],
+      "images": ["/images/props/office_0.webp", "/images/props/interior_2.webp"],
       "description": "This 250 sqm commercial unit in Runda has been finished to a practical standard and priced with discipline. Infrastructure — power backup, connectivity and parking — supports immediate occupation. The Runda market band and 6% yield environment make this a disciplined income or appreciation play.",
       "agency": "Diaspora Property Group",
       "agent": {
@@ -2391,9 +2391,9 @@
       "sizeSqm": 108,
       "amenities": ["Gym", "Secure parking", "24/7 security", "Borehole water"],
       "images": [
-        "/images/props/bedroom_0.jpg",
-        "/images/props/interior_0.jpg",
-        "/images/props/apartment_0.jpg"
+        "/images/props/bedroom_0.webp",
+        "/images/props/interior_0.webp",
+        "/images/props/apartment_0.webp"
       ],
       "description": "An honest, well-maintained apartment in Milimani — 108 sqm of sensible layout for owners and investors alike. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. A practical choice for anyone seeking a genuine Milimani address without overpaying.",
       "agency": "Horizon Realtors",
@@ -2461,8 +2461,8 @@
       "sizeSqm": 116,
       "amenities": ["Car porch", "Water storage tanks", "Mature garden"],
       "images": [
-        "/images/props/interior_1.jpg",
-        "/images/props/townhouse_0.jpg"
+        "/images/props/interior_1.webp",
+        "/images/props/townhouse_0.webp"
       ],
       "description": "An honest, well-maintained bungalow in Diani — 116 sqm of sensible layout for owners and investors alike. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. Benchmarked against comparable stock in Diani, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Nairobi Prime Properties",
@@ -2536,9 +2536,9 @@
         "Balcony"
       ],
       "images": [
-        "/images/props/interior_1.jpg",
-        "/images/props/apartment_0.jpg",
-        "/images/props/apartment_2.jpg"
+        "/images/props/interior_1.webp",
+        "/images/props/apartment_0.webp",
+        "/images/props/apartment_2.webp"
       ],
       "description": "Rarely available: a apartment in Athi River combining space (150 sqm), light and a convenient address. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Athi River, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Coastal Living Estates",
@@ -2606,7 +2606,7 @@
         "Beaconed boundaries",
         "Electricity on site"
       ],
-      "images": ["/images/props/land_0.jpg"],
+      "images": ["/images/props/land_0.webp"],
       "description": "An honest, well-maintained land parcel in Nakuru — 15857 sqm of sensible layout for owners and investors alike. Documentation is available for inspection; the holding is clean and transfer-ready. A practical choice for anyone seeking a genuine Nakuru address without overpaying.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -2680,9 +2680,9 @@
         "Fibre internet ready"
       ],
       "images": [
-        "/images/props/bedroom_0.jpg",
-        "/images/props/interior_0.jpg",
-        "/images/props/apartment_1.jpg"
+        "/images/props/bedroom_0.webp",
+        "/images/props/interior_0.webp",
+        "/images/props/apartment_1.webp"
       ],
       "description": "Set in the heart of Runda, this apartment delivers 171 sqm of comfortable living with genuine character. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. The Runda market band and 6% yield environment make this a disciplined income or appreciation play.",
       "agency": "Diaspora Property Group",
@@ -2750,7 +2750,7 @@
         "Ready title deed",
         "Water on site"
       ],
-      "images": ["/images/props/land_0.jpg"],
+      "images": ["/images/props/land_0.webp"],
       "description": "This 13261 sqm land parcel in Kasarani has been finished to a practical standard and priced with discipline. Documentation is available for inspection; the holding is clean and transfer-ready. A practical choice for anyone seeking a genuine Kasarani address without overpaying.",
       "agency": "Skyline Agents Kenya",
       "agent": {
@@ -2818,8 +2818,8 @@
       "sizeSqm": 126,
       "amenities": ["Water storage tanks", "Solar water heating", "Car porch"],
       "images": [
-        "/images/props/interior_1.jpg",
-        "/images/props/townhouse_0.jpg"
+        "/images/props/interior_1.webp",
+        "/images/props/townhouse_0.webp"
       ],
       "description": "This 126 sqm bungalow in Kasarani has been finished to a practical standard and priced with discipline. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. At KES 65k/sqm the pricing sits above the Kasarani band, and the area yield band of 8.6% supports a solid income case.",
       "agency": "Horizon Realtors",
@@ -2887,7 +2887,7 @@
         "Ready title deed",
         "Electricity on site"
       ],
-      "images": ["/images/props/land_1.jpg"],
+      "images": ["/images/props/land_1.webp"],
       "description": "Rarely available: a land parcel in Kitengela combining space (38275 sqm), light and a convenient address. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Kitengela at this price point rarely lingers.",
       "agency": "Prestige Homes KE",
       "agent": {
@@ -2960,8 +2960,8 @@
         "Borehole water"
       ],
       "images": [
-        "/images/props/townhouse_0.jpg",
-        "/images/props/apartment_2.jpg"
+        "/images/props/townhouse_0.webp",
+        "/images/props/apartment_2.webp"
       ],
       "description": "Set in the heart of Karen, this townhouse delivers 144 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. Convenient, well-connected and realistically priced for the current market.",
       "agency": "Coastal Living Estates",
@@ -3034,9 +3034,9 @@
         "Backup generator"
       ],
       "images": [
-        "/images/props/interior_0.jpg",
-        "/images/props/apartment_2.jpg",
-        "/images/props/apartment_0.jpg"
+        "/images/props/interior_0.webp",
+        "/images/props/apartment_2.webp",
+        "/images/props/apartment_0.webp"
       ],
       "description": "This 60 sqm apartment in Madaraka has been finished to a practical standard and priced with discipline. Interiors are clean and neutral, ready for immediate occupation or a light personal refresh. Viewings are recommended — honest stock in Madaraka at this price point rarely lingers.",
       "agency": "Prestige Homes KE",
@@ -3108,9 +3108,9 @@
         "Borehole water"
       ],
       "images": [
-        "/images/props/interior_1.jpg",
-        "/images/props/apartment_0.jpg",
-        "/images/props/interior_0.jpg"
+        "/images/props/interior_1.webp",
+        "/images/props/apartment_0.webp",
+        "/images/props/interior_0.webp"
       ],
       "description": "Set in the heart of Runda, this apartment delivers 64 sqm of comfortable living with genuine character. Interiors are clean and neutral, ready for immediate occupation or a light personal refresh. A practical choice for anyone seeking a genuine Runda address without overpaying.",
       "agency": "Horizon Realtors",
@@ -3183,8 +3183,8 @@
         "Borehole + storage tanks"
       ],
       "images": [
-        "/images/props/townhouse_1.jpg",
-        "/images/props/interior_0.jpg"
+        "/images/props/townhouse_1.webp",
+        "/images/props/interior_0.webp"
       ],
       "description": "Set in the heart of Runda, this villa delivers 350 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. Benchmarked against comparable stock in Runda, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Coastal Living Estates",
@@ -3252,7 +3252,7 @@
         "Beaconed boundaries",
         "Ready title deed"
       ],
-      "images": ["/images/props/land_0.jpg"],
+      "images": ["/images/props/land_0.webp"],
       "description": "An honest, well-maintained land parcel in Diani — 31055 sqm of sensible layout for owners and investors alike. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Diani at this price point rarely lingers.",
       "agency": "Prestige Homes KE",
       "agent": {
@@ -3325,8 +3325,8 @@
         "Swimming pool"
       ],
       "images": [
-        "/images/props/interior_0.jpg",
-        "/images/props/townhouse_1.jpg"
+        "/images/props/interior_0.webp",
+        "/images/props/townhouse_1.webp"
       ],
       "description": "A well-presented villa in Westlands, Nairobi, offering 390 sqm of bright, efficiently planned space. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 130k/sqm the pricing sits within the Westlands band, and the area yield band of 7.6% supports a solid income case.",
       "agency": "Horizon Realtors",
@@ -3394,7 +3394,7 @@
         "Water on site",
         "Beaconed boundaries"
       ],
-      "images": ["/images/props/land_0.jpg"],
+      "images": ["/images/props/land_0.webp"],
       "description": "Rarely available: a land parcel in Athi River combining space (18000 sqm), light and a convenient address. Documentation is available for inspection; the holding is clean and transfer-ready. Convenient, well-connected and realistically priced for the current market.",
       "agency": "Nairobi Prime Properties",
       "agent": {
@@ -3467,8 +3467,8 @@
         "Perimeter wall"
       ],
       "images": [
-        "/images/props/apartment_2.jpg",
-        "/images/props/townhouse_0.jpg"
+        "/images/props/apartment_2.webp",
+        "/images/props/townhouse_0.webp"
       ],
       "description": "An honest, well-maintained townhouse in Nanyuki — 168 sqm of sensible layout for owners and investors alike. The property sits on a mature, well-kept compound with room for family life and entertaining. Benchmarked against comparable stock in Nanyuki, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Nairobi Prime Properties",
@@ -3540,7 +3540,7 @@
         "Gated community",
         "Swimming pool"
       ],
-      "images": ["/images/props/villa_0.jpg", "/images/props/villa_1.jpg"],
+      "images": ["/images/props/villa_0.webp", "/images/props/villa_1.webp"],
       "description": "An honest, well-maintained villa in Nakuru — 164 sqm of sensible layout for owners and investors alike. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 27k/sqm the pricing sits below the Nakuru band, and the area yield band of 7.8% supports a solid income case.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -3607,7 +3607,7 @@
         "Electricity on site",
         "Water on site"
       ],
-      "images": ["/images/props/land_0.jpg"],
+      "images": ["/images/props/land_0.webp"],
       "description": "A well-presented land parcel in Westlands, Nairobi, offering 29039 sqm of bright, efficiently planned space. Documentation is available for inspection; the holding is clean and transfer-ready. A practical choice for anyone seeking a genuine Westlands address without overpaying.",
       "agency": "Skyline Agents Kenya",
       "agent": {
@@ -3679,7 +3679,7 @@
         "Staff quarters",
         "Solar backup"
       ],
-      "images": ["/images/props/interior_0.jpg", "/images/props/villa_0.jpg"],
+      "images": ["/images/props/interior_0.webp", "/images/props/villa_0.webp"],
       "description": "Rarely available: a villa in Syokimau combining space (191 sqm), light and a convenient address. The property sits on a mature, well-kept compound with room for family life and entertaining. The Syokimau market band and 7.8% yield environment make this a disciplined income or appreciation play.",
       "agency": "Prestige Homes KE",
       "agent": {
@@ -3751,8 +3751,8 @@
         "Private garden"
       ],
       "images": [
-        "/images/props/interior_2.jpg",
-        "/images/props/apartment_2.jpg"
+        "/images/props/interior_2.webp",
+        "/images/props/apartment_2.webp"
       ],
       "description": "Rarely available: a townhouse in Kitengela combining space (255 sqm), light and a convenient address. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 42k/sqm the pricing sits within the Kitengela band, and the area yield band of 7.6% supports a solid income case.",
       "agency": "Horizon Realtors",
@@ -3820,8 +3820,8 @@
       "sizeSqm": 78,
       "amenities": ["Car porch", "Water storage tanks", "Mature garden"],
       "images": [
-        "/images/props/townhouse_0.jpg",
-        "/images/props/interior_1.jpg"
+        "/images/props/townhouse_0.webp",
+        "/images/props/interior_1.webp"
       ],
       "description": "This 78 sqm bungalow in Madaraka has been finished to a practical standard and priced with discipline. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. Benchmarked against comparable stock in Madaraka, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Nairobi Prime Properties",
@@ -3895,9 +3895,9 @@
         "Balcony"
       ],
       "images": [
-        "/images/props/interior_0.jpg",
-        "/images/props/interior_1.jpg",
-        "/images/props/apartment_0.jpg"
+        "/images/props/interior_0.webp",
+        "/images/props/interior_1.webp",
+        "/images/props/apartment_0.webp"
       ],
       "description": "Rarely available: a apartment in Kitengela combining space (137 sqm), light and a convenient address. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. At KES 36k/sqm the pricing sits below the Kitengela band, and the area yield band of 7.6% supports a solid income case.",
       "agency": "Skyline Agents Kenya",
@@ -3971,9 +3971,9 @@
         "Backup generator"
       ],
       "images": [
-        "/images/props/apartment_2.jpg",
-        "/images/props/interior_1.jpg",
-        "/images/props/apartment_0.jpg"
+        "/images/props/apartment_2.webp",
+        "/images/props/interior_1.webp",
+        "/images/props/apartment_0.webp"
       ],
       "description": "A well-presented apartment in Kilimani, Nairobi, offering 97 sqm of bright, efficiently planned space. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Kilimani, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Nairobi Prime Properties",
@@ -4041,7 +4041,7 @@
         "Ready title deed",
         "Near tarmac road"
       ],
-      "images": ["/images/props/land_1.jpg"],
+      "images": ["/images/props/land_1.webp"],
       "description": "This 12070 sqm land parcel in Runda has been finished to a practical standard and priced with discipline. Documentation is available for inspection; the holding is clean and transfer-ready. Convenient, well-connected and realistically priced for the current market.",
       "agency": "Nairobi Prime Properties",
       "agent": {
@@ -4113,7 +4113,7 @@
         "Guest wing",
         "EV charger ready"
       ],
-      "images": ["/images/props/interior_0.jpg", "/images/props/villa_0.jpg"],
+      "images": ["/images/props/interior_0.webp", "/images/props/villa_0.webp"],
       "description": "Set in the heart of Riverside, this villa delivers 248 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 130k/sqm the pricing sits within the Riverside band, and the area yield band of 7.2% supports a solid income case.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -4180,7 +4180,7 @@
         "Ready title deed",
         "Electricity on site"
       ],
-      "images": ["/images/props/land_0.jpg"],
+      "images": ["/images/props/land_0.webp"],
       "description": "An honest, well-maintained land parcel in Milimani — 10970 sqm of sensible layout for owners and investors alike. Documentation is available for inspection; the holding is clean and transfer-ready. Convenient, well-connected and realistically priced for the current market.",
       "agency": "Nairobi Prime Properties",
       "agent": {
@@ -4252,8 +4252,8 @@
         "Fenced compound"
       ],
       "images": [
-        "/images/props/townhouse_0.jpg",
-        "/images/props/interior_1.jpg"
+        "/images/props/townhouse_0.webp",
+        "/images/props/interior_1.webp"
       ],
       "description": "A well-presented bungalow in Kileleshwa, Nairobi, offering 66 sqm of bright, efficiently planned space. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. Benchmarked against comparable stock in Kileleshwa, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Nairobi Prime Properties",
@@ -4327,9 +4327,9 @@
         "Lift access"
       ],
       "images": [
-        "/images/props/interior_1.jpg",
-        "/images/props/interior_0.jpg",
-        "/images/props/apartment_2.jpg"
+        "/images/props/interior_1.webp",
+        "/images/props/interior_0.webp",
+        "/images/props/apartment_2.webp"
       ],
       "description": "This 139 sqm apartment in Ruaka has been finished to a practical standard and priced with discipline. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Ruaka, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Nairobi Prime Properties",
@@ -4397,7 +4397,7 @@
         "Beaconed boundaries",
         "Near tarmac road"
       ],
-      "images": ["/images/props/land_0.jpg"],
+      "images": ["/images/props/land_0.webp"],
       "description": "A well-presented land parcel in Westlands, Nairobi, offering 26004 sqm of bright, efficiently planned space. Documentation is available for inspection; the holding is clean and transfer-ready. A practical choice for anyone seeking a genuine Westlands address without overpaying.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -4465,8 +4465,8 @@
       "sizeSqm": 98,
       "amenities": ["Quiet cul-de-sac", "Solar water heating", "Mature garden"],
       "images": [
-        "/images/props/interior_1.jpg",
-        "/images/props/townhouse_0.jpg"
+        "/images/props/interior_1.webp",
+        "/images/props/townhouse_0.webp"
       ],
       "description": "Rarely available: a bungalow in Nyali combining space (98 sqm), light and a convenient address. A calm street position keeps the setting quiet while keeping the neighbourhood amenities close. At KES 79k/sqm the pricing sits within the Nyali band, and the area yield band of 6.8% supports a solid income case.",
       "agency": "Skyline Agents Kenya",
@@ -4535,7 +4535,7 @@
         "Water on site",
         "Electricity on site"
       ],
-      "images": ["/images/props/land_1.jpg"],
+      "images": ["/images/props/land_1.webp"],
       "description": "A well-presented land parcel in Westlands, Nairobi, offering 26325 sqm of bright, efficiently planned space. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Westlands at this price point rarely lingers.",
       "agency": "Prestige Homes KE",
       "agent": {
@@ -4606,7 +4606,7 @@
         "Loading bay",
         "100% backup power"
       ],
-      "images": ["/images/props/interior_2.jpg", "/images/props/office_0.jpg"],
+      "images": ["/images/props/interior_2.webp", "/images/props/office_0.webp"],
       "description": "Set in the heart of Karen, this commercial unit delivers 712 sqm of comfortable living with genuine character. Infrastructure — power backup, connectivity and parking — supports immediate occupation. A practical choice for anyone seeking a genuine Karen address without overpaying.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -4679,9 +4679,9 @@
         "Secure parking"
       ],
       "images": [
-        "/images/props/bedroom_0.jpg",
-        "/images/props/interior_0.jpg",
-        "/images/props/apartment_0.jpg"
+        "/images/props/bedroom_0.webp",
+        "/images/props/interior_0.webp",
+        "/images/props/apartment_0.webp"
       ],
       "description": "A well-presented apartment in Kileleshwa, Nairobi, offering 169 sqm of bright, efficiently planned space. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Kileleshwa, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Nairobi Prime Properties",
@@ -4755,9 +4755,9 @@
         "Gym"
       ],
       "images": [
-        "/images/props/apartment_2.jpg",
-        "/images/props/bedroom_0.jpg",
-        "/images/props/interior_1.jpg"
+        "/images/props/apartment_2.webp",
+        "/images/props/bedroom_0.webp",
+        "/images/props/interior_1.webp"
       ],
       "description": "This 103 sqm apartment in Kasarani has been finished to a practical standard and priced with discipline. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. The Kasarani market band and 8.6% yield environment make this a disciplined income or appreciation play.",
       "agency": "Diaspora Property Group",
@@ -4828,7 +4828,7 @@
         "Ample parking bays",
         "Fibre backbone"
       ],
-      "images": ["/images/props/office_0.jpg", "/images/props/office_1.jpg"],
+      "images": ["/images/props/office_0.webp", "/images/props/office_1.webp"],
       "description": "An honest, well-maintained commercial unit in Nanyuki — 260 sqm of sensible layout for owners and investors alike. Infrastructure — power backup, connectivity and parking — supports immediate occupation. At KES 23k/sqm the pricing sits below the Nanyuki band, and the area yield band of 6.4% supports a solid income case.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -4900,7 +4900,7 @@
         "Borehole + storage tanks",
         "Guest wing"
       ],
-      "images": ["/images/props/villa_0.jpg", "/images/props/interior_0.jpg"],
+      "images": ["/images/props/villa_0.webp", "/images/props/interior_0.webp"],
       "description": "Set in the heart of Lavington, this villa delivers 294 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. The Lavington market band and 7.4% yield environment make this a disciplined income or appreciation play.",
       "agency": "Diaspora Property Group",
       "agent": {
@@ -4967,7 +4967,7 @@
         "Ready title deed",
         "Electricity on site"
       ],
-      "images": ["/images/props/land_0.jpg"],
+      "images": ["/images/props/land_0.webp"],
       "description": "A well-presented land parcel in Kilimani, Nairobi, offering 556 sqm of bright, efficiently planned space. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Kilimani at this price point rarely lingers.",
       "agency": "Diaspora Property Group",
       "agent": {
@@ -5040,8 +5040,8 @@
         "Gated compound"
       ],
       "images": [
-        "/images/props/townhouse_0.jpg",
-        "/images/props/apartment_2.jpg"
+        "/images/props/townhouse_0.webp",
+        "/images/props/apartment_2.webp"
       ],
       "description": "This 159 sqm townhouse in Runda has been finished to a practical standard and priced with discipline. The property sits on a mature, well-kept compound with room for family life and entertaining. The Runda market band and 6% yield environment make this a disciplined income or appreciation play.",
       "agency": "Diaspora Property Group",
@@ -5115,9 +5115,9 @@
         "Borehole water"
       ],
       "images": [
-        "/images/props/apartment_2.jpg",
-        "/images/props/apartment_0.jpg",
-        "/images/props/bedroom_0.jpg"
+        "/images/props/apartment_2.webp",
+        "/images/props/apartment_0.webp",
+        "/images/props/bedroom_0.webp"
       ],
       "description": "Rarely available: a apartment in Nyali combining space (68 sqm), light and a convenient address. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Nyali, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Coastal Living Estates",
@@ -5190,8 +5190,8 @@
         "Staff quarters"
       ],
       "images": [
-        "/images/props/townhouse_0.jpg",
-        "/images/props/apartment_2.jpg"
+        "/images/props/townhouse_0.webp",
+        "/images/props/apartment_2.webp"
       ],
       "description": "Set in the heart of Riverside, this townhouse delivers 158 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. The Riverside market band and 7.2% yield environment make this a disciplined income or appreciation play.",
       "agency": "Prestige Homes KE",
@@ -5265,9 +5265,9 @@
         "24/7 security"
       ],
       "images": [
-        "/images/props/apartment_0.jpg",
-        "/images/props/interior_1.jpg",
-        "/images/props/bedroom_0.jpg"
+        "/images/props/apartment_0.webp",
+        "/images/props/interior_1.webp",
+        "/images/props/bedroom_0.webp"
       ],
       "description": "This 61 sqm apartment in Ruaka has been finished to a practical standard and priced with discipline. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Ruaka, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Coastal Living Estates",
@@ -5340,7 +5340,7 @@
         "Staff quarters",
         "Half-acre garden"
       ],
-      "images": ["/images/props/villa_1.jpg", "/images/props/villa_0.jpg"],
+      "images": ["/images/props/villa_1.webp", "/images/props/villa_0.webp"],
       "description": "A well-presented villa in Westlands, Nairobi, offering 183 sqm of bright, efficiently planned space. The property sits on a mature, well-kept compound with room for family life and entertaining. The Westlands market band and 7.6% yield environment make this a disciplined income or appreciation play.",
       "agency": "Prestige Homes KE",
       "agent": {
@@ -5412,7 +5412,7 @@
         "Solar backup",
         "Gated community"
       ],
-      "images": ["/images/props/villa_0.jpg", "/images/props/villa_1.jpg"],
+      "images": ["/images/props/villa_0.webp", "/images/props/villa_1.webp"],
       "description": "An honest, well-maintained villa in Milimani — 240 sqm of sensible layout for owners and investors alike. The property sits on a mature, well-kept compound with room for family life and entertaining. The Milimani market band and 7.4% yield environment make this a disciplined income or appreciation play.",
       "agency": "Diaspora Property Group",
       "agent": {
@@ -5485,9 +5485,9 @@
         "CCTV surveillance"
       ],
       "images": [
-        "/images/props/apartment_1.jpg",
-        "/images/props/interior_0.jpg",
-        "/images/props/apartment_0.jpg"
+        "/images/props/apartment_1.webp",
+        "/images/props/interior_0.webp",
+        "/images/props/apartment_0.webp"
       ],
       "description": "This 88 sqm apartment in Runda has been finished to a practical standard and priced with discipline. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Runda, this listing offers defensible entry pricing for an income-focused buyer.",
       "agency": "Coastal Living Estates",
@@ -5561,9 +5561,9 @@
         "Balcony"
       ],
       "images": [
-        "/images/props/bedroom_0.jpg",
-        "/images/props/interior_1.jpg",
-        "/images/props/apartment_1.jpg"
+        "/images/props/bedroom_0.webp",
+        "/images/props/interior_1.webp",
+        "/images/props/apartment_1.webp"
       ],
       "description": "This 176 sqm apartment in Ruaka has been finished to a practical standard and priced with discipline. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. The Ruaka market band and 8% yield environment make this a disciplined income or appreciation play.",
       "agency": "Diaspora Property Group",

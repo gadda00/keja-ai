@@ -17,7 +17,7 @@ import { PropertyRow } from '@/components/property/PropertyCard';
 import { cn } from '@/lib/utils';
 
 export default function AccountView() {
-  const { user, loginWithEmail, logout, register } = useAuth();
+  const { user, logout, register } = useAuth();
   const all = useAllProperties();
   const [favorites] = useStore<string[]>('favorites', []);
   const { searches, remove, toggleAlerts } = useSavedSearches();

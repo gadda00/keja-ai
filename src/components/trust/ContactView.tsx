@@ -1,7 +1,7 @@
 'use client';
 /** Contact — the human channel behind the platform. */
 import { useState } from 'react';
-import { Clock, Mail, MapPin, MessageCircle, Phone, Send } from 'lucide-react';
+import { Clock, Mail, MapPin, MessageCircle, Send } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DejaVu Sans', 'Helvetica Neue', Arial, sans-serif; background: #ffffff; }
+  .diagram { width: 1100px; padding: 26px 30px 30px 30px; background: #ffffff; }
+  .band { display: flex; gap: 30px; }
+  .col { flex: 1; min-width: 0; }
+  .col-title {
+    font-size: 20px; font-weight: 700; color: #32454e; text-transform: uppercase;
+    letter-spacing: 1.2px; text-align: center; padding-bottom: 8px; margin-bottom: 12px;
+    border-bottom: 2.5px solid #1f6c92;
+  }
+  .stack { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+  .node {
+    background: #eef4f8; border: 1.5px solid #7ba7c0; border-left: 5px solid #1f6c92;
+    border-radius: 5px; padding: 10px 12px;
+  }
+  .node.red { border-left-color: #c23a50; background: #f9eef0; border-color: #c99aa4; }
+  .node.green { border-left-color: #529067; background: #eef6f0; border-color: #9dbfa9; }
+  .node.amber { border-left-color: #8c7443; background: #f7f3e9; border-color: #c2b491; }
+  .node h4 { font-size: 19px; color: #131515; font-weight: 700; margin-bottom: 4px; }
+  .node p { font-size: 14.5px; color: #4a5257; line-height: 1.42; }
+  .mid { display: flex; align-items: center; justify-content: center; margin: 0; height: 56px; }
+  .converge { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  .vline { width: 3px; height: 16px; background: #4b86a4; }
+  .harrow { display: flex; align-items: center; }
+  .harrow .shaft { height: 3px; background: #4b86a4; width: 40px; }
+  .harrow .head { width: 0; height: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 12px solid #4b86a4; }
+  .hub {
+    border: 2.5px solid #32454e; background: #ffffff; border-radius: 8px;
+    padding: 14px 18px; text-align: center;
+  }
+  .hub h3 { font-size: 22px; color: #131515; font-weight: 800; letter-spacing: 0.3px; }
+  .hub p { font-size: 15px; color: #4a5257; margin-top: 4px; line-height: 1.4; }
+  .split-row { display: flex; gap: 30px; margin-top: 0; }
+  .footer-note {
+    margin-top: 20px; border: 1.5px dashed #8ba4b5; border-radius: 6px; background: #f4f7f9;
+    padding: 11px 15px; font-size: 15px; color: #3a4348; line-height: 1.5;
+  }
+  .footer-note b { color: #131515; }
+</style>
+</head>
+<body>
+<div class="diagram">
+  <!-- CLIENT BAND -->
+  <div class="band">
+    <div class="col">
+      <div class="col-title">Clients (unchanged surfaces)</div>
+      <div class="stack" style="flex-direction: row;">
+        <div class="node" style="flex:1">
+          <h4>PWA (keja.app)</h4>
+          <p>Same static shell; gains server APIs + sync; keeps offline cache</p>
+        </div>
+        <div class="node" style="flex:1">
+          <h4>Capacitor Android / iOS</h4>
+          <p>Native shells point at live API; push notifications become possible</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mid"><div class="converge">
+    <div class="vline"></div>
+    <div class="harrow"><div class="shaft"></div><div class="head"></div></div>
+  </div></div>
+  <!-- API BAND -->
+  <div class="hub">
+    <h3>API Layer - Next.js server routes or Node mini-services on Vercel</h3>
+    <p>Typed contract (zod-validated), REST or tRPC - the single seam between the SPA and all persistence.
+    Rate limiting, idempotency keys, structured logging at this boundary.</p>
+  </div>
+  <div class="mid"><div class="converge">
+    <div class="vline"></div>
+    <div class="vline"></div>
+  </div></div>
+  <!-- SERVICES BAND -->
+  <div class="split-row">
+    <div class="node green">
+      <h4>PostgreSQL + real Prisma schema</h4>
+      <p>Listing, Booking, Message, Review, Payment, KYCRecord, AuditEntry; migrations + seeds; PII columns encrypted</p>
+    </div>
+    <div class="node green">
+      <h4>Auth service</h4>
+      <p>Server-side sessions (HttpOnly), argon2 hashing, RBAC enforced server-side; Google Sign-In via OIDC</p>
+    </div>
+    <div class="node amber">
+      <h4>M-Pesa Daraja (via licensed PSP)</h4>
+      <p>STK push, C2B callbacks, escrow ledger; sandbox first; idempotent webhooks</p>
+    </div>
+    <div class="node">
+      <h4>Search + AI services</h4>
+      <p>Typesense/Meilisearch for listings; optional LLM behind the existing engine interface with FACT labeling preserved</p>
+    </div>
+  </div>
+  <div class="footer-note">
+    <b>Migration principle:</b> the current localStorage stores already model their server counterparts
+    (documented in docs/DATA_DICTIONARY.md), so each store can be swapped to an API-backed hook one domain
+    at a time - tenants first (highest risk), then listings, then tokenization after CMA sandbox approval.
+  </div>
+</div>
+</body>
+</html>

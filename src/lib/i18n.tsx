@@ -22,6 +22,7 @@ const LS_KEY = 'keja:lang';
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  'nav.home': 'Home',
   'nav.discover': 'Discover',
   'nav.verify': 'Verify',
   'nav.analyse': 'Analyse',
@@ -64,6 +65,7 @@ const en: Dict = {
 };
 
 const sw: Dict = {
+  'nav.home': 'Nyumbani',
   'nav.discover': 'Gundua',
   'nav.verify': 'Thibitisha',
   'nav.analyse': 'Chambua',
@@ -106,6 +108,7 @@ const sw: Dict = {
 };
 
 const fr: Dict = {
+  'nav.home': 'Accueil',
   'nav.discover': 'D\u00E9couvrir',
   'nav.verify': 'V\u00E9rifier',
   'nav.analyse': 'Analyser',

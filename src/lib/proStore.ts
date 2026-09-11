@@ -10,6 +10,7 @@
 import type { Property } from '@/data/properties';
 import { isRentalPrice } from '@/lib/finance';
 import { useStore } from '@/lib/store';
+import { newId } from '@/lib/uuid';
 
 export type ProSubjectType =
   'apartment' | 'villa' | 'townhouse' | 'bungalow' | 'land' | 'commercial';
@@ -72,7 +73,7 @@ export function useProStore(): [ProState, (v: ProState | ((prev: ProState) => Pr
 
 /** Collision-safe id for records created on this device. */
 export function newProId(prefix: string): string {
-  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  return newId(prefix);
 }
 
 /* ------------------------------------------------------------------ */

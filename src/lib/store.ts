@@ -3,7 +3,7 @@
  * Uses localStorage so all features work without a backend — MVP-ready and
  * upgradeable to a real API later (roadmap Phase 2/3).
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const PREFIX = 'keja:';
 
@@ -54,14 +54,30 @@ function write<T>(key: string, value: T) {
 
 export function useStore<T>(key: string, fallback: T): [T, (v: T | ((prev: T) => T)) => void] {
   const [value, setValue] = useState<T>(() => read(key, fallback));
+  // fallback is usually an inline literal — reading it through a ref keeps
+  // the listener stable without re-subscribing on every render.
+  const fallbackRef = useRef(fallback);
+  useEffect(() => {
+    fallbackRef.current = fallback;
+  }, [fallback]);
   useEffect(() => {
     const onChange = (e: Event) => {
       const { detail } = e as CustomEvent;
-      if (detail === key) setValue(read(key, fallback));
+      if (detail === key) setValue(read(key, fallbackRef.current));
+    };
+    // Cross-tab sync (audit F-21): the browser fires `storage` on OTHER tabs
+    // for every localStorage write — listening here means every useStore
+    // consumer (favourites, compare tray, leads, …) stays coherent across
+    // tabs, not just auth.
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === PREFIX + key) setValue(read(key, fallbackRef.current));
     };
     window.addEventListener('keja-store-change', onChange);
-    return () => window.removeEventListener('keja-store-change', onChange);
-     
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('keja-store-change', onChange);
+      window.removeEventListener('storage', onStorage);
+    };
   }, [key]);
   const set = (v: T | ((prev: T) => T)) => {
     const next = typeof v === 'function' ? (v as (prev: T) => T)(read(key, fallback)) : v;

@@ -1,7 +1,7 @@
 'use client';
 /** Pro workspace — for agents & professionals: comparables (CMA), listing generation, viewings. */
 import { useMemo, useState } from 'react';
-import { BadgeCheck, CalendarClock, FileBarChart, Home, Sparkles, Users } from 'lucide-react';
+import { CalendarClock, FileBarChart, Home, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,7 +9,7 @@ import { useAllProperties } from '@/lib/inventory';
 import { useProStore } from '@/lib/proStore';
 import { formatKES } from '@/lib/format';
 import { navigate } from '@/lib/router';
-import { cn } from '@/lib/utils';
+import { newId } from '@/lib/uuid';
 
 export default function ProWorkspaceView() {
   const all = useAllProperties();
@@ -33,7 +33,7 @@ export default function ProWorkspaceView() {
       ...prev,
       cmas: [
         {
-          id: `cma-${Date.now()}`,
+          id: newId('cma'),
           createdAt: new Date().toISOString(),
           subjectArea: area,
           subjectType: type as 'apartment' | 'villa' | 'townhouse' | 'bungalow' | 'land' | 'commercial',

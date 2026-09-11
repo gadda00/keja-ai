@@ -1,8 +1,23 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Keja AI — Phase 2 domain schema (audit Ch. 24 data dictionary, F-30 / P2-1)
+//
+// This is a translation, not an invention: every model traces to an interface
+// that already exists in the client stores, and every constraint is one the
+// client currently enforces by discipline alone. It models exactly what the
+// product ships today plus the two Phase-2 additions the roadmap requires
+// (payment records and server sessions); custody and settlement tables are
+// deferred to the tokenization track where the CMA sandbox will dictate
+// their shape.
+//
+// Datasource: SQLite for local development / CI. Production target is
+// Postgres (swap provider + `String[]`→`String` + `Json`→`Json` when the
+// API seam ships — the field set is deliberately portable).
+//
+// Integrity rules encoded here (vs client discipline):
+//   - unique(unitId, period) on RentPayment  → double-entry impossible
+//   - unique(userId) on KycRecord            → identity cannot fork
+//   - cascade deletes through the property graph (evidence, units,
+//     submissions); financial records RESTRICT (never silently deleted)
+//   - opaque session tokens, sliding 12h/30d semantics carried over
 
 generator client {
   provider = "prisma-client-js"
@@ -13,20 +28,423 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+/* ----------------------------------- enums --------------------------------- */
+
+enum Role {
+  user
+  agent
+  admin
 }
 
-model Post {
+enum UserStatus {
+  active
+  suspended
+}
+
+enum Language {
+  en
+  sw
+  fr
+}
+
+enum PropertyType {
+  apartment
+  townhouse
+  villa
+  bungalow
+  land
+  commercial
+}
+
+enum Purpose {
+  buy
+  rent
+  invest
+}
+
+enum PropertyStatus {
+  draft
+  live
+  withdrawn
+  sold
+  let
+}
+
+enum PropertySource {
+  seed
+  auto
+  user
+}
+
+enum EvidenceKind {
+  titleCheck
+  ardhisasaMatch
+  photoVerification
+  duplicateCheck
+  listingVelocity
+}
+
+enum CheckStatus {
+  pending
+  pass
+  warn
+  fail
+}
+
+enum ApplicationStatus {
+  submitted
+  screening
+  shortlisted
+  approved
+  rejected
+  withdrawn
+}
+
+enum ViewingStatus {
+  requested
+  confirmed
+  completed
+  cancelled
+  no_show
+}
+
+enum LeadSource {
+  chat
+  viewing
+  contact
+  whatsapp
+  manual
+}
+
+enum PaymentChannel {
+  mpesa
+  bank
+  cash
+}
+
+enum UnitStatus {
+  vacant
+  occupied
+  maintenance
+}
+
+enum TicketPriority {
+  low
+  normal
+  high
+  urgent
+}
+
+enum TicketStatus {
+  open
+  in_progress
+  resolved
+  closed
+}
+
+enum SubmissionStatus {
+  pending
+  approved
+  rejected
+  flagged
+}
+
+enum KycStatus {
+  unverified
+  pending
+  verified
+  rejected
+}
+
+enum IdType {
+  national_id
+  passport
+}
+
+enum ClaimStatus {
+  verified
+  partially_verified
+  simulated
+  planned
+}
+
+/* ----------------------------------- core ---------------------------------- */
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String? // null until the auth service ships (OAuth-only rows)
+  role         Role       @default(user)
+  status       UserStatus @default(active)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  profile             Profile?
+  sessions            Session[]
+  applications        TenancyApplication[]
+  viewings            Viewing[]
+  savedSearches       SavedSearch[]
+  kyc                 KycRecord?
+  auditEntries        AuditEntry[]      @relation("Actor")
+  listings            ListingSubmission[] @relation("Listings")
+  moderatedSubmissions ListingSubmission[] @relation("Moderator")
+}
+
+model Session {
   id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
+  token     String   @unique // opaque random, never a JWT in v1
+  userId    String
+  expiresAt DateTime
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Profile {
+  userId     String   @id
+  name       String
+  phone      String?
+  avatarUrl  String?
+  language   Language @default(en)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/* --------------------------------- property -------------------------------- */
+
+model Area {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  aliases     String // CSV in SQLite; text[] on Postgres
+  description String
+
+  properties Property[]
+}
+
+model Property {
+  id          String         @id @default(cuid())
+  slug        String         @unique
+  title       String
+  type        PropertyType
+  purpose     Purpose
+  areaId      String
+  priceKes    Int
+  bedrooms    Int?
+  description String
+  status      PropertyStatus @default(live)
+  source      PropertySource @default(seed)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  area         Area                 @relation(fields: [areaId], references: [id])
+  evidence     PropertyEvidence[]
+  units        Unit[]
+  applications TenancyApplication[]
+  viewings     Viewing[]
+  leads        Lead[]
+  submissions  ListingSubmission[]
+
+  @@index([areaId])
+  @@index([status, source])
+}
+
+model PropertyEvidence {
+  id         String        @id @default(cuid())
+  propertyId String
+  kind       EvidenceKind
+  label      String
+  detail     String // JSON payload (sqlite Json is text under the hood)
+  status     CheckStatus   @default(pending)
+  method     String // e.g. "ardhisasa", "manual-review" — never "simulated" for real rows
+  verifiedAt DateTime?
+  expiresAt  DateTime?
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+}
+
+model ListingSubmission {
+  id           String           @id @default(cuid())
+  submitterId  String?
+  payload      String // JSON: the submitted listing body
+  status       SubmissionStatus @default(pending)
+  reviewerId   String?
+  reviewerNote String?
+  createdAt    DateTime         @default(now())
+  reviewedAt   DateTime?
+
+  submitter User? @relation("Listings", fields: [submitterId], references: [id])
+  reviewer  User? @relation("Moderator", fields: [reviewerId], references: [id])
+  property  Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String?
+
+  @@index([status, createdAt])
+}
+
+/* ------------------------------- tenancy ops -------------------------------- */
+
+model TenancyApplication {
+  id               String            @id @default(cuid())
+  propertyId       String
+  userId           String
+  status           ApplicationStatus @default(submitted)
+  monthlyIncomeKes Int?
+  employer         String?
+  referencesJson   String? // PII — encrypt at rest in the service layer
+  createdAt        DateTime          @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([propertyId, status])
+  @@index([userId])
+}
+
+model Viewing {
+  id           String        @id @default(cuid())
+  propertyId   String
+  userId       String
+  scheduledFor DateTime
+  status       ViewingStatus @default(requested)
+  notes        String?
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, scheduledFor])
+}
+
+model Lead {
+  id         String     @id @default(cuid())
+  propertyId String?
+  name       String
+  phone      String
+  message    String?
+  source     LeadSource
+  createdAt  DateTime   @default(now())
+
+  property Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+
+  @@index([propertyId])
+  @@index([createdAt])
+}
+
+/* ------------------------------ landlord ops -------------------------------- */
+
+model Unit {
+  id         String     @id @default(cuid())
+  propertyId String
+  label      String
+  rentKes    Int
+  status     UnitStatus @default(vacant)
+
+  property   Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  tenants    TenantRecord[]
+  payments   RentPayment[]
+  tickets    MaintenanceTicket[]
+
+  @@index([propertyId])
+}
+
+model TenantRecord {
+  id        String    @id @default(cuid())
+  unitId    String
+  userId    String? // linked once the tenant has an account
+  name      String
+  phone     String
+  startedAt DateTime
+  endedAt   DateTime?
+
+  unit     Unit          @relation(fields: [unitId], references: [id], onDelete: Restrict)
+  payments RentPayment[]
+
+  @@index([unitId])
+}
+
+model RentPayment {
+  id        String         @id @default(cuid())
+  unitId    String
+  tenantId  String
+  period    String // ISO month, e.g. "2026-09" — unique per unit
+  amountKes Int
+  channel   PaymentChannel
+  reference String? // M-Pesa receipt / bank slip
+  paidAt    DateTime       @default(now())
+
+  unit    Unit          @relation(fields: [unitId], references: [id], onDelete: Restrict)
+  tenant  TenantRecord  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+
+  @@unique([unitId, period]) // double-entry is impossible at the DB level
+  @@index([tenantId])
+}
+
+model MaintenanceTicket {
+  id        String         @id @default(cuid())
+  unitId    String
+  title     String
+  body      String
+  priority  TicketPriority @default(normal)
+  status    TicketStatus   @default(open)
+  createdAt DateTime       @default(now())
+
+  unit Unit @relation(fields: [unitId], references: [id], onDelete: Cascade)
+
+  @@index([unitId, status])
+}
+
+/* ------------------------------ trust & admin -------------------------------- */
+
+model Claim {
+  id              String      @id @default(cuid())
+  slug            String      @unique
+  statement       String
+  status          ClaimStatus
+  evidenceUrl     String?
+  lastVerifiedAt  DateTime?
+  // materialised so the Trust Center becomes queryable history (audit note)
+
+  @@index([status])
+}
+
+model KycRecord {
+  id                String    @id @default(cuid())
+  userId            String    @unique // identity cannot fork
+  status            KycStatus @default(unverified)
+  idType            IdType
+  idNumberEncrypted String? // AES-256-GCM in the service layer — never plaintext (F-02)
+  sourceOfFunds     String?
+  decidedAt         DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+}
+
+model AuditEntry {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String // e.g. "auth.login", "submission.approve"
+  targetType String
+  targetId   String?
+  meta       String? // JSON
+  createdAt  DateTime @default(now())
+
+  actor User? @relation("Actor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([targetType, targetId])
+}
+
+model SavedSearch {
+  id            String   @id @default(cuid())
+  userId        String
+  criteria      String // JSON of the searchStore filter shape
+  alertsEnabled Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

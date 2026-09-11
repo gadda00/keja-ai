@@ -22,6 +22,7 @@ import { areaInsights } from '@/data/properties';
 import { isRentalPrice } from '@/lib/finance';
 import { marketInventory } from '@/lib/inventory';
 import { store, useStore } from '@/lib/store';
+import { newId } from '@/lib/uuid';
 
 /** Storage key (the shared store prefixes 'keja:' → 'keja:dev-projects'). */
 export const DEV_PROJECTS_KEY = 'dev-projects';
@@ -321,7 +322,7 @@ export function getDevProjects(): DevProject[] {
 /** Pure factory: stamps id + createdAt; the caller appends it to the store. */
 export function newDevProject(name: string, inputs: DevFeasibilityInputs): DevProject {
   return {
-    id: `dev-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+    id: newId('dev'),
     name: name.trim() || 'Untitled scheme',
     createdAt: new Date().toISOString(),
     inputs,

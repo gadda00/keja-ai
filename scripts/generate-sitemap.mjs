@@ -6,7 +6,7 @@
  * from the source data files and emits the full URL set. Runs in CI before
  * every deploy so the sitemap never rots when inventory grows.
  */
-import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -50,9 +50,6 @@ const STATIC_ROUTES = [
   { loc: '/ecosystem', priority: '0.7', changefreq: 'weekly' },
   { loc: '/partners', priority: '0.7', changefreq: 'weekly' },
   { loc: '/sell', priority: '0.7', changefreq: 'weekly' },
-  { loc: '/manage', priority: '0.6', changefreq: 'weekly' },
-  { loc: '/tenant', priority: '0.6', changefreq: 'weekly' },
-  { loc: '/pro', priority: '0.6', changefreq: 'weekly' },
   { loc: '/valuation', priority: '0.6', changefreq: 'weekly' },
   { loc: '/develop', priority: '0.6', changefreq: 'weekly' },
   { loc: '/diaspora', priority: '0.6', changefreq: 'weekly' },
@@ -61,6 +58,11 @@ const STATIC_ROUTES = [
   { loc: '/compare', priority: '0.5', changefreq: 'weekly' },
   { loc: '/legal', priority: '0.3', changefreq: 'yearly' },
 ]
+
+// Private / crawl-budget-wasting routes are deliberately NOT listed here
+// (account, admin, pro, manage, tenant, finance, transact, deal-analyst,
+// portfolio) — robots.txt also disallows the admin surfaces, and none of
+// them render meaningful content to a crawler (audit Ch. 7).
 
 const propertyIds = [
   ...extractAutoIds('src/data/auto-listings.json'),
@@ -76,12 +78,17 @@ const urls = [
   ...guideSlugs.map((slug) => ({ loc: `/areas/${slug}`, priority: '0.8', changefreq: 'weekly', lastmod: today })),
 ]
 
+// Trailing-slash canonical form — matches the prerendered directories
+// (out/properties/KJA-001/index.html) and the Next.js trailingSlash config,
+// so sitemap, canonical and served URL never disagree.
+const locFor = (loc) => (loc === '/' ? `${BASE}/` : `${BASE}${loc}/`)
+
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls
   .map(
     (u) => `  <url>
-    <loc>${BASE}${u.loc === '/' ? '/' : u.loc}</loc>
+    <loc>${locFor(u.loc)}</loc>
     <lastmod>${u.lastmod}</lastmod>
     <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority}</priority>
@@ -91,5 +98,11 @@ ${urls
 </urlset>
 `
 
+// public/ serves dev + `next build`'s copy step; out/ is the authoritative
+// post-build artifact (audit F-07 / P0-3: the sitemap must exist as a real
+// XML file BEFORE the SPA rewrite, which Vercel's filesystem precedence
+// guarantees for real files).
 writeFileSync(resolve(ROOT, 'public/sitemap.xml'), xml + '\n', 'utf8')
-console.log(`[sitemap] wrote ${urls.length} URLs (${propertyIds.length} properties · ${articleSlugs.length} articles · ${guideSlugs.length} area guides · ${STATIC_ROUTES.length} static)`)
+const OUT = resolve(ROOT, 'out/sitemap.xml')
+if (existsSync(resolve(ROOT, 'out'))) writeFileSync(OUT, xml + '\n', 'utf8')
+console.log(`[sitemap] wrote ${urls.length} URLs (${propertyIds.length} properties · ${articleSlugs.length} articles · ${guideSlugs.length} area guides · ${STATIC_ROUTES.length} static)${existsSync(resolve(ROOT, 'out')) ? ' → public/ + out/' : ' → public/'}`)

@@ -17,8 +17,10 @@ const nextConfig: NextConfig = {
   ...(isStatic ? { output: "export" as const } : {}),
   trailingSlash: true,
   images: { unoptimized: true },
-  typescript: { ignoreBuildErrors: true },
-  reactStrictMode: false,
+  // Quality gates are real gates (audit F-18 / P1-1): the build fails on
+  // type errors, and React StrictMode surfaces effect bugs in dev.
+  typescript: { ignoreBuildErrors: false },
+  reactStrictMode: true,
 };
 
 export default nextConfig;

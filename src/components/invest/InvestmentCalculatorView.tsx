@@ -5,16 +5,7 @@
  * buying costs and mortgage integration. All inputs labelled FACT/ESTIMATE.
  */
 import { useMemo, useState } from 'react';
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, } from '@/components/charts/reexports';
 import { Calculator, Home, LineChart, PiggyBank, Receipt, TrendingUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

@@ -24,7 +24,7 @@ const PUB = resolve(ROOT, 'public');
 
 const GREEN = '#0E7A4E';
 const GREEN_DEEP = '#0A5A39';
-const GREEN_DARK = '#10201B';
+const _GREEN_DARK = '#10201B'; // palette reference (kept for regeneration docs)
 const CREAM = '#F7F5EF';
 const GOLD = '#D4B04A';
 const GOLD_DARK = '#A88430';

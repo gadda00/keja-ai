@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DejaVu Sans', 'Helvetica Neue', Arial, sans-serif; background: #ffffff; }
+  .diagram { width: 1100px; padding: 26px 30px 30px 30px; background: #ffffff; }
+  .phase-row { display: flex; gap: 34px; }
+  .phase { flex: 1; min-width: 0; }
+  .phase-title {
+    background: #32454e; color: #ffffff; font-size: 21px; font-weight: 700;
+    padding: 11px 12px; text-align: center; border-radius: 6px 6px 0 0;
+    letter-spacing: 0.4px;
+  }
+  .phase-body {
+    border: 1.5px solid #acbdc5; border-top: none; border-radius: 0 0 6px 6px;
+    padding: 14px 12px; display: flex; flex-direction: column; gap: 12px;
+    background: #f8fafa; min-height: 318px;
+  }
+  .node {
+    background: #eef4f8; border: 1.5px solid #7ba7c0; border-left: 5px solid #1f6c92;
+    border-radius: 5px; padding: 10px 12px;
+  }
+  .node.red { border-left-color: #c23a50; background: #f9eef0; border-color: #c99aa4; }
+  .node.amber { border-left-color: #8c7443; background: #f7f3e9; border-color: #c2b491; }
+  .node.green { border-left-color: #529067; background: #eef6f0; border-color: #9dbfa9; }
+  .node h4 { font-size: 19px; color: #131515; font-weight: 700; margin-bottom: 4px; }
+  .node p { font-size: 15px; color: #4a5257; line-height: 1.42; }
+  .arrow-row { display: flex; gap: 34px; margin: 0; height: 46px; align-items: center; }
+  .arrow-cell { flex: 1; display: flex; justify-content: center; align-items: center; }
+  .flowline { display: flex; align-items: center; }
+  .flowline .shaft { height: 3px; background: #4b86a4; flex: 1; }
+  .flowline .head {
+    width: 0; height: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent;
+    border-left: 12px solid #4b86a4;
+  }
+  .loop-note {
+    margin-top: 22px; border: 1.5px dashed #8ba4b5; border-radius: 6px;
+    background: #f4f7f9; padding: 12px 16px; display: flex; align-items: center; gap: 14px;
+  }
+  .loop-badge {
+    background: #c23a50; color: #fff; font-weight: 700; font-size: 14px;
+    border-radius: 4px; padding: 5px 10px; letter-spacing: 1px; white-space: nowrap;
+  }
+  .loop-note p { font-size: 15.5px; color: #3a4348; line-height: 1.45; }
+  .loop-note b { color: #131515; }
+</style>
+</head>
+<body>
+<div class="diagram">
+  <div class="phase-row">
+    <div class="phase">
+      <div class="phase-title">1 - Authored Data</div>
+      <div class="phase-body">
+        <div class="node">
+          <h4>Seed catalog</h4>
+          <p>src/data/properties.ts - 27 richly-typed listings, trust signals, verification blocks</p>
+        </div>
+        <div class="node">
+          <h4>Auto-Pilot output</h4>
+          <p>src/data/auto-listings.json - 60 synthetic listings from 40 pipeline runs, trust-capped</p>
+        </div>
+        <div class="node">
+          <h4>Editorial content</h4>
+          <p>articles.ts, claims.ts (honesty register), neighborhoods.ts, tokenize.ts</p>
+        </div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-title">2 - Build Pipeline</div>
+      <div class="phase-body">
+        <div class="node">
+          <h4>Next.js 16 static export</h4>
+          <p>NEXT_STATIC=1, output: 'export', single index.html + 52 hashed chunks</p>
+        </div>
+        <div class="node amber">
+          <h4>CI quality gates</h4>
+          <p>GitHub Actions: tsc --noEmit, eslint, static build, SW stamp (SHA-256 of out/)</p>
+        </div>
+        <div class="node">
+          <h4>Vercel CLI deploy</h4>
+          <p>vercel pull / build --prod / deploy --prebuilt on push to main</p>
+        </div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-title">3 - Edge Delivery</div>
+      <div class="phase-body">
+        <div class="node">
+          <h4>Vercel CDN</h4>
+          <p>out/ (21 MB), SPA rewrite, cache + security headers, keja.app TLS</p>
+        </div>
+        <div class="node">
+          <h4>Service worker</h4>
+          <p>sw.js: cache-first assets, network-first navigation (8s timeout), offline.html</p>
+        </div>
+        <div class="node">
+          <h4>Capacitor shells</h4>
+          <p>Android (Gradle, minSdk 24) + iOS (Xcode) wrap the same out/ bundle</p>
+        </div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-title">4 - Client Runtime</div>
+      <div class="phase-body">
+        <div class="node">
+          <h4>Hash-router SPA</h4>
+          <p>32 views, 31 lazy-loaded, custom router.tsx over hashchange events</p>
+        </div>
+        <div class="node red">
+          <h4>localStorage state</h4>
+          <p>~28 keja:* keys - auth, KYC, wallets, landlord ledger, applications (no server)</p>
+        </div>
+        <div class="node">
+          <h4>Rule-based AI</h4>
+          <p>ai/engine.ts - 1,049-line intent matcher, EN/SW/FR, offline, no LLM</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="arrow-row">
+    <div class="arrow-cell"><div class="flowline"><div class="shaft"></div><div class="head"></div></div></div>
+    <div class="arrow-cell"><div class="flowline"><div class="shaft"></div><div class="head"></div></div></div>
+    <div class="arrow-cell"><div class="flowline"><div class="shaft"></div><div class="head"></div></div></div>
+  </div>
+  <div class="loop-note">
+    <div class="loop-badge">GROWTH LOOP</div>
+    <p><b>Auto-Pilot cron (4x daily):</b> scanner + feed adapters, enrichment, dedupe, quality gate, publish JSON,
+    commit to main as owner identity, which re-triggers phases 2 and 3 automatically. The marketplace inventory
+    grows without any server-side runtime.</p>
+  </div>
+</div>
+</body>
+</html>

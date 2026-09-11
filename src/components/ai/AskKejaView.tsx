@@ -19,6 +19,7 @@ import { navigate } from '@/lib/router';
 import { whatsappLink } from '@/config';
 import { PropertyRow } from '@/components/property/PropertyCard';
 import { cn } from '@/lib/utils';
+import { newId } from '@/lib/uuid';
 
 interface ChatMessage {
   id: string;
@@ -81,7 +82,9 @@ export default function AskKejaView() {
         },
       ]);
     }
-     
+    // first-mount seeding only: greet an empty history once; re-running on
+    // messages/setMessages changes would fight the user's own messages
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -94,7 +97,7 @@ export default function AskKejaView() {
       if (!text || thinking) return;
       setInput('');
       const userMsg: ChatMessage = {
-        id: `u-${Date.now()}`,
+        id: newId('u'),
         role: 'user',
         text,
         ts: new Date().toISOString(),
@@ -105,7 +108,7 @@ export default function AskKejaView() {
       setTimeout(() => {
         const res = kejaAI.respond(text);
         const kejaMsg: ChatMessage = {
-          id: `k-${Date.now()}`,
+          id: newId('k'),
           role: 'keja',
           text: res.text,
           ts: new Date().toISOString(),

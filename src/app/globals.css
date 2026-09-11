@@ -40,6 +40,7 @@
   --color-card: var(--card);
   /* Keja brand tokens */
   --color-gold: var(--gold);
+  --color-gold-bright: var(--gold-bright);
   --color-gold-foreground: var(--gold-foreground);
   --color-gold-soft: var(--gold-soft);
   --color-emerald-deep: var(--emerald-deep);
@@ -88,8 +89,12 @@
   --sidebar-accent-foreground: oklch(0.335 0.06 162);
   --sidebar-border: oklch(0.912 0.012 140);
   --sidebar-ring: oklch(0.455 0.115 160);
-  /* brand */
-  --gold: oklch(0.745 0.155 80);
+  /* brand — gold darkened for light mode (audit F-25): oklch(0.57 0.112 78)
+     ≈ #83651c reads 5.0:1 on the cream background (WCAG AA, body text).
+     Decorative golds (borders, gradients) use --gold-bright to keep the
+     sunny premium tone where contrast does not apply. */
+  --gold: oklch(0.57 0.112 78);
+  --gold-bright: oklch(0.745 0.155 80);
   --gold-foreground: oklch(0.24 0.04 70);
   --gold-soft: oklch(0.955 0.045 90);
   --emerald-deep: oklch(0.335 0.075 163);

@@ -25,7 +25,6 @@ import {
   Search,
   ShieldCheck,
   Sparkles,
-  TrendingUp,
   Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -336,7 +335,7 @@ function TokenSpotlight() {
       <div
         className="absolute inset-0 opacity-20"
         style={{
-          backgroundImage: 'url(/images/waterfront/karen-villa-pool.jpg)',
+          backgroundImage: 'url(/images/waterfront/karen-villa-pool.webp)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

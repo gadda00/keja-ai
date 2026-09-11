@@ -13,6 +13,7 @@
 import type { Property } from '@/data/properties';
 import { isRentalPrice } from '@/lib/finance';
 import { useStore } from '@/lib/store';
+import { newId } from '@/lib/uuid';
 
 export type ValuationType =
   'apartment' | 'villa' | 'townhouse' | 'bungalow' | 'land' | 'commercial';
@@ -52,7 +53,7 @@ export function useSavedValuations(): [
 
 /** Collision-safe id for valuations saved on this device. */
 export function newValuationId(): string {
-  return `val-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  return newId('val');
 }
 
 /** 1 acre = 4046.8564224 m² (international surveying convention). Keja land

@@ -4,8 +4,8 @@
  * Search, facets (area/type/purpose/price/beds/trust), sorting, comparison
  * and saved searches. Every card surfaces the Trust Score.
  */
-import { useMemo, useState } from 'react';
-import { Bell, Filter, Search, SlidersHorizontal, Star, X } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Bell, Filter, MapPin, Search, SlidersHorizontal, Star, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -15,9 +15,11 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { toast } from '@/hooks/use-toast';
 import { useAllProperties } from '@/lib/inventory';
 import { isRentalPrice } from '@/lib/finance';
+import { track } from '@/lib/analytics';
 import type { Property } from '@/data/properties';
 import { PropertyCard } from '@/components/property/PropertyCard';
 import { CompareBar, useCompare } from '@/components/property/CompareBar';
+import MapPanel from '@/components/property/MapPanel';
 import { navigate, useRouter } from '@/lib/router';
 import { useStore } from '@/lib/store';
 import { useSavedSearches } from '@/lib/searchStore';
@@ -42,6 +44,7 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
   const [beds, setBeds] = useState<string>('any');
   const [sort, setSort] = useState<SortKey>('trust');
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
 
   const [favorites, setFavorites] = useStore<string[]>('favorites', []);
   const { ids: compareIds, toggle } = useCompare();
@@ -86,10 +89,24 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
     return list;
   }, [all, q, area, type, purpose, maxPrice, minTrust, beds, sort]);
 
-  const toggleSave = (p: Property) =>
+  const toggleSave = (p: Property) => {
+    const wasSaved = favorites.includes(p.id);
     setFavorites((prev) =>
       prev.includes(p.id) ? prev.filter((x) => x !== p.id) : [...prev, p.id],
     );
+    if (!wasSaved) track({ event: 'save', propertyId: p.id });
+  };
+
+  // Search analytics (audit F-11): debounced so live typing does not spam —
+  // one 'search' event per settled query, with the result count.
+  const resultCount = filtered.length;
+  useEffect(() => {
+    if (!q.trim()) return;
+    const t = window.setTimeout(() => {
+      track({ event: 'search', query: q.trim(), results: resultCount });
+    }, 900);
+    return () => window.clearTimeout(t);
+  }, [q, resultCount]);
 
   const saveSearch = () => {
     const label = [
@@ -240,6 +257,15 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant={mapOpen ? 'default' : 'outline'}
+            size="sm"
+            className="font-bold"
+            aria-pressed={mapOpen}
+            onClick={() => setMapOpen((v) => !v)}
+          >
+            <MapPin className="mr-1.5 h-4 w-4" aria-hidden /> {mapOpen ? 'Hide map' : 'Map view'}
+          </Button>
           <Button variant="outline" size="sm" className="font-bold" onClick={saveSearch}>
             <Bell className="mr-1.5 h-4 w-4" aria-hidden /> Save search
           </Button>
@@ -358,6 +384,12 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
           </Button>
         </div>
       ) : (
+        <div>
+        {mapOpen && (
+          <div className="mt-6">
+            <MapPanel properties={filtered} onSelectArea={(a) => setArea(a)} />
+          </div>
+        )}
         <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((p, i) => (
             <PropertyCard
@@ -370,6 +402,7 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
               onSave={toggleSave}
             />
           ))}
+        </div>
         </div>
       )}
 

@@ -9,18 +9,22 @@ import { GitCompareArrows, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useStore } from '@/lib/store';
 import { useAllProperties, findProperty } from '@/lib/inventory';
+import { track } from '@/lib/analytics';
 import { Link } from '@/lib/router';
 
 const MAX_COMPARE = 4;
 
 export function useCompare() {
   const [ids, setIds] = useStore<string[]>('compare', []);
-  const toggle = (id: string) =>
+  const toggle = (id: string) => {
+    const wasIncluded = ids.includes(id);
     setIds((prev) => {
       if (prev.includes(id)) return prev.filter((x) => x !== id);
       if (prev.length >= MAX_COMPARE) return [...prev.slice(1), id];
       return [...prev, id];
     });
+    if (!wasIncluded) track({ event: 'compare_add', propertyId: id });
+  };
   const remove = (id: string) => setIds((prev) => prev.filter((x) => x !== id));
   const clear = () => setIds([]);
   return { ids, toggle, remove, clear };

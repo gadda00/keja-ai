@@ -143,7 +143,7 @@ const seedSubmissions: ListingSubmission[] = [
     description:
       'Fully furnished 2-bedroom on Riverside Drive with river views, backup generator, 24/7 concierge and secure parking. Popular with expatriate tenants; walking distance to Riverside Square.',
     amenities: ['Furnished', 'Balcony', 'Lift', 'Backup Generator', 'Concierge', 'Parking'],
-    images: ['/images/props/apartment_0.jpg'],
+    images: ['/images/props/apartment_0.webp'],
     source: 'partner',
     status: 'pending',
     flags: [],
@@ -189,7 +189,7 @@ const seedSubmissions: ListingSubmission[] = [
     description:
       'Prime beachfront plot with clean freehold title, direct beach access, graded access road and mains electricity at the boundary. Ideal for villa development or holiday-let project; comparable plots in the row recently transacted at KES 9.2M–10.5M.',
     amenities: ['Beachfront', 'Freehold Title', 'Electricity', ' graded road'],
-    images: ['/images/props/land_0.jpg', '/images/props/land_1.jpg'],
+    images: ['/images/props/land_0.webp', '/images/props/land_1.webp'],
     source: 'self-service',
     status: 'approved',
     flags: [],
@@ -247,7 +247,7 @@ const seedSubmissions: ListingSubmission[] = [
     description:
       'Whole-floor Grade-A office space in a new Upper Hill tower: raised floors, VRV climate control, dual-fibre connectivity, 2 high-speed lift banks, 24/7 security with access control, and 12 dedicated parking bays. LEED-equivalent fit-out standard.',
     amenities: ['Raised Floors', 'VRV HVAC', 'Dual Fibre', 'Parking', 'Access Control', 'Lift'],
-    images: ['/images/props/office_0.jpg', '/images/props/office_1.jpg'],
+    images: ['/images/props/office_0.webp', '/images/props/office_1.webp'],
     source: 'partner',
     status: 'pending',
     flags: [],
@@ -562,7 +562,7 @@ export function submissionToListing(s: ListingSubmission): UserListing {
     bathrooms: s.bathrooms,
     sizeSqm: s.sizeSqm,
     amenities: s.amenities,
-    images: s.images.length ? s.images : ['/images/props/apartment_2.jpg'],
+    images: s.images.length ? s.images : ['/images/props/apartment_2.webp'],
     description: s.description,
     agency: s.agency ?? 'Keja Verified Partner',
     agent: { name: s.submitterName, phone: s.submitterPhone ?? '' },

@@ -6,45 +6,54 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+/**
+ * ESLint — correctness rules re-armed (audit F-15 / P1-1).
+ *
+ * History: the rebuild-era config disabled 26 rules including core
+ * correctness sets, so the linter passed by construction. The correctness
+ * set below is now ON and the CI gate treats warnings as failures. Stylistic
+ * opinion stays out — only rules that catch real defects.
+ */
 const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
   rules: {
-    // TypeScript rules
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-unused-vars": "off",
-    "@typescript-eslint/no-non-null-assertion": "off",
+    // ---- correctness (re-armed) ----
+    "no-unused-vars": "off", // TS's own check is stricter; see @typescript-eslint rule below
+    "@typescript-eslint/no-unused-vars": ["warn", {
+      argsIgnorePattern: "^_",
+      varsIgnorePattern: "^_",
+      caughtErrorsIgnorePattern: "^_",
+    }],
+    "no-unreachable": "warn",
+    "no-redeclare": "warn",
+    "no-useless-escape": "warn",
+    "no-fallthrough": "warn",
+    "no-case-declarations": "warn",
+    "no-mixed-spaces-and-tabs": "warn",
+    "no-irregular-whitespace": "warn",
+    "no-debugger": "warn",
+
+    // ---- React correctness (re-armed) ----
+    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/purity": "warn",
+    "react/no-unescaped-entities": "off", // apostrophes in copy are intentional
+    "react/prop-types": "off",            // TS types cover this
+
+    // ---- pragmatic keeps ----
+    "@typescript-eslint/no-explicit-any": "off",      // incremental tightening
+    "@typescript-eslint/no-non-null-assertion": "off", // compare view has guarded asserts
     "@typescript-eslint/ban-ts-comment": "off",
-    "@typescript-eslint/prefer-as-const": "off",
-    "@typescript-eslint/no-unused-disable-directive": "off",
-    
-    // React rules
-    "react-hooks/exhaustive-deps": "off",
-    "react-hooks/purity": "off",
-    "react/no-unescaped-entities": "off",
-    "react/display-name": "off",
-    "react/prop-types": "off",
-    "react-compiler/react-compiler": "off",
-    
-    // Next.js rules
-    "@next/next/no-img-element": "off",
+    "no-console": ["warn", { allow: ["warn", "error", "info"] }],
+    "@next/next/no-img-element": "off",  // static export: plain <img> is the design
     "@next/next/no-html-link-for-pages": "off",
-    
-    // General JavaScript rules
-    "prefer-const": "off",
-    "no-unused-vars": "off",
-    "no-console": "off",
-    "no-debugger": "off",
-    "no-empty": "off",
-    "no-irregular-whitespace": "off",
-    "no-case-declarations": "off",
-    "no-fallthrough": "off",
-    "no-mixed-spaces-and-tabs": "off",
-    "no-redeclare": "off",
-    "no-undef": "off",
-    "no-unreachable": "off",
-    "no-useless-escape": "off",
   },
 }, {
-  ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts", "examples/**", "skills"]
+  // CLI scripts: console.log IS the user interface — allow it there.
+  files: ["scripts/**/*.mjs", "scripts/**/*.ts"],
+  rules: {
+    "no-console": "off",
+  },
+}, {
+  ignores: ["node_modules/**", ".next/**", "out/**", ".vercel/**", "build/**", "next-env.d.ts", "examples/**", "skills", "download/**", "scripts/keja-docs/**", "scripts/phase2_audit/**", "android/**", "ios/**"]
 }];
 
 export default eslintConfig;
