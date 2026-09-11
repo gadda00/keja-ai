@@ -1,8 +1,8 @@
 # Keja AI — Current Picture
 
-**Snapshot date: 11 September 2026 · repo `gadda00/keja-ai` · this document is the post-implementation state of the platform after the Phase-2 engineering engagement (plus the Phase-2.5 access-and-auth hardening below).**
+**Snapshot date: 11 September 2026 · repo `gadda00/keja-ai` · this document is the post-implementation state of the platform after the Phase-2 engineering engagement (plus the Phase-2.5 access-and-auth hardening and the Phase-3 intelligence layer below).**
 
-This is the honest, complete picture after: (1) the Phase-1 build (Aug–Sep 2026), (2) the ~100-page Phase-2 technical audit (`scripts/phase2_audit/final.pdf`), (3) the implementation of the audit's Phase-2 workstreams described below, and (4) the Phase-2.5 additions — real Google Sign-In, valid `.well-known` app associations, and the operator site guide. It replaces `REPO_PICTURE.md` (the pre-audit snapshot) as the authoritative "where are we" document. `src/lib/api/storeTwin.ts` points readers here for the local/remote persistence story.
+This is the honest, complete picture after: (1) the Phase-1 build (Aug–Sep 2026), (2) the ~100-page Phase-2 technical audit (`scripts/phase2_audit/final.pdf`), (3) the implementation of the audit's Phase-2 workstreams described below, (4) the Phase-2.5 additions — real Google Sign-In, valid `.well-known` app associations, and the operator site guide, and (5) the Phase-3 additions — the governed events/data-quality layer, release-correctness fixes, the intelligence gateway, and Google Sign-In activation in production. It replaces `REPO_PICTURE.md` (the pre-audit snapshot) as the authoritative "where are we" document. `src/lib/api/storeTwin.ts` points readers here for the local/remote persistence story.
 
 ---
 
@@ -69,10 +69,11 @@ The audit's Ch. 22 demanded a real test suite before any LLM work. `npm test` ru
 | `tests/claims.test.ts` | the 24-claim register: unique ids, valid statuses, disclosure rules, path-to-live for non-live claims |
 | `tests/verification.test.ts` | 90-day freshness policy incl. exact boundary days, evidence derivation |
 | `tests/seo.test.ts` | meta idempotency, absolute OG URLs, default-image reset, JSON-LD replacement |
-| `tests/analytics.test.ts` | 11-event taxonomy enforcement, 200-entry ring buffer, corruption recovery |
+| `tests/analytics.test.ts` | governed-layer contracts — envelope validation, safeText redaction, unknown-key stripping, 500-entry ring cap, corruption recovery, quality verdicts, metric computation |
 | `tests/api-client.test.ts` | unconfigured-seam rejection contract, token custody |
 | `tests/uuid.test.ts`, `tests/format.test.ts`, `tests/areaCoords.test.ts`, `tests/responsive-images.test.ts` | identifiers, KES formatting/trust tiers/time-ago, Kenya bounding-box gazetteer, srcset construction |
 | `tests/googleAuth.test.ts` | GIS ID-token decoder round-trip + malformed rejections, claim validation (issuer/audience/expiry/email_verified), admin-allowlist mapping, Google-photo vs demo-colour pictures |
+| `tests/aiGateway.test.ts` | 11-category escalation catalogue + factual-exception guards, provider-seam redaction, retrieval (area boost/gibberish/sufficiency), corpus integrity (real inventory refs, freshness windows), gateway outcomes with governed-event assertions, post-generation review controls |
 
 ## 4. Bugs the verification caught (and fixed)
 
@@ -85,6 +86,14 @@ The audit's Ch. 22 demanded a real test suite before any LLM work. `npm test` ru
 - **Real Google Sign-In (Google Identity Services):** `src/lib/googleAuth.ts` (GIS loader, base64url JWT decoder, claim validation, role mapping — pure and unit-tested) + `loginWithGoogleCredential()` in `auth.tsx` (find-or-create, profile refresh, admin allowlist that upgrades but never downgrades) + the real Google button in `AuthModal` whenever `NEXT_PUBLIC_GOOGLE_CLIENT_ID` is set. CSP in `vercel.json` was extended for `accounts.google.com` (script/frame/connect) and `*.googleusercontent.com` profile photos. Activation runbook: `docs/GOOGLE_AUTH_SETUP.md`; the demo accounts remain for QA.
 - **Well-known app associations:** valid empty `assetlinks.json` + `apple-app-site-association` with forced `application/json` headers (fixes the HTML-behind-200 responses).
 - **Operator documentation:** `.env.example` documenting every `NEXT_PUBLIC_*` var, and the designed site guide `docs/pdf/keja-site-guide.pdf` (HTML source: `scripts/keja-docs/doc6_site_guide.html`) — access map, demo credentials, admin console, Android/iOS PWA install, ops pipeline, credential custody and rotation checklist.
+
+## 4.6 Phase-3 additions (the intelligence layer + Google activation)
+
+- **Intelligence gateway (audit ch.9–11):** every Ask Keja turn now flows through one governed pipeline — `src/lib/ai/gateway.ts`: CLASSIFY (versioned 11-category escalation catalogue with factual-exception guards, `src/lib/ai/policy.ts`) → REDACT (at the provider *egress* seam only — the on-device engine and local corpus never leave the device, so budget figures keep parsing) → RETRIEVE (authorization-first, freshness-gated BM25-lite over the approved public corpus — `corpus.ts` + `retrieval.ts`, every property entry cross-referenced to a real inventory id) → GENERATE (local deterministic provider by default; the DeepSeek tier is import-guarded and armed server-side only) → REVIEW (prohibited-advice language + citation requirement) → AUDIT (`ai.answer.generated.v1` / `ai.answer.escalated.v1` governed events). The chat now renders **source chips** — corpus citations with as-of dates under every grounded answer.
+- **Governed events + data quality (audit ch.7–8):** `src/lib/events/` — the strict envelope + 15-event taxonomy (privacy-classed, redaction-repaired, ring-buffered) behind `emit()`, with a 10-metric registry and a data-quality report over the local buffer; `analytics.ts` is now a typed façade over the governed layer.
+- **Release correctness (audit SEC-201/202/203):** `useSyncExternalStore` migration (no setState-in-effect), the unconditional single static-export contract with `verify-artifacts.mjs` gating every build, dependency tree bumped audit-clean (next 16.3.4, recharts 3.10.1, prisma 6.19.3 + overrides), and CI actions pinned to immutable SHAs.
+- **Google Sign-In is ACTIVE in production:** `NEXT_PUBLIC_GOOGLE_CLIENT_ID` is set in Vercel (production/preview/development) — the real Google button renders in the Auth modal on keja.app. Admin mapping via `ADMIN_EMAILS` allowlist (see `docs/GOOGLE_AUTH_SETUP.md`); the demo/QA accounts remain.
+- **Test suite:** 233 tests across 18 files — the AI gateway golden set (45 cases) now pins the escalation catalogue, redaction, retrieval, corpus integrity, gateway outcomes and post-generation review.
 
 ## 5. Architecture — current state
 
