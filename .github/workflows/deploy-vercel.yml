@@ -57,6 +57,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Unit tests
+        run: npm test
+
       # Link the workspace to the Vercel project (the .vercel/ directory is
       # gitignored; the CLI needs these two IDs to know where to deploy).
       - name: Link Vercel project
