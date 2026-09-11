@@ -4,10 +4,14 @@
  * the rebuild kept the auth context but never mounted its modal, leaving
  * requireAuth() a silent no-op).
  *
- * Three flows, honest about the static deployment (audit F-01 / P0-1):
- *  1. One-tap demo accounts (Google-style) — clearly labelled as demo.
- *  2. Email + password sign-in — PBKDF2-hashed on this device.
- *  3. Registration — carries an explicit "demo mode" disclosure: the account
+ * Flows, honest about the static deployment (audit F-01 / P0-1):
+ *  1. Real Google Sign-In (Google Identity Services) — rendered whenever
+ *     NEXT_PUBLIC_GOOGLE_CLIENT_ID is configured; the returned ID token is
+ *     validated before an account is created (see lib/googleAuth.ts).
+ *  2. One-tap demo accounts (Google-style) — clearly labelled as demo;
+ *     the primary surface until the client ID is set, still available for QA.
+ *  3. Email + password sign-in — PBKDF2-hashed on this device.
+ *  4. Registration — carries an explicit "demo mode" disclosure: the account
  *     exists only in this browser, is not a real credential, and upgrades to
  *     a server account when the Phase-2 auth service ships.
  *
@@ -15,7 +19,7 @@
  * success, so gated actions (admin console, saving while signed-out, …)
  * continue where the user left off.
  */
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { LogIn, ShieldCheck, UserPlus, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -23,6 +27,56 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth, DEMO_GOOGLE_ACCOUNTS, initials } from '@/lib/auth';
 import { useFocusTrap } from '@/lib/useFocusTrap';
+import { loadGoogleIdentity } from '@/lib/googleAuth';
+import { GOOGLE_CLIENT_ID } from '@/config';
+
+/** Real "Sign in with Google" — GIS button rendered into a container div.
+ *  Falls back to an error message if the script cannot load (offline /
+ *  blocked). The callback hands the raw credential to the auth context,
+ *  which validates claims before creating the session. */
+function GoogleSignInButton({ onCredential }: { onCredential: (c: string) => void }) {
+  const holder = useRef<HTMLDivElement>(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    loadGoogleIdentity()
+      .then((id) => {
+        if (cancelled || !holder.current) return;
+        id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: (response) => onCredential(response.credential),
+          ux_mode: 'popup',
+          use_fedcm_for_prompt: true,
+        });
+        id.renderButton(holder.current, {
+          theme: 'outline',
+          size: 'large',
+          text: 'continue_with',
+          shape: 'rectangular',
+          logo_alignment: 'center',
+          width: Math.min(340, holder.current.clientWidth || 340),
+        });
+      })
+      .catch((e) => {
+        if (!cancelled) setError(e instanceof Error ? e.message : 'Google Sign-In unavailable.');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [onCredential]);
+
+  return (
+    <div className="grid justify-items-center gap-2">
+      <div ref={holder} aria-label="Sign in with Google" />
+      {error && (
+        <p className="text-center text-xs font-semibold text-destructive" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
 
 export function AuthModal() {
   const {
@@ -31,6 +85,7 @@ export function AuthModal() {
     pendingIntent,
     clearIntent,
     loginWithGoogle,
+    loginWithGoogleCredential,
     loginWithEmail,
     register,
     loading,
@@ -50,6 +105,29 @@ export function AuthModal() {
   };
 
   useFocusTrap(dialogRef, authModalOpen, close);
+
+  // Real-Google callback — stable via useCallback so the GIS button isn't
+  // re-initialised on every render (only when the pending intent changes).
+  // Self-contained (no render-local function deps) so it stays valid even
+  // after the early return below.
+  const handleGoogleCredential = useCallback(
+    async (credential: string) => {
+      setError('');
+      try {
+        await loginWithGoogleCredential(credential);
+        const intent = pendingIntent;
+        setAuthModalOpen(false);
+        setError('');
+        setMode('signin');
+        clearIntent();
+        // Continue the gated action AFTER the modal is gone.
+        if (intent) window.setTimeout(() => intent.onDone(), 0);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Something went wrong.');
+      }
+    },
+    [loginWithGoogleCredential, pendingIntent, setAuthModalOpen, clearIntent]
+  );
 
   if (!authModalOpen) return null;
 
@@ -102,8 +180,18 @@ export function AuthModal() {
           </button>
         </div>
 
+        {/* Real Google Sign-In (activated by NEXT_PUBLIC_GOOGLE_CLIENT_ID) */}
+        {GOOGLE_CLIENT_ID && (
+          <div className="mt-5">
+            <GoogleSignInButton onCredential={handleGoogleCredential} />
+          </div>
+        )}
+
         {/* Demo one-tap accounts */}
         <div className="mt-5 grid gap-2">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            {GOOGLE_CLIENT_ID ? 'Demo / QA accounts' : 'One-tap demo accounts'}
+          </p>
           {DEMO_GOOGLE_ACCOUNTS.map((acc) => (
             <button
               key={acc.email}

@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuth } from '@/lib/auth';
+import { useAuth, initials } from '@/lib/auth';
+import { isPictureUrl } from '@/lib/googleAuth';
 import { useStore } from '@/lib/store';
 import { useSavedSearches } from '@/lib/searchStore';
 import { useAllProperties } from '@/lib/inventory';
@@ -31,8 +32,20 @@ export default function AccountView() {
       {/* profile header */}
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-3xl border bg-card p-5 sm:p-6">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-xl font-black text-primary-foreground">
-            <User className="h-7 w-7" aria-hidden />
+          <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-primary text-xl font-black text-primary-foreground">
+            {user && isPictureUrl(user.picture) ? (
+              <img
+                src={user.picture}
+                alt=""
+                className="h-full w-full object-cover"
+                referrerPolicy="no-referrer"
+                loading="lazy"
+              />
+            ) : user ? (
+              <span aria-hidden>{initials(user.name)}</span>
+            ) : (
+              <User className="h-7 w-7" aria-hidden />
+            )}
           </div>
           <div>
             {user ? (

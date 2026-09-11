@@ -41,6 +41,32 @@ export const LANGUAGES = [
 export type LanguageCode = (typeof LANGUAGES)[number]['code'];
 
 /**
+ * Google Sign-In (Google Identity Services) — real Google accounts.
+ *
+ * When NEXT_PUBLIC_GOOGLE_CLIENT_ID is set (build-time inlined, static-safe),
+ * the auth modal renders the real "Sign in with Google" button and the
+ * returned ID token is validated client-side (issuer / audience / expiry /
+ * email_verified). Without it, the platform stays fully usable through the
+ * clearly-labelled demo accounts + email sign-in.
+ *
+ * See docs/GOOGLE_AUTH_SETUP.md for the 5-minute activation runbook
+ * (Google Cloud Console → OAuth client → Vercel env var → redeploy).
+ */
+export const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
+
+/**
+ * Comma-separated allowlist of Google account emails that are granted the
+ * admin role on Google sign-in (NEXT_PUBLIC_ADMIN_EMAILS). Example:
+ *   NEXT_PUBLIC_ADMIN_EMAILS=clive@chacadom.com,you@gmail.com
+ * Emails are compared case-insensitively; allowlisting can upgrade a
+ * matching account to admin but never downgrades an existing admin.
+ */
+export const ADMIN_EMAILS = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? '')
+  .split(',')
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
+
+/**
  * Canonical site origin — single source of truth for SEO and deep links.
  * keja.app is the canonical home.
  */

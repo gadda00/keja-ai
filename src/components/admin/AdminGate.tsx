@@ -7,6 +7,10 @@
  * anonymous visitors and an explicit 403 for non-admin accounts before the
  * AdminView (and its lazy chunk) is ever mounted.
  *
+ * Two ways in: (a) the seeded demo admin account (password on this device),
+ * (b) Google Sign-In with an email allowlisted in NEXT_PUBLIC_ADMIN_EMAILS —
+ * the recommended production path, see docs/GOOGLE_AUTH_SETUP.md.
+ *
  * Scope note: with a static deployment this remains a UI gate — a determined
  * user could still read the bundle. No admin-scoped data or action exists on
  * any server to call (there is no API yet); everything the console shows is
@@ -18,6 +22,7 @@ import type { ReactNode } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
+import { GOOGLE_CLIENT_ID } from '@/config';
 
 export function AdminGate({ children }: { children: ReactNode }) {
   const { isLoggedIn, isAdmin, user, requireAuth } = useAuth();
@@ -30,8 +35,10 @@ export function AdminGate({ children }: { children: ReactNode }) {
         </div>
         <h1 className="text-xl font-bold">Admin console</h1>
         <p className="text-sm text-muted-foreground">
-          This area is restricted to platform administrators. Sign in with an
-          admin account to continue.
+          This area is restricted to platform administrators.
+          {GOOGLE_CLIENT_ID
+            ? ' Sign in with your allowlisted administrator Google account to continue.'
+            : ' Sign in with an admin account to continue.'}
         </p>
         <Button onClick={() => requireAuth('admin console access', () => undefined)}>
           <LogIn className="mr-2 h-4 w-4" aria-hidden /> Sign in

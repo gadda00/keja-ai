@@ -2,10 +2,11 @@
  * KEJA Authentication & Session Management
  * ---------------------------------------------------------------------------
  * Implements the account layer of the KEJA platform blueprint:
- *  - Google Sign-In (Google Identity Services) — activates automatically when
- *    a GOOGLE_CLIENT_ID is present in the site config; otherwise falls back to
- *    a fully-functional demo mode (simulated Google accounts) so the platform
- *    experience is complete on a static host (GitHub Pages).
+ *  - Google Sign-In (Google Identity Services) — real Google accounts when
+ *    NEXT_PUBLIC_GOOGLE_CLIENT_ID is configured (see src/lib/googleAuth.ts
+ *    and docs/GOOGLE_AUTH_SETUP.md); otherwise falls back to a
+ *    fully-functional demo mode (simulated accounts) so the platform
+ *    experience is complete on a static host.
  *  - Email + password registration (client-side accounts, upgradeable to API).
  *  - Persistent sessions with expiry + activity refresh ("remember me").
  *  - Role-based access: user | agent | admin (RBAC per blueprint Ch.14).
@@ -35,6 +36,12 @@ import {
   isLegacyHash,
   verifyPassword,
 } from '@/lib/password';
+import {
+  decodeIdToken,
+  roleForEmail,
+  validateIdTokenClaims,
+} from '@/lib/googleAuth';
+import { ADMIN_EMAILS, GOOGLE_CLIENT_ID } from '@/config';
 
 export type Role = 'user' | 'agent' | 'admin';
 export type AuthMethod = 'google' | 'email';
@@ -71,6 +78,8 @@ interface AuthState {
 interface AuthContextValue extends AuthState {
   users: UserAccount[];
   loginWithGoogle: (demoAccount?: DemoGoogleAccount) => Promise<UserAccount>;
+  /** Real Google Sign-In: consumes a GIS ID-token credential. */
+  loginWithGoogleCredential: (credential: string) => Promise<UserAccount>;
   loginWithEmail: (email: string, password: string, remember?: boolean) => Promise<UserAccount>;
   register: (data: RegisterInput) => Promise<UserAccount>;
   logout: (reason?: string) => void;
@@ -378,6 +387,59 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     [users, persistLogin]
   );
 
+  /** Real Google Sign-In — consume a GIS credential (JWT ID token):
+   *  decode + validate the claims (issuer / audience / expiry / verified
+   *  email), then find-or-create the local account. Admin allowlist emails
+   *  are upgraded to the admin role (never downgraded). */
+  const loginWithGoogleCredential = useCallback(
+    async (credential: string) => {
+      setLoading(true);
+      try {
+        const claims = decodeIdToken(credential);
+        const check = validateIdTokenClaims(claims, GOOGLE_CLIENT_ID);
+        if (!check.ok) throw new Error(check.reason ?? 'Google sign-in could not be verified.');
+        const email = claims.email as string;
+        const picture = typeof claims.picture === 'string' ? claims.picture : undefined;
+        const name =
+          (typeof claims.name === 'string' && claims.name.trim()) || email.split('@')[0];
+
+        const existing = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+        if (existing) {
+          if (existing.status === 'suspended')
+            throw new Error('This Google account is suspended on Keja. Contact support.');
+          // keep profile fresh + apply admin allowlist without ever downgrading
+          const allowed = roleForEmail(email, ADMIN_EMAILS);
+          const role = allowed === 'admin' || existing.role === 'admin' ? 'admin' : existing.role;
+          const refreshed: UserAccount =
+            existing.name === name && existing.picture === picture && existing.role === role
+              ? existing
+              : { ...existing, name, picture: picture ?? existing.picture, role };
+          const next =
+            refreshed === existing ? users : users.map((u) => (u.id === existing.id ? refreshed : u));
+          return persistLogin(refreshed, true, next);
+        }
+
+        const now = new Date().toISOString();
+        const account: UserAccount = {
+          id: `usr-${newToken().slice(0, 8)}`,
+          name,
+          email,
+          role: roleForEmail(email, ADMIN_EMAILS) === 'admin' ? 'admin' : 'user',
+          provider: 'google',
+          status: 'active',
+          picture,
+          createdAt: now,
+          lastLoginAt: now,
+          loginCount: 0,
+        };
+        return persistLogin(account, true, [...users, account]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [users, persistLogin]
+  );
+
   const loginWithEmail = useCallback(
     async (email: string, password: string, remember = false) => {
       setLoading(true);
@@ -525,6 +587,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       loading,
       users,
       loginWithGoogle,
+      loginWithGoogleCredential,
       loginWithEmail,
       register,
       logout,
@@ -543,6 +606,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       loading,
       users,
       loginWithGoogle,
+      loginWithGoogleCredential,
       loginWithEmail,
       register,
       logout,
