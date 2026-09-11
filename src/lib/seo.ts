@@ -24,7 +24,7 @@ export const DEFAULT_OG_IMAGE = `${SITE_URL}${asset('og-image.jpg')}`;
 
 /** Absolute URL for an image path ('/x' inputs; http(s) passthrough). */
 export const absoluteImage = (path: string): string =>
-  path.startsWith('http') ? path : `${SITE_URL}${path.replace(/^\//, '')}`;
+  path.startsWith('http') ? path : `${SITE_URL}/${path.replace(/^\//, '')}`;
 
 function upsertMeta(attr: 'name' | 'property', key: string, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
