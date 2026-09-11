@@ -110,8 +110,7 @@ export function memoizeWithTTL<T extends (...args: any[]) => any>(
  * Useful for code splitting and performance optimization.
  */
 export function lazyLoad<T>(
-  importFunc: () => Promise<{ default: T }>,
-  loading?: T
+  importFunc: () => Promise<{ default: T }>
 ): Promise<T> {
   let cached: T | null = null;
   let promise: Promise<T> | null = null;
@@ -382,7 +381,9 @@ export function preloadImages(
  */
 export function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined') return false;
-  
+  // jsdom and some embedded webviews expose `window` without `matchMedia`
+  if (typeof window.matchMedia !== 'function') return false;
+
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 

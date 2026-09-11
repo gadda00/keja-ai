@@ -1,24 +1,26 @@
 /**
- * Progressive Image Component
- * 
- * A smart image component that:
- * - Loads low-quality placeholder first (LQIP - Low Quality Image Placeholder)
- * - Fades in high-quality image when loaded
- * - Supports WebP with JPEG fallback
- * - Handles adaptive loading based on network conditions
- * - Provides loading and error states
+ * Progressive Image Components
+ *
+ * A smart image layer that:
+ * - Renders the real <img> immediately (never blocks the browser from
+ *   starting the download) and fades it in over a blurred LQIP placeholder
+ * - Serves WebP natively via <picture><source> (no JS capability sniffing,
+ *   no hydration mismatch risk)
+ * - Ships skeleton and error states
+ * - Respects reduced-motion via the `motion-reduce:` Tailwind variant
  */
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence, type Transition } from 'framer-motion';
+import { useCallback, useState } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { Skeleton } from './LoadingSkeleton';
-import { prefersReducedMotion, isSlowConnection } from '@/lib/performance';
 
 interface ProgressiveImageProps {
   src: string;
   alt: string;
-  placeholder?: string; // Low-quality placeholder (blurhash or small image)
-  webpSrc?: string; // WebP version for modern browsers
+  /** Low-quality placeholder (LQIP / tiny JPEG) shown beneath the main image */
+  placeholder?: string;
+  /** WebP variant; served via <source> so the browser picks natively */
+  webpSrc?: string;
   sizes?: string;
   className?: string;
   width?: number | string;
@@ -31,34 +33,12 @@ interface ProgressiveImageProps {
 }
 
 /**
- * Check if an image URL is a data URL (base64 encoded)
- */
-function isDataUrl(url: string): boolean {
-  return url.startsWith('data:');
-}
-
-/**
- * Check if the browser supports WebP
- */
-function supportsWebP(): boolean {
-  if (typeof window === 'undefined') return false;
-  
-  // Create a test image element
-  const webP = new Image();
-  return webP.src === 'data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAQAgCDASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
-}
-
-/**
  * Progressive Image Component
- * 
- * Features:
- * - Automatic WebP support with fallback
- * - Blurhash/LQIP placeholder support
- * - Smooth fade-in animation
- * - Loading skeleton state
- * - Error handling
- * - Network-aware loading
- * - Reduced motion support
+ *
+ * The main image is always in the DOM with `opacity-0` until its load event
+ * fires. The placeholder sits underneath, so users see the LQIP instantly
+ * and the full image crossfades in on arrival. If hydration never runs, the
+ * placeholder still shows — the layout never collapses.
  */
 export function ProgressiveImage({
   src,
@@ -76,110 +56,56 @@ export function ProgressiveImage({
   onError,
 }: ProgressiveImageProps) {
   const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
-  const [currentSrc, setCurrentSrc] = useState<string>('');
-  const [useWebP, setUseWebP] = useState<boolean>(false);
-  const imgRef = useRef<HTMLImageElement>(null);
-  const hasPlaceholder = Boolean(placeholder && !isDataUrl(placeholder));
 
-  // Check WebP support on mount
-  useEffect(() => {
-    setUseWebP(supportsWebP());
-  }, []);
-
-  // Determine the actual source to use
-  const actualSrc = useMemo(() => useWebP && webpSrc ? webpSrc : src, [useWebP, webpSrc, src]);
-
-  // Handle image loading
   const handleLoad = useCallback(() => {
     setStatus('loaded');
     onLoad?.();
   }, [onLoad]);
 
   const handleError = useCallback(() => {
-    // Try fallback to original src if webp failed
-    if (useWebP && webpSrc && currentSrc === webpSrc) {
-      setCurrentSrc(src);
-      return;
-    }
     setStatus('error');
     onError?.();
-  }, [useWebP, webpSrc, currentSrc, src, onError]);
+  }, [onError]);
 
-  // Set the current source when it changes
-  useEffect(() => {
-    setCurrentSrc(actualSrc);
-  }, [actualSrc]);
-
-  // Preload the image if it's high priority
-  useEffect(() => {
-    if (loadingPriority === 'high' && status === 'loading') {
-      const img = new Image();
-      img.src = actualSrc;
-      if (img.complete) {
-        handleLoad();
-      }
+  // Cached images can finish loading before React attaches its event
+  // listeners (prerendered HTML + warm HTTP cache). The ref callback runs
+  // during commit, so this catches that case without an effect.
+  const attachImg = useCallback((node: HTMLImageElement | null) => {
+    if (node?.complete && node.naturalWidth > 0) {
+      setStatus('loaded');
     }
-  }, [actualSrc, loadingPriority, status, handleLoad]);
+  }, []);
 
-  // Animation configuration
-  const animationConfig = useMemo(() => prefersReducedMotion()
-    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.1 } as Transition }
-    : {
-        initial: { opacity: 0, scale: 0.98 },
-        animate: { opacity: 1, scale: 1 },
-        transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as Transition['ease'] },
-      }, []);
+  const frameStyle: CSSProperties = {};
+  if (width !== undefined) frameStyle.width = width;
+  if (height !== undefined) frameStyle.height = height;
 
-  // Render different states
-  if (status === 'loading') {
-    if (showSkeleton) {
-      return (
-        <div className={className} style={{ width, height } as React.CSSProperties}>
-          <Skeleton
-            className={`w-full h-full ${skeletonClassName}`}
-            variant="rectangular"
-          />
-        </div>
-      );
-    }
+  return (
+    <div className={`relative overflow-hidden ${className}`} style={frameStyle}>
+      {/* LQIP base layer — visible until the main image fades in over it */}
+      {placeholder && status !== 'error' && (
+        <img
+          src={placeholder}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full scale-110 object-cover"
+          style={{ filter: 'blur(8px)' }}
+        />
+      )}
 
-    // Show placeholder if available
-    if (placeholder) {
-      return (
-        <motion.div
-          className={className}
-          style={{ width, height } as React.CSSProperties}
-          {...animationConfig}
+      {/* Skeleton layer while the main image is in flight (no placeholder case) */}
+      {status === 'loading' && !placeholder && showSkeleton && (
+        <Skeleton className={`absolute inset-0 ${skeletonClassName}`} variant="rectangular" />
+      )}
+
+      {status === 'error' ? (
+        <div
+          className="flex h-full w-full items-center justify-center rounded bg-gray-200 dark:bg-gray-700"
+          role="img"
+          aria-label={alt}
         >
-          <img
-            src={placeholder}
-            alt={alt}
-            className="w-full h-full object-cover"
-            style={{ filter: 'blur(8px)' } as React.CSSProperties['filter']}
-          />
-        </motion.div>
-      );
-    }
-
-    // Default loading state
-    return (
-      <div className={className} style={{ width, height } as React.CSSProperties}>
-        <Skeleton className="w-full h-full" variant="rectangular" />
-      </div>
-    );
-  }
-
-  if (status === 'error') {
-    return (
-      <div
-        className={className}
-        style={{ width, height } as React.CSSProperties}
-        role="img"
-        aria-label={alt}
-      >
-        <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded">
           <svg
-            className="w-8 h-8 text-gray-400 dark:text-gray-500"
+            className="h-8 w-8 text-gray-400 dark:text-gray-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -192,91 +118,76 @@ export function ProgressiveImage({
             />
           </svg>
         </div>
-      </div>
-    );
-  }
-
-  // Loaded state with fade-in
-  return (
-    <motion.div
-      className={className}
-      style={{ width, height } as React.CSSProperties}
-      {...animationConfig}
-    >
-      <AnimatePresence mode="wait">
-        {status === 'loaded' && (
-          <motion.img
-            key={currentSrc}
-            src={currentSrc}
+      ) : (
+        <picture>
+          {webpSrc && <source type="image/webp" srcSet={webpSrc} sizes={sizes} />}
+          <img
+            ref={attachImg}
+            src={src}
             alt={alt}
-            className="w-full h-full object-cover"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 } as Transition}
-            loading={loadingPriority === 'high' ? 'eager' : 'lazy'}
-            ref={imgRef}
             sizes={sizes}
+            loading={loadingPriority === 'high' ? 'eager' : 'lazy'}
+            decoding="async"
+            draggable={false}
             onLoad={handleLoad}
             onError={handleError}
+            className={`relative h-full w-full object-cover transition-opacity duration-500 motion-reduce:transition-none ${
+              status === 'loaded' ? 'opacity-100' : 'opacity-0'
+            }`}
           />
-        )}
-      </AnimatePresence>
-    </motion.div>
+        </picture>
+      )}
+    </div>
   );
 }
 
 /**
  * Responsive Image Component
- * 
- * A wrapper for responsive images with srcset support
+ *
+ * Renders a real <picture> element with WebP + fallback srcSets so the
+ * browser chooses the right asset for the viewport — plain HTML, no JS.
  */
-interface ResponsiveImageProps extends Omit<ProgressiveImageProps, 'src' | 'webpSrc'> {
+interface ResponsiveImageProps {
+  src: string;
+  alt: string;
   srcSet?: {
     webp?: string[];
     fallback?: string[];
   };
-  src: string;
-  breakpoints?: number[];
+  sizes?: string;
+  className?: string;
+  loadingPriority?: 'high' | 'low';
+}
+
+function buildSrcSet(urls: string[], breakpoints: number[]): string {
+  return breakpoints
+    .map((bp, i) => `${urls[i] ?? urls[urls.length - 1] ?? ''} ${bp}w`)
+    .join(', ');
 }
 
 export function ResponsiveImage({
   src,
+  alt,
   srcSet,
-  breakpoints = [480, 768, 1024, 1280, 1920],
-  ...props
+  sizes = '(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw',
+  className = '',
+  loadingPriority = 'low',
 }: ResponsiveImageProps) {
-  // Build srcset for WebP if available
-  const webpSrcSet = useMemo(() => {
-    if (!srcSet?.webp) return undefined;
-    return breakpoints
-      .map((bp, i) => `${srcSet.webp?.[i] || srcSet.webp?.[srcSet.webp.length - 1] || ''} ${bp}w`)
-      .join(', ');
-  }, [srcSet?.webp, breakpoints]);
-
-  // Build srcset for fallback
-  const fallbackSrcSet = useMemo(() => {
-    if (!srcSet?.fallback) return undefined;
-    return breakpoints
-      .map((bp, i) => `${srcSet.fallback?.[i] || srcSet.fallback?.[srcSet.fallback.length - 1] || ''} ${bp}w`)
-      .join(', ');
-  }, [srcSet?.fallback, breakpoints]);
-
-  // Generate sizes attribute if not provided
-  const sizesAttr = props.sizes || '(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw';
+  const breakpoints = [480, 768, 1024, 1280, 1920];
+  const webpSrcSet = srcSet?.webp?.length ? buildSrcSet(srcSet.webp, breakpoints) : undefined;
+  const fallbackSrcSet = srcSet?.fallback?.length ? buildSrcSet(srcSet.fallback, breakpoints) : undefined;
 
   return (
     <picture>
-      {webpSrcSet && (
-        <source
-          type="image/webp"
-          srcSet={webpSrcSet}
-          sizes={sizesAttr}
-        />
-      )}
-      <ProgressiveImage
-        {...props}
+      {webpSrcSet && <source type="image/webp" srcSet={webpSrcSet} sizes={sizes} />}
+      <img
         src={src}
-        sizes={sizesAttr}
+        alt={alt}
+        srcSet={fallbackSrcSet}
+        sizes={sizes}
+        loading={loadingPriority === 'high' ? 'eager' : 'lazy'}
+        decoding="async"
+        className={className}
       />
     </picture>
   );
@@ -284,22 +195,22 @@ export function ResponsiveImage({
 
 /**
  * Background Image Component
- * 
- * A component for progressive background images
+ *
+ * A hidden <img> with the same URL preloads the asset (cache-shared with the
+ * background-image), and the real layer fades in when it arrives. No
+ * chicken-and-egg: the preloader is always mounted.
  */
 interface BackgroundImageProps {
   src: string;
-  webpSrc?: string;
   placeholder?: string;
   className?: string;
-  children?: React.ReactNode;
+  children?: ReactNode;
   overlay?: boolean;
   overlayClassName?: string;
 }
 
 export function BackgroundImage({
   src,
-  webpSrc,
   placeholder,
   className = '',
   children,
@@ -307,76 +218,61 @@ export function BackgroundImage({
   overlayClassName = 'bg-black/40 dark:bg-black/60',
 }: BackgroundImageProps) {
   const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
-  const [useWebP, setUseWebP] = useState<boolean>(false);
 
-  useEffect(() => {
-    setUseWebP(supportsWebP());
-  }, []);
-
-  const actualSrc = useMemo(() => useWebP && webpSrc ? webpSrc : src, [useWebP, webpSrc, src]);
-
-  const handleLoad = useCallback(() => setStatus('loaded'), []);
-  const handleError = useCallback(() => setStatus('error'), []);
+  const layerStyle: CSSProperties = {
+    backgroundImage: `url(${src})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  };
 
   return (
-    <div
-      className={`relative overflow-hidden ${className}`}
-      style={{
-        backgroundImage: placeholder ? `url(${placeholder})` : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        filter: placeholder ? 'blur(8px)' : undefined,
-      } as React.CSSProperties}
-    >
-      {/* Background Image */}
-      <AnimatePresence mode="wait">
-        {status === 'loaded' && (
-          <motion.div
-            key={actualSrc}
-            className="absolute inset-0"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 } as Transition}
-            style={{
-              backgroundImage: `url(${actualSrc})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            } as React.CSSProperties}
-          >
-            {/* Actual image for better quality */}
-            <img
-              src={actualSrc}
-              alt=""
-              className="w-full h-full object-cover opacity-0"
-              onLoad={handleLoad}
-              onError={handleError}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Overlay */}
-      {overlay && (
+    <div className={`relative overflow-hidden ${className}`}>
+      {/* LQIP underlay while the full background streams in */}
+      {placeholder && status === 'loading' && (
         <div
-          className={`absolute inset-0 ${overlayClassName} transition-opacity duration-500 ${
-            status === 'loaded' ? 'opacity-100' : 'opacity-0'
-          }` as string}
+          aria-hidden="true"
+          className="absolute inset-0 -scale-110"
+          style={{
+            backgroundImage: `url(${placeholder})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'blur(8px)',
+          }}
         />
       )}
 
-      {/* Children */}
-      <div className="relative z-10">{children}</div>
-
-      {/* Loading State */}
-      {status === 'loading' && !placeholder && (
-        <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse" />
+      {/* Full-res layer — mounted immediately, faded in once loaded */}
+      {status !== 'error' && (
+        <div
+          aria-hidden="true"
+          className={`absolute inset-0 transition-opacity duration-500 motion-reduce:transition-none ${
+            status === 'loaded' ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={layerStyle}
+        />
       )}
 
-      {/* Error State */}
+      {/* Preloader: same URL as the background layer, so this is a cache hit,
+          but it gives us a reliable load event to drive the fade. */}
+      <img
+        src={src}
+        alt=""
+        aria-hidden="true"
+        className="sr-only"
+        onLoad={() => setStatus('loaded')}
+        onError={() => setStatus('error')}
+      />
+
+      {overlay && (
+        <div className={`absolute inset-0 ${overlayClassName}`} aria-hidden="true" />
+      )}
+
+      <div className="relative z-10">{children}</div>
+
       {status === 'error' && (
-        <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-700">
           <svg
-            className="w-8 h-8 text-gray-400 dark:text-gray-500"
+            className="h-8 w-8 text-gray-400 dark:text-gray-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -413,11 +309,11 @@ export function Avatar({
   placeholder,
 }: AvatarProps) {
   const sizeClasses = {
-    xs: 'w-6 h-6',
-    sm: 'w-8 h-8',
-    md: 'w-10 h-10',
-    lg: 'w-12 h-12',
-    xl: 'w-16 h-16',
+    xs: 'h-6 w-6',
+    sm: 'h-8 w-8',
+    md: 'h-10 w-10',
+    lg: 'h-12 w-12',
+    xl: 'h-16 w-16',
   };
 
   return (

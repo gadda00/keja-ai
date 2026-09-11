@@ -204,7 +204,7 @@ export function ChartSkeleton() {
       <Skeleton className="w-1/3 h-6 mb-6" variant="text" />
       <div className="h-64 flex items-end gap-2">
         {heights.map((height, index) => (
-          <div key={index} className="flex-1" style={{ height } as React.CSSProperties['height']}>
+          <div key={index} className="flex-1" style={{ height }}>
             <Skeleton className="w-full h-full" variant="rectangular" />
           </div>
         ))}

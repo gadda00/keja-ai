@@ -39,3 +39,11 @@ npm-debug.log*
 .vercel
 scripts/ghsecret/
 .deploy-stage/
+
+# ad-film pipeline local artifacts (QA frames, render intermediates —
+# never ship these to the repo; final deliverables live in docs/pdf/ and
+# the GitHub release)
+ad_build/
+scripts/keja-docs/doc7_body.pdf
+scripts/keja-docs/doc7_cover.html
+scripts/keja-docs/doc7_cover.pdf

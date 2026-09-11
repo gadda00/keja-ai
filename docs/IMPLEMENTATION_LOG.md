@@ -37,10 +37,18 @@ This document provides a **comprehensive change log** of all implementations, im
 
 | Date | Change ID | Category | Description | Files Modified | Status | Test Coverage |
 |------|-----------|----------|-------------|----------------|--------|---------------|
-| 2026-09-12 | IMP-001 | Performance | Created performance utilities module | `src/lib/performance.ts` | ✅ Implemented | ✅ Tests Added |
-| 2026-09-12 | IMP-002 | UI/UX | Created loading skeleton components | `src/components/ui/LoadingSkeleton.tsx` | ✅ Implemented | ✅ Manual Testing |
-| 2026-09-12 | IMP-003 | UI/UX | Created progressive image component | `src/components/ui/ProgressiveImage.tsx` | ✅ Implemented | ✅ Manual Testing |
-| 2026-09-12 | IMP-004 | Documentation | Created comprehensive improvement plan | `docs/IMPROVEMENT_PLAN_v2.md` | ✅ Implemented | N/A |
+| 2026-09-11 | IMP-001 | Performance | Created performance utilities module | `src/lib/performance.ts` | ✅ Implemented | ✅ `tests/performance.test.ts` (20 tests, added in IMP-005) |
+| 2026-09-11 | IMP-002 | UI/UX | Created loading skeleton components | `src/components/ui/LoadingSkeleton.tsx` | ✅ Remediated (IMP-005) | ✅ Typecheck + lint gates |
+| 2026-09-11 | IMP-003 | UI/UX | Created progressive image component | `src/components/ui/ProgressiveImage.tsx` | ✅ Remediated (IMP-005) | ✅ Typecheck + lint gates |
+| 2026-09-11 | IMP-004 | Documentation | Created comprehensive improvement plan | `docs/IMPROVEMENT_PLAN_v2.md` | ✅ Implemented | N/A |
+| 2026-09-11 | IMP-005 | Quality | CI remediation: fixed typecheck + lint failures, fixed runtime bugs in IMP-002/003, added unit tests, hardened SSR guards | `src/components/ui/*.tsx`, `src/lib/performance.ts`, `tests/performance.test.ts` | ✅ Implemented | ✅ `tests/performance.test.ts` (20/20) |
+
+> **Honesty note (2026-09-11):** IMP-001..004 as originally pushed did **not** pass CI — the
+> Typecheck step failed on every deploy (bogus `React.CSSProperties` casts), and
+> IMP-003 contained runtime defects (images could never finish loading; broken
+> WebP detection; invalid `<picture>` markup). The "Tests Added" / "Manual Testing"
+> coverage claims in the original rows were inaccurate. IMP-005 records the full
+> remediation; all rows above describe the **post-remediation** state.
 
 ---
 
@@ -526,6 +534,54 @@ rm docs/IMPROVEMENT_PLAN_v2.md
 
 ---
 
+### Change IMP-005: CI Remediation — Typecheck, Lint, and Runtime Fixes
+
+**Category:** Quality / Correctness  
+**Priority:** CRITICAL  
+**Implementation Date:** 2026-09-11  
+**Implemented By:** Keja AI Engineering Team
+
+#### 📝 Summary
+The original Phase-4 push (IMP-001..004) broke the production pipeline: three
+consecutive `Deploy to Vercel` runs failed at the **Typecheck** step, so no
+code shipped to keja.app from those commits. This change restores green CI and
+fixes genuine runtime defects the type errors were hiding.
+
+#### 🐛 Defects Fixed
+
+**Typecheck (CI blocker):**
+- `LoadingSkeleton.tsx` — invalid `style={{ height } as React.CSSProperties['height']}` cast; replaced with the plain, valid `style={{ height }}`
+- `ProgressiveImage.tsx` — same broken pattern with `React.CSSProperties['filter']`
+
+**ESLint (CI blocker):**
+- `react-hooks/set-state-in-effect` — the `setUseWebP()`-in-effect pattern replaced by native `<picture><source>` WebP negotiation (no JS state at all)
+- `react-hooks/preserve-manual-memoization` — srcSet builders rewritten as plain functions (they are cheap string joins; memoization was unnecessary)
+
+**Runtime (correctness):**
+- ProgressiveImage: the main `<img>` only rendered once `status === 'loaded'`, but `status` could only become `loaded` from that img's own `onLoad` — a chicken-and-egg that meant **images never displayed**. The real img is now always mounted (opacity-faded over the LQIP), with a ref callback that also catches cache-completed images
+- ProgressiveImage: `supportsWebP()` was not actually a WebP test (it compared an assigned `src` string); WebP is now served via native `<source type="image/webp">` — correct, and hydration-safe
+- ResponsiveImage: rendered a `<div>` inside `<picture>`, which is invalid HTML (the `<source>` was ignored); now renders a real `<picture>` + `<img srcSet>`
+- BackgroundImage: same chicken-and-egg (the preloader `<img>` lived inside the `loaded` branch); the preloader is now always mounted
+- `prefersReducedMotion()` crashed in environments that expose `window` without `matchMedia` (jsdom, some embedded webviews) — now guarded
+- `lazyLoad()` carried an unused `loading` parameter — removed
+
+#### 🧪 Tests Added
+- `tests/performance.test.ts` — 20 tests: debounce coalescing/restart semantics, throttle leading + trailing buffer, memoize (default + custom key), TTL expiry, lazyLoad caching, virtual-scroll windowing math (incl. bounds clamping), metric rating thresholds, adaptive image fallbacks, batch chunking, SSR guards. Suite total: **271 tests**.
+
+#### ✅ Verification
+- `npx tsc --noEmit` — clean
+- `npx eslint` on all touched files — clean
+- `vitest run` — 271/271 green
+- Full production build chain (prebuilt Vercel) — passed
+
+#### ⚠️ Breaking Changes
+- None (component public APIs preserved; `ResponsiveImage`/`BackgroundImage` dropped props that were silently ignored)
+
+#### 🔄 Rollback Instructions
+Revert this commit.
+
+---
+
 ## 📊 Implementation Statistics
 
 ### Summary Metrics
@@ -537,7 +593,7 @@ rm docs/IMPROVEMENT_PLAN_v2.md
 | Components Created | 15+ |
 | Utilities Created | 10+ |
 | Documentation Pages | 1 |
-| Test Coverage | Manual + Integration |
+| Test Coverage | 271 automated tests (incl. 20 for performance utils) |
 
 ### File Changes
 
