@@ -34,7 +34,7 @@ import { TwoFactorChallenge } from '@/components/common/TwoFactorChallenge';
 import { useAuth } from '@/lib/auth';
 import { useFocusTrap } from '@/lib/useFocusTrap';
 import { loadGoogleIdentity } from '@/lib/googleAuth';
-import { navigate } from '@/lib/router';
+import { navigate, useRouter } from '@/lib/router';
 import { useToast } from '@/hooks/use-toast';
 import { GOOGLE_CLIENT_ID, SITE_URL } from '@/config';
 import {
@@ -263,12 +263,38 @@ export function AuthModal() {
     loading,
   } = useAuth();
   const originMismatch = useOriginMismatch();
+  const { route } = useRouter();
 
   const dialogRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState('');
   const [step, setStep] = useState<'google' | 'register' | 'challenge'>('google');
   /** account that just signed in — drives register → challenge chaining */
   const [signedInAccount, setSignedInAccount] = useState<UserAccount | null>(null);
+
+  /** Whether the modal is open, readable inside effects without re-running
+   *  them on every open/close (used by the route-change watcher below). */
+  const openRef = useRef(false);
+  useEffect(() => {
+    openRef.current = authModalOpen;
+  }, [authModalOpen]);
+
+  /** The sign-in modal is route-scoped: navigating away abandons the gated
+   *  action that opened it ("sign in to continue: publish a listing" is
+   *  meaningless on a different page). Before this, the modal — a
+   *  full-screen overlay that intercepts every click — followed the user
+   *  around indefinitely until manually closed (observed 2026-09-12: it
+   *  blocked the contact form's Send button three routes later). */
+  useEffect(() => {
+    if (openRef.current) {
+      openRef.current = false;
+      setAuthModalOpen(false);
+      setError('');
+      setStep('google');
+      setSignedInAccount(null);
+      clearIntent();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- close-on-navigate only; refs are read on purpose
+  }, [route.path]);
 
   /** Close and reset transient form state so a reopen starts clean. */
   const close = () => {
@@ -346,6 +372,10 @@ export function AuthModal() {
       role="dialog"
       aria-modal="true"
       aria-label="Sign in to Keja"
+      onClick={(e) => {
+        // backdrop click dismisses (same as Escape / the Close button)
+        if (e.target === e.currentTarget) close();
+      }}
     >
       <div
         ref={dialogRef}
