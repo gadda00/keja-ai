@@ -1,0 +1,12 @@
+# KEJA AI — security.txt (RFC 9116)
+# https://securitytxt.org
+
+Contact: mailto:torv54@gmail.com
+Contact: mailto:info@chacadom.com
+Expires: 2027-09-11T00:00:00.000Z
+Preferred-Languages: en, sw
+Policy: https://keja.app/#/trust
+Canonical: https://keja.app/.well-known/security.txt
+
+# We thank researchers who give us 90 days before public disclosure.
+# Please include "KEJA SECURITY" in the subject line.

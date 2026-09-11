@@ -230,7 +230,8 @@ export default function TrustCenterView() {
           <p className="mt-6 rounded-2xl border border-gold/40 bg-gold-soft p-4 text-xs leading-relaxed text-gold-foreground/85">
             Security.txt: responsible-disclosure contact is published at{' '}
             <code className="font-mono font-bold">/.well-known/security.txt</code>. We thank
-            researchers who give us 90 days before public disclosure.
+            researchers who give us 90 days before public disclosure. Platform administrator:{' '}
+            <a className="font-semibold underline" href="mailto:torv54@gmail.com">torv54@gmail.com</a>.
           </p>
         </TabsContent>
 

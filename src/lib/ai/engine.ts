@@ -565,11 +565,11 @@ export class KejaAI {
     // Account / sign in
     if (/(sign in|sign up|log ?in|register|account|google|session|create account)/.test(t)) {
       return {
-        text: 'You can create a Keja account in seconds — **Continue with Google** or email. Your account unlocks:\n\n• Saved properties & searches\n• Your investment portfolio & Keja Tokenize holdings\n• Keja AI conversations that remember you\n• Viewing requests & WhatsApp updates\n• KEJA PRO tools if you\u2019re an agent\n\nSessions are role-based (user / agent / admin) and expire automatically. Privacy by design: your data stays on your device in this demo build.',
+        text: 'You can sign in to Keja in one tap — **Continue with Google**. Your account unlocks:\n\n• Saved properties & searches\n• Your investment portfolio & Keja Tokenize holdings\n• Keja AI conversations that remember you\n• Viewing requests & WhatsApp updates\n• KEJA PRO tools if you\u2019re an agent\n\nAdmin and 2FA-protected accounts also verify a 6-digit code from Google Authenticator. Sessions are role-based (user / agent / admin) and expire automatically. Privacy by design: your data stays on your device in this demo build.',
         meta: [
           {
             label: 'FACT',
-            text: 'RBAC + auto-expiring sessions per the KEJA security architecture',
+            text: 'Google-only accounts + RFC 6238 two-factor per the KEJA security architecture',
           },
         ],
         quickReplies: ['Sign in now', 'Tell me about the admin console', 'Find property first'],

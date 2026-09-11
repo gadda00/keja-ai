@@ -6,7 +6,6 @@
  * back to seeded defaults and (in salvage mode) drops only the bad entries.
  */
 import {
-  passwordMapSchema,
   safeParse,
   sessionSchema,
   userAccountSchema,
@@ -19,7 +18,7 @@ const validUser = {
   name: 'Amina',
   email: 'amina@example.com',
   role: 'user',
-  provider: 'email',
+  provider: 'google',
   status: 'active',
   createdAt: '2026-01-01T00:00:00Z',
   lastLoginAt: '2026-09-01T00:00:00Z',
@@ -50,7 +49,11 @@ describe('userAccountSchema', () => {
   });
 
   it('rejects unknown roles / providers / statuses', () => {
-    for (const patch of [{ role: 'owner' }, { provider: 'facebook' }, { status: 'banned' }]) {
+    for (const patch of [
+      { role: 'owner' },
+      { provider: 'email' }, // retired 2026-09-11 — Google-only accounts
+      { status: 'banned' },
+    ]) {
       expect(userAccountSchema.safeParse({ ...validUser, ...patch }).success).toBe(false);
     }
   });
@@ -71,6 +74,7 @@ describe('sessionSchema', () => {
     issuedAt: '2026-09-01T00:00:00Z',
     expiresAt: '2026-09-02T00:00:00Z',
     remember: false,
+    mfaVerified: false,
   };
 
   it('accepts a well-formed session', () => {
@@ -82,12 +86,12 @@ describe('sessionSchema', () => {
     const { remember: _r, ...noRemember } = validSession;
     expect(sessionSchema.safeParse(noRemember).success).toBe(false);
   });
-});
 
-describe('passwordMapSchema', () => {
-  it('validates email → hash records', () => {
-    expect(passwordMapSchema.safeParse({ 'a@b.c': 'k2$1$s$h' }).success).toBe(true);
-    expect(passwordMapSchema.safeParse(['not', 'an', 'object']).success).toBe(false);
+  it('defaults mfaVerified to false for legacy sessions', () => {
+    const { mfaVerified: _m, ...legacy } = validSession;
+    const parsed = sessionSchema.safeParse(legacy);
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.mfaVerified).toBe(false);
   });
 });
 

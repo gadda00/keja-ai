@@ -1,12 +1,12 @@
 'use client';
-/** Account — profile, sign-in (demo), favorites, saved searches, language. */
+/** Account — profile, Google sign-in, two-factor security, favorites, saved searches, language. */
 import { useState } from 'react';
-import { Bell, Globe, Heart, LogIn, LogOut, Search, Settings, User } from 'lucide-react';
+import { Bell, Globe, Heart, KeyRound, LogIn, LogOut, Search, Settings, ShieldCheck, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TwoFactorChallenge } from '@/components/common/TwoFactorChallenge';
 import { useAuth, initials } from '@/lib/auth';
 import { isPictureUrl } from '@/lib/googleAuth';
 import { useStore } from '@/lib/store';
@@ -18,12 +18,23 @@ import { PropertyRow } from '@/components/property/PropertyCard';
 import { cn } from '@/lib/utils';
 
 export default function AccountView() {
-  const { user, logout, register } = useAuth();
+  const {
+    user,
+    logout,
+    setAuthModalOpen,
+    twoFactorEnrolled,
+    isAdmin,
+    disableTwoFactor,
+  } = useAuth();
   const all = useAllProperties();
   const [favorites] = useStore<string[]>('favorites', []);
   const { searches, remove, toggleAlerts } = useSavedSearches();
   const { lang, setLang } = useI18n();
-  const [email, setEmail] = useState('');
+
+  // 2FA management state
+  const [securityPanel, setSecurityPanel] = useState<'idle' | 'enrol' | 'disable'>('idle');
+  const [disableCode, setDisableCode] = useState('');
+  const [disableError, setDisableError] = useState('');
 
   const saved = all.filter((p) => favorites.includes(p.id));
 
@@ -51,12 +62,16 @@ export default function AccountView() {
             {user ? (
               <>
                 <h1 className="text-xl font-black">{user.name}</h1>
-                <p className="text-sm text-muted-foreground">{user.email} · role: {user.role}</p>
+                <p className="text-sm text-muted-foreground">
+                  {user.email} · Google account{isAdmin ? ' · admin' : ''}
+                </p>
               </>
             ) : (
               <>
                 <h1 className="text-xl font-black">Guest session</h1>
-                <p className="text-sm text-muted-foreground">Your data lives on this device — sign in to carry it across sessions.</p>
+                <p className="text-sm text-muted-foreground">
+                  Your data lives on this device — sign in with Google to carry it across sessions.
+                </p>
               </>
             )}
           </div>
@@ -66,34 +81,17 @@ export default function AccountView() {
             <LogOut className="mr-1.5 h-4 w-4" aria-hidden /> Sign out
           </Button>
         ) : (
-          <Button
-            className="font-bold"
-            onClick={() =>
-              register({ name: email.split('@')[0] || 'Keja Guest', email: email || 'demo@keja.app', password: 'demo-trial-2026' })
-            }
-          >
-            <LogIn className="mr-1.5 h-4 w-4" aria-hidden /> Continue (demo account)
+          <Button className="font-bold" onClick={() => setAuthModalOpen(true)}>
+            <LogIn className="mr-1.5 h-4 w-4" aria-hidden /> Sign in with Google
           </Button>
         )}
       </div>
-
-      {!user && (
-        <div className="mt-4 max-w-sm rounded-2xl border bg-card p-4">
-          <Label htmlFor="acc-email">Email (demo)</Label>
-          <div className="mt-1.5 flex gap-2">
-            <Input id="acc-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
-          </div>
-          <p className="mt-2 text-[10px] text-muted-foreground">
-            Trial build: sessions persist locally with a 12h sliding window. Google Sign-In wires to a real client ID when the backend ships.
-          </p>
-        </div>
-      )}
 
       <Tabs defaultValue="favorites" className="mt-7">
         <TabsList className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="favorites" className="gap-1.5 font-bold"><Heart className="h-4 w-4" aria-hidden /> Saved homes ({saved.length})</TabsTrigger>
           <TabsTrigger value="searches" className="gap-1.5 font-bold"><Bell className="h-4 w-4" aria-hidden /> Saved searches ({searches.length})</TabsTrigger>
-          <TabsTrigger value="settings" className="gap-1.5 font-bold"><Settings className="h-4 w-4" aria-hidden /> Preferences</TabsTrigger>
+          <TabsTrigger value="settings" className="gap-1.5 font-bold"><Settings className="h-4 w-4" aria-hidden /> Preferences &amp; security</TabsTrigger>
         </TabsList>
 
         <TabsContent value="favorites" className="mt-6">
@@ -175,12 +173,95 @@ export default function AccountView() {
                 Longer term: Kinyarwanda, Luganda, Amharic and Arabic as Keja expands across Africa.
               </p>
             </div>
+
+            {/* Two-factor authentication (Google Authenticator) */}
+            <div className="rounded-3xl border bg-card p-5">
+              <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider">
+                <KeyRound className="h-4 w-4 text-gold" aria-hidden /> Two-factor authentication
+              </h2>
+              {!user ? (
+                <div className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  <p>Sign in with your Google account to manage two-factor authentication.</p>
+                  <Button className="mt-3 font-bold" size="sm" onClick={() => setAuthModalOpen(true)}>
+                    <LogIn className="mr-1.5 h-4 w-4" aria-hidden /> Sign in with Google
+                  </Button>
+                </div>
+              ) : securityPanel === 'enrol' ? (
+                <div className="mt-3">
+                  <TwoFactorChallenge mode="enrol" compact onDone={() => setSecurityPanel('idle')} onCancel={() => setSecurityPanel('idle')} />
+                </div>
+              ) : securityPanel === 'disable' ? (
+                <div className="mt-3 grid gap-2">
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    Enter a current 6-digit code from Google Authenticator to turn 2FA off on this device.
+                  </p>
+                  <Input
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={disableCode}
+                    onChange={(e) => { setDisableCode(e.target.value.replace(/\D/g, '').slice(0, 6)); setDisableError(''); }}
+                    placeholder="6-digit code"
+                    className="text-center font-mono tracking-[0.3em]"
+                    aria-label="Code to disable two-factor"
+                  />
+                  {disableError && (
+                    <p className="rounded-lg bg-destructive/10 px-3 py-2 text-xs font-semibold text-destructive" role="alert">{disableError}</p>
+                  )}
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="font-bold"
+                      disabled={disableCode.length !== 6}
+                      onClick={async () => {
+                        if (await disableTwoFactor(disableCode)) {
+                          setSecurityPanel('idle');
+                          setDisableCode('');
+                        } else {
+                          setDisableError('Incorrect code — 2FA stays on.');
+                        }
+                      }}
+                    >
+                      Turn off 2FA
+                    </Button>
+                    <Button size="sm" variant="ghost" className="font-bold" onClick={() => { setSecurityPanel('idle'); setDisableCode(''); }}>
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : twoFactorEnrolled ? (
+                <div className="mt-3 text-sm leading-relaxed">
+                  <p className="flex items-center gap-1.5 font-bold text-primary">
+                    <ShieldCheck className="h-4 w-4" aria-hidden /> Enabled — Google Authenticator
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Each sign-in asks for a 6-digit code from your authenticator app.
+                    {isAdmin ? ' Admin accounts always require the second factor.' : ''}
+                  </p>
+                  <Button size="sm" variant="outline" className="mt-3 font-bold" onClick={() => setSecurityPanel('disable')}>
+                    Turn off
+                  </Button>
+                </div>
+              ) : (
+                <div className="mt-3 text-sm leading-relaxed">
+                  <p className="text-xs text-muted-foreground">
+                    Add a second factor with Google Authenticator (or any authenticator app): a
+                    6-digit code refreshed every 30 seconds on top of your Google sign-in.
+                    {isAdmin ? ' Admin accounts are required to enrol.' : ''}
+                  </p>
+                  <Button size="sm" className="mt-3 font-bold" onClick={() => setSecurityPanel('enrol')}>
+                    <KeyRound className="mr-1.5 h-4 w-4" aria-hidden /> Enable 2FA
+                  </Button>
+                </div>
+              )}
+            </div>
+
             <div className="rounded-3xl border bg-card p-5">
               <h2 className="text-sm font-black uppercase tracking-wider">Data & privacy</h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                This trial stores everything locally: favorites, searches, portfolio, chat history
-                and the tokenization trial wallet never leave this device. Clearing browser data
-                resets the platform.
+                This trial stores everything locally: favourites, searches, portfolio, chat history
+                and your 2FA enrolment never leave this device. Clearing browser data
+                resets the platform (and disables 2FA here).
               </p>
               <Button
                 variant="outline"

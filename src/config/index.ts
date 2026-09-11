@@ -13,6 +13,8 @@ export const SITE = {
   // digits-only international format; overridable via NEXT_PUBLIC_WHATSAPP.
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP ?? '254108611387',
   email: 'info@chacadom.com',
+  /** Public administrator contact (shown on the admin gate + Trust Center). */
+  adminEmail: 'torv54@gmail.com',
   phone: '+254 108 611 387',
   offices: 'Westlands, Nairobi · Kenya',
   founded: '2026',
@@ -57,11 +59,13 @@ export const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
 /**
  * Comma-separated allowlist of Google account emails that are granted the
  * admin role on Google sign-in (NEXT_PUBLIC_ADMIN_EMAILS). Example:
- *   NEXT_PUBLIC_ADMIN_EMAILS=clive@chacadom.com,you@gmail.com
+ *   NEXT_PUBLIC_ADMIN_EMAILS=torv54@gmail.com,ops@chacadom.com
  * Emails are compared case-insensitively; allowlisting can upgrade a
  * matching account to admin but never downgrades an existing admin.
+ * Defaults to the public administrator account so the platform has an
+ * owner even when the env var is not set on a deployment.
  */
-export const ADMIN_EMAILS = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? '')
+export const ADMIN_EMAILS = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? SITE.adminEmail)
   .split(',')
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);

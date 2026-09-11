@@ -1,8 +1,8 @@
 # Keja AI — Current Picture
 
-**Snapshot date: 11 September 2026 · repo `gadda00/keja-ai` · this document is the post-implementation state of the platform after the Phase-2 engineering engagement (plus the Phase-2.5 access-and-auth hardening and the Phase-3 intelligence layer below).**
+**Snapshot date: 11 September 2026 · repo `gadda00/keja-ai` · this document is the post-implementation state of the platform after the Phase-2 engineering engagement (plus the Phase-2.5 access-and-auth hardening, the Phase-3 intelligence layer, and the Phase-3.5 Google-only + 2FA hardening below).**
 
-This is the honest, complete picture after: (1) the Phase-1 build (Aug–Sep 2026), (2) the ~100-page Phase-2 technical audit (`scripts/phase2_audit/final.pdf`), (3) the implementation of the audit's Phase-2 workstreams described below, (4) the Phase-2.5 additions — real Google Sign-In, valid `.well-known` app associations, and the operator site guide, and (5) the Phase-3 additions — the governed events/data-quality layer, release-correctness fixes, the intelligence gateway, and Google Sign-In activation in production. It replaces `REPO_PICTURE.md` (the pre-audit snapshot) as the authoritative "where are we" document. `src/lib/api/storeTwin.ts` points readers here for the local/remote persistence story.
+This is the honest, complete picture after: (1) the Phase-1 build (Aug–Sep 2026), (2) the ~100-page Phase-2 technical audit (`scripts/phase2_audit/final.pdf`), (3) the implementation of the audit's Phase-2 workstreams described below, (4) the Phase-2.5 additions — real Google Sign-In, valid `.well-known` app associations, and the operator site guide, (5) the Phase-3 additions — the governed events/data-quality layer, release-correctness fixes, the intelligence gateway, and Google Sign-In activation in production, and (6) the Phase-3.5 additions — Google-only accounts, Google Authenticator two-factor (RFC 6238), and the public administrator contact. It replaces `REPO_PICTURE.md` (the pre-audit snapshot) as the authoritative "where are we" document. `src/lib/api/storeTwin.ts` points readers here for the local/remote persistence story.
 
 ---
 
@@ -95,6 +95,15 @@ The audit's Ch. 22 demanded a real test suite before any LLM work. `npm test` ru
 - **Google Sign-In is ACTIVE in production:** `NEXT_PUBLIC_GOOGLE_CLIENT_ID` is set in Vercel (production/preview/development) — the real Google button renders in the Auth modal on keja.app. Admin mapping via `ADMIN_EMAILS` allowlist (see `docs/GOOGLE_AUTH_SETUP.md`); the demo/QA accounts remain.
 - **Test suite:** 233 tests across 18 files — the AI gateway golden set (45 cases) now pins the escalation catalogue, redaction, retrieval, corpus integrity, gateway outcomes and post-generation review.
 
+## 4.7 Phase-3.5 additions (Google-only accounts + Google Authenticator)
+
+- **Demo accounts retired — Google is the only sign-in method.** The one-tap demo accounts, email/password sign-in and client-side registration are removed from the codebase (`src/lib/auth.tsx`, `AuthModal.tsx`, `AccountView.tsx`); `src/lib/password.ts` is deleted. Browsers holding legacy records are migrated on load: `@demo.keja.app` accounts and provider `email` entries are dropped (the schema now only admits `provider: 'google'`), and the retired `keja:pw` / `keja:login-fails` keys are purged. Sessions are schema-versioned with `mfaVerified` defaulting to `false`.
+- **Two-factor authentication (Google Authenticator, RFC 6238):** `src/lib/totp.ts` — a dependency-free TOTP implementation (base32 RFC 4648, HMAC-SHA1 via WebCrypto, ±1-step drift, timing-safe compare, `otpauth://` Key-Uri Format builder) pinned by 22 tests against the RFC 6238 appendix-B vectors. Admins **must** enrol (first admin visit routes through the QR wizard); every account can opt in from `#/account → Preferences & security`. Enrolment mints 8 single-use `XXXXX-XXXXX` recovery codes (shown once). Every fresh session starts `mfaVerified: false`; a valid code (or recovery code) flips it. The shared challenge component (`TwoFactorChallenge.tsx`) renders the QR via a dynamic `qrcode` import so the library stays out of the main bundle. All 2FA events land in the audit trail (`auth.2fa.enrolled / verified / failed / recovery_used / disabled`).
+- **Admin gate is now three walls:** Google sign-in → allowlist role → per-session 2FA. `AdminGate.tsx` renders the challenge inline; there is no demo admin account anymore.
+- **Public administrator contact:** `torv54@gmail.com` — `SITE.adminEmail` (`src/config/index.ts`), shown in the footer, on the admin gate and in the Trust Center; it is also the default `NEXT_PUBLIC_ADMIN_EMAILS` allowlist when the env var is unset. A real `/.well-known/security.txt` (RFC 9116) now publishes the disclosure contacts — previously the Trust Center referenced it without the file existing.
+- **Honest scope (unchanged discipline):** the 2FA secret and enrolment state are device-local in this static build — a real second factor against casual use of a borrowed session on the device, not yet a server-side policy. The same RFC 6238 module moves verbatim server-side with the Phase-2 auth service.
+- **Test suite:** 241 tests across 18 files (22 new TOTP tests; 14 password-module tests retired with the module).
+
 ## 5. Architecture — current state
 
 - **Shape:** Next.js 16 App Router mounting a single-route client SPA (`/` + hash deep links) — one codebase serves the Vercel CDN and the Capacitor shells, works offline via the service worker. React 19, TypeScript strict, Tailwind 4, Radix/shadcn primitives (trimmed to what is used), recharts, Leaflet.
@@ -114,7 +123,7 @@ The audit's Ch. 22 demanded a real test suite before any LLM work. `npm test` ru
 
 ## 7. Honest limitations (unchanged from the audit, by design)
 
-- Auth/RBAC is still **client-side** (demo-grade by declaration); the PBKDF2 layer is an interim fix, not server security. The Phase-2 auth service is the roadmap's first backend milestone.
+- Auth/RBAC is **Google-gated and 2FA-gated but still client-side** — Google verifies identity, the TOTP module verifies the device-bound second factor, and both move server-side with the Phase-2 auth service (that is the roadmap's first backend milestone).
 - No real payments, escrow, or M-Pesa integration; tokenization is a labelled simulation (CMA sandbox track lives in `docs/cma/`).
 - Verification checks are simulated evidence on seeded data; Ardhisasa integration is partner-dependent.
 - Analytics is a local ring buffer; the remote mirror activates only when `NEXT_PUBLIC_ANALYTICS_ENDPOINT` is set.

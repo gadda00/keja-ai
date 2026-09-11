@@ -1,20 +1,34 @@
 /**
- * KEJA Authentication & Session Management
+ * KEJA Authentication & Session Management — Google-only edition
  * ---------------------------------------------------------------------------
- * Implements the account layer of the KEJA platform blueprint:
- *  - Google Sign-In (Google Identity Services) — real Google accounts when
- *    NEXT_PUBLIC_GOOGLE_CLIENT_ID is configured (see src/lib/googleAuth.ts
- *    and docs/GOOGLE_AUTH_SETUP.md); otherwise falls back to a
- *    fully-functional demo mode (simulated accounts) so the platform
- *    experience is complete on a static host.
- *  - Email + password registration (client-side accounts, upgradeable to API).
- *  - Persistent sessions with expiry + activity refresh ("remember me").
- *  - Role-based access: user | agent | admin (RBAC per blueprint Ch.14).
- *  - Audit-ready: every auth event is logged to the audit trail.
+ * The account layer of the KEJA platform, now production-shaped:
  *
- * NOTE FOR PRODUCTION: this is the MVP auth layer for a static deployment.
- * Moving to the Phase-2 backend, the same interface is served by real APIs —
- * Google credential JWTs must then be verified server-side.
+ *  1. Google Sign-In (Google Identity Services) — the only sign-in method.
+ *     A real Google account behind NEXT_PUBLIC_GOOGLE_CLIENT_ID; the ID
+ *     token claims are validated (issuer / audience / expiry / verified
+ *     email) before any session is created. The demo accounts, email+
+ *     password sign-in and client-side registration were RETIRED
+ *     (2026-09-11): one identity provider, one trust path.
+ *
+ *  2. Two-factor authentication (RFC 6238 TOTP) via Google Authenticator —
+ *     REQUIRED for admin accounts, optional for everyone else. Enrolment
+ *     is a device-local secret scanned as an otpauth:// QR code; every
+ *     new session starts unverified (mfaVerified=false) and must present
+ *     a valid 6-digit code (or single-use recovery code) to unlock
+ *     2FA-gated surfaces. See src/lib/totp.ts.
+ *
+ *  3. Persistent sessions with expiry + activity refresh ("remember me"),
+ *     schema-validated on read so tampered shapes sign out safely.
+ *
+ *  4. Role-based access: user | agent | admin (RBAC per blueprint Ch.14)
+ *     — admin is granted only through the NEXT_PUBLIC_ADMIN_EMAILS
+ *     allowlist on Google sign-in, never self-registered.
+ *
+ *  5. Audit-ready: every auth + 2FA event lands in the audit trail.
+ *
+ * Migration note: browsers that still hold the retired demo accounts /
+ * email-password records in localStorage have them purged on load —
+ * sign-in from that point on is Google-only.
  */
 import {
   createContext,
@@ -31,20 +45,20 @@ import { logAudit } from '@/lib/adminStore';
 import { store } from '@/lib/store';
 import { safeParse, userAccountSchema, sessionSchema } from '@/lib/boundaries';
 import {
-  DEMO_PW_HASHES,
-  hashPassword,
-  isLegacyHash,
-  verifyPassword,
-} from '@/lib/password';
-import {
   decodeIdToken,
   roleForEmail,
   validateIdTokenClaims,
 } from '@/lib/googleAuth';
-import { ADMIN_EMAILS, GOOGLE_CLIENT_ID } from '@/config';
+import {
+  buildOtpauthUri,
+  generateTotpSecret,
+  verifyTotp,
+  type TotpEnrolment,
+} from '@/lib/totp';
+import { ADMIN_EMAILS, GOOGLE_CLIENT_ID, SITE } from '@/config';
 
 export type Role = 'user' | 'agent' | 'admin';
-export type AuthMethod = 'google' | 'email';
+export type AuthMethod = 'google';
 
 export interface UserAccount {
   id: string;
@@ -67,6 +81,8 @@ export interface Session {
   issuedAt: string;
   expiresAt: string;
   remember: boolean;
+  /** Second factor satisfied for THIS session (Google sign-in + TOTP). */
+  mfaVerified: boolean;
 }
 
 interface AuthState {
@@ -75,17 +91,39 @@ interface AuthState {
   loading: boolean;
 }
 
+/** Enrolment pending confirmation: secret minted, code not yet verified. */
+export interface PendingEnrolment {
+  secret: string;
+  otpauthUri: string;
+}
+
 interface AuthContextValue extends AuthState {
   users: UserAccount[];
-  loginWithGoogle: (demoAccount?: DemoGoogleAccount) => Promise<UserAccount>;
   /** Real Google Sign-In: consumes a GIS ID-token credential. */
   loginWithGoogleCredential: (credential: string) => Promise<UserAccount>;
-  loginWithEmail: (email: string, password: string, remember?: boolean) => Promise<UserAccount>;
-  register: (data: RegisterInput) => Promise<UserAccount>;
   logout: (reason?: string) => void;
   updateUser: (patch: Partial<UserAccount>) => void;
   isLoggedIn: boolean;
   isAdmin: boolean;
+  /** Session has passed the second factor (admin gate). */
+  mfaVerified: boolean;
+  /** Does this account need a 2FA step right now (admin, or enrolled)? */
+  needsTwoFactor: boolean;
+  /** Same check for any account — used right after Google sign-in. */
+  accountRequiresTwoFactor: (account: UserAccount) => boolean;
+  /** The account's confirmed enrolment, if any. */
+  twoFactorEnrolled: boolean;
+  /** Mint a fresh enrolment secret + otpauth URI (pre-confirmation). */
+  beginTwoFactorEnrolment: () => PendingEnrolment;
+  /** Confirm an enrolment by verifying a code against the pending secret. */
+  confirmTwoFactorEnrolment: (
+    code: string,
+    pendingSecret: string
+  ) => Promise<{ ok: boolean; recoveryCodes: string[] }>;
+  /** Verify a TOTP or recovery code → flags the session mfaVerified. */
+  verifyTwoFactor: (code: string) => Promise<{ ok: boolean; usedRecovery?: boolean }>;
+  /** Disable 2FA for this account (requires a valid code). */
+  disableTwoFactor: (code: string) => Promise<boolean>;
   /** Require auth for an action — opens the auth modal if not signed in. */
   requireAuth: (reason: string, onDone: () => void) => void;
   /** Pending auth intent set by requireAuth, consumed by the auth modal. */
@@ -93,13 +131,6 @@ interface AuthContextValue extends AuthState {
   clearIntent: () => void;
   authModalOpen: boolean;
   setAuthModalOpen: (open: boolean) => void;
-}
-
-export interface RegisterInput {
-  name: string;
-  email: string;
-  password: string;
-  phone?: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -112,117 +143,61 @@ const SESSION_KEY = 'keja:session';
 const USERS_KEY = 'keja:users';
 
 /* ------------------------------------------------------------------ */
-/* Password handling now lives in src/lib/password.ts (extracted so the
- * crypto surface — PBKDF2-SHA-256 hashing, k1 legacy verification and the
- * transparent k1->k2 migration — is unit-testable without the React
- * context). Same functions, no behaviour change; see that module for the
- * stored-format and honest-scope notes. */
-
-/* ------------------------------------------------------------------ */
-/* Demo Google accounts (used until a real GOOGLE_CLIENT_ID is set)    */
+/* TOTP enrolment store (per-account, this device)                     */
 /* ------------------------------------------------------------------ */
 
-export interface DemoGoogleAccount {
-  email: string;
-  name: string;
-  role: Role;
-  picture: string; // avatar color
-  blurb: string;
-}
+type TotpMap = Record<string, TotpEnrolment>;
 
-export const DEMO_GOOGLE_ACCOUNTS: DemoGoogleAccount[] = [
-  {
-    email: 'amina.otieno@demo.keja.app',
-    name: 'Amina Otieno',
-    role: 'user',
-    picture: '#a88727',
-    blurb: 'Verified investor · 3 tokenized holdings',
-  },
-  {
-    email: 'victor.ndunda@demo.keja.app',
-    name: 'Victor Ndunda',
-    role: 'agent',
-    picture: '#1f2937',
-    blurb: 'Agent · Chacadom Premier Properties',
-  },
-  {
-    email: 'clive@demo.keja.app',
-    name: 'Clive Mwangi',
-    role: 'admin',
-    picture: '#7c2d12',
-    blurb: 'Platform administrator · Chacadom',
-  },
-];
-
-/* ------------------------------------------------------------------ */
-/* Seed accounts (email login for demos & QA)                          */
-/* ------------------------------------------------------------------ */
-
-const seedUsers = (): UserAccount[] => {
-  const now = new Date().toISOString();
-  return [
-    {
-      id: 'usr-admin',
-      name: 'Clive Mwangi',
-      email: 'admin@demo.keja.app',
-      role: 'admin',
-      provider: 'email',
-      status: 'active',
-      phone: '+254 700 000 001',
-      company: 'Chacadom Investments',
-      createdAt: '2026-06-01T08:00:00Z',
-      lastLoginAt: now,
-      loginCount: 42,
-    },
-    {
-      id: 'usr-agent',
-      name: 'Victor Ndunda',
-      email: 'agent@demo.keja.app',
-      role: 'agent',
-      provider: 'email',
-      status: 'active',
-      phone: '+254 700 000 002',
-      company: 'Chacadom Premier Properties',
-      createdAt: '2026-06-12T09:30:00Z',
-      lastLoginAt: now,
-      loginCount: 17,
-    },
-    {
-      id: 'usr-investor',
-      name: 'Amina Otieno',
-      email: 'investor@demo.keja.app',
-      role: 'user',
-      provider: 'email',
-      status: 'active',
-      phone: '+254 700 000 003',
-      createdAt: '2026-07-03T14:15:00Z',
-      lastLoginAt: now,
-      loginCount: 9,
-    },
-  ];
+const readEnrolments = (): TotpMap => {
+  const raw = store.get<unknown>('totp', null);
+  return raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as TotpMap) : {};
 };
 
+const writeEnrolments = (map: TotpMap) => store.set('totp', map);
+
+/** Single-use recovery codes: 8 × "XXXXX-XXXXX" (crypto-random base32). */
+const mintRecoveryCodes = (n = 8): string[] =>
+  Array.from({ length: n }, () => {
+    const bytes = crypto.getRandomValues(new Uint8Array(10));
+    const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no lookalikes
+    const s = Array.from(bytes, (b) => alphabet[b % alphabet.length]).join('');
+    return `${s.slice(0, 5)}-${s.slice(5)}`;
+  });
+
+/* ------------------------------------------------------------------ */
+/* Accounts (Google-only) + legacy migration                           */
+/* ------------------------------------------------------------------ */
+
 const loadUsers = (): UserAccount[] => {
-  const raw = store.get<unknown>(USERS_KEY.replace('keja:', ''), null);
-  // F-19: validate each stored account; invalid entries are dropped so one
-  // corrupted record cannot lock every account out.
+  const raw = store.get<unknown>('users', null);
   const users = Array.isArray(raw)
     ? raw.flatMap((u) => {
         const parsed = userAccountSchema.safeParse(u);
+        // userAccountSchema only admits provider 'google' now — retired
+        // email/demo records fail validation here and are dropped.
         return parsed.success ? [parsed.data as UserAccount] : [];
       })
-    : null;
-  if (users?.length) return users;
-  const seeded = seedUsers();
-  store.set('users', seeded);
-  // seed demo passwords (investor123 / agent123 / admin123) — pre-computed
-  // PBKDF2 hashes so seeding stays synchronous (see DEMO_PW_HASHES).
-  const pw = store.get<Record<string, string>>('pw', {});
-  for (const [email, hash] of Object.entries(DEMO_PW_HASHES)) {
-    if (!pw[email]) pw[email] = hash;
+    : [];
+  // Google-only migration (2026-09-11): purge retired keys + any demo
+  // accounts from earlier builds, then persist the pruned set once.
+  let purged = false;
+  try {
+    if (localStorage.getItem('keja:pw') !== null) {
+      localStorage.removeItem('keja:pw');
+      purged = true;
+    }
+    if (localStorage.getItem('keja:login-fails') !== null) {
+      localStorage.removeItem('keja:login-fails');
+      purged = true;
+    }
+  } catch {
+    /* storage unavailable */
   }
-  store.set('pw', pw);
-  return seeded;
+  const clean = users.filter(
+    (u) => !u.email.toLowerCase().endsWith('@demo.keja.app'),
+  );
+  if (raw && (clean.length !== users.length || purged)) store.set('users', clean);
+  return clean;
 };
 
 const saveUsers = (users: UserAccount[]) => store.set('users', users);
@@ -243,14 +218,16 @@ const createSession = (userId: string, remember: boolean): Session => ({
   issuedAt: new Date().toISOString(),
   expiresAt: new Date(Date.now() + (remember ? SESSION_LONG_MS : SESSION_SHORT_MS)).toISOString(),
   remember,
+  // every fresh session starts second-factor-unverified
+  mfaVerified: false,
 });
 
 const readSession = (): Session | null => {
   try {
     const raw = localStorage.getItem(SESSION_KEY);
     if (!raw) return null;
-    // F-19: schema-validate the persisted session; tampered or legacy
-    // shapes are treated as "no session" (safe fallback = signed out).
+    // schema-validate the persisted session; tampered or legacy shapes
+    // are treated as "no session" (safe fallback = signed out).
     const s = safeParse(sessionSchema, JSON.parse(raw), null, 'auth.session');
     if (!s) return null;
     if (new Date(s.expiresAt).getTime() < Date.now()) {
@@ -309,6 +286,15 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     [session, users]
   );
 
+  const enrolments = readEnrolments();
+  const myEnrolment = user ? enrolments[user.id] : undefined;
+  // Admins always need the second factor; everyone else only once enrolled.
+  const needsTwoFactor = !!user && (user.role === 'admin' || !!myEnrolment);
+  const accountRequiresTwoFactor = useCallback(
+    (account: UserAccount) => account.role === 'admin' || !!readEnrolments()[account.id],
+    []
+  );
+
   // cross-tab session sync + same-tab users collection sync (admin edits)
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
@@ -344,47 +330,12 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         actorEmail: account.email,
         action: 'auth.login',
         target: account.email,
-        detail: `Signed in via ${account.provider === 'google' ? 'Google' : 'email'} (role: ${account.role})`,
+        detail: `Signed in via Google (role: ${account.role})`,
         severity: 'info',
       });
       return account;
     },
     [users]
-  );
-
-  const loginWithGoogle = useCallback(
-    async (demoAccount?: DemoGoogleAccount) => {
-      setLoading(true);
-      try {
-        // simulate network round-trip for realistic UX
-        await new Promise((r) => setTimeout(r, 650));
-        let account = demoAccount
-          ? users.find((u) => u.email === demoAccount.email)
-          : users.find((u) => u.provider === 'google' && u.role === 'user');
-        if (!account) {
-          const src = demoAccount ?? DEMO_GOOGLE_ACCOUNTS[0];
-          const now = new Date().toISOString();
-          account = {
-            id: `usr-${newToken().slice(0, 8)}`,
-            name: src.name,
-            email: src.email,
-            role: src.role,
-            provider: 'google',
-            status: 'active',
-            createdAt: now,
-            lastLoginAt: now,
-            loginCount: 0,
-          };
-          const next = [...users, account];
-          return persistLogin(account, true, next);
-        }
-        if (account.status === 'suspended') throw new Error('Account suspended. Contact support.');
-        return persistLogin(account, true);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [users, persistLogin]
   );
 
   /** Real Google Sign-In — consume a GIS credential (JWT ID token):
@@ -440,93 +391,150 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     [users, persistLogin]
   );
 
-  const loginWithEmail = useCallback(
-    async (email: string, password: string, remember = false) => {
-      setLoading(true);
-      try {
-        await new Promise((r) => setTimeout(r, 450));
-        // brute-force throttle: 5 failures per email → 60s lockout (demo-grade, client-side)
-        const fails = store.get<Record<string, { n: number; ts: number }>>('login-fails', {});
-        const f = fails[email.trim().toLowerCase()];
-        if (f && f.n >= 5 && Date.now() - f.ts < 60_000) {
-          throw new Error('Too many attempts. Wait one minute and try again.');
-        }
-        const recordFail = () => {
-          const cur = store.get<Record<string, { n: number; ts: number }>>('login-fails', {});
-          cur[email.trim().toLowerCase()] = {
-            n: (cur[email.trim().toLowerCase()]?.n ?? 0) + 1,
-            ts: Date.now(),
-          };
-          store.set('login-fails', cur);
-        };
-        if (email.length > 254 || password.length > 128) throw new Error('Invalid credentials.');
-        const account = users.find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
-        if (!account) {
-          recordFail();
-          throw new Error('No account found with that email. Create one below.');
-        }
-        if (account.status === 'suspended')
-          throw new Error('This account has been suspended. Contact info@chacadom.com.');
-        const pw = store.get<Record<string, string>>('pw', {});
-        const expected = pw[account.email];
-        const demoHash = DEMO_PW_HASHES[account.email];
-        const matchedStored = expected ? await verifyPassword(password, expected) : false;
-        const matchedDemo = !matchedStored && demoHash ? await verifyPassword(password, demoHash) : false;
-        if (!matchedStored && !matchedDemo) {
-          recordFail();
-          throw new Error('Incorrect password. Try again or use Google sign-in.');
-        }
-        // Transparent hash migration: k1 (DJB2) accounts are re-hashed to
-        // PBKDF2 on successful sign-in; demo accounts get their hash persisted.
-        if (isLegacyHash(expected) || (matchedDemo && !expected)) {
-          pw[account.email] = await hashPassword(password);
-          store.set('pw', pw);
-        }
-        // success clears the throttle
-        const cur = store.get<Record<string, { n: number; ts: number }>>('login-fails', {});
-        delete cur[email.trim().toLowerCase()];
-        store.set('login-fails', cur);
-        return persistLogin(account, remember);
-      } finally {
-        setLoading(false);
+  /* ---------------------------------------------------------------- */
+  /* Two-factor (Google Authenticator, RFC 6238)                        */
+  /* ---------------------------------------------------------------- */
+
+  const flagSessionMfa = useCallback(() => {
+    // only an already-authenticated, non-expired session can be flagged
+    setSession((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, mfaVerified: true };
+      writeSession(next);
+      return next;
+    });
+  }, []);
+
+  const beginTwoFactorEnrolment = useCallback((): PendingEnrolment => {
+    const secret = generateTotpSecret();
+    return {
+      secret,
+      otpauthUri: buildOtpauthUri({
+        secretBase32: secret,
+        account: user?.email ?? 'keja-user',
+        issuer: SITE.name,
+      }),
+    };
+  }, [user]);
+
+  const confirmTwoFactorEnrolment = useCallback(
+    async (code: string, pendingSecret: string) => {
+      if (!user) throw new Error('Sign in first.');
+      if (!pendingSecret) throw new Error('Start the enrolment again.');
+      const result = await verifyTotp(pendingSecret, code);
+      if (!result.ok) {
+        logAudit({
+          actor: user.name,
+          actorEmail: user.email,
+          action: 'auth.2fa.failed',
+          target: user.email,
+          detail: 'Enrolment confirmation code rejected',
+          severity: 'warning',
+        });
+        return { ok: false, recoveryCodes: [] };
       }
+      const recoveryCodes = mintRecoveryCodes();
+      const map = readEnrolments();
+      map[user.id] = {
+        secret: pendingSecret,
+        confirmedAt: new Date().toISOString(),
+        recoveryCodes,
+        createdAt: new Date().toISOString(),
+      };
+      writeEnrolments(map);
+      flagSessionMfa();
+      logAudit({
+        actor: user.name,
+        actorEmail: user.email,
+        action: 'auth.2fa.enrolled',
+        target: user.email,
+        detail: `Google Authenticator enrolment confirmed (drift ${result.drift}s)`,
+        severity: 'info',
+      });
+      return { ok: true, recoveryCodes };
     },
-    [users, persistLogin]
+    [user, flagSessionMfa]
   );
 
-  const register = useCallback(
-    async (data: RegisterInput) => {
-      setLoading(true);
-      try {
-        await new Promise((r) => setTimeout(r, 550));
-        if (users.some((u) => u.email.toLowerCase() === data.email.trim().toLowerCase()))
-          throw new Error('An account with this email already exists. Sign in instead.');
-        if (data.password.length < 6) throw new Error('Password must be at least 6 characters.');
-        if (data.password.length > 128) throw new Error('Password must be at most 128 characters.');
-        const now = new Date().toISOString();
-        const account: UserAccount = {
-          id: `usr-${newToken().slice(0, 8)}`,
-          name: data.name.trim(),
-          email: data.email.trim(),
-          role: 'user', // self-registration can never mint elevated roles (RBAC safety)
-          provider: 'email',
-          status: 'active',
-          phone: data.phone?.trim(),
-          createdAt: now,
-          lastLoginAt: now,
-          loginCount: 0,
+  const verifyTwoFactor = useCallback(
+    async (code: string) => {
+      if (!user) return { ok: false };
+      const enrolment = readEnrolments()[user.id];
+      if (!enrolment) return { ok: false };
+      const trimmed = code.trim().toUpperCase();
+
+      // recovery codes: single-use, exact match against the stored set
+      if (/^[A-Z2-9]{5}-[A-Z2-9]{5}$/.test(trimmed) && enrolment.recoveryCodes.includes(trimmed)) {
+        const map = readEnrolments();
+        map[user.id] = {
+          ...enrolment,
+          recoveryCodes: enrolment.recoveryCodes.filter((c) => c !== trimmed),
         };
-        const next = [...users, account];
-        const pw = store.get<Record<string, string>>('pw', {});
-        pw[account.email] = await hashPassword(data.password);
-        store.set('pw', pw);
-        return persistLogin(account, true, next);
-      } finally {
-        setLoading(false);
+        writeEnrolments(map);
+        flagSessionMfa();
+        logAudit({
+          actor: user.name,
+          actorEmail: user.email,
+          action: 'auth.2fa.recovery_used',
+          target: user.email,
+          detail: 'Signed in with a single-use recovery code',
+          severity: 'warning',
+        });
+        return { ok: true, usedRecovery: true };
       }
+
+      const result = await verifyTotp(enrolment.secret, code);
+      if (!result.ok) {
+        logAudit({
+          actor: user.name,
+          actorEmail: user.email,
+          action: 'auth.2fa.failed',
+          target: user.email,
+          detail: 'Verification code rejected',
+          severity: 'warning',
+        });
+        return { ok: false };
+      }
+      flagSessionMfa();
+      logAudit({
+        actor: user.name,
+        actorEmail: user.email,
+        action: 'auth.2fa.verified',
+        target: user.email,
+        detail: 'Verification code accepted',
+        severity: 'info',
+      });
+      return { ok: true };
     },
-    [users, persistLogin]
+    [user, flagSessionMfa]
   );
+
+  const disableTwoFactor = useCallback(
+    async (code: string) => {
+      if (!user) return false;
+      const enrolment = readEnrolments()[user.id];
+      if (!enrolment) return false;
+      const result = await verifyTotp(enrolment.secret, code);
+      if (!result.ok) return false;
+      const map = readEnrolments();
+      delete map[user.id];
+      writeEnrolments(map);
+      logAudit({
+        actor: user.name,
+        actorEmail: user.email,
+        action: 'auth.2fa.disabled',
+        target: user.email,
+        detail: 'Two-factor authentication removed from this device',
+        severity: 'warning',
+      });
+      return true;
+    },
+    [user]
+  );
+
+  /* ---------------------------------------------------------------- */
+  /* Session lifecycle                                                 */
+  /* ---------------------------------------------------------------- */
 
   const logout = useCallback(
     (reason = 'user') => {
@@ -586,14 +594,19 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       session,
       loading,
       users,
-      loginWithGoogle,
       loginWithGoogleCredential,
-      loginWithEmail,
-      register,
       logout,
       updateUser,
       isLoggedIn: !!user,
       isAdmin: user?.role === 'admin',
+      mfaVerified: !!session?.mfaVerified,
+      needsTwoFactor,
+      accountRequiresTwoFactor,
+      twoFactorEnrolled: !!myEnrolment,
+      beginTwoFactorEnrolment,
+      confirmTwoFactorEnrolment,
+      verifyTwoFactor,
+      disableTwoFactor,
       requireAuth,
       pendingIntent,
       clearIntent,
@@ -605,12 +618,16 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       session,
       loading,
       users,
-      loginWithGoogle,
       loginWithGoogleCredential,
-      loginWithEmail,
-      register,
       logout,
       updateUser,
+      needsTwoFactor,
+      accountRequiresTwoFactor,
+      myEnrolment,
+      beginTwoFactorEnrolment,
+      confirmTwoFactorEnrolment,
+      verifyTwoFactor,
+      disableTwoFactor,
       requireAuth,
       pendingIntent,
       clearIntent,

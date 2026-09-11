@@ -140,7 +140,9 @@ export const userAccountSchema = z.object({
   name: z.string(),
   email: z.string(),
   role: z.enum(['user', 'agent', 'admin']),
-  provider: z.enum(['google', 'email']),
+  // Google-only accounts (2026-09-11): retired 'email' records fail here
+  // and are dropped by the loader — the safe path to re-entry is Google.
+  provider: z.literal('google'),
   status: z.enum(['active', 'suspended']),
   picture: z.string().optional(),
   phone: z.string().optional(),
@@ -156,9 +158,9 @@ export const sessionSchema = z.object({
   issuedAt: z.string(),
   expiresAt: z.string(),
   remember: z.boolean(),
+  // second-factor state; legacy sessions without it default to unverified
+  mfaVerified: z.boolean().default(false),
 });
-
-export const passwordMapSchema = z.record(z.string(), z.string());
 
 /* ------------------------------ tokenize store ----------------------------- */
 

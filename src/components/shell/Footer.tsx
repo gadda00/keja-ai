@@ -56,6 +56,12 @@ export function Footer() {
                 {SITE.phone}
               </a>
             </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Platform administrator:{' '}
+              <a href={`mailto:${SITE.adminEmail}`} className="font-semibold hover:text-foreground">
+                {SITE.adminEmail}
+              </a>
+            </p>
             <button
               type="button"
               onClick={() => window.dispatchEvent(new CustomEvent('keja:show-install'))}

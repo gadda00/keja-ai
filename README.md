@@ -48,13 +48,14 @@ funds, REITs, SACCOs, insurers) and **Partners** (partnership deck requests).
   KSh 20M?" answered live from inventory with sample sizes and sourcing declared.
 - **Keja Manage** — units, tenants & screening, rent collection ledger, arrears engine,
   maintenance tickets and transparent rule-based AI alerts.
-- **Accounts** — Google Sign-In (Google Identity Services — activates with
-  `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, see `docs/GOOGLE_AUTH_SETUP.md`) plus
-  demo sign-in, email accounts (PBKDF2-hashed on-device), 12h/30d sliding
-  sessions, RBAC (user/agent/admin) with an `NEXT_PUBLIC_ADMIN_EMAILS`
-  Google admin allowlist.
+- **Accounts** — Google-only sign-in (Google Identity Services, activated with
+  `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, see `docs/GOOGLE_AUTH_SETUP.md`) with
+  12h/30d sliding sessions, RBAC (user/agent/admin) with an
+  `NEXT_PUBLIC_ADMIN_EMAILS` Google admin allowlist, and two-factor
+  authentication via Google Authenticator (RFC 6238 TOTP — required for
+  admins, optional for everyone, single-use recovery codes included).
 - **Admin console** — verification queue, listing-report adjudication, partner applications,
-  feed health, audit trail, settings.
+  feed health, audit trail, settings; gated behind Google + allowlist + 2FA.
 - **Auto-Pilot** — the AI listing engine (scanner → enrich → dedupe → quality gate → publish)
   on a 6-hour cron; commits grow the marketplace and trigger the gated deploy.
 - **Platform** — PWA (installable, offline shell), light/dark themes, EN/SW/FR UI language,
