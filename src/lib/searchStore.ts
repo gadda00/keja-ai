@@ -6,6 +6,7 @@ import { useCallback, useEffect } from 'react';
 
 import type { Property } from '@/data/properties';
 import { isRentalPrice } from '@/lib/finance';
+import { matchesFreeQuery, parseFreeQuery } from '@/lib/queryParser';
 import { KEYS, store, useStore } from '@/lib/store';
 import { newId } from '@/lib/uuid';
 
@@ -112,9 +113,10 @@ export const RENT_CEILING = 200;
 export function matchesSearch(p: Property, f: SavedSearch['filters']): boolean {
   const rentMode = f.purpose === 'rent';
   if (f.q) {
-    const q = f.q.toLowerCase();
-    const hay = `${p.title} ${p.area} ${p.county} ${p.id} ${p.type} ${p.agency}`.toLowerCase();
-    if (!hay.includes(q)) return false;
+    // Same free-query semantics as the results page (queryParser) — a saved
+    // search must alert on the same listings the user saw when saving it.
+    const pq = parseFreeQuery(f.q, []);
+    if (pq.raw && !matchesFreeQuery(p, pq)) return false;
   }
   if (f.type && f.type !== 'all' && p.type !== f.type) return false;
   // Rent mode shows true rentals only (price IS the monthly rent) — mirrors

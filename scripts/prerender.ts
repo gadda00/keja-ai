@@ -31,10 +31,10 @@ import { NEIGHBORHOOD_GUIDES } from '../src/data/neighborhoods';
 import { AUTO_PROPERTIES } from '../src/lib/autoListings';
 import { SITE_URL } from '../src/config';
 import {
-  realEstateListingJsonLd,
-  articleJsonLd,
-  breadcrumbJsonLd,
-} from '../src/lib/seo';
+  listingMeta,
+  articleMeta,
+  areaMeta,
+} from '../src/lib/detailMeta';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = resolve(ROOT, 'out');
@@ -48,6 +48,13 @@ if (!existsSync(TEMPLATE)) {
 const template = readFileSync(TEMPLATE, 'utf8');
 
 /* ------------------------------ helpers ---------------------------------- */
+
+;
+
+/** Normalise PageMetaOptions.jsonLd into PageSpec's object[] type. */
+function jsonLdArray(v: object | object[] | null | undefined): object[] | undefined {
+  return v == null ? undefined : Array.isArray(v) ? v : [v];
+}
 
 const escapeHtml = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -136,6 +143,9 @@ const NOSCRIPT_STYLE =
   'font-family:-apple-system,system-ui,sans-serif;max-width:640px;margin:2rem auto;padding:0 1.25rem;color:#191612;line-height:1.6';
 
 function listingSpec(p: Property): PageSpec {
+  // Shared derivation with the live view (src/lib/detailMeta) — the static
+  // HTML and the hydrated DOM can never drift apart.
+  const m = listingMeta(p);
   const monthly = p.purpose.includes('rent');
   const priceLabel = p.priceOnApplication
     ? 'Price on application'
@@ -145,35 +155,10 @@ function listingSpec(p: Property): PageSpec {
   const size = p.sizeSqm ? `${p.sizeSqm} sqm` : '';
   return {
     path: `/properties/${p.id}`,
-    title: clip(`${p.title} — ${p.area}, ${p.county}`, 65),
-    description: clip(
-      `${p.type} in ${p.area}, ${p.county}. ${priceLabel}. Trust Score ${p.trustScore}/100 with verified evidence. ${p.description}`,
-      158,
-    ),
-    ogImage: p.images[0],
-    jsonLd: [
-      realEstateListingJsonLd({
-        id: p.id,
-        title: p.title,
-        description: clip(p.description, 400),
-        price: p.price,
-        priceOnApplication: p.priceOnApplication,
-        images: p.images.slice(0, 3),
-        area: p.area,
-        county: p.county,
-        bedrooms: p.bedrooms,
-        bathrooms: p.bathrooms,
-        sizeSqm: p.sizeSqm,
-        agency: p.agency,
-        listedAt: p.listedAt,
-        monthly,
-      }),
-      breadcrumbJsonLd([
-        { name: 'Home', path: '/' },
-        { name: 'Properties', path: '/properties' },
-        { name: p.title, path: `/properties/${p.id}` },
-      ]),
-    ],
+    title: m.title!,
+    description: m.description!,
+    ogImage: m.image,
+    jsonLd: jsonLdArray(m.jsonLd),
     noscript: `<div style="${NOSCRIPT_STYLE}"><h1>${escapeHtml(p.title)}</h1>
 <p><strong>${escapeHtml(priceLabel)}</strong> · ${escapeHtml(`${beds}${baths}${size}`)} · ${escapeHtml(p.area)}, ${escapeHtml(p.county)}</p>
 <p>${escapeHtml(clip(p.description, 420))}</p>
@@ -182,24 +167,12 @@ function listingSpec(p: Property): PageSpec {
 }
 
 function articleSpec(a: (typeof ARTICLES)[number]): PageSpec {
+  const m = articleMeta(a);
   return {
     path: `/insights/${a.slug}`,
-    title: clip(a.title, 65),
-    description: clip(a.excerpt, 158),
-    jsonLd: [
-      articleJsonLd({
-        title: a.title,
-        description: a.excerpt,
-        slug: a.slug,
-        publishedAt: a.date,
-        author: a.author,
-      }),
-      breadcrumbJsonLd([
-        { name: 'Home', path: '/' },
-        { name: 'Insights', path: '/insights' },
-        { name: a.title, path: `/insights/${a.slug}` },
-      ]),
-    ],
+    title: m.title!,
+    description: m.description!,
+    jsonLd: jsonLdArray(m.jsonLd),
     noscript: `<div style="${NOSCRIPT_STYLE}"><h1>${escapeHtml(a.title)}</h1>
 <p>${escapeHtml(a.excerpt)}</p>
 <p>${escapeHtml(a.author)} · ${escapeHtml(a.date)} · ${a.minutes} min read · <a href="${SITE_URL}/insights/${a.slug}/">Read the full guide</a></p></div>`,
@@ -207,19 +180,14 @@ function articleSpec(a: (typeof ARTICLES)[number]): PageSpec {
 }
 
 function areaSpec(g: (typeof NEIGHBORHOOD_GUIDES)[number]): PageSpec {
+  const m = areaMeta(g);
   const summary = g.summary ?? g.tagline;
   return {
     path: `/areas/${g.slug}`,
-    title: clip(`${g.name} area guide`, 65),
-    description: clip(summary, 158),
-    ogImage: g.hero?.base,
-    jsonLd: [
-      breadcrumbJsonLd([
-        { name: 'Home', path: '/' },
-        { name: 'Area guides', path: '/areas' },
-        { name: g.name, path: `/areas/${g.slug}` },
-      ]),
-    ],
+    title: m.title!,
+    description: m.description!,
+    ogImage: m.image,
+    jsonLd: jsonLdArray(m.jsonLd),
     noscript: `<div style="${NOSCRIPT_STYLE}"><h1>${escapeHtml(g.name)} — area guide</h1>
 <p>${escapeHtml(clip(summary, 420))}</p>
 <p><a href="${SITE_URL}/areas/${g.slug}/">Open the full guide</a></p></div>`,

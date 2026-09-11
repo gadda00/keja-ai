@@ -40,6 +40,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
 import { useAllProperties } from '@/lib/inventory';
 import { track } from '@/lib/analytics';
+import { usePageMeta } from '@/lib/seo';
+import { listingMeta } from '@/lib/detailMeta';
 import { srcsetFor, GALLERY_SIZES } from '@/lib/responsive-images';
 import { investmentScore } from '@/lib/investmentScore';
 import { trustScore } from '@/lib/trustScore';
@@ -408,6 +410,14 @@ export default function PropertyDetailView({ id }: { id: string }) {
   const p = useMemo(() => all.find((x) => x.id === id), [all, id]);
   const [favorites, setFavorites] = useStore<string[]>('favorites', []);
   const saved = p ? favorites.includes(p.id) : false;
+
+  // Entity SEO (2026-09-12): re-apply the prerendered meta after hydration so
+  // the tab title, OG tags and JSON-LD stay entity-specific instead of
+  // reverting to the generic shell default (RouteMeta's fallback).
+  usePageMeta(
+    p ? listingMeta(p) : { title: 'Listing not found', robots: 'noindex' },
+    `/properties/${id}`,
+  );
 
   // Analytics (audit F-11): one result_view per listing open.
   useEffect(() => {

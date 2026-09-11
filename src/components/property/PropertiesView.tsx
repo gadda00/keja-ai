@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { toast } from '@/hooks/use-toast';
 import { useAllProperties } from '@/lib/inventory';
+import { matchesFreeQuery, parseFreeQuery } from '@/lib/queryParser';
 import { isRentalPrice } from '@/lib/finance';
 import { track } from '@/lib/analytics';
 import type { Property } from '@/data/properties';
@@ -52,13 +53,15 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
 
   const areas = useMemo(() => [...new Set(all.map((p) => p.area))].sort(), [all]);
 
+  // Free-text query understanding (2026-09-12): the hero invites natural
+  // language (“2BR Kilimani under 15M”), so the page filter parses structured
+  // intent out of the box — instead of the old literal-substring match that
+  // returned 0 results for the product's own advertised example.
+  const parsedQ = useMemo(() => parseFreeQuery(q, areas), [q, areas]);
+
   const filtered = useMemo(() => {
-    const needle = q.trim().toLowerCase();
     let list = all.filter((p) => {
-      if (needle) {
-        const hay = `${p.title} ${p.area} ${p.county} ${p.type} ${p.description}`.toLowerCase();
-        if (!hay.includes(needle)) return false;
-      }
+      if (parsedQ.raw && !matchesFreeQuery(p, parsedQ)) return false;
       if (area !== 'all' && p.area !== area) return false;
       if (type !== 'all' && p.type !== type) return false;
       if (purpose !== 'all' && !p.purpose.includes(purpose as Property['purpose'][number])) return false;
@@ -87,7 +90,7 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
     });
     void monthly;
     return list;
-  }, [all, q, area, type, purpose, maxPrice, minTrust, beds, sort]);
+  }, [all, parsedQ, area, type, purpose, maxPrice, minTrust, beds, sort]);
 
   const toggleSave = (p: Property) => {
     const wasSaved = favorites.includes(p.id);
@@ -256,7 +259,7 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
             }[sort]}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex max-w-full flex-wrap items-center justify-start gap-2 sm:justify-end">
           <Button
             variant={mapOpen ? 'default' : 'outline'}
             size="sm"
@@ -270,7 +273,7 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
             <Bell className="mr-1.5 h-4 w-4" aria-hidden /> Save search
           </Button>
           <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
-            <SelectTrigger className="h-9 w-44 text-xs font-bold" aria-label="Sort listings">
+            <SelectTrigger className="h-9 w-full min-w-0 flex-1 text-xs font-bold sm:w-44 sm:flex-none" aria-label="Sort listings">
               <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden />
               <SelectValue />
             </SelectTrigger>

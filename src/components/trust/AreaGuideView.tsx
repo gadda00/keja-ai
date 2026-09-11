@@ -9,10 +9,17 @@ import { areaInsights } from '@/data/properties';
 import { useAllProperties } from '@/lib/inventory';
 import { PropertyCard } from '@/components/property/PropertyCard';
 import { navigate } from '@/lib/router';
+import { usePageMeta } from '@/lib/seo';
+import { areaMeta } from '@/lib/detailMeta';
 
 export default function AreaGuideView({ slug }: { slug: string }) {
   const all = useAllProperties();
   const guide = getNeighborhoodGuide(slug);
+  // Entity SEO — keep the prerendered area-guide meta after hydration.
+  usePageMeta(
+    guide ? areaMeta(guide) : { title: 'Area guide not found', robots: 'noindex' },
+    `/areas/${slug}`,
+  );
   if (!guide) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">

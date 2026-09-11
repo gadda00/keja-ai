@@ -5,9 +5,16 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ARTICLES } from '@/data/articles';
 import { navigate } from '@/lib/router';
+import { usePageMeta } from '@/lib/seo';
+import { articleMeta } from '@/lib/detailMeta';
 
 export default function ArticleDetailView({ slug }: { slug: string }) {
   const article = ARTICLES.find((a) => a.slug === slug);
+  // Entity SEO — keep the prerendered article meta after hydration.
+  usePageMeta(
+    article ? articleMeta(article) : { title: 'Article not found', robots: 'noindex' },
+    `/insights/${slug}`,
+  );
   if (!article) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
