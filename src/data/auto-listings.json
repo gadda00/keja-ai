@@ -1,7 +1,21 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-11T00:03:21.385Z",
+  "generatedAt": "2026-09-12T00:11:43.518Z",
   "runs": [
+    {
+      "id": "run-2026-09-12-03173",
+      "startedAt": "2026-09-12T00:11:43.518Z",
+      "ingested": 4,
+      "published": 4,
+      "queued": 0,
+      "rejected": 0,
+      "deduped": 0,
+      "sources": {
+        "scanner": 4,
+        "feeds": 0
+      },
+      "feedStatus": []
+    },
     {
       "id": "run-2026-09-11-01215",
       "startedAt": "2026-09-11T00:03:21.385Z",
@@ -1269,42 +1283,303 @@
           "state": "ok"
         }
       ]
-    },
-    {
-      "id": "run-2026-08-30-24082",
-      "startedAt": "2026-08-30T13:32:04.096Z",
-      "ingested": 2,
-      "published": 2,
-      "queued": 0,
-      "rejected": 0,
-      "deduped": 10,
-      "sources": {
-        "scanner": 2,
-        "feeds": 0
-      },
-      "feedStatus": [
-        {
-          "feed": "diaspora-property.xml",
-          "format": "XML",
-          "items": 3,
-          "state": "ok"
-        },
-        {
-          "feed": "horizon-realtors.csv",
-          "format": "CSV",
-          "items": 3,
-          "state": "ok"
-        },
-        {
-          "feed": "skyline-agents.json",
-          "format": "JSON",
-          "items": 3,
-          "state": "ok"
-        }
-      ]
     }
   ],
   "listings": [
+    {
+      "id": "KJA-A0200",
+      "title": "Contemporary Commercial Unit in Kasarani",
+      "type": "commercial",
+      "purpose": ["buy", "invest"],
+      "area": "Kasarani",
+      "county": "Nairobi",
+      "price": 23450000,
+      "rentEstimate": 168000,
+      "grossYieldEstimate": 8.6,
+      "bathrooms": 1,
+      "sizeSqm": 385,
+      "amenities": [
+        "Conference facilities",
+        "Loading bay",
+        "100% backup power",
+        "Central A/C"
+      ],
+      "images": [
+        "/images/props/office_1.webp",
+        "/images/props/interior_2.webp"
+      ],
+      "description": "This 385 sqm commercial unit in Kasarani has been finished to a practical standard and priced with discipline. Infrastructure — power backup, connectivity and parking — supports immediate occupation. Benchmarked against comparable stock in Kasarani, this listing offers defensible entry pricing for an income-focused buyer.",
+      "agency": "Nairobi Prime Properties",
+      "agent": {
+        "name": "Grace Wairimu",
+        "phone": "+254 736 481 902"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-12T09:54:00.000Z",
+      "appreciationForecast": 8.1,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 61k/sqm — within the Kasarani band",
+        "Close to Thika Road Mall",
+        "Est. gross yield ~8.6% p.a. (area band 8.6%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-12T09:54:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 8.6,
+        "areaPpsmBand": [45000, 70000],
+        "areaAcreBand": [5, 14],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 61k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "45-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0202",
+      "title": "Modern 3-Bedroom Townhouse in Madaraka",
+      "type": "townhouse",
+      "purpose": ["buy", "invest"],
+      "area": "Madaraka",
+      "county": "Nairobi",
+      "price": 7400000,
+      "rentEstimate": 54000,
+      "grossYieldEstimate": 8.8,
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "sizeSqm": 106,
+      "amenities": [
+        "Borehole water",
+        "Clubhouse access",
+        "Private garden",
+        "Double garage"
+      ],
+      "images": [
+        "/images/props/townhouse_0.webp",
+        "/images/props/townhouse_1.webp"
+      ],
+      "description": "This 106 sqm townhouse in Madaraka has been finished to a practical standard and priced with discipline. The property sits on a mature, well-kept compound with room for family life and entertaining. The Madaraka market band and 8.8% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Kevin Ochieng",
+        "phone": "+254 745 902 210"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-12T07:30:00.000Z",
+      "appreciationForecast": 6.2,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 70k/sqm — below the Madaraka band",
+        "Close to Madaraka shops",
+        "Est. gross yield ~8.8% p.a. (area band 8.8%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-12T07:30:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 8.8,
+        "areaPpsmBand": [70000, 100000],
+        "areaAcreBand": [8, 20],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 70k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "48-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0199",
+      "title": "Bright Commercial Unit in Westlands",
+      "type": "commercial",
+      "purpose": ["buy", "invest"],
+      "area": "Westlands",
+      "county": "Nairobi",
+      "price": 83050000,
+      "rentEstimate": 526000,
+      "grossYieldEstimate": 7.6,
+      "bathrooms": 2,
+      "sizeSqm": 840,
+      "amenities": [
+        "Conference facilities",
+        "Loading bay",
+        "Central A/C",
+        "100% backup power"
+      ],
+      "images": [
+        "/images/props/interior_2.webp",
+        "/images/props/office_0.webp"
+      ],
+      "description": "A well-presented commercial unit in Westlands, Nairobi, offering 840 sqm of bright, efficiently planned space. Infrastructure — power backup, connectivity and parking — supports immediate occupation. Benchmarked against comparable stock in Westlands, this listing offers defensible entry pricing for an income-focused buyer.",
+      "agency": "Coastal Living Estates",
+      "agent": {
+        "name": "Ali Hassan",
+        "phone": "+254 722 684 195"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-12T05:53:00.000Z",
+      "appreciationForecast": 8.1,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 99k/sqm — below the Westlands band",
+        "Close to Peponi School",
+        "Est. gross yield ~7.6% p.a. (area band 7.6%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-12T05:53:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 7.6,
+        "areaPpsmBand": [100000, 150000],
+        "areaAcreBand": [90, 180],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 99k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "42-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0201",
+      "title": "Refined 2-Bedroom Apartment in Diani",
+      "type": "apartment",
+      "purpose": ["rent"],
+      "area": "Diani",
+      "county": "Kwale",
+      "price": 35000,
+      "bedrooms": 2,
+      "bathrooms": 2,
+      "sizeSqm": 85,
+      "amenities": [
+        "CCTV surveillance",
+        "Borehole water",
+        "Secure parking",
+        "Gym",
+        "24/7 security"
+      ],
+      "images": [
+        "/images/props/interior_0.webp",
+        "/images/props/apartment_2.webp",
+        "/images/props/bedroom_0.webp"
+      ],
+      "description": "An honest, well-maintained apartment in Diani — 85 sqm of sensible layout for owners and investors alike. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. A practical choice for anyone seeking a genuine Diani address without overpaying.",
+      "agency": "Horizon Realtors",
+      "agent": {
+        "name": "Dennis Otieno",
+        "phone": "+254 701 644 087"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-12T02:42:00.000Z",
+      "appreciationForecast": 5.7,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "Diani location with steady tenant demand",
+        "Close to Baharini shopping plaza",
+        "Popular with expatriate family tenants"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-12T02:42:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "n/a",
+        "areaYieldBand": 7,
+        "areaPpsmBand": [45000, 85000],
+        "areaAcreBand": [3, 12],
+        "qualityScore": 92,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "Price sits inside the area market band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "46-word description · 3 photos · 5 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
     {
       "id": "KJA-A0195",
       "title": "Bright 1-Bedroom City Apartment in Diani",
@@ -1679,7 +1954,10 @@
         "Conference facilities",
         "100% backup power"
       ],
-      "images": ["/images/props/interior_2.webp", "/images/props/office_1.webp"],
+      "images": [
+        "/images/props/interior_2.webp",
+        "/images/props/office_1.webp"
+      ],
       "description": "A well-presented commercial unit in Kileleshwa, Nairobi, offering 714 sqm of bright, efficiently planned space. Infrastructure — power backup, connectivity and parking — supports immediate occupation. At KES 107k/sqm the pricing sits within the Kileleshwa band, and the area yield band of 8.4% supports a solid income case.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -1819,7 +2097,10 @@
         "Gated community",
         "Half-acre garden"
       ],
-      "images": ["/images/props/townhouse_1.webp", "/images/props/villa_1.webp"],
+      "images": [
+        "/images/props/townhouse_1.webp",
+        "/images/props/villa_1.webp"
+      ],
       "description": "A well-presented villa in Kileleshwa, Nairobi, offering 316 sqm of bright, efficiently planned space. The property sits on a mature, well-kept compound with room for family life and entertaining. The Kileleshwa market band and 8.4% yield environment make this a disciplined income or appreciation play.",
       "agency": "Prestige Homes KE",
       "agent": {
@@ -1889,7 +2170,10 @@
         "Fibre backbone",
         "Raised floors"
       ],
-      "images": ["/images/props/office_0.webp", "/images/props/interior_2.webp"],
+      "images": [
+        "/images/props/office_0.webp",
+        "/images/props/interior_2.webp"
+      ],
       "description": "An honest, well-maintained commercial unit in Milimani — 133 sqm of sensible layout for owners and investors alike. Infrastructure — power backup, connectivity and parking — supports immediate occupation. At KES 70k/sqm the pricing sits above the Milimani band, and the area yield band of 7.4% supports a solid income case.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -2326,7 +2610,10 @@
         "Ample parking bays",
         "Grade-A finishes"
       ],
-      "images": ["/images/props/office_0.webp", "/images/props/interior_2.webp"],
+      "images": [
+        "/images/props/office_0.webp",
+        "/images/props/interior_2.webp"
+      ],
       "description": "This 250 sqm commercial unit in Runda has been finished to a practical standard and priced with discipline. Infrastructure — power backup, connectivity and parking — supports immediate occupation. The Runda market band and 6% yield environment make this a disciplined income or appreciation play.",
       "agency": "Diaspora Property Group",
       "agent": {
@@ -4606,7 +4893,10 @@
         "Loading bay",
         "100% backup power"
       ],
-      "images": ["/images/props/interior_2.webp", "/images/props/office_0.webp"],
+      "images": [
+        "/images/props/interior_2.webp",
+        "/images/props/office_0.webp"
+      ],
       "description": "Set in the heart of Karen, this commercial unit delivers 712 sqm of comfortable living with genuine character. Infrastructure — power backup, connectivity and parking — supports immediate occupation. A practical choice for anyone seeking a genuine Karen address without overpaying.",
       "agency": "Horizon Realtors",
       "agent": {
@@ -5320,301 +5610,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "KJA-A0140",
-      "title": "Charming 4-Bedroom Villa in Westlands",
-      "type": "villa",
-      "purpose": ["buy", "invest"],
-      "area": "Westlands",
-      "county": "Nairobi",
-      "price": 22700000,
-      "rentEstimate": 144000,
-      "grossYieldEstimate": 7.6,
-      "bedrooms": 4,
-      "bathrooms": 3,
-      "sizeSqm": 183,
-      "amenities": [
-        "Borehole + storage tanks",
-        "Swimming pool",
-        "Staff quarters",
-        "Half-acre garden"
-      ],
-      "images": ["/images/props/villa_1.webp", "/images/props/villa_0.webp"],
-      "description": "A well-presented villa in Westlands, Nairobi, offering 183 sqm of bright, efficiently planned space. The property sits on a mature, well-kept compound with room for family life and entertaining. The Westlands market band and 7.6% yield environment make this a disciplined income or appreciation play.",
-      "agency": "Prestige Homes KE",
-      "agent": {
-        "name": "Alice Mumbi",
-        "phone": "+254 726 900 451"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-05T07:14:00.000Z",
-      "appreciationForecast": 5.5,
-      "offPlan": true,
-      "furnished": false,
-      "highlights": [
-        "KES 124k/sqm — within the Westlands band",
-        "Close to Sarit Centre",
-        "Est. gross yield ~7.6% p.a. (area band 7.6%)",
-        "Off-plan with staged payment plan"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-05T07:14:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 7.6,
-        "areaPpsmBand": [100000, 150000],
-        "areaAcreBand": [90, 180],
-        "qualityScore": 90,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 124k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "45-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0133",
-      "title": "Contemporary 4-Bedroom Family Villa in Milimani",
-      "type": "villa",
-      "purpose": ["buy", "invest"],
-      "area": "Milimani",
-      "county": "Kisumu",
-      "price": 15350000,
-      "rentEstimate": 95000,
-      "grossYieldEstimate": 7.4,
-      "bedrooms": 4,
-      "bathrooms": 3,
-      "sizeSqm": 240,
-      "amenities": [
-        "Borehole + storage tanks",
-        "Half-acre garden",
-        "Solar backup",
-        "Gated community"
-      ],
-      "images": ["/images/props/villa_0.webp", "/images/props/villa_1.webp"],
-      "description": "An honest, well-maintained villa in Milimani — 240 sqm of sensible layout for owners and investors alike. The property sits on a mature, well-kept compound with room for family life and entertaining. The Milimani market band and 7.4% yield environment make this a disciplined income or appreciation play.",
-      "agency": "Diaspora Property Group",
-      "agent": {
-        "name": "Kevin Ochieng",
-        "phone": "+254 745 902 210"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-05T05:28:00.000Z",
-      "appreciationForecast": 7.3,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 64k/sqm — above the Milimani band",
-        "Close to Lake Victoria shoreline",
-        "Est. gross yield ~7.4% p.a. (area band 7.4%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-05T05:28:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "above",
-        "areaYieldBand": 7.4,
-        "areaPpsmBand": [40000, 70000],
-        "areaAcreBand": [4, 12],
-        "qualityScore": 90,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 64k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "48-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0138",
-      "title": "Modern 2-Bedroom Residence in Runda",
-      "type": "apartment",
-      "purpose": ["buy"],
-      "area": "Runda",
-      "county": "Nairobi",
-      "price": 5800000,
-      "rentEstimate": 29000,
-      "grossYieldEstimate": 6,
-      "bedrooms": 2,
-      "bathrooms": 2,
-      "sizeSqm": 88,
-      "amenities": [
-        "Fibre internet ready",
-        "Gym",
-        "24/7 security",
-        "Borehole water",
-        "CCTV surveillance"
-      ],
-      "images": [
-        "/images/props/apartment_1.webp",
-        "/images/props/interior_0.webp",
-        "/images/props/apartment_0.webp"
-      ],
-      "description": "This 88 sqm apartment in Runda has been finished to a practical standard and priced with discipline. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Runda, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Coastal Living Estates",
-      "agent": {
-        "name": "Halima Yusuf",
-        "phone": "+254 718 337 540"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-05T03:37:00.000Z",
-      "appreciationForecast": 5.4,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 66k/sqm — below the Runda band",
-        "Close to Village Market",
-        "Est. gross yield ~6% p.a. (area band 6%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-05T03:37:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 6,
-        "areaPpsmBand": [60000, 95000],
-        "areaAcreBand": [15, 40],
-        "qualityScore": 95,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 66k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "50-word description · 3 photos · 5 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0134",
-      "title": "Bright 4-Bedroom Residence in Ruaka",
-      "type": "apartment",
-      "purpose": ["buy", "invest"],
-      "area": "Ruaka",
-      "county": "Nairobi",
-      "price": 11550000,
-      "rentEstimate": 77000,
-      "grossYieldEstimate": 8,
-      "bedrooms": 4,
-      "bathrooms": 1,
-      "sizeSqm": 176,
-      "amenities": [
-        "Gym",
-        "Rooftop terrace",
-        "Lift access",
-        "Backup generator",
-        "Balcony"
-      ],
-      "images": [
-        "/images/props/bedroom_0.webp",
-        "/images/props/interior_1.webp",
-        "/images/props/apartment_1.webp"
-      ],
-      "description": "This 176 sqm apartment in Ruaka has been finished to a practical standard and priced with discipline. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. The Ruaka market band and 8% yield environment make this a disciplined income or appreciation play.",
-      "agency": "Diaspora Property Group",
-      "agent": {
-        "name": "Kevin Ochieng",
-        "phone": "+254 745 902 210"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-05T02:44:00.000Z",
-      "appreciationForecast": 4.9,
-      "offPlan": false,
-      "furnished": true,
-      "highlights": [
-        "KES 66k/sqm — below the Ruaka band",
-        "Close to Ruaka town centre",
-        "Est. gross yield ~8% p.a. (area band 8%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-05T02:44:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 8,
-        "areaPpsmBand": [65000, 95000],
-        "areaAcreBand": [10, 28],
-        "qualityScore": 95,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 66k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "50-word description · 3 photos · 5 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
     }
   ],
   "pending": [],
@@ -5782,7 +5777,11 @@
     "apartment|Diani|1br|5",
     "bungalow|Kilimani|4br|22",
     "bungalow|Kileleshwa|4br|16",
-    "apartment|Nanyuki|4br|4"
+    "apartment|Nanyuki|4br|4",
+    "commercial|Westlands|0br|83",
+    "commercial|Kasarani|0br|23",
+    "apartment|Diani|2br|7",
+    "townhouse|Madaraka|3br|7"
   ],
   "rejected": []
 }
