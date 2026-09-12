@@ -118,15 +118,35 @@ else fail("robots.txt missing");
     .filter((tag) => /\bas="script"/.test(tag))
     .map((tag) => tag.match(/\bhref="([^"]+)"/)?.[1])
     .filter(Boolean);
-  if (preloads.length === 0) {
+  let missing = 0;
+  for (const href of preloads) {
+    if (!existsSync(join(out, href.replace(/^\//, "")))) missing++;
+  }
+  if (missing > 0) {
+    fail(`${missing} preload hint(s) point at files that do not exist`);
+  } else if (preloads.length === 0) {
     fail("no script preloads in index.html — inject-preloads.mjs did not run (boot waterfall is back)");
   } else {
-    let missing = 0;
+    // Next emits its own tiny webpack-runtime preload (~6 kB); the INJECTED
+    // hints are the boot-time dynamic chunk graph (zod + shell, hundreds of
+    // kB). Count only preloaded weight to tell them apart — otherwise Next's
+    // built-in hint satisfies a bare count and a missing injection ships
+    // silently (exactly what happened live on 2026-09-12: the deployment
+    // passed verification while the waterfall fix was absent).
+    let preloadedBytes = 0;
     for (const href of preloads) {
-      if (!existsSync(join(out, href.replace(/^\//, "")))) missing++;
+      const f = join(out, href.replace(/^\//, ""));
+      if (existsSync(f)) preloadedBytes += statSync(f).size;
     }
-    if (missing === 0) ok(`${preloads.length} boot preload hint(s), all resolve`);
-    else fail(`${missing} preload hint(s) point at files that do not exist`);
+    const MIN_PRELOADED_GRAPH_BYTES = 150 * 1024;
+    if (preloadedBytes >= MIN_PRELOADED_GRAPH_BYTES) {
+      ok(`${preloads.length} boot preload hint(s), all resolve (${(preloadedBytes / 1024).toFixed(0)} kB of the shell graph)`);
+    } else {
+      fail(
+        `preload hints cover only ${(preloadedBytes / 1024).toFixed(0)} kB — the boot-time dynamic chunks ` +
+          "(zod + KejaApp shell) are not preloaded; inject-preloads.mjs ran before the chunks were built, or did not run",
+      );
+    }
   }
 
   /* 5c — entry-JS budget (audit line: 500 kB raw, excluding nomodule

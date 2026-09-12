@@ -828,3 +828,17 @@ through a 3-minute grace for the record to appear before concluding the
 integration is absent, then through the original 6-minute window for its
 build to reach a terminal state (14 guard tests, incl. two simulated-clock
 grace cases). The next deploy run is the live re-test.
+
+**Wave-11 live-test amendment 2 (same day): the deployed site shipped
+without the preloads — vercel.json drift.** The integration's build of
+`0793b29` passed verification but the live HTML carried no injected
+preloads: `package.json`'s build script had gained `inject-preloads.mjs`
+while `vercel.json`'s `buildCommand` — the string both deploy paths
+actually execute — had not. The verification gap was real too: Next's own
+tiny webpack-runtime preload (~6 kB) satisfied the bare "a preload
+exists" assertion. Fixes: the step was added to `vercel.json`; the
+verification now requires the preloaded script weight to cover the
+boot-time dynamic graph (≥150 kB — Next's built-in hint covers 6 kB, the
+shell graph 616 kB); and `tests/buildParity.test.ts` pins the two build
+definitions step-for-step so the drift cannot reappear silently (it also
+pins injection-before-prerender ordering and verification-last).
