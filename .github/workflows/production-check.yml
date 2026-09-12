@@ -77,8 +77,10 @@ jobs:
       # the repo must be live. A 404 means production is stale — typically
       # a deploy that failed after the data landed. One retry covers the
       # mid-deploy window (the integration takes ~4 minutes to build+promote).
+      # (Keyed on url, not on the boolean matrix.required — GitHub
+      # expressions do not cast booleans to the 'true' string.)
       - name: Freshness — newest committed listing must be live on keja.app
-        if: matrix.required == 'true' && matrix.url == 'https://keja.app'
+        if: matrix.url == 'https://keja.app'
         run: |
           # auto-listings are stored newest-first (sorted by listedAt desc)
           newest=$(node -e "
