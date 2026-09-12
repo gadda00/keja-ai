@@ -122,14 +122,44 @@ describe('pollUntilTerminalOrTimeout', () => {
     expect(result.reason).toContain('GitHub API error');
   });
 
-  it('deploys immediately when the integration never created a deployment', async () => {
+  it('waits through the webhook-latency grace when the record has not appeared yet (live 2026-09-12: gates at T+70s, record at T+73s)', async () => {
+    let clock = 1_000_000;
+    let recordAppears = false;
+    const list = vi.fn(async () => (recordAppears ? [vercelDeploy(11)] : []));
+    const status = vi.fn(async () => 'success');
     const result = await pollUntilTerminalOrTimeout({
       ...baseCfg,
+      waitMinutes: 10, // simulated clock — the window must outlast the grace
+      list,
+      status,
+      graceMinutes: 3,
+      pollSeconds: 30,
+      now: () => clock,
+      sleepFn: async () => {
+        clock += 60_000; // each poll advances one minute of simulated time
+        if (clock > 1_000_000 + 90_000) recordAppears = true; // record lands at ~90 s
+      },
+    });
+    expect(result.decision).toBe('skip');
+    expect(list.mock.calls.length).toBeGreaterThanOrEqual(2); // it polled, not fired immediately
+  });
+
+  it('deploys via the CLI only after the grace window when the integration truly never creates a record', async () => {
+    let clock = 1_000_000;
+    const result = await pollUntilTerminalOrTimeout({
+      ...baseCfg,
+      waitMinutes: 10, // simulated clock — the window must outlast the grace
       list: async () => [],
       status: async () => 'unknown',
+      graceMinutes: 3,
+      pollSeconds: 30,
+      now: () => clock,
+      sleepFn: async () => {
+        clock += 60_000;
+      },
     });
     expect(result.decision).toBe('deploy');
-    expect(result.reason).toContain('no vercel[bot] deployment');
+    expect(result.reason).toContain('integration absent or disconnected');
   });
 
   it('honours the injected sleep between polls', async () => {

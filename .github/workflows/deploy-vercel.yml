@@ -85,8 +85,12 @@ jobs:
       # production smoke tests below.
 
       # Ask the GitHub deployments API whether the Vercel Git integration
-      # already deployed this exact SHA (it starts at push time, the gates
-      # above have taken ~5 minutes, so it is usually terminal by now).
+      # already deployed this exact SHA. It starts at push time, but its
+      # deployment RECORD can lag the push by ~90 s (live measurement
+      # 2026-09-12: gates finished at T+70 s, record appeared at T+73 s — the
+      # guard's first check raced it), so the guard waits through a 3-minute
+      # grace for the record to appear before concluding the integration is
+      # absent, then through the 6-minute window for its build to finish.
       #   skip   → integration deployed; this workflow goes straight to smoke
       #   deploy → integration failed/absent; CLI prebuilt deploy below
       # Fails open (API trouble → deploy): degradation is a duplicate

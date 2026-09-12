@@ -817,3 +817,14 @@ deploying and the freshness assertion (hourly) becomes the only alarm;
 the auto-revert acts within ~5 minutes of a bad ingest (the data is live
 briefly before the revert lands); preload hints warm the cache but do not
 reduce bytes (the data-split remains the real fix, tracked in §8).
+
+**Wave-11 live-test amendment (same day):** the first production run of the
+deploy guard raced the integration's webhook — the workflow's gates finished
+at T+70 s, the guard queried at T+71 s and found no deployment record, but
+`vercel[bot]` created it at T+73 s. The fallback behaved correctly (CLI
+deploy + smoke, all green) but the skip should have fired. Fixed: "no
+deployment record" is now treated as a transient state — the guard waits
+through a 3-minute grace for the record to appear before concluding the
+integration is absent, then through the original 6-minute window for its
+build to reach a terminal state (14 guard tests, incl. two simulated-clock
+grace cases). The next deploy run is the live re-test.

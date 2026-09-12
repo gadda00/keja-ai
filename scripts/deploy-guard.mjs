@@ -92,26 +92,53 @@ async function latestDeploymentStatus(repo, deploymentId, token) {
 
 /**
  * Poll the integration deployment until terminal or the wait window closes.
+ *
+ * "No deployment yet" is a TRANSIENT state: the Git integration's webhook
+ * takes up to ~90 s after push to create the deployment record (live
+ * measurement 2026-09-12: gates finished at T+70 s, the record appeared at
+ * T+73 s — the guard's first check raced it and needlessly fell back to the
+ * CLI). So an absent record is only trusted after a grace window
+ * (graceMinutes, default 3); before that it just means "keep waiting".
+ *
  * @param {{repo:string, sha:string, token?:string, waitMinutes?:number,
- *          pollSeconds?:number, list?:Function, status?:Function,
- *          sleepFn?:Function, log?:Function}} cfg
+ *          graceMinutes?:number, pollSeconds?:number, list?:Function,
+ *          status?:Function, sleepFn?:Function, log?:Function,
+ *          now?:Function}} cfg
  */
 export async function pollUntilTerminalOrTimeout(cfg) {
   const list = cfg.list ?? listDeployments;
   const status = cfg.status ?? latestDeploymentStatus;
   const sleep = cfg.sleepFn ?? ((ms) => new Promise((r) => setTimeout(r, ms)));
   const log = cfg.log ?? (() => {});
-  const deadline = Date.now() + (cfg.waitMinutes ?? 6) * 60_000;
+  const now = cfg.now ?? (() => Date.now());
+  const graceMs = (cfg.graceMinutes ?? 3) * 60_000;
+  const deadline = now() + (cfg.waitMinutes ?? 6) * 60_000;
+  let noRecordSince = null;
   let lastReason = "no deployment yet";
-  while (Date.now() < deadline) {
+  while (now() < deadline) {
     try {
-      const deployments = await list(cfg.repo, cfg.sha, cfg.token);
-      const [decision, reason] = await decide(deployments, (id) =>
-        status(cfg.repo, id, cfg.token),
+      const deployments = (await list(cfg.repo, cfg.sha, cfg.token)).filter(
+        (d) => d.creator === "vercel[bot]",
       );
-      lastReason = reason;
-      if (decision === "skip" || decision === "deploy") return { decision, reason };
-      log(`[deploy-guard] ${reason} — waiting…`);
+      if (deployments.length === 0) {
+        if (noRecordSince === null) noRecordSince = now();
+        if (now() - noRecordSince >= graceMs) {
+          return {
+            decision: "deploy",
+            reason: `no vercel[bot] deployment appeared within ${cfg.graceMinutes ?? 3} min — integration absent or disconnected`,
+          };
+        }
+        lastReason = "no deployment record yet (integration webhook latency)";
+        log(`[deploy-guard] ${lastReason} — waiting…`);
+      } else {
+        noRecordSince = null;
+        const [decision, reason] = await decide(deployments, (id) =>
+          status(cfg.repo, id, cfg.token),
+        );
+        lastReason = reason;
+        if (decision === "skip" || decision === "deploy") return { decision, reason };
+        log(`[deploy-guard] ${reason} — waiting…`);
+      }
     } catch (err) {
       // fail open: API trouble means duplicate deploy, not missing deploy
       return { decision: "deploy", reason: `GitHub API error: ${err.message}` };
@@ -133,6 +160,7 @@ if (isMain) {
       sha: { type: "string" },
       token: { type: "string", default: process.env.GITHUB_TOKEN ?? "" },
       "wait-minutes": { type: "string", default: "6" },
+      "grace-minutes": { type: "string", default: "3" },
       "poll-seconds": { type: "string", default: "20" },
     },
   });
@@ -145,6 +173,7 @@ if (isMain) {
     sha: args.sha,
     token: args.token,
     waitMinutes: Number(args["wait-minutes"]),
+    graceMinutes: Number(args["grace-minutes"]),
     pollSeconds: Number(args["poll-seconds"]),
     log: console.log,
   });
