@@ -105,6 +105,56 @@ if (!existsSync(sitemapPath)) {
 if (existsSync(join(out, "robots.txt"))) ok("robots.txt");
 else fail("robots.txt missing");
 
+/* 5b — boot-waterfall preloads (2026-09-12): the SPA shell is a next/dynamic
+   import, so without hints the browser only discovers the shell chunks
+   (zod + the KejaApp graph) after the entry scripts execute. The build
+   injects <link rel="preload" as="script"> for exactly those chunks
+   (scripts/inject-preloads.mjs). Gate 1: the hints exist. Gate 2: every
+   hint resolves to a real file — a broken hint is a wasted round trip. */
+{
+  // attribute-order-agnostic: any <link> that is both rel="preload" and as="script"
+  const preloads = [...html0().matchAll(/<link\b[^>]*\brel="preload"[^>]*>/g)]
+    .map((m) => m[0])
+    .filter((tag) => /\bas="script"/.test(tag))
+    .map((tag) => tag.match(/\bhref="([^"]+)"/)?.[1])
+    .filter(Boolean);
+  if (preloads.length === 0) {
+    fail("no script preloads in index.html — inject-preloads.mjs did not run (boot waterfall is back)");
+  } else {
+    let missing = 0;
+    for (const href of preloads) {
+      if (!existsSync(join(out, href.replace(/^\//, "")))) missing++;
+    }
+    if (missing === 0) ok(`${preloads.length} boot preload hint(s), all resolve`);
+    else fail(`${missing} preload hint(s) point at files that do not exist`);
+  }
+
+  /* 5c — entry-JS budget (audit line: 500 kB raw, excluding nomodule
+     polyfills). Measured 507 kB on 2026-09-12 after the wave-8/9/10 additions
+     (2FA, store zod seams). The ratchet is set at 525 kB so the NEXT
+     regression fails the build instead of quietly compounding; tighten to
+     500 kB when the inventory data-split lands (see CURRENT_PICTURE §8). */
+  const ENTRY_JS_BUDGET_BYTES = 525 * 1024;
+  // nomodule is case-variant in the wild ("noModule="), and may sit after src —
+  // test the whole opening tag, case-insensitively
+  const entrySrcs = [...html0().matchAll(/<script\b[^>]*>/g)]
+    .filter((m) => /\bsrc="([^"]+)"/.test(m[0]) && !/\bnomodule\b/i.test(m[0]))
+    .map((m) => m[0].match(/\bsrc="([^"]+)"/)[1]);
+  let entryBytes = 0;
+  for (const src of entrySrcs) entryBytes += statSync(join(out, src.replace(/^\//, ""))).size;
+  if (entryBytes <= ENTRY_JS_BUDGET_BYTES) {
+    ok(`entry JS ${(entryBytes / 1024).toFixed(0)} kB ≤ ${(ENTRY_JS_BUDGET_BYTES / 1024).toFixed(0)} kB budget`);
+  } else {
+    fail(
+      `entry JS ${(entryBytes / 1024).toFixed(0)} kB exceeds the ${(ENTRY_JS_BUDGET_BYTES / 1024).toFixed(0)} kB ratchet — ` +
+        "split the added weight before shipping (see CURRENT_PICTURE §8 data-split plan)",
+    );
+  }
+}
+function html0() {
+  return existsSync(indexPath) ? readFileSync(indexPath, "utf8") : "";
+}
+
 /* 6 — prerendered route shells exist (spot check of the real layout) */
 for (const f of [
   "properties/KJA-001/index.html",

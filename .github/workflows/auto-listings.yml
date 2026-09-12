@@ -2,11 +2,25 @@
 #
 # Runs the code-automated pipeline (market scanner + partner feed adapters →
 # AI enrichment → dedupe → quality gate → publish) on a schedule. When new
-# listings are published, the updated data file is committed, which triggers
-# the main deploy workflow — the marketplace grows itself, end to end.
+# listings are published, the updated data file is committed, and the
+# Vercel Git integration deploys it — the marketplace grows itself, end
+# to end.
 #
 #   schedule : every 6 hours (04:10, 10:10, 16:10, 22:10 UTC)
 #   dispatch : manual, with an optional volume override
+#
+# Deploy-path reality (2026-09-12): this workflow pushes with GITHUB_TOKEN,
+# which by GitHub's recursion-prevention rule can NEVER trigger
+# deploy-vercel.yml. The push deploys anyway because the Vercel Git
+# integration builds every commit. Consequence: the ingest commit ships to
+# production ~1 minute after the push, so the verify job below is the ONLY
+# automated quality gate between bot-written data and the live marketplace.
+# It therefore runs the FULL gate suite (unit tests — including the
+# data-integrity checks over every bot listing — plus the complete build
+# with prerender + artifact verification), and if that gate fails, the
+# revert job undoes the ingest commit (guarded: only if it is still HEAD),
+# which the integration then redeploys — production self-heals to the last
+# good state within minutes.
 name: Auto-Pilot listings
 
 on:
@@ -71,8 +85,9 @@ jobs:
             -m "chore(autopilot): ingest new listings $(date -u +'%Y-%m-%d %H:%M UTC')" \
             -m "Automated by the Auto-Pilot workflow (.github/workflows/auto-listings.yml)."
           git push
-          echo "Committed — the verify job below gates it; the push itself"
-          echo "triggers the Vercel deploy workflow on main."
+          echo "Committed — the verify job below gates the data; the push"
+          echo "deploys via the Vercel Git integration (this GITHUB_TOKEN push"
+          echo "cannot trigger deploy-vercel.yml — GitHub recursion rule)."
 
       - name: Run summary
         run: |
@@ -89,8 +104,10 @@ jobs:
           " >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
-  # Quality gate on the freshly-committed listings — the push itself
-  # already triggers the Vercel deploy workflow (deploy-vercel.yml) on main.
+  # Quality gate on the freshly-committed bot data. The ingest push is
+  # already deploying via the Vercel Git integration while this runs, so
+  # this is a post-commit tripwire: it must fail loudly (and trigger the
+  # revert job) if the committed data breaks the marketplace contract.
   verify:
     # Runs only when the ingest job committed new listings.
     needs: [ingest]
@@ -120,5 +137,52 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Build (static export)
-        run: npx next build --webpack
+      # The data-integrity suite (every bot listing passes schema, every
+      # image path resolves to a real file, unique ids, sane prices) is the
+      # whole point of this job — it did not run here before 2026-09-12,
+      # which meant bot data reached production having never been tested.
+      - name: Unit tests (incl. data-integrity over the fresh bot data)
+        run: npm test
+
+      # The full build: sitemap + prerender (new listings get real pages) +
+      # preload injection + SW stamp + artifact verification — the same
+      # gate the deployment builds run.
+      - name: Build (static export + artifact verification)
+        run: npm run build
+
+  # Self-heal: if the verify gate failed on data the integration has
+  # already deployed, revert the ingest commit. GUARDED: only reverts when
+  # HEAD of main is still the autopilot ingest commit — if a human (or any
+  # other automation) has pushed in the meantime, we leave history alone
+  # and shout instead. The revert push is GITHUB_TOKEN-authored (same
+  # owner identity for Vercel Hobby verification) and is deployed by the
+  # Git integration like any other push, restoring the last good state.
+  revert-if-broken:
+    needs: [verify]
+    if: needs.ingest.outputs.changed == 'true' && failure()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          ref: main
+          # HEAD + parent is all `git revert HEAD` needs
+          fetch-depth: 2
+
+      - name: Revert the ingest commit (only if it is still HEAD)
+        run: |
+          set -eu
+          head_subject=$(git log -1 --pretty=%s)
+          case "$head_subject" in
+            "chore(autopilot): ingest new listings "*)
+              echo "HEAD is the ingest commit — reverting: $head_subject"
+              git config user.name "gadda00"
+              git config user.email "torv54@gmail.com"
+              git revert --no-edit HEAD
+              git push
+              echo "::warning::Auto-Pilot ingest failed the verify gate and has been reverted. Production is being restored to the last good state by the Git integration. Investigate the verify job's logs before the next ingest."
+              ;;
+            *)
+              echo "::error::Verify failed, but HEAD ('$head_subject') is no longer the ingest commit — refusing to revert automatically. Manual investigation required."
+              exit 1
+              ;;
+          esac

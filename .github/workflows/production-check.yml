@@ -1,9 +1,23 @@
 # Production monitoring — hourly smoke test of the live site.
 #
-# Complements deploy-vercel.yml (which smoke-tests each new deployment
-# immediately): this one watches the steady state, so a regression that
-# appears between deploys (edge incident, DNS change, hijacked record)
-# surfaces in the Actions tab within the hour.
+# Complements deploy-vercel.yml (which smoke-tests each push): this one
+# watches the steady state, so a regression that appears between deploys
+# (edge incident, DNS change, hijacked record, failed deployment that
+# leaves the alias on a stale build) surfaces in the Actions tab within
+# the hour.
+#
+# Two assertions per run, on top of availability/PWA/security headers:
+#
+#   freshness — the newest listing in the committed repo data must exist on
+#     production (a prerendered page, so a missing page means production
+#     is NOT serving this repo: a deploy failed somewhere, or the Auto-
+#     Pilot's GITHUB_TOKEN push never deployed). Before 2026-09-12 a
+#     failed integration deployment left the alias serving the last good
+#     build forever — healthy-looking and quietly stale — and nothing
+#     noticed.
+#   canonical-first — keja.app is REQUIRED (it is the domain real users
+#     type; the DNS switch at Spaceship happened 2026-09-10). The vercel
+#     alias is checked as the secondary surface.
 name: Production check
 
 on:
@@ -25,13 +39,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - url: https://keja-ai-rho.vercel.app
-            label: production alias
-            required: true
           - url: https://keja.app
-            label: canonical domain (needs DNS switch at Spaceship)
-            required: false
+            label: canonical domain (what users type)
+            required: true
+          - url: https://keja-ai-rho.vercel.app
+            label: production alias (same deployment)
+            required: true
     steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
       - name: Smoke-test ${{ matrix.label }}
         run: |
           url="${{ matrix.url }}"
@@ -49,10 +65,39 @@ jobs:
             echo "GET /manifest.webmanifest -> $code"; [ "$code" = "200" ] || fail=1
           fi
           if [ "$fail" = 1 ] && [ "$required" = "true" ]; then
-            echo "Smoke test FAILED on the production alias."
+            echo "Smoke test FAILED on $url."
             exit 1
           elif [ "$fail" = 1 ]; then
-            echo "::warning::keja.app not serving the Vercel deployment yet — DNS records must point at Vercel (see docs/DEPLOYMENT.md §4)."
+            echo "::warning::$url failed its smoke checks."
           else
             echo "Smoke test PASSED."
+          fi
+
+      # Freshness tripwire (canonical domain only): the newest listing in
+      # the repo must be live. A 404 means production is stale — typically
+      # a deploy that failed after the data landed. One retry covers the
+      # mid-deploy window (the integration takes ~4 minutes to build+promote).
+      - name: Freshness — newest committed listing must be live on keja.app
+        if: matrix.required == 'true' && matrix.url == 'https://keja.app'
+        run: |
+          # auto-listings are stored newest-first (sorted by listedAt desc)
+          newest=$(node -e "
+            const d = require('./src/data/auto-listings.json');
+            console.log(d.listings[0].id);
+          ")
+          echo "newest committed auto-listing: $newest"
+          check() {
+            curl -s --max-time 30 -o /dev/null -w "%{http_code}" "https://keja.app/properties/$newest" || echo 000
+          }
+          code=$(check)
+          if [ "$code" != "200" ]; then
+            echo "not live yet (got $code) — waiting 300s for a mid-deploy window, then rechecking"
+            sleep 300
+            code=$(check)
+          fi
+          if [ "$code" = "200" ]; then
+            echo "freshness OK — /properties/$newest is live"
+          else
+            echo "::error::PRODUCTION IS STALE: /properties/$newest returns $code on keja.app. The repo contains listings the live site does not serve — find the failed deployment (Vercel project dashboard or the deploy workflow logs)."
+            exit 1
           fi

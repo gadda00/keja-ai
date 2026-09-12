@@ -1,12 +1,26 @@
 name: Deploy to Vercel (keja.app)
 
 # The canonical production deployment: every push to main that passes the
-# quality pipeline ships to Vercel (keja-ai-rho.vercel.app / keja.app).
+# quality pipeline ships to Vercel (keja.app / keja-ai-rho.vercel.app).
 #
-# The Vercel account has no GitHub integration connected, so deploys are
-# API-driven from CI with the vercel CLI prebuilt flow (pull → build →
-# deploy), authenticated by the VERCEL_TOKEN repo secret. Unchanged files
-# are skipped on upload via content hashing, so steady-state deploys are fast.
+# Deployment reality (verified 2026-09-12, see docs/DEPLOYMENT.md §1):
+# the Vercel Git integration IS connected to this repo and builds+deploys
+# every push to main within ~1 minute — including the Auto-Pilot's
+# GITHUB_TOKEN pushes, which can never trigger this workflow (GitHub's
+# recursion-prevention rule). This workflow is therefore the SECOND deploy
+# path, not the only one:
+#
+#   1. Vercel Git integration — primary, deploys everything (bot data too).
+#   2. This workflow — quality gates for human pushes, then EITHER skips its
+#      own deploy (the integration already shipped this exact SHA —
+#      scripts/deploy-guard.mjs answers that against the GitHub deployments
+#      API) OR falls back to the CLI prebuilt deploy when the integration
+#      failed / is absent. Either way it ends with the production smoke
+#      test, which the integration does not run on its own.
+#
+# The CLI fallback needs the VERCEL_TOKEN repo secret; deploys use the
+# `vercel pull → build --prod → deploy --prebuilt` flow, and `vercel
+# build` compiles vercel.json routing/headers into .vercel/output.
 on:
   push:
     branches: [main]
@@ -60,23 +74,53 @@ jobs:
       - name: Unit tests
         run: npm test
 
-      # Link the workspace to the Vercel project (the .vercel/ directory is
-      # gitignored; the CLI needs these two IDs to know where to deploy).
+      # Note: there is deliberately no standalone `npm run build` step here.
+      # The artifact-level gates (sitemap, prerender, preload injection, SW
+      # stamp, verify-artifacts — the full buildCommand) run inside every
+      # deployment path that can produce an artifact: the Vercel Git
+      # integration's build (a failed gate fails its deployment, which the
+      # guard below detects and answers with a CLI fallback) and this
+      # workflow's own `vercel build --prod`. What this workflow always owns
+      # for every push: source gates (typecheck/lint/tests above) + the live
+      # production smoke tests below.
+
+      # Ask the GitHub deployments API whether the Vercel Git integration
+      # already deployed this exact SHA (it starts at push time, the gates
+      # above have taken ~5 minutes, so it is usually terminal by now).
+      #   skip   → integration deployed; this workflow goes straight to smoke
+      #   deploy → integration failed/absent; CLI prebuilt deploy below
+      # Fails open (API trouble → deploy): degradation is a duplicate
+      # deployment, never a missing one.
+      - name: Deploy guard — did the Git integration already ship this SHA?
+        id: guard
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node scripts/deploy-guard.mjs \
+            --repo "${{ github.repository }}" \
+            --sha "${{ github.sha }}" \
+            --token "$GITHUB_TOKEN" \
+            --wait-minutes 6
+
       - name: Link Vercel project
+        if: steps.guard.outputs.should-deploy == 'true'
         run: |
           mkdir -p .vercel
           printf '{"projectId":"%s","orgId":"%s"}\n' \
             "$VERCEL_PROJECT_ID" "$VERCEL_ORG_ID" > .vercel/project.json
 
       - name: Pull project settings
+        if: steps.guard.outputs.should-deploy == 'true'
         run: npx --yes vercel@latest pull --yes --environment=production --token "$VERCEL_TOKEN"
 
       # Static export + service-worker version stamp, then the routing and
       # header rules from vercel.json are compiled into .vercel/output.
       - name: Build (prebuilt)
+        if: steps.guard.outputs.should-deploy == 'true'
         run: npx --yes vercel@latest build --prod --token "$VERCEL_TOKEN"
 
       - name: Deploy to Vercel
+        if: steps.guard.outputs.should-deploy == 'true'
         id: deploy
         run: |
           url=$(npx --yes vercel@latest deploy --prebuilt --prod --token "$VERCEL_TOKEN" 2>&1 | tail -n 20 | grep -oE 'https://[a-z0-9-]+\.vercel\.app' | head -n 1)
@@ -89,8 +133,11 @@ jobs:
 
       # Raw deployment URLs are behind Vercel Authentication on Hobby — only
       # the project's assigned production domain (and custom domains) are
-      # public. Smoke-test the production alias, which reflects the build that
-      # was just promoted.
+      # public. Smoke-test BOTH public surfaces: the production alias (which
+      # reflects whichever deployment was promoted last) and the canonical
+      # domain real users type. The routing contract assertions (real 404s,
+      # prerendered sections) run against the alias; the canonical domain gets
+      # the availability + PWA + security-header checks.
       - name: Smoke-test the production alias
         env:
           URL: https://keja-ai-rho.vercel.app
@@ -132,4 +179,29 @@ jobs:
             || { echo "finance shell lost its title"; fail=1; }
           echo "$finance_html" | grep -qi 'name="robots" content="noindex"' \
             || { echo "finance shell is not noindexed"; fail=1; }
-          if [ "$fail" = 0 ]; then echo "Smoke test PASSED — production is live."; else echo "Smoke test FAILED"; exit 1; fi
+          if [ "$fail" = 0 ]; then echo "Smoke test PASSED — production alias is live."; else echo "Smoke test FAILED"; exit 1; fi
+
+      # The canonical domain is what real users type; it must serve the same
+      # deployment the alias does (DNS at Spaceship → Vercel anycast).
+      - name: Smoke-test the canonical domain (keja.app)
+        run: |
+          fail=0
+          for attempt in 1 2 3 4 5; do
+            code=$(curl -s --max-time 30 -o /dev/null -w "%{http_code}" "https://keja.app/" || echo 000)
+            echo "attempt $attempt: GET https://keja.app/ -> $code"
+            [ "$code" = "200" ] && break
+            sleep 15
+          done
+          [ "$code" = "200" ] || { echo "keja.app did not return 200"; fail=1; }
+          headers=$(curl -sI --max-time 30 "https://keja.app/sw.js" || true)
+          echo "$headers" | grep -qi "^cache-control: public, max-age=0, must-revalidate" \
+            && echo "keja.app /sw.js cache-control -> OK" || { echo "keja.app /sw.js cache-control -> FAIL"; fail=1; }
+          echo "$headers" | grep -qi "^x-frame-options: DENY" \
+            && echo "keja.app /sw.js security hdrs -> OK" || { echo "keja.app /sw.js security hdrs -> FAIL"; fail=1; }
+          code=$(curl -s --max-time 30 -o /dev/null -w "%{http_code}" "https://keja.app/manifest.webmanifest" || echo 000)
+          echo "keja.app /manifest.webmanifest -> $code"; [ "$code" = "200" ] || fail=1
+          # real 404s on the canonical domain too (the routing contract must
+          # hold where users actually land, not only on the alias)
+          code=$(curl -s --max-time 30 -o /dev/null -w "%{http_code}" "https://keja.app/__smoke_deep_link__" || echo 000)
+          echo "keja.app unknown path -> $code (expect 404)"; [ "$code" = "404" ] || fail=1
+          if [ "$fail" = 0 ]; then echo "Canonical domain smoke PASSED."; else echo "Canonical domain smoke FAILED"; exit 1; fi

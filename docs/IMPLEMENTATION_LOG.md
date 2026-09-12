@@ -747,3 +747,73 @@ TOTP necessity (server-side custody is the Phase-2 milestone); the throttle
 state is client-side like all demo state; zod's default key-stripping means
 future `UserListing` fields must be added to the schema (drift-barrier by
 design, pinned by round-trip tests).
+
+## Wave 11 — The Delivery Pipeline Gets Gates (2026-09-12)
+
+**Cycle:** observe (repo + CI + live + forensics) → identify (5 impact-ranked
+defects in how code reaches production) → plan → implement → verify → record.
+
+**IMP-010 — Bot data shipped to production without the unit-test gate.**
+The Auto-Pilot commits with GITHUB_TOKEN, which can never trigger
+`deploy-vercel.yml` (GitHub recursion-prevention) — verified live: commit
+`1e4f473` (00:11 UTC ingest) has **zero** workflow runs, yet its listings
+were live on keja.app 37 s later via the Vercel Git integration. The
+autopilot's verify job ran typecheck + lint + `next build` but **not
+`npm test`** — the data-integrity suite is the designed defense against bad
+bot data. The verify job now runs the full gate chain (tests + complete
+build incl. artifact verification), and a guarded `revert-if-broken` job
+undoes the ingest commit if the gate fails — only when HEAD is still the
+ingest commit; a diverged main fails loudly instead of reverting the wrong
+thing. The revert push is redeployed by the Git integration: the
+marketplace self-heals to the last good state within minutes.
+
+**IMP-011 — Every PAT push double-deployed; the docs described a deploy
+architecture that no longer existed.** Deployment forensics (GitHub
+deployments API): `vercel[bot]` production deployments exist for every
+commit since `99f8eee` (2026-09-11 09:19) — the Git integration is
+connected, contradicting the "no GitHub integration" claim in
+`deploy-vercel.yml`, `DEPLOYMENT.md` and `CURRENT_PICTURE.md`. Regular
+pushes built and promoted TWICE (integration + CLI, racing the alias).
+New `scripts/deploy-guard.mjs` (unit-tested decision table + polling +
+fail-open semantics): the workflow skips its CLI deploy when the
+integration already shipped the exact SHA, retries via CLI when it failed
+or is absent, and fails OPEN on API errors — degradation is duplication,
+never a missing deploy. The workflow keeps what the integration lacks:
+source gates and the post-deploy smoke tests (now against both the alias
+and keja.app). Docs rewritten to the verified two-path reality.
+
+**IMP-012 — The canonical domain was optional in monitoring; stale
+production was invisible.** `production-check.yml` required only the
+vercel alias (keja.app was `required: false` behind a stale "needs DNS
+switch" note — the switch happened 2026-09-10). A keja.app-only outage
+passed silently; so did a failed deployment (the alias keeps serving the
+last good build — healthy-looking and stale). Fixed: both URLs required;
+the deploy smoke gained a keja.app leg; the hourly check gained a
+**freshness assertion** — the newest committed listing must be live on
+keja.app (prerendered page, one 300 s retry for the mid-deploy window).
+
+**IMP-013 — Serial boot waterfall; entry over the 500 kB audit line.**
+Measured: entry 507 kB raw → execute → zod (274 kB) + shell carrying the
+entire 87-listing inventory (336 kB) → execute → paint. New
+`scripts/inject-preloads.mjs` (13 tests, byte-verified webpack runtime
+shapes: inline special cases, paren-wrapped hash map, named-base ids)
+injects preload hints for the exact boot-time dynamic chunks into the HTML
+template before the prerender clones it — the browser now fetches shell
+chunks in parallel with entry execution. `verify-artifacts.mjs` asserts
+the hints exist and resolve, and enforces an entry-JS budget ratchet
+(525 kB; tighten to 500 kB after the planned inventory data-split —
+CURRENT_PICTURE §8.5 has the measured plan).
+
+**Verification:** 404 tests / 31 files (26 new) · typecheck clean · lint
+clean · full build + artifact verification PASSED (118 static pages, 111
+sitemap URLs, 2 preloads, 507 kB ≤ 525 kB) · live walkthrough clean (home,
+NL search "2BR Kilimani under 15M" → 2 results, listing detail, Ask Keja
+escalation, account — zero console errors, no 390 px overflow) · all four
+workflow YAMLs validated.
+
+**Remaining risks:** the deploy guard trusts the GitHub deployments API —
+if the integration is silently disconnected, autopilot pushes stop
+deploying and the freshness assertion (hourly) becomes the only alarm;
+the auto-revert acts within ~5 minutes of a bad ingest (the data is live
+briefly before the revert lands); preload hints warm the cache but do not
+reduce bytes (the data-split remains the real fix, tracked in §8).

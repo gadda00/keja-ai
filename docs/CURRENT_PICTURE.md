@@ -15,11 +15,8 @@ This is the honest, complete picture after: (1) the Phase-1 build (Aug–Sep 202
 | Repo | https://github.com/gadda00/keja-ai | `main` = production, every push deploys |
 | Native shells | `android/`, `ios/` (Capacitor 8) | buildable via `npm run mobile:apk` / `mobile:ios` |
 
-- Hosting is **Vercel** (project `keja-ai`, API-driven deploys from GitHub Actions — the account has no GitHub app integration; the `VERCEL_TOKEN` secret + prebuilt-deploy pattern is the runbook in `docs/DEPLOYMENT.md`).
-- The Netlify configuration is fully retired; the keja.app domain points at Vercel's nameservers.
-- Build output: static export (`out/`, 95 prerendered pages + 111 sitemap URLs at last build) behind a SPA rewrite, with per-path cache/security headers from `vercel.json`.
-- `/.well-known/assetlinks.json` and `/.well-known/apple-app-site-association` now serve **valid JSON** with `application/json` headers (previously the SPA rewrite answered them with HTML + HTTP 200). They carry empty statements until release signing keys exist — then `scripts/generate-assetlinks.mjs` fills in the real fingerprints.
-- Monitoring: hourly `production-check.yml` smoke test (availability, `sw.js` cache headers, manifest, security headers) plus a post-deploy smoke test inside `deploy-vercel.yml`.
+- **Deployment reality (verified 2026-09-12):** the **Vercel Git integration is connected** and deploys every push to `main` — including the Auto-Pilot's GITHUB_TOKEN pushes (which can never trigger workflows). The CLI workflow (`deploy-vercel.yml`) is the gated second path: source gates for human pushes, a deploy guard that skips its own CLI deploy when the integration already shipped the SHA and falls back to the CLI when it did not, and the post-deploy smoke tests. Details and evidence: `docs/DEPLOYMENT.md` §1/§3.
+- Monitoring: hourly `production-check.yml` smoke test of **both** `keja.app` (required) and the production alias — availability, `sw.js` cache headers, manifest, security headers — **plus a freshness assertion**: the newest committed listing must be live on the canonical domain, so a failed deployment (stale-but-healthy production) goes red within the hour.
 
 ## 2. What Phase 2 shipped
 
@@ -134,6 +131,12 @@ The audit's Ch. 22 demanded a real test suite before any LLM work. `npm test` ru
 - **Validated reads for every-visitor stores.** `useValidatedStore` (`store.ts`) puts zod schemas at the localStorage read seam for favorites, compare, chat-history, saved-searches, notifications and user-listings — invalid roots fall back, junk array elements drop element-wise, repairs persist, function-updaters seed from the validated value. The stale `ChatMessage.meta: string[]` was corrected to the real gateway shape (meta/sources/action).
 - **Gates:** 378 tests across 29 files (52 new: throttle policy + format/lockout integration, recovery hashing + migration, the listing gate, store corruption resilience + schema round-trips) · typecheck + lint clean · artifact verification green (118 pages).
 
+### 4.12 Wave-11 additions (delivery pipeline: the marketplace ships itself — now with gates)
+
+- **The delivery pipeline was audited end-to-end and corrected to reality.** Forensic evidence (GitHub Actions runs + deployments API): the **Vercel Git integration deploys every push to main** — including the Auto-Pilot's GITHUB_TOKEN pushes, which can never trigger `deploy-vercel.yml` (GitHub recursion-prevention). Three consequences were fixed: (1) the docs claimed no integration existed while every PAT push double-deployed (integration + CLI racing the alias) — `deploy-vercel.yml` now runs a **deploy guard** (`scripts/deploy-guard.mjs`, unit-tested) that skips its own CLI deploy when the integration already shipped the exact SHA and falls back to the CLI when it failed or is absent (fails open); (2) **bot data reached production having never been unit-tested** — the Auto-Pilot's verify job ran typecheck+lint+build but NOT `npm test` (the data-integrity suite is the designed defense against bad bot listings); it now runs the full gate suite, and a guarded **revert-if-broken** job undoes the ingest commit when the gate fails (only if it is still HEAD) so the integration restores production to the last good state; (3) the hourly production check treated the **canonical domain `keja.app` as optional** (stale "needs DNS switch" note — the switch happened 2026-09-10) — both URLs are now required, and the check gained a **freshness assertion** (the newest committed listing must be live on keja.app, so a failed deployment — stale-but-healthy production — goes red within the hour).
+- **Boot waterfall parallelized + entry budget enforced.** The critical first-paint chain was serial: entry scripts (507 kB raw) → execute → zod (274 kB) + shell-with-all-87-listings (336 kB) → execute → paint — ~1.12 MB raw / ~350 kB gz before first paint, with the entry over the 500 kB audit line (wave 7 had it at 491 kB). The build now injects `<link rel="preload" as="script">` hints for the exact chunks the boot-time dynamic import needs (`scripts/inject-preloads.mjs`, walks the webpack runtime's own chunk map; 26 tests pin the extraction), and `verify-artifacts.mjs` enforces both the hints' existence/resolvability and an **entry-JS budget ratchet** (525 kB today, 500 kB after the data-split) so the next regression fails the build instead of compounding.
+- **Gates:** 404 tests / 31 files (26 new: deploy-guard decision table + fail-open polling semantics, webpack chunk-map extraction incl. the named-base and paren-wrapped map forms, preload dedup/idempotency) · typecheck + lint clean · artifact verification green (118 pages, preloads verified, 507 kB ≤ 525 kB budget) · live walkthrough clean (home, search, listing detail, Ask Keja escalation, account — zero console errors, no 390 px overflow).
+
 ## 5. Architecture — current state
 
 - **Shape:** Next.js 16 App Router mounting a single-route client SPA (`/` + hash deep links) — one codebase serves the Vercel CDN and the Capacitor shells, works offline via the service worker. React 19, TypeScript strict, Tailwind 4, Radix/shadcn primitives (trimmed to what is used), recharts, Leaflet.
@@ -146,10 +149,11 @@ The audit's Ch. 22 demanded a real test suite before any LLM work. `npm test` ru
 
 | Workflow | Trigger | What it does |
 | --- | --- | --- |
-| `pr-check.yml` | PRs + non-main pushes | bun frozen install → typecheck → lint → **unit tests** → static build |
-| `deploy-vercel.yml` | push to `main` | same gates → `vercel build --prod` → prebuilt deploy → smoke-test the production alias |
-| `auto-listings.yml` | 6-hour cron | ingest → quality gates → commit (triggers deploy) |
-| `production-check.yml` | hourly | live smoke test: `/`, `sw.js` headers, manifest, security headers |
+| `pr-check.yml` | PRs + non-main pushes | bun frozen install → typecheck → lint → **unit tests** → static build (incl. artifact verification) |
+| `deploy-vercel.yml` | push to `main` (PAT pushes — GITHUB_TOKEN pushes cannot trigger it) | source gates (typecheck/lint/tests) → **deploy guard**: skip the CLI deploy when the Vercel Git integration already shipped the SHA, else CLI prebuilt deploy → smoke-test the alias + `keja.app` |
+| `auto-listings.yml` | 6-hour cron | ingest → quality gates → commit (deploys via the Git integration) → **verify job: full gate suite on the committed data** → **guarded auto-revert** if the gate fails |
+| `production-check.yml` | hourly | live smoke of `keja.app` **(required)** + the alias — availability, headers, manifest — **plus freshness**: the newest committed listing must be live |
+| *Vercel Git integration* | every push (incl. autopilot) | builds `vercel.json`'s buildCommand (full gate chain incl. `verify-artifacts.mjs`) and promotes production ~1 min after push |
 
 ## 7. Honest limitations (unchanged from the audit, by design)
 
@@ -165,5 +169,6 @@ The audit's Ch. 22 demanded a real test suite before any LLM work. `npm test` ru
 2. M-Pesa sandbox behind a PSP, gated on licensing as much as code.
 3. Turn the hourly production check into the operational baseline; add error telemetry when the backend exists.
 4. Keep the audit's honesty standard: every new capability enters the claims register with a status and evidence before it ships.
+5. **Inventory data-split (performance, wave-11 evidence):** the KejaApp shell chunk (336 kB) statically carries the **entire 87-listing inventory** (auto-listings JSON 180 kB + authored properties 68 kB, minified into the chunk that `Home` eagerly imports), and zod (274 kB) rides along because `auth.tsx` needs it at shell init — ~1.12 MB raw / ~350 kB gzip of critical JS before first paint on a mobile-first audience. The wave-11 preload hints cut the *serial discovery* (chunks now fetch in parallel with entry execution) but the *bytes* remain. The fix is architectural: split the inventory into a small home-page subset (featured picks + precomputed stats) and a lazily-imported full dataset for `/properties`, `/compare`, and detail routes — then tighten the entry budget ratchet in `verify-artifacts.mjs` from 525 kB back to the audit line of 500 kB. Measure before/after with a real headless first-load capture.
 
 *The full findings, scoring and sequencing live in `scripts/phase2_audit/final.pdf`; the document suite (deployment runbook, Google Sign-In activation, strategy, marketing, partner proposals, operator site guide) is under `docs/`.*

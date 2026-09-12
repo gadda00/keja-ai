@@ -9,12 +9,13 @@
 | Layer | What runs it | Notes |
 |---|---|---|
 | Hosting / CDN | Vercel edge network | Static export — no server functions |
-| Build & deploy | GitHub Actions → `vercel` CLI prebuilt deploys | `.github/workflows/deploy-vercel.yml` on every push to `main` |
-| Production URLs | **`keja-ai-rho.vercel.app`** (public) · `keja-ai-victors-projects-37d86841.vercel.app` (team alias — behind Vercel Authentication on Hobby) | keja.app attaches via DNS (§4) |
+| Build & deploy — **primary** | **Vercel Git integration** (`vercel[bot]`) | Builds & promotes every push to main within ~1 min — including the Auto-Pilot's GITHUB_TOKEN pushes (which can never trigger workflows). Verified live 2026-09-12 (see below) |
+| Build & deploy — **fallback** | GitHub Actions → `vercel` CLI prebuilt deploys | `.github/workflows/deploy-vercel.yml` — gates + smoke for human pushes; skips its own deploy when the integration already shipped the SHA (deploy-guard), falls back to the CLI when it did not |
+| Production URLs | **`keja-ai-rho.vercel.app`** (public) · **`keja.app`** (canonical — required in the hourly check) | keja.app attaches via DNS (§4) |
 | Install | `bun install --frozen-lockfile` | Lockfile is `bun.lock` — never `npm ci` |
-| Build command | `NEXT_STATIC=1 npx next build && node scripts/sw-version.mjs` | Emits `out/` + stamps the service-worker cache version |
+| Build command | `npx next build --webpack && node scripts/inject-preloads.mjs && bun scripts/generate-sitemap.mjs && bun scripts/prerender.ts && node scripts/sw-version.mjs && node scripts/verify-artifacts.mjs` | Emits `out/` + boot preloads + sitemap/prerender + SW stamp + artifact verification (same command on both deploy paths) |
 | Runtime | 100% client-side SPA | Hash routing (`#/properties/KJA-001`), localStorage, offline shell |
-| Routing / headers | `vercel.json` | SPA rewrite, cache policy, security headers |
+| Routing / headers | `vercel.json` | Cache policy, security headers (rewrites removed 2026-09-12 — filesystem wins) |
 | Domains | `keja.app` (primary) + `www.keja.app` (308 → apex) | DNS hosted at Spaceship |
 
 The project deliberately uses the **static builder** (`"framework": null` in `vercel.json`)
@@ -22,23 +23,40 @@ rather than the Next.js framework preset: the app is a static export, and the st
 gives deterministic, first-class control of `vercel.json` rewrites and headers. Project-level
 settings in the Vercel dashboard mirror `vercel.json` — keep the two in sync if either changes.
 
-**Why CLI deploys, not the Vercel Git integration:** the Vercel account
-(`victors-projects-37d86841`) has no GitHub account connected — the GitHub link lives on a
-second Vercel login (the same identity that holds the `keja-ai.vercel.app` alias and held
-the Netlify keja.app claim). The GitHub Actions workflow therefore builds the static export
-and ships it with `vercel pull → build --prod → deploy --prebuilt --prod`, authenticated by
-the `VERCEL_TOKEN` repo secret. `vercel build` compiles `vercel.json` (rewrites + headers)
-into `.vercel/output/config.json`, so the deployed routing is exactly what the repo declares.
-If the GitHub App is ever connected to this Vercel account, the workflow can be dropped in
-favour of automatic Git deploys.
+**Two deploy paths, verified 2026-09-12 (was previously believed to be one):**
+the Vercel **Git integration is connected** to this repo and deploys every
+push to `main` — the historical comment below was wrong by then, and every
+PAT push was double-deploying (integration + CLI). Evidence: commit
+`1e4f473` (Auto-Pilot, GITHUB_TOKEN, 00:11 UTC) has **zero** workflow runs —
+GitHub's recursion-prevention rule — yet `vercel[bot]` deployed it 37 s
+later and its listings went live on keja.app. The workflow now checks the
+GitHub deployments API (`scripts/deploy-guard.mjs`) before deploying:
+
+- **integration deployed this SHA** → the CLI deploy is skipped (gates +
+  smoke still run — the integration has neither);
+- **integration failed or is absent** → the CLI prebuilt flow runs as before
+  (`vercel pull → build --prod → deploy --prebuilt --prod`, authenticated by
+  the `VERCEL_TOKEN` repo secret), keeping the deploy pipeline alive even
+  if the integration is ever disconnected;
+- API trouble fails **open** (duplicate deploy), never closed.
+
+`vercel build` compiles `vercel.json` (headers + routing) into
+`.vercel/output/config.json`, so the deployed routing is exactly what the
+repo declares. If the Git integration is ever *disconnected*, the workflow
+quietly becomes the only deploy path again — for the Auto-Pilot that would
+be a gap (its GITHUB_TOKEN pushes cannot trigger workflows), covered by the
+hourly production check's freshness assertion (see §3).
 
 ## 2. vercel.json — what each block does
 
-- **`rewrites`** — `/(.*) → /index.html`: the SPA fallback (parity with the old Netlify
-  `/* /index.html 200` rule). Vercel checks the filesystem first, so real assets
-  (`/sw.js`, `/manifest.json`, `/icons/*`, hashed build files) are served directly;
-  only unmatched paths fall through to the app shell. Unknown hash routes render the
-  in-app 404 view.
+- **`rewrites`** — **empty since 2026-09-12** (wave 8). The old catch-all
+  `/(.*) → /index.html` rewrite answered every unknown path with HTTP 200 +
+  the home shell (soft-404s across an infinite URL space). Now the 8
+  app-workspace sections are prerendered as noindexed shells, every public
+  route is a real file, and unknown paths fall through to `out/404.html` —
+  a real 404. Vercel serves the filesystem first, so assets
+  (`/sw.js`, `/manifest.webmanifest`, `/icons/*`, hashed build files) are
+  unaffected.
 - **`headers`** — mirrors the old `public/_headers` exactly, plus HSTS:
   - `/sw.js` → `Cache-Control: public, max-age=0, must-revalidate` (the service worker
     must never be edge-cached, or updates take up to a day to reach installed clients);
@@ -53,16 +71,35 @@ favour of automatic Git deploys.
 ## 3. Deploy pipeline
 
 1. Push to `main` (human or Auto-Pilot cron commit).
-2. `.github/workflows/deploy-vercel.yml` runs the quality gates (typecheck + lint), then
-   `bun install --frozen-lockfile`, then the Vercel CLI prebuilt flow:
-   `vercel pull` (fetch project settings) → `vercel build --prod` (runs the static build +
-   SW stamp, compiles `vercel.json` routing) → `vercel deploy --prebuilt --prod`
-   (uploads the bundle — unchanged files are skipped via content hashing).
-3. The workflow prints the deployment URL and smoke-tests the public production alias
-   (`keja-ai-rho.vercel.app`): HTTP 200, manifest, `sw.js` no-cache header, security
-   headers. (Raw deployment URLs are Vercel-auth-gated on Hobby — never test those.)
-4. `.github/workflows/production-check.yml` re-runs that smoke test hourly against the
-   production alias.
+2. The **Vercel Git integration** starts building at once (~1 min start,
+   ~4 min total) and promotes a production deployment on success. Its
+   `buildCommand` (from `vercel.json`) runs the full gate chain — sitemap,
+   prerender, preload injection, SW stamp, `verify-artifacts.mjs` — so a
+   failed gate fails the deployment and the alias stays on the last good
+   build.
+3. `deploy-vercel.yml` (PAT pushes only — GITHUB_TOKEN pushes cannot trigger
+   it) runs the source gates (typecheck → lint → **unit tests**), then the
+   deploy guard: skip its CLI deploy if the integration already shipped the
+   SHA; otherwise `vercel pull` (fetch project settings) → `vercel build
+   --prod` (runs the static build + SW stamp, compiles `vercel.json`
+   routing) → `vercel deploy --prebuilt --prod` (uploads the bundle —
+   unchanged files are skipped via content hashing).
+4. The workflow then smoke-tests **both** public surfaces — the production
+   alias (full routing contract: real 404s, prerendered sections, noindexed
+   app shells) and the canonical `keja.app` (availability, PWA, headers,
+   real 404s). Raw deployment URLs are Vercel-auth-gated on Hobby — never
+   test those.
+5. For Auto-Pilot pushes: `auto-listings.yml`'s **verify** job runs the full
+   gate suite against the committed data (unit tests — including the
+   data-integrity checks over every bot listing — plus the complete build).
+   If it fails, the guarded **revert-if-broken** job undoes the ingest commit
+   (only if it is still HEAD), which the integration redeploys — production
+   self-heals to the last good state within minutes.
+6. `production-check.yml` re-runs the smoke hourly against **both** URLs
+   (both required), and — on the canonical domain — asserts **freshness**:
+   the newest committed listing must be live, so a stale production (failed
+   deployment, lost push) goes red within the hour instead of serving an
+   old build forever.
 
 One repo secret is required: `VERCEL_TOKEN` (a Vercel personal access token with deploy
 scope). The legacy `NETLIFY_AUTH_TOKEN` / `NETLIFY_SITE_ID` secrets were removed during the

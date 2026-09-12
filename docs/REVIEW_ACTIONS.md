@@ -147,3 +147,25 @@ fix is test-pinned; the four code fixes ship as one coherent change set.
 Evidence: 378 tests across 29 files (52 new); typecheck + lint clean; the
 full build passes artifact verification (118 static pages, 111 sitemap
 URLs); live smoke of keja.app green before and after.
+
+## 2026-09-12 — wave 11: the delivery pipeline gets gates (cycle 4)
+
+One observe→identify→plan→implement→verify cycle over **how code reaches
+production**, prompted by the Auto-Pilot's 00:11 UTC ingest shipping to
+keja.app with zero workflow runs against it. Forensic evidence (Actions
+runs API + deployments API) drove every fix. No app-runtime behaviour
+changed except additive preload hints.
+
+| Finding | Severity | What was done |
+| --- | --- | --- |
+| **Bot data reached production having never been unit-tested.** The Auto-Pilot pushes with GITHUB_TOKEN, which can never trigger `deploy-vercel.yml` (GitHub recursion-prevention) — its `1e4f473` commit had 0 workflow runs yet went live within 37 s. The autopilot's own `verify` job ran only typecheck + lint + `next build` — **not `npm test`**, i.e. not the data-integrity suite (every listing passes schema, every image path resolves, unique ids, sane prices) that exists precisely to police bot-written data. | P0 (data/quality) | The verify job now runs the full gate suite: typecheck → lint → **unit tests** → the complete `npm run build` (sitemap, prerender, preload injection, SW stamp, artifact verification — the same chain the deployment builds run). If it fails, the new **revert-if-broken** job `git revert`s the ingest commit — guarded: only if HEAD is still the ingest commit (a human push in between means history is left alone and the job fails loudly instead) — and the Vercel Git integration redeploys the last good state. The marketplace self-heals. |
+| **Every PAT push deployed twice** — the Vercel Git integration (connected, contra the documented "no GitHub integration" claim — `vercel[bot]` production deployments exist for every commit since `99f8eee`) AND the CLI workflow, racing the production alias and burning duplicate builds. | P1 (reliability) | New `scripts/deploy-guard.mjs` (13 unit tests: decision table, polling semantics, fail-open): the workflow asks the GitHub deployments API whether `vercel[bot]` already shipped the exact SHA; **skip** the CLI deploy when it succeeded, **fall back** to the CLI when it failed or is absent, **fail open** (duplicate deploy, never missing deploy) on API errors. Gates + the (now dual-URL) smoke test still run on every push — the integration has neither. |
+| **The canonical domain was optional in monitoring.** `production-check.yml` required only the vercel alias; `keja.app` was `required: false` behind a stale "needs DNS switch at Spaceship" note — the switch happened 2026-09-10 and keja.app is the domain real users type. A keja.app-only outage (DNS drift, domain re-verification, SSL) passed the hourly check silently. | P0 (monitoring) | `keja.app` is now `required: true` (the alias too, as the secondary surface), and the deploy smoke test gained a canonical-domain leg (availability, PWA, security headers, real 404s). |
+| **A failed deployment = stale-but-healthy production, and nothing noticed.** If the integration's build fails (e.g. bad data), the alias serves the last good build; the hourly smoke only checks "200 + headers" — it stayed green forever. | P1 (reliability) | The hourly check gained a **freshness assertion**: the newest listing in the committed repo data must exist as a live prerendered page on keja.app (one 300 s retry covers the mid-deploy window). Stale production goes red within the hour, with an error message that names the symptom and where to look. |
+| **Critical-JS boot waterfall + entry over the audit line.** Entry 507 kB raw (audit line 500 kB, wave-7 result 491 kB) discovered the shell chunks (zod 274 kB + shell-with-all-87-listings 336 kB) only after executing the entry — ~1.12 MB raw serial before first paint. | P1 (performance) | `scripts/inject-preloads.mjs` (13 tests): walks the webpack runtime's own chunk map (inline special cases, paren-wrapped hash map, named-base ids — byte-verified shapes) and injects `<link rel="preload" as="script">` for exactly the boot-time dynamic chunks into `out/index.html` **before** the prerender clones it; `verify-artifacts.mjs` now asserts the hints exist and resolve, and enforces an **entry-JS budget ratchet** (525 kB, tightening to 500 kB when the planned inventory data-split lands — CURRENT_PICTURE §8.5). |
+
+Evidence: 404 tests / 31 files (26 new) · typecheck + lint clean · artifact
+verification green (118 pages, 2 injected preloads, 507 kB ≤ 525 kB budget) ·
+live walkthrough clean (home, NL search, listing detail, Ask Keja escalation,
+account — zero console errors, no 390 px overflow) · all four workflow files
+YAML-validated.
