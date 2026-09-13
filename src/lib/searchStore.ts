@@ -5,7 +5,6 @@
 import { useCallback, useEffect } from 'react';
 
 import type { Property } from '@/data/properties';
-import { isRentalPrice } from '@/lib/finance';
 import { matchesFreeQuery, parseFreeQuery } from '@/lib/queryParser';
 import { KEYS, store, useValidatedStore } from '@/lib/store';
 import { notificationsSchema, savedSearchesSchema } from '@/lib/boundaries';
@@ -40,6 +39,14 @@ export interface Notification {
   href?: string;
   createdAt: string;
   read: boolean;
+}
+
+/** Known areas for free-query parsing inside matchers — derived from the
+ * live inventory (the same list the Properties page parses against), so a
+ * saved query like "2BR Kilimani under 15M" keeps its area structure when
+ * matched in a sweep instead of degrading to a substring scan. */
+export function inventoryAreas(properties: Property[]): string[] {
+  return [...new Set(properties.map((p) => p.area))];
 }
 
 /* Approximate area coordinates (Kenya) — powers the stylized map view. */
@@ -106,43 +113,31 @@ export function useSavedSearches() {
   return { searches, save, remove, toggleAlerts };
 }
 
-/** True when the max-price filter sits at its ceiling (i.e. "Any"). */
-export const PRICE_CEILING = 100;
-export const RENT_CEILING = 200;
-
-/** Does a property satisfy a saved search? Mirrors Properties page filter logic. */
-export function matchesSearch(p: Property, f: SavedSearch['filters']): boolean {
-  const rentMode = f.purpose === 'rent';
+/** Does a property satisfy a saved search? Mirrors Properties page filter
+ * logic line-for-line — an alert must never fire on a listing the results
+ * page would not have shown when the search was saved.
+ *
+ * maxPrice is absolute KES (the slider's own units), matching the schema and
+ * the Properties page. previously it was interpreted in M/k units with
+ * ceiling checks at 100/200 — a saved 15M cap excluded everything (15 <
+ * 100 always at ceiling) while a 15k rent cap filtered sales in millions.
+ */
+export function matchesSearch(
+  p: Property,
+  f: SavedSearch['filters'],
+  knownAreas: string[] = [],
+): boolean {
   if (f.q) {
-    // Same free-query semantics as the results page (queryParser) — a saved
-    // search must alert on the same listings the user saw when saving it.
-    const pq = parseFreeQuery(f.q, []);
+    // Same free-query semantics as the results page (queryParser, with the
+    // same known-areas list) — a saved search must alert on the same
+    // listings the user saw when saving it.
+    const pq = parseFreeQuery(f.q, knownAreas);
     if (pq.raw && !matchesFreeQuery(p, pq)) return false;
   }
   if (f.type && f.type !== 'all' && p.type !== f.type) return false;
-  // Rent mode shows true rentals only (price IS the monthly rent) — mirrors
-  // the Properties page filter; sale-priced "also rentable" stock stays in
-  // the buy/invest modes.
-  if (f.purpose === 'rent' && !(p.purpose.includes('rent') && isRentalPrice(p.price))) return false;
-  if (f.purpose === 'buy' && !p.purpose.includes('buy')) return false;
-  if (f.purpose === 'invest' && !p.purpose.includes('invest')) return false;
+  if (f.purpose && f.purpose !== 'all' && !p.purpose.includes(f.purpose as Property['purpose'][number])) return false;
   if (f.area && f.area !== 'all' && p.area !== f.area) return false;
-  if (f.maxPrice != null) {
-    const atCeiling = f.maxPrice >= (rentMode ? RENT_CEILING : PRICE_CEILING);
-    if (!atCeiling) {
-      // Price-on-application listings carry no price — a cap cannot vouch
-      // for them, so they leave capped result sets (portal convention).
-      if (p.priceOnApplication) return false;
-      // Rent-mode caps apply to rentals (monthly KES k); sale-mode caps to
-      // sale listings (KES M). Rentals pass sale caps and vice-versa — the
-      // units are incomparable, so a cap in one scale never filters the other.
-      if (isRentalPrice(p.price)) {
-        if (rentMode && p.price > f.maxPrice * 1000) return false;
-      } else {
-        if (!rentMode && p.price > f.maxPrice * 1_000_000) return false;
-      }
-    }
-  }
+  if (f.maxPrice != null && p.price > f.maxPrice && !p.priceOnApplication) return false;
   if (f.minBeds && (p.bedrooms ?? 0) < f.minBeds) return false;
   if (f.verifiedOnly && p.trustScore < VERIFIED_TRUST_FLOOR) return false;
   return true;
@@ -156,10 +151,21 @@ export function runAlertSweep(properties: Property[]) {
   const searches: SavedSearch[] = store.get<SavedSearch[]>(KEYS.searches, []);
   const active = searches.filter((s) => s.alerts);
   if (!active.length) return;
-  const notifs: Notification[] = store.get<Notification[]>(KEYS.notifications, []);
+  // raw reads inside the sweep go through the same schemas the hooks use —
+  // a corrupted payload falls back to empty instead of throwing inside the
+  // sweep's timeout (silent failure: no alerts, no seenIds persistence).
+  const parsed = savedSearchesSchema.safeParse(searches);
+  const safeSearches = parsed.success ? parsed.data : [];
+  const activeSearches = safeSearches.filter((s) => s.alerts);
+  if (!activeSearches.length) return;
+  const areas = inventoryAreas(properties);
+  const notifsParsed = notificationsSchema.safeParse(store.get<Notification[]>(KEYS.notifications, []));
+  const notifs: Notification[] = notifsParsed.success ? notifsParsed.data : [];
   let added = false;
-  for (const s of active) {
-    const hits = properties.filter((p) => matchesSearch(p, s.filters) && !s.seenIds.includes(p.id));
+  for (const s of activeSearches) {
+    const hits = properties.filter(
+      (p) => matchesSearch(p, s.filters, areas) && !s.seenIds.includes(p.id),
+    );
     if (!hits.length) continue;
     s.seenIds = [...s.seenIds, ...hits.map((p) => p.id)].slice(-200);
     for (const p of hits.slice(0, 3)) {
@@ -176,7 +182,7 @@ export function runAlertSweep(properties: Property[]) {
     added = true;
   }
   if (added) {
-    store.set(KEYS.searches, searches);
+    store.set(KEYS.searches, safeSearches);
     store.set(KEYS.notifications, notifs.slice(0, 50));
   }
 }

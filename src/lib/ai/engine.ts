@@ -594,7 +594,7 @@ export class KejaAI {
     // Admin console
     if (/(admin|console|back ?office|moderation|review queue|who reviews)/.test(t)) {
       return {
-        text: 'The **Admin Console** is the operating layer of the platform — restricted to administrator accounts:\n\n• **Overview** — KPIs, funnel, supply health\n• **Users** — role-based access management (admin / agent / user)\n• **Listings** — verification queue with anomaly flags, completeness scores and user issue reports\n• **Leads** — HOT/WARM/COLD CRM pipeline\n• **Partners & Feeds** — applications, feed connections, sync operations\n• **Audit Trail** — every critical action, recorded\n• **Settings** — review SLA, auto-approve thresholds, maintenance mode\n\nIt opens from the sign-in modal — the demo credentials are listed right there on the dialog.',
+        text: 'The **Admin Console** is the operating layer of the platform — restricted to administrator accounts:\n\n• **Overview** — KPIs, funnel, supply health\n• **Users** — role-based access management (admin / agent / user)\n• **Listings** — verification queue with anomaly flags, completeness scores and user issue reports\n• **Leads** — HOT/WARM/COLD CRM pipeline\n• **Partners & Feeds** — applications, feed connections, sync operations\n• **Audit Trail** — every critical action, recorded\n• **Settings** — review SLA, auto-approve thresholds, maintenance mode\n\nAccess is Google sign-in with an administrator-role account, plus a per-session two-factor code — there are no demo credentials; roles are allowlisted when the account is provisioned.',
         meta: [
           { label: 'FACT', text: 'RBAC-gated console; audit trail per security architecture' },
         ],

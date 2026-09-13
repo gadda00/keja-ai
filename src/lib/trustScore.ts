@@ -126,6 +126,7 @@ function yieldFactors(p: Property, area: string) {
 export function trustScore(p: Property): TrustScoreResult {
   const area = p.area;
   const profile = AREA_PROFILE[area] ?? AREA_PROFILE.default;
+  const agencyKnown = p.agency in AGENCY_CREDIBILITY;
   const agencyCred = AGENCY_CREDIBILITY[p.agency] ?? 74;
   const pricing = pricingScore(p);
   const documentation = documentationScore(p);
@@ -241,8 +242,14 @@ export function trustScore(p: Property): TrustScoreResult {
       label: 'Agent / Developer Credibility',
       score: agencyCred,
       weight: 0.07,
-      basis: 'FACT',
-      note: `${p.agency} — platform-verified agency track record.`,
+      // Only the curated agency table is platform-verified track record
+      // (FACT); auto-ingested and wizard listings carry agency names the
+      // platform has never verified — those default to an ESTIMATE band,
+      // same FACT-mislabel fix the Investment Score got in wave 12.
+      basis: agencyKnown ? 'FACT' : 'ESTIMATE',
+      note: agencyKnown
+        ? `${p.agency} — platform-verified agency track record.`
+        : `${p.agency} — not yet on the platform's verified-agency record; provisional band pending track record.`,
     },
     {
       key: 'liquidity',

@@ -122,10 +122,19 @@ export function analyzeDeal(input: DealInput): DealAnalysis {
   const band = areaPricePerSqm(area);
   const annualExpenses = input.annualExpenses ?? Math.round(monthlyRentEstimate * 12 * 0.28);
 
-  // 1 — Market value estimate (ESTIMATE label).
-  const estimatedMarketValue = band ? Math.round(band.mid * sizeSqm) : Math.round(askingPrice * 0.97);
+  // 1 — Market value estimate (ESTIMATE label). A cleared size field yields
+  // sizeSqm 0 (HTML min is non-blocking) and estimatedMarketValue 0, which
+  // previously divided into Infinity here and rendered "Infinity%" flags.
+  const estimatedMarketValue =
+    band && sizeSqm > 0
+      ? Math.round(band.mid * sizeSqm)
+      : askingPrice > 0
+        ? Math.round(askingPrice * 0.97)
+        : 0;
   const priceDifferencePct =
-    askingPrice > 0 ? ((askingPrice - estimatedMarketValue) / estimatedMarketValue) * 100 : 0;
+    askingPrice > 0 && estimatedMarketValue > 0
+      ? ((askingPrice - estimatedMarketValue) / estimatedMarketValue) * 100
+      : 0;
 
   // 2 — Yields.
   const annualGross = monthlyRentEstimate * 12;

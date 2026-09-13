@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { NotificationsBell } from '@/components/shell/NotificationsBell';
 import { Link, useRouter } from '@/lib/router';
 import { ECOSYSTEM, PORTALS } from '@/lib/ecosystem';
 import { LANGUAGES, useI18n } from '@/lib/i18n';
@@ -281,6 +282,7 @@ export function Navbar() {
           >
             <Search className="h-4 w-4" />
           </Link>
+          <NotificationsBell />
           <LanguageSwitcher />
           <ThemeToggle />
           <Button

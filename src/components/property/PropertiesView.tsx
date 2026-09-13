@@ -23,7 +23,8 @@ import { CompareBar, useCompare } from '@/components/property/CompareBar';
 import MapPanel from '@/components/property/MapPanel';
 import { navigate, useRouter } from '@/lib/router';
 import { useFavorites } from '@/lib/store';
-import { useSavedSearches } from '@/lib/searchStore';
+import { useSavedSearches, VERIFIED_TRUST_FLOOR } from '@/lib/searchStore';
+import { formatKES } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 type SortKey = 'trust' | 'price-asc' | 'price-desc' | 'newest' | 'yield';
@@ -112,11 +113,18 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
   }, [q, resultCount]);
 
   const saveSearch = () => {
+    // Persist the FULL active filter set, not just q/area/type/purpose —
+    // a user who drags "Max 15M", "2+ beds" or "Verified only" and saves
+    // expects alerts on exactly what the results page showed. maxPrice is
+    // absolute KES (the slider's units; matchesSearch compares 1:1).
     const label = [
       q.trim() || 'All areas',
       area !== 'all' ? area : null,
       type !== 'all' ? type : null,
       purpose !== 'all' ? purpose : null,
+      maxPrice < MAX_PRICE ? `≤ ${formatKES(maxPrice)}` : null,
+      minTrust > 0 ? `Trust ${minTrust}+` : null,
+      beds !== 'any' ? `${beds}+ beds` : null,
     ]
       .filter(Boolean)
       .join(' · ');
@@ -126,6 +134,10 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
         area: area !== 'all' ? area : undefined,
         type: type !== 'all' ? type : undefined,
         purpose: purpose !== 'all' ? purpose : undefined,
+        maxPrice: maxPrice < MAX_PRICE ? maxPrice : undefined,
+        minBeds: beds !== 'any' ? parseInt(beds, 10) : undefined,
+        verifiedOnly: minTrust >= VERIFIED_TRUST_FLOOR ? true : undefined,
+        sort,
       },
       label,
     );

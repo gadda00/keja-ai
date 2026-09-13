@@ -843,3 +843,75 @@ boot-time dynamic graph (≥150 kB — Next's built-in hint covers 6 kB, the
 shell graph 616 kB); and `tests/buildParity.test.ts` pins the two build
 definitions step-for-step so the drift cannot reappear silently (it also
 pins injection-before-prerender ordering and verification-last).
+
+**Wave 13 — Severed trust loops, dead alert machinery, and six claims that
+cited tests that did not exist (2026-09-13).** A fresh deep-review sweep
+(13 verified findings) found the honesty story broken in the places wave 12
+had not reached, plus severed wiring with all its infrastructure built and
+never mounted.
+
+**IMP-014 — The trust workflow's user-side correction loop was severed.**
+"Report an issue" on every listing's evidence panel tracked an analytics
+event and toasted a confirmation — but never created a report.
+`reportListing()` had zero callers, so the admin console's "Listing
+reports" KPI could only ever read zero while the Trust Center advertised
+the adjudication queue it fed. Fixed: a reason + detail dialog now files
+real reports (`PropertyDetailView` → `reportListing()`), with the admin
+queue receiving them (storage, resolution flow and analytics existed
+already — only the wiring was missing).
+
+**IMP-015 — The saved-search alert machinery was dead code.** The sweep,
+the notification store, the unread badge plumbing — none of it was
+mounted; no component ran it and no surface could display its output,
+while the Discover page promised "We'll alert you when matching listings
+arrive." A promise the app could not keep. Fixed: `NotificationsBell`
+runs `useAlertSweep` when the inventory settles and renders the bell
+popover (mark-read, dismiss, deep links); the sweep reads through the
+same zod schemas the hooks use; and the matcher now mirrors the results
+page line-for-line — full filter persistence (maxPrice in the slider's
+own absolute-KES units, beds, verified-only), the real known-areas list
+for free-query parsing, and no rent/sale unit split (the old M/k
+dual-scale made a saved 15M cap filter nothing).
+
+**IMP-016 — Wizard listings published with fabricated verification.** The
+supply wizard auto-published with `titleCheck: 'verified'`,
+`ardhisasaMatch: true` and a "Human-reviewed" signal at a 78–94 trust
+score — none of it true, and less honest than the bot path. Fixed:
+pending submissions now render `titleCheck: 'pending'`, no registry
+claim, a visible "Human review pending" signal and a capped score
+(base 66, ceiling 78); the admin console's Approve action upgrades the
+marketplace listing through the submission join — approval is a state
+change buyers can see.
+
+**IMP-017 — Six "live" claims cited unit tests that did not exist.** The
+stakeholder-tool claims (landlord-studio, tenant-hub, keja-pro,
+valuation-desk, developer-console, diaspora-hub) all said "covered by
+unit tests" while no test file imported their modules — ~3,200 lines of
+untested math. The pricing-anomaly claim cited an "admin anomaly sweep"
+that never runs at runtime. Fixed by making the register true, not by
+softening it: 96 new tests across six suites (arrears/statements,
+application validation/lease math, CMA/copywriter/viewings, valuation
+engine, timezone/remittance/PoA, feasibility/cashflow/sensitivity), a
+claims-test coherence guard that structurally prevents the drift class
+(register↔test-file imports), and the pricing-anomaly evidence corrected
+to name what actually runs (ingest pipeline + wizard boundary).
+
+**IMP-018 — Statefulness and copy defects.** Disabling 2FA left the
+account view showing "Enabled" (the 'totp' store-write triggered no
+re-render; a Turn-off button that could only fail) — enrolments are now
+provider state synced via both the store-change and storage events. The
+Deal Analyst rendered "Infinity%" on a cleared size field — the market
+value guard now covers it. Ask Keja advertised demo credentials retired
+on 2026-09-11 — copy corrected to the real flow. Unknown agencies were
+labelled FACT in the trust engine — now ESTIMATE with an honest note,
+completing wave 12's FACT-mislabel sweep.
+
+**Also this wave:** three Edition-2 documents (marketing playbook with
+live product screenshots, strategy, researched partner proposals — all on
+the shared PDF kit), and the product film rebuilt from real keja.app
+screenshots ("See the Evidence", 93 s) replacing the AI-b-roll launch
+film.
+
+**Verification:** 538 tests / 41 files (96 new) · typecheck clean · lint
+clean · build + artifact verification PASSED · film and documents
+verified after render.

@@ -12,36 +12,47 @@ import { useMemo } from 'react';
 import { asset } from '@/config';
 import type { Property } from '@/data/properties';
 import { PROPERTIES } from '@/data/properties';
-import { type UserListing, useUserListings } from '@/lib/adminStore';
+import { type UserListing, useUserListings, useSubmissions } from '@/lib/adminStore';
 import { AUTO_PROPERTIES } from '@/lib/autoListings';
 import { store } from '@/lib/store';
 
 /**
- * Trust score derived from what the verification desk can actually attest to:
- * human review + submission completeness. Never above 94 (below the platform
- * elite band) because partner listings lack on-platform transaction history.
+ * Trust score derived from what the verification desk can actually attest to.
+ * Approved submissions: human review + submission completeness, never above 94
+ * (below the platform elite band — partner listings lack on-platform
+ * transaction history).
+ * Pending submissions: schema-screened only — the desk has NOT reviewed it
+ * yet, so the score is capped at 78 and the baseline sits below every
+ * human-verified band. The score a listing earns and the score it is
+ * temporarily granted while awaiting review are different things.
  */
-export function partnerTrustScore(u: UserListing): number {
-  let score = 78; // human-reviewed & approved by the verification desk
+export function partnerTrustScore(u: UserListing, approved: boolean): number {
+  let score = approved ? 78 : 66; // 78: human-reviewed · 66: awaiting review
   if (u.images.length >= 2) score += 4;
   if (u.description.length >= 120) score += 3;
   if (u.amenities.length >= 3) score += 3;
   if (u.rentEstimate && u.rentEstimate > 0) score += 2;
-  return Math.min(94, score);
+  return Math.min(approved ? 94 : 78, score);
 }
 
-/** Adapt an approved user submission into a full marketplace Property. */
-export function userListingToProperty(u: UserListing): Property {
+/** Adapt an approved user submission into a full marketplace Property.
+ *
+ * Honest by review state: a listing awaiting desk review renders
+ * titleCheck PENDING, no Ardhisasa match claim, a visible "pending review"
+ * signal and a capped score. The admin console's Approve action upgrades
+ * the same listing (via the submission join in useAllProperties) — approval
+ * is now a state change the marketplace can see, not a private flag flip. */
+export function userListingToProperty(u: UserListing, approved: boolean): Property {
   return {
     ...u,
     type: u.type as Property['type'],
     purpose: u.purpose as Property['purpose'],
     // base-path aware so images resolve under GitHub Pages subpath hosting
     images: u.images.map((p) => (p.startsWith('http') || p.startsWith('data:') ? p : asset(p))),
-    trustScore: partnerTrustScore(u),
+    trustScore: partnerTrustScore(u, approved),
     verification: {
-      titleCheck: 'verified' as const,
-      ardhisasaMatch: true,
+      titleCheck: (approved ? 'verified' : 'pending') as Property['verification']['titleCheck'],
+      ardhisasaMatch: approved,
       photosVerified: u.images.length > 0,
       duplicateCheck: 'clean' as const,
       listingVelocity: 'normal' as const,
@@ -53,11 +64,18 @@ export function userListingToProperty(u: UserListing): Property {
         status: 'pass' as const,
         detail: `Source: ${u.source} — screened by trust-by-design anomaly detection`,
       },
-      {
-        label: 'Human-reviewed',
-        status: 'pass' as const,
-        detail: 'Approved by the Keja verification desk before publication',
-      },
+      approved
+        ? {
+            label: 'Human-reviewed',
+            status: 'pass' as const,
+            detail: 'Approved by the Keja verification desk before publication',
+          }
+        : {
+            label: 'Human review pending',
+            status: 'warn' as const,
+            detail:
+              'Published ahead of review (trial platform) — the verification desk screens it next; title and registry checks stay pending until then',
+          },
       {
         label: 'Completeness',
         status:
@@ -67,19 +85,27 @@ export function userListingToProperty(u: UserListing): Property {
         detail: `${u.images.length} photo${u.images.length === 1 ? '' : 's'}, ${u.amenities.length} amenities declared`,
       },
     ],
-    highlights: ['Recently approved', 'Partner supply'],
+    highlights: approved ? ['Recently approved', 'Partner supply'] : ['Pending desk review'],
   };
 }
 
-/** Merged inventory hook — auto-published Auto-Pilot listings, approved
- * partner submissions, then seed stock. (Auto listings are machine-screened
+/** Merged inventory hook — auto-published Auto-Pilot listings, user
+ * submissions (verification state derived from the linked submission's
+ * review status), then seed stock. (Auto listings are machine-screened
  * and trust-capped — see lib/autoListings.) */
 export function useAllProperties(): Property[] {
   const [userListings] = useUserListings();
-  return useMemo(
-    () => [...userListings.map(userListingToProperty), ...AUTO_PROPERTIES, ...PROPERTIES],
-    [userListings]
-  );
+  const [submissions] = useSubmissions();
+  return useMemo(() => {
+    const approved = new Set(
+      submissions.filter((s) => s.status === 'approved').map((s) => s.id),
+    );
+    return [
+      ...userListings.map((u) => userListingToProperty(u, !!u.submissionId && approved.has(u.submissionId))),
+      ...AUTO_PROPERTIES,
+      ...PROPERTIES,
+    ];
+  }, [userListings, submissions]);
 }
 
 /**
@@ -92,8 +118,16 @@ export function useAllProperties(): Property[] {
  * store state.
  */
 export function marketInventory(): Property[] {
+  const approved = new Set(
+    store
+      .get<{ id: string; status: string }[]>('submissions', [])
+      .filter((s) => s.status === 'approved')
+      .map((s) => s.id),
+  );
   return [
-    ...store.get<UserListing[]>('user-listings', []).map(userListingToProperty),
+    ...store
+      .get<UserListing[]>('user-listings', [])
+      .map((u) => userListingToProperty(u, !!u.submissionId && approved.has(u.submissionId))),
     ...AUTO_PROPERTIES,
     ...PROPERTIES,
   ];

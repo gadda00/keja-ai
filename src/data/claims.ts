@@ -71,9 +71,9 @@ export const CAPABILITY_CLAIMS: CapabilityClaim[] = [
     id: 'pricing-anomaly',
     claim: 'Asking prices are screened against market bands for anomalies.',
     status: 'live',
-    surface: 'Auto-Pilot pipeline · anomaly detection (adminStore)',
+    surface: 'Auto-Pilot pipeline · listing wizard boundary (lib/boundaries)',
     evidence:
-      'Deterministic price-band screening runs on every ingested listing and inside the admin anomaly sweep; covered by unit tests.',
+      'Deterministic price-band screening runs on every ingested listing (Auto-Pilot) and again at the listing-wizard publish boundary before anything enters the marketplace; covered by unit tests.',
     lastReviewed: CLAIM_LAST_REVIEWED,
   },
   {

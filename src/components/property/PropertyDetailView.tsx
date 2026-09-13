@@ -52,6 +52,10 @@ import { formatKES, timeAgo, trustTier } from '@/lib/format';
 import { areaInsights, type Property } from '@/data/properties';
 import { navigate } from '@/lib/router';
 import { useFavorites } from '@/lib/store';
+import { reportListing, REPORT_REASONS, type ReportReason } from '@/lib/adminStore';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { asset, whatsappLink } from '@/config';
 import { PropertyCard } from './PropertyCard';
 import { TrustDial } from './TrustBadge';
@@ -304,6 +308,24 @@ function TrustFactorsPanel({ p }: { p: Property }) {
 
 function EvidencePanel({ p }: { p: Property }) {
   const checks = evidenceFor(p);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reason, setReason] = useState<ReportReason>('sold-or-let');
+  const [detail, setDetail] = useState('');
+  const submitReport = () => {
+    reportListing({
+      propertyId: p.id,
+      propertyTitle: p.title,
+      reason,
+      detail: detail.trim() || undefined,
+    });
+    track({ event: 'issue_reported', propertyId: p.id, reason });
+    setReportOpen(false);
+    setDetail('');
+    toast({
+      title: 'Report filed — thank you',
+      description: 'The verification desk will review this listing. Trust is a shared effort.',
+    });
+  };
   return (
     <div className="rounded-2xl border bg-card p-5">
       <h3 className="text-sm font-black uppercase tracking-wider">Verification evidence</h3>
@@ -342,16 +364,50 @@ function EvidencePanel({ p }: { p: Property }) {
         variant="ghost"
         size="sm"
         className="mt-3 w-full text-xs font-bold"
-        onClick={() => {
-          track({ event: 'issue_reported', propertyId: p.id, reason: 'listing-flag' });
-          toast({
-            title: 'Issue reported',
-            description: 'The verification desk will review this listing. Thank you — trust is a shared effort.',
-          });
-        }}
+        onClick={() => setReportOpen(true)}
       >
         <ShieldAlert className="mr-1.5 h-3.5 w-3.5" aria-hidden /> Report an issue with this listing
       </Button>
+      <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Report an issue</DialogTitle>
+            <DialogDescription>
+              Reports on {p.title} ({p.id}) enter the verification desk's adjudication queue. Your report is stored on this device.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label htmlFor="report-reason" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">What is wrong?</label>
+              <Select value={reason} onValueChange={(v) => setReason(v as ReportReason)}>
+                <SelectTrigger id="report-reason" className="mt-1.5 w-full" aria-label="Report reason">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {REPORT_REASONS.map((r) => (
+                    <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label htmlFor="report-detail" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Details (optional)</label>
+              <Textarea
+                id="report-detail"
+                value={detail}
+                onChange={(e) => setDetail(e.target.value)}
+                placeholder="e.g. The agent said this unit was let two weeks ago…"
+                className="mt-1.5 min-h-20 text-sm"
+                maxLength={500}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReportOpen(false)}>Cancel</Button>
+            <Button onClick={submitReport}>File report</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

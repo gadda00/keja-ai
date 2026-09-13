@@ -299,6 +299,12 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [users, setUsers] = useState<UserAccount[]>(() => loadUsers());
   const [session, setSession] = useState<Session | null>(() => readSession());
+  // enrolments held in state (not read per render): disabling 2FA writes the
+  // store but previously triggered no re-render, so the account view kept
+  // showing "Enabled" (with a Turn-off button that could only fail) until an
+  // unrelated provider re-render landed. Now 'totp' writes re-render it —
+  // same-Tab and cross-tab (storage event) both covered.
+  const [enrolments, setEnrolments] = useState<TotpMap>(() => readEnrolments());
   const [loading, setLoading] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [pendingIntent, setPendingIntent] = useState<{ reason: string; onDone: () => void } | null>(
@@ -313,7 +319,6 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     [session, users]
   );
 
-  const enrolments = readEnrolments();
   const myEnrolment = user ? enrolments[user.id] : undefined;
   // Admins always need the second factor; everyone else only once enrolled.
   const needsTwoFactor = !!user && (user.role === 'admin' || !!myEnrolment);
@@ -329,9 +334,12 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const onStorage = (e: StorageEvent) => {
       if (e.key === SESSION_KEY) setSession(readSession());
       if (e.key === USERS_KEY) setUsers(loadUsers());
+      if (e.key === 'keja:totp') setEnrolments(readEnrolments());
     };
     const onStoreChange = (e: Event) => {
-      if ((e as CustomEvent).detail === 'users') setUsers(loadUsers());
+      const key = (e as CustomEvent).detail;
+      if (key === 'users') setUsers(loadUsers());
+      if (key === 'totp') setEnrolments(readEnrolments());
     };
     window.addEventListener('storage', onStorage);
     window.addEventListener('keja-store-change', onStoreChange as EventListener);
