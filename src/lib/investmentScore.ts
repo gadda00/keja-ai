@@ -2,10 +2,20 @@
  * KEJA Investment Score™ — the transparent multi-factor framework from the
  * blueprint (Ch.7): rental potential, capital appreciation, location, demand,
  * price/value, liquidity and risk. Scores are decision-support tools, never
- * guarantees — the engine separates verified inputs from estimates.
+ * guarantees — the engine separates verified inputs from estimates and
+ * communicates how much data stands behind each score.
  */
-import { areaInsights, type Property } from '@/data/properties';
+import { areaInsights, PROPERTIES, type Property } from '@/data/properties';
 import { isRentalPrice } from '@/lib/finance';
+import { AUTO_PROPERTIES } from '@/lib/autoListings';
+
+/**
+ * Version of this scoring engine. Bump on ANY change to factors, weights or
+ * banding — the value ships in every trust-anchor manifest (see
+ * src/lib/trustAnchor.ts), so a published score can always be traced to the
+ * exact algorithm that produced it.
+ */
+export const INVESTMENT_ALGORITHM_VERSION = '2026-09-13.1';
 
 export interface ScoreFactor {
   key: string;
@@ -19,6 +29,78 @@ export interface InvestmentScore {
   overall: number; // 0–10, one decimal
   band: 'Exceptional' | 'Strong' | 'Solid' | 'Moderate' | 'Speculative';
   factors: ScoreFactor[];
+  /** How much live data stands behind this score — drives presentation honesty. */
+  confidence: DataConfidence;
+}
+
+/* ------------------------------ data confidence ---------------------------- */
+
+export interface DataConfidence {
+  /** thin (<5 comparables) · growing (5–14) · robust (≥15) */
+  grade: 'thin' | 'growing' | 'robust';
+  /** live same-area, same-market listings the area-level factors draw on */
+  comparables: number;
+  /** all live listings in the area, any type or market */
+  areaListings: number;
+  /** the presentation precision the data actually supports */
+  precision: 'band' | 'integer' | 'decimal';
+  /** one honest sentence for the UI chip */
+  note: string;
+}
+
+/** Count same-area, same-market listings (excluding the subject) as comparables. */
+export function comparableCount(p: Property, all: Property[]): number {
+  const subjectIsRental = isRentalPrice(p.price);
+  return all.filter(
+    (q) =>
+      q.id !== p.id &&
+      q.area === p.area &&
+      !q.priceOnApplication &&
+      isRentalPrice(q.price) === subjectIsRental,
+  ).length;
+}
+
+/** Compute the data-confidence layer for a listing against an inventory. */
+export function dataConfidence(p: Property, all: Property[]): DataConfidence {
+  const comparables = comparableCount(p, all);
+  const areaListings = all.filter((q) => q.area === p.area).length;
+  if (comparables < 5) {
+    return {
+      grade: 'thin',
+      comparables,
+      areaListings,
+      precision: 'band',
+      note: `Thin data — ${comparables} comparable listing${comparables === 1 ? '' : 's'} in ${p.area}. Directional only; the decimal would be false precision.`,
+    };
+  }
+  if (comparables < 15) {
+    return {
+      grade: 'growing',
+      comparables,
+      areaListings,
+      precision: 'integer',
+      note: `Based on ${comparables} comparable listings in ${p.area}.`,
+    };
+  }
+  return {
+    grade: 'robust',
+    comparables,
+    areaListings,
+    precision: 'decimal',
+    note: `Backed by ${comparables} comparable listings in ${p.area}.`,
+  };
+}
+
+/** Presentation helper — what the UI may honestly show for the overall score. */
+export function displayOverall(score: InvestmentScore): string {
+  if (score.confidence.precision === 'band') return score.band;
+  if (score.confidence.precision === 'integer') return String(Math.round(score.overall));
+  return score.overall.toFixed(1);
+}
+
+/** Presentation helper — factor precision follows the same confidence rule. */
+export function displayFactor(score: number, precision: DataConfidence['precision']): string {
+  return precision === 'decimal' ? score.toFixed(1) : String(Math.round(score));
 }
 
 /** Location demand bands (illustrative, Nairobi-centric, upgradeable to data). */
@@ -36,7 +118,13 @@ const LOCATION_SCORE: Record<string, number> = {
   default: 7.2,
 };
 
-export function investmentScore(p: Property): InvestmentScore {
+export function investmentScore(
+  p: Property,
+  opts?: {
+    /** inventory the confidence layer counts comparables against (defaults to the platform catalogue) */
+    inventory?: Property[];
+  },
+): InvestmentScore {
   // Rental listings are not sale assets — price/value per-sqm norm comparison
   // is skipped for them (monthly rent vs sale price per sqm is meaningless).
   // 1 — Rental potential. For rental listings (price = monthly rent) the
@@ -92,12 +180,12 @@ export function investmentScore(p: Property): InvestmentScore {
       key: 'rental',
       label: 'Rental Potential',
       score: round1(rental),
-      basis: grossYield > 0 ? (isRental ? 'ESTIMATE' : 'FACT') : 'ASSUMPTION',
+      basis: grossYield > 0 ? 'ESTIMATE' : 'ASSUMPTION',
       note: isRental
         ? `Area typical gross yield ~${grossYield.toFixed(1)}% (rental listing — income yield context)`
         : grossYield > 0
-          ? `Gross yield ${grossYield.toFixed(1)}% (verified rent estimate)`
-          : 'No verified rent data — benchmark assumption applied',
+          ? `Gross yield ${grossYield.toFixed(1)}% (authored rent estimate ÷ asking price)`
+          : 'No rent data — benchmark assumption applied',
     },
     {
       key: 'growth',
@@ -110,15 +198,15 @@ export function investmentScore(p: Property): InvestmentScore {
       key: 'location',
       label: 'Location',
       score: round1(location),
-      basis: 'FACT',
-      note: `${p.area}, ${p.county} — location intelligence band`,
+      basis: 'ESTIMATE',
+      note: `${p.area}, ${p.county} — location intelligence band (editorial research, upgraded as data grows)`,
     },
     {
       key: 'demand',
       label: 'Demand',
       score: round1(demand),
-      basis: 'FACT',
-      note: `${p.views} views · trust score ${p.trustScore}/100`,
+      basis: 'ESTIMATE',
+      note: `${p.views} platform views blended with the trust score — a model proxy, not verified transaction demand`,
     },
     {
       key: 'value',
@@ -168,7 +256,9 @@ export function investmentScore(p: Property): InvestmentScore {
             ? 'Moderate'
             : 'Speculative';
 
-  return { overall, band, factors };
+  const inventory = opts?.inventory ?? [...AUTO_PROPERTIES, ...PROPERTIES];
+
+  return { overall, band, factors, confidence: dataConfidence(p, inventory) };
 }
 
 const round1 = (n: number) => Math.round(n * 10) / 10;

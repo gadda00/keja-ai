@@ -32,7 +32,7 @@ export interface CapabilityClaim {
   pathToLive?: string;
 }
 
-export const CLAIM_LAST_REVIEWED = '2026-08-31';
+export const CLAIM_LAST_REVIEWED = '2026-09-13';
 
 export const CAPABILITY_CLAIMS: CapabilityClaim[] = [
   /* ------------------------------ verification ----------------------------- */
@@ -89,11 +89,11 @@ export const CAPABILITY_CLAIMS: CapabilityClaim[] = [
   },
   {
     id: 'trust-score',
-    claim: 'Every listing carries a 0–100 trust score with five weighted pillars.',
+    claim: 'Every listing carries a 0–100 trust score computed from twelve weighted, evidence-labelled factors.',
     status: 'live',
     surface: 'Listing pages · Trust Center',
     evidence:
-      'Scores and their five-pillar weighting are computed and displayed deterministically; factor definitions are published on the Trust Center.',
+      'Scores and their twelve-factor weighting are computed deterministically by a versioned engine; factor definitions are published on the Trust Center, and every release ships a machine-readable score anchor (trust-anchor.json) so published scores stay auditable after the fact.',
     lastReviewed: CLAIM_LAST_REVIEWED,
   },
   {

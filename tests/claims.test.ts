@@ -7,6 +7,11 @@
  * everything not yet live, and a real review date.
  */
 import { CAPABILITY_CLAIMS, CLAIM_LAST_REVIEWED, type ClaimStatus } from '@/data/claims';
+import { PROPERTIES } from '@/data/properties';
+import { trustScore } from '@/lib/trustScore';
+import { assertRegulatedClaims, REGULATED_CLAIM_IDS } from '@/lib/regulatory';
+import { readFileSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
 
 const STATUSES: ClaimStatus[] = ['live', 'simulated', 'partner-dependent', 'planned'];
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -77,5 +82,49 @@ describe('honesty rules', () => {
     );
     expect(money.length).toBeGreaterThan(0);
     for (const c of money) expect(c.status).not.toBe('live');
+  });
+});
+
+describe('claims ↔ engine coherence (wave 12)', () => {
+  const WORDS: Record<number, string> = {
+    2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight',
+    9: 'nine', 10: 'ten', 11: 'eleven', 12: 'twelve', 13: 'thirteen', 14: 'fourteen',
+    15: 'fifteen', 16: 'sixteen', 17: 'seventeen', 18: 'eighteen', 19: 'nineteen', 20: 'twenty',
+  };
+
+  it('the trust-score claim states the engine\'s actual factor count', () => {
+    const claim = CAPABILITY_CLAIMS.find((c) => c.id === 'trust-score');
+    expect(claim).toBeTruthy();
+    const engineCount = trustScore(PROPERTIES[0]).factors.length;
+    const accepted = [String(engineCount), WORDS[engineCount]];
+    expect(
+      accepted.some((form) => (claim!.claim + claim!.evidence).toLowerCase().includes(form.toLowerCase())),
+      `claim must state the engine's factor count (${engineCount}) — a register that misstates its own engine is worse than none`,
+    ).toBe(true);
+  });
+
+  it('the trust-score claim cites the published anchor manifest', () => {
+    const claim = CAPABILITY_CLAIMS.find((c) => c.id === 'trust-score');
+    expect(claim!.evidence).toContain('trust-anchor.json');
+  });
+
+  it('regulated claims can only be live with a committed legal approval artifact', () => {
+    // real filesystem: docs/legal/approvals/<id>.md must exist and parse for a live status
+    const readDoc = (path: string) => {
+      const full = join(process.cwd(), path);
+      return existsSync(full) ? readFileSync(full, 'utf8') : null;
+    };
+    const { ok, violations } = assertRegulatedClaims(CAPABILITY_CLAIMS, readDoc);
+    if (!ok) {
+      const detail = violations.map((v) => `${v.id}: ${v.why}`).join('; ');
+      throw new Error(
+        `Regulatory gate failed — a regulated capability is claimed live without a valid, unexpired ` +
+          `approval document at docs/legal/approvals/<id>.md:\n${detail}`,
+      );
+    }
+    // the gate itself must be wired to the regulated ids we know about today
+    for (const id of REGULATED_CLAIM_IDS) {
+      expect(CAPABILITY_CLAIMS.some((c) => c.id === id)).toBe(true);
+    }
   });
 });

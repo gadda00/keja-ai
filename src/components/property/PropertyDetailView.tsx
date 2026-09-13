@@ -43,15 +43,16 @@ import { track } from '@/lib/analytics';
 import { usePageMeta } from '@/lib/seo';
 import { listingMeta } from '@/lib/detailMeta';
 import { srcsetFor, GALLERY_SIZES } from '@/lib/responsive-images';
-import { investmentScore } from '@/lib/investmentScore';
-import { trustScore } from '@/lib/trustScore';
+import { displayFactor, displayOverall, investmentScore } from '@/lib/investmentScore';
+import { TRUST_ALGORITHM_VERSION, trustScore } from '@/lib/trustScore';
+import { currentRelease } from '@/lib/telemetry';
 import { evidenceFor, listingFreshness } from '@/lib/verification';
 import { calculateMortgage } from '@/lib/finance';
 import { formatKES, timeAgo, trustTier } from '@/lib/format';
 import { areaInsights, type Property } from '@/data/properties';
 import { navigate } from '@/lib/router';
 import { useFavorites } from '@/lib/store';
-import { whatsappLink } from '@/config';
+import { asset, whatsappLink } from '@/config';
 import { PropertyCard } from './PropertyCard';
 import { TrustDial } from './TrustBadge';
 import { cn } from '@/lib/utils';
@@ -168,6 +169,11 @@ function PropertyPassport({ p }: { p: Property }) {
             Twelve-factor score · evidence-labelled · never a guarantee — always pair with
             professional due diligence.
           </p>
+          <p className="text-center text-[10px] leading-relaxed text-muted-foreground/80">
+            Engine v{TRUST_ALGORITHM_VERSION}
+            {currentRelease() && <> · anchored in release <span className="font-mono">{currentRelease()}</span></>}
+            {' '}· <a className="underline hover:text-foreground" href={asset('trust-anchor.json')} target="_blank" rel="noreferrer">published manifest</a>
+          </p>
           <Button
             variant="outline"
             size="sm"
@@ -207,7 +213,8 @@ function PropertyPassport({ p }: { p: Property }) {
 /* ------------------------------ score panels ------------------------------ */
 
 function InvestmentPanel({ p }: { p: Property }) {
-  const score = investmentScore(p);
+  const all = useAllProperties();
+  const score = investmentScore(p, { inventory: all });
   return (
     <div className="rounded-2xl border bg-card p-5">
       <div className="flex items-center justify-between">
@@ -218,10 +225,24 @@ function InvestmentPanel({ p }: { p: Property }) {
             score.overall >= 8 ? 'text-primary' : score.overall >= 6.5 ? 'text-foreground' : 'text-gold',
           )}
         >
-          {score.overall.toFixed(1)}
-          <span className="text-xs font-bold text-muted-foreground">/10 · {score.band}</span>
+          {displayOverall(score)}
+          {score.confidence.precision !== 'band' && (
+            <span className="text-xs font-bold text-muted-foreground">/10 · {score.band}</span>
+          )}
         </span>
       </div>
+      <p
+        className={cn(
+          'mt-2 rounded-lg px-2.5 py-1.5 text-[11px] leading-snug',
+          score.confidence.grade === 'thin'
+            ? 'bg-gold/15 text-gold-foreground'
+            : score.confidence.grade === 'growing'
+              ? 'bg-accent text-muted-foreground'
+              : 'text-muted-foreground/70',
+        )}
+      >
+        {score.confidence.note}
+      </p>
       <div className="mt-4 space-y-3">
         {score.factors.map((f) => (
           <div key={f.key}>
@@ -241,7 +262,7 @@ function InvestmentPanel({ p }: { p: Property }) {
                   {f.basis}
                 </span>
               </span>
-              <span className="font-black tabular-nums">{f.score.toFixed(1)}</span>
+              <span className="font-black tabular-nums">{displayFactor(f.score, score.confidence.precision)}</span>
             </div>
             <Progress value={f.score * 10} className="mt-1 h-1.5" aria-label={`${f.label} ${f.score} of 10`} />
             <p className="mt-1 text-[11px] leading-snug text-muted-foreground">{f.note}</p>

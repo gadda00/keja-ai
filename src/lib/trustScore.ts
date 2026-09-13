@@ -26,6 +26,15 @@ import { areaInsights } from '@/data/properties';
 
 export type ScoreBasis = 'FACT' | 'ESTIMATE' | 'ASSUMPTION';
 
+/**
+ * Version of this scoring engine. Bump on ANY change to factors, weights or
+ * banding — the value ships in every trust-anchor manifest (see
+ * src/lib/trustAnchor.ts and scripts/generate-trust-anchor.ts), so a score
+ * published today can always be traced back to the exact algorithm that
+ * produced it. Audit events and the claims register reference it too.
+ */
+export const TRUST_ALGORITHM_VERSION = '2026-09-13.1';
+
 export interface TrustFactor {
   key: string;
   label: string;

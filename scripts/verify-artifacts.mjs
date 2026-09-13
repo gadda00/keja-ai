@@ -11,7 +11,7 @@
  * expected vs. what was found. Run automatically as the last step of
  * `npm run build` (and therefore in CI + the Vercel build).
  */
-import { readFileSync, existsSync, statSync } from "node:fs";
+import { readFileSync, existsSync, statSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const OUT = process.env.OUT_DIR || "out";
@@ -230,6 +230,75 @@ if (sectionPages === SECTION_PATHS.length + APP_SECTION_PATHS.length) {
   }
   if (notNoindexed === 0) ok("app-workspace sections are noindexed");
   else fail(`${notNoindexed} app section page(s) missing noindex`);
+}
+
+/* 7 — trust anchor (2026-09-13): the build must publish the per-release score
+   manifest — algorithm versions + one digest per listing. Structural checks
+   only (plain node, no TS runtime); the deep contract (coverage, digests,
+   recomputation) lives in src/lib/trustAnchor.ts + tests/trustAnchor.test.ts,
+   and the generator self-validates before writing. */
+{
+  const anchorPath = join(out, "trust-anchor.json");
+  if (!existsSync(anchorPath)) {
+    fail("out/trust-anchor.json missing — generate-trust-anchor.ts did not run (scores ship unanchored)");
+  } else {
+    let manifest = null;
+    try {
+      manifest = JSON.parse(readFileSync(anchorPath, "utf8"));
+      ok("trust-anchor.json valid JSON");
+    } catch {
+      fail("trust-anchor.json is not valid JSON");
+    }
+    if (manifest) {
+      if (manifest.schemaVersion !== 1) fail("trust-anchor schemaVersion !== 1");
+      else ok("trust-anchor schemaVersion 1");
+      const vOk =
+        /^\d{4}-\d{2}-\d{2}\.\d+$/.test(manifest.algorithmVersion ?? "") &&
+        /^\d{4}-\d{2}-\d{2}\.\d+$/.test(manifest.investmentAlgorithmVersion ?? "");
+      if (!vOk) fail("trust-anchor algorithm versions missing/malformed — engines are unversioned");
+      else ok(`trust engines ${manifest.algorithmVersion} / ${manifest.investmentAlgorithmVersion}`);
+      const listings = Array.isArray(manifest.listings) ? manifest.listings : [];
+      let badEntries = 0;
+      let badDigest = 0;
+      const seen = new Set();
+      let dupes = 0;
+      for (const l of listings) {
+        if (
+          typeof l?.id !== "string" ||
+          !Number.isInteger(l.trust) ||
+          l.trust < 0 ||
+          l.trust > 100 ||
+          typeof l.investment !== "number" ||
+          !l.band ||
+          !l.investmentBand
+        ) badEntries++;
+        if (!/^[a-f0-9]{64}$/.test(l?.digest ?? "")) badDigest++;
+        if (seen.has(l?.id)) dupes++;
+        seen.add(l?.id);
+      }
+      if (badEntries === 0 && badDigest === 0 && dupes === 0) {
+        ok(`trust-anchor covers ${listings.length} listings, all entries + digests well-formed`);
+      } else {
+        fail(`trust-anchor malformed entries: ${badEntries} bad, ${badDigest} bad digests, ${dupes} duplicates`);
+      }
+      // coverage: every prerendered property page must have an anchored score
+      const propDir = join(out, "properties");
+      let propPages = 0;
+      if (existsSync(propDir)) {
+        for (const d of readdirSync(propDir)) {
+          if (statSync(join(propDir, d)).isDirectory() && existsSync(join(propDir, d, "index.html"))) propPages++;
+        }
+      }
+      if (propPages > 0 && listings.length === propPages) {
+        ok(`trust-anchor coverage === prerendered listings (${propPages})`);
+      } else {
+        fail(
+          `trust-anchor covers ${listings.length} listings but ${propPages} property pages are prerendered — ` +
+            "the anchor and the shipped inventory have drifted",
+        );
+      }
+    }
+  }
 }
 
 console.log(

@@ -196,7 +196,7 @@ export const ARTICLES: Article[] = [
     slug: 'how-keja-verifies-listings',
     title: 'Inside the Keja trust layer: how a listing earns the Verified badge',
     excerpt:
-      'Ardhisasa cross-checks, photo forensics, duplicate-signature detection and price anomaly bands — the five signals behind every trust score.',
+      'Ardhisasa cross-checks, photo forensics, duplicate-signature detection and price anomaly bands — the five verification signals behind every listing badge.',
     category: 'Trust & Safety',
     minutes: 6,
     date: '2026-07-20',

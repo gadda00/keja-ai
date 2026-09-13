@@ -1,0 +1,706 @@
+{
+  "schemaVersion": 1,
+  "algorithmVersion": "2026-09-13.1",
+  "investmentAlgorithmVersion": "2026-09-13.1",
+  "generatedAt": "2026-09-13T05:05:38.661Z",
+  "inventoryCount": 87,
+  "inputSnapshot": "a62d2d22a57b0402cbb158d25b4340b4d79cd95ad98fecdf904dc28442fa4cdf",
+  "listings": [
+    {
+      "id": "KJA-A0200",
+      "trust": 68,
+      "band": "High Risk",
+      "investment": 6.9,
+      "investmentBand": "Solid",
+      "digest": "e24dbe108ab2046b82804c0342d308783f8864f6881f9d142fe6ae14900c7b1c"
+    },
+    {
+      "id": "KJA-A0202",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 7.1,
+      "investmentBand": "Solid",
+      "digest": "beef6350700ea202339bfae306cefd70f7bb276b7e5d5c3cf300732e17704865"
+    },
+    {
+      "id": "KJA-A0199",
+      "trust": 74,
+      "band": "Moderate",
+      "investment": 7.4,
+      "investmentBand": "Solid",
+      "digest": "004e46b7a4e13ffc15f4d9d051862662e70ac2865342b63aeba89017e062d30b"
+    },
+    {
+      "id": "KJA-A0201",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.6,
+      "investmentBand": "Solid",
+      "digest": "9e3b5c3a7932f2645947f6827540b75b4151102f68d871c064dc51e7bbd6b46a"
+    },
+    {
+      "id": "KJA-A0195",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.5,
+      "investmentBand": "Solid",
+      "digest": "51d1fcbd5a3bc09fe9f207f51fcd684079116906c051ebebe5e53cf6ab2891e2"
+    },
+    {
+      "id": "KJA-A0197",
+      "trust": 73,
+      "band": "Moderate",
+      "investment": 7,
+      "investmentBand": "Solid",
+      "digest": "d87efca3d8823669bf20d32d5850ab241ec7ab810721e86a44ef36e817cbb567"
+    },
+    {
+      "id": "KJA-A0196",
+      "trust": 74,
+      "band": "Moderate",
+      "investment": 6.7,
+      "investmentBand": "Solid",
+      "digest": "058eef3a94385beb445702b3d05b9efe3409050153793f2ef2707c497f9cf043"
+    },
+    {
+      "id": "KJA-A0198",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 5.5,
+      "investmentBand": "Moderate",
+      "digest": "3f5693d42d0259d9f9a050688ef5062d81aa044cfa7fed296bb8cc74fe7f89cd"
+    },
+    {
+      "id": "KJA-A0192",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.9,
+      "investmentBand": "Solid",
+      "digest": "f5f920e6aaef9cb1a06f0ab6d2805c53654ea917e053c12d65fa4c197817ab6d"
+    },
+    {
+      "id": "KJA-A0194",
+      "trust": 73,
+      "band": "Moderate",
+      "investment": 7.4,
+      "investmentBand": "Solid",
+      "digest": "d67a0fa71724033db6333fdc750a5a31123aac412c11b87c67ae7500e25005d6"
+    },
+    {
+      "id": "KJA-A0193",
+      "trust": 70,
+      "band": "Moderate",
+      "investment": 7,
+      "investmentBand": "Solid",
+      "digest": "71bf9c4d94fa5e435886880e62e867ab5a9dc9b949ae00ba6e1db5b46b4f7e6c"
+    },
+    {
+      "id": "KJA-A0191",
+      "trust": 73,
+      "band": "Moderate",
+      "investment": 7.3,
+      "investmentBand": "Solid",
+      "digest": "a3ad8c4b87df05d3095000a7752697d6fa89c6c0219b77084877936ae52183a8"
+    },
+    {
+      "id": "KJA-A0188",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.2,
+      "investmentBand": "Moderate",
+      "digest": "831d3baaf1b5e923eb6b29ac3bb3981aaaec1f5730c6bb62ef1e219a011b63b7"
+    },
+    {
+      "id": "KJA-A0190",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.2,
+      "investmentBand": "Moderate",
+      "digest": "56955e79be7e21a4c15679bef0b79faf11e8a30cffbb9a187deec0ec4c7093a0"
+    },
+    {
+      "id": "KJA-A0189",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.3,
+      "investmentBand": "Moderate",
+      "digest": "6056967cdf5905c21c8589b745f7afb44b70481553adec4a24fcb0e4be792d28"
+    },
+    {
+      "id": "KJA-A0187",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.5,
+      "investmentBand": "Solid",
+      "digest": "9d7b679b9a5e868c97032fdd60da1dd17e28beace83ff27f8623b969de4d8d14"
+    },
+    {
+      "id": "KJA-A0184",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.1,
+      "investmentBand": "Moderate",
+      "digest": "8d34cd19a3537b4560666b0ee8ed40b02210f7148620d89808581e1778e46f4f"
+    },
+    {
+      "id": "KJA-A0183",
+      "trust": 70,
+      "band": "Moderate",
+      "investment": 6.5,
+      "investmentBand": "Solid",
+      "digest": "18996eb57bb8ce0f15d9fda65d3ba94fbc178dfce132cde61b0eb9ed3933a279"
+    },
+    {
+      "id": "KJA-A0181",
+      "trust": 70,
+      "band": "Moderate",
+      "investment": 6.3,
+      "investmentBand": "Moderate",
+      "digest": "82329c992c3b4cc6f6db9c2d638645b30d6ed15e87c2499c8a81a6def9d7f2d5"
+    },
+    {
+      "id": "KJA-A0182",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.3,
+      "investmentBand": "Moderate",
+      "digest": "db87d56306d1562c1b1461d5999f725d8d6ceaca8558cb693e02faf2879deb62"
+    },
+    {
+      "id": "KJA-A0185",
+      "trust": 68,
+      "band": "High Risk",
+      "investment": 7.2,
+      "investmentBand": "Solid",
+      "digest": "57e752955c5cf0929d4935cf0d6f0e9cb474d6f842856a636d89deb25a679cfc"
+    },
+    {
+      "id": "KJA-A0180",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.5,
+      "investmentBand": "Solid",
+      "digest": "f92f459c52d34c37c2e00c3b871c414d05cd3374bfe593a767322fc485f32d18"
+    },
+    {
+      "id": "KJA-A0175",
+      "trust": 67,
+      "band": "High Risk",
+      "investment": 5.5,
+      "investmentBand": "Moderate",
+      "digest": "0c75b3c1071ad43602e0fc36ef1133c30938ac2562a8302dfd90d34f51dd21f0"
+    },
+    {
+      "id": "KJA-A0177",
+      "trust": 71,
+      "band": "Moderate",
+      "investment": 6.9,
+      "investmentBand": "Solid",
+      "digest": "0657574bccbbcce7f9211d6242f7976d5fa2a6c7c618c14ccf4b786b062c4b51"
+    },
+    {
+      "id": "KJA-A0186",
+      "trust": 68,
+      "band": "High Risk",
+      "investment": 5.2,
+      "investmentBand": "Speculative",
+      "digest": "13ab20ff267e9c3ee4aeccbecf860b17c0b48c2de7b27eaaec6375c299eb194c"
+    },
+    {
+      "id": "KJA-A0178",
+      "trust": 68,
+      "band": "High Risk",
+      "investment": 6.9,
+      "investmentBand": "Solid",
+      "digest": "3355727b98b28bb114b0c73feb90af1ff68cd5672c6187ea8a2c9c4dce51be97"
+    },
+    {
+      "id": "KJA-A0163",
+      "trust": 67,
+      "band": "High Risk",
+      "investment": 5.5,
+      "investmentBand": "Moderate",
+      "digest": "17a9db010278cce68ccc2388c32485ecadf703668274f62b031eb21559de108f"
+    },
+    {
+      "id": "KJA-A0173",
+      "trust": 70,
+      "band": "Moderate",
+      "investment": 6.8,
+      "investmentBand": "Solid",
+      "digest": "4808eff8836bf2f2ca7e4ca0e413ea907a3d53bde2f8faad572dba6b62a552c9"
+    },
+    {
+      "id": "KJA-A0170",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 7.1,
+      "investmentBand": "Solid",
+      "digest": "61b2be0efbdaaf53a716c0a8156a4cd89285e8eeba388222ff3d1d31a2ea8f2d"
+    },
+    {
+      "id": "KJA-A0174",
+      "trust": 71,
+      "band": "Moderate",
+      "investment": 6.5,
+      "investmentBand": "Solid",
+      "digest": "addbc4fc92bdb9b23c0199ab00af898376fa8cdd2d68fcd00e27b19214e42e3b"
+    },
+    {
+      "id": "KJA-A0171",
+      "trust": 70,
+      "band": "Moderate",
+      "investment": 6.8,
+      "investmentBand": "Solid",
+      "digest": "c622c742938d3a3f66dedbcf6f8b43c0738cab948266182a3ec9a73f84411203"
+    },
+    {
+      "id": "KJA-A0172",
+      "trust": 67,
+      "band": "High Risk",
+      "investment": 5.9,
+      "investmentBand": "Moderate",
+      "digest": "3ff3d49baa30f5e5fda8001400dd00ba79569b6c4e3265ae61883a4c78b588df"
+    },
+    {
+      "id": "KJA-A0168",
+      "trust": 75,
+      "band": "Moderate",
+      "investment": 6.7,
+      "investmentBand": "Solid",
+      "digest": "7862e38b9044550d5d7b372d98428fea08c4aebfffe1729e0b430ed7b6555f39"
+    },
+    {
+      "id": "KJA-A0165",
+      "trust": 67,
+      "band": "High Risk",
+      "investment": 5.3,
+      "investmentBand": "Speculative",
+      "digest": "bdcda8fc4e849a142cbdb90e2454ef06bbf09f267e995cfe546112714ab0a7e6"
+    },
+    {
+      "id": "KJA-A0166",
+      "trust": 68,
+      "band": "High Risk",
+      "investment": 6.1,
+      "investmentBand": "Moderate",
+      "digest": "2c5485908d42bf707a894bfbaf90dffc2c0a0bf73bd4f1f770214228145bd060"
+    },
+    {
+      "id": "KJA-A0169",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.6,
+      "investmentBand": "Solid",
+      "digest": "46a61612f2cb857bcec9adecb7753241867595275086d04eb48ec970510ed367"
+    },
+    {
+      "id": "KJA-A0164",
+      "trust": 74,
+      "band": "Moderate",
+      "investment": 5.9,
+      "investmentBand": "Moderate",
+      "digest": "3ecc4062c8743dee1c66abf4ca491325afea1b6c5d0f487b22fc00d3a135c507"
+    },
+    {
+      "id": "KJA-A0152",
+      "trust": 68,
+      "band": "High Risk",
+      "investment": 6.4,
+      "investmentBand": "Moderate",
+      "digest": "1c852e8f841dc21ee62c27153d5d6088a414a46e50e54e5adebbeb85cfa3d774"
+    },
+    {
+      "id": "KJA-A0147",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.5,
+      "investmentBand": "Solid",
+      "digest": "56f50e35e7c91c65c1bd3e7864a9103f858d3770566f133c9ed45d9385103844"
+    },
+    {
+      "id": "KJA-A0158",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 7.3,
+      "investmentBand": "Solid",
+      "digest": "802680e2589902a9e86cbf582882ff3695c7c621da2dfda5b30d35bf8eb8b85b"
+    },
+    {
+      "id": "KJA-A0157",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.4,
+      "investmentBand": "Moderate",
+      "digest": "7bee672c832eafb74ac3fcc799d1b290d3f580eb67dd3a78329d35008b118369"
+    },
+    {
+      "id": "KJA-A0162",
+      "trust": 75,
+      "band": "Moderate",
+      "investment": 7.9,
+      "investmentBand": "Strong",
+      "digest": "bc090c2037dfc7caa61f418ccf189fa82055af632ac179c8135e5876c51b6e6f"
+    },
+    {
+      "id": "KJA-A0153",
+      "trust": 70,
+      "band": "Moderate",
+      "investment": 6.9,
+      "investmentBand": "Solid",
+      "digest": "c70e681d0337172f5c7ae7ec6b2a6a31a8c19b8a7505a46ba43f72f939cb385f"
+    },
+    {
+      "id": "KJA-A0154",
+      "trust": 73,
+      "band": "Moderate",
+      "investment": 6.7,
+      "investmentBand": "Solid",
+      "digest": "0976e20ebd72a970e79bbea1aeb1ce4ceee506b2b77a3cf40a839ca2feeea0cd"
+    },
+    {
+      "id": "KJA-A0155",
+      "trust": 68,
+      "band": "High Risk",
+      "investment": 5.5,
+      "investmentBand": "Moderate",
+      "digest": "b25f7e25c28a7f6d93a6dc20f212399f40f81f7553c92e162568ae9cc27cf56f"
+    },
+    {
+      "id": "KJA-A0151",
+      "trust": 73,
+      "band": "Moderate",
+      "investment": 7.2,
+      "investmentBand": "Solid",
+      "digest": "5c0dc8829fb76cbcb9897638996caa7ad929a61f0975ca8c6525ae61acadfd24"
+    },
+    {
+      "id": "KJA-A0149",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.8,
+      "investmentBand": "Solid",
+      "digest": "e34f8189981a3a8df9638e2be5fe173e3089af7c262031dc741d47be04300a21"
+    },
+    {
+      "id": "KJA-A0161",
+      "trust": 74,
+      "band": "Moderate",
+      "investment": 5.5,
+      "investmentBand": "Moderate",
+      "digest": "df8d576481816f7aed9e394fc715c82f7614ccbb36ffb935b24d66d584480136"
+    },
+    {
+      "id": "KJA-A0160",
+      "trust": 70,
+      "band": "Moderate",
+      "investment": 7.1,
+      "investmentBand": "Solid",
+      "digest": "7286cac14deccde36c36111132e2e656c95434c97834b16351889e3a3fedf099"
+    },
+    {
+      "id": "KJA-A0156",
+      "trust": 74,
+      "band": "Moderate",
+      "investment": 6.1,
+      "investmentBand": "Moderate",
+      "digest": "8573a99e99340939d2e6ff55df6cd93665f6752a9200abda7d537f8becdeb6c8"
+    },
+    {
+      "id": "KJA-A0148",
+      "trust": 70,
+      "band": "Moderate",
+      "investment": 6.5,
+      "investmentBand": "Solid",
+      "digest": "1a1b62a59b5cb8adebad2b1e3a609450b9042c27506b74b9308bce1efe3387cd"
+    },
+    {
+      "id": "KJA-A0159",
+      "trust": 74,
+      "band": "Moderate",
+      "investment": 7.2,
+      "investmentBand": "Solid",
+      "digest": "2fc4d2ff9497fb0d3f3d42db98b8f70e81d0a639922a187c92e69f726b1ead93"
+    },
+    {
+      "id": "KJA-A0150",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.6,
+      "investmentBand": "Solid",
+      "digest": "dbf12c4d68723314be384dbc43a2235f86821806c4c21d54d2729ff1bdb9847a"
+    },
+    {
+      "id": "KJA-A0136",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6,
+      "investmentBand": "Moderate",
+      "digest": "999d6524eda0f82304e8b157e9b9d9f619458c9007d0472db8f1ae6a628098e2"
+    },
+    {
+      "id": "KJA-A0145",
+      "trust": 73,
+      "band": "Moderate",
+      "investment": 7.3,
+      "investmentBand": "Solid",
+      "digest": "b1f1da37c41b7cdb0cf3e1b61b486c57c2051f6fa516e0971ba47517db83817c"
+    },
+    {
+      "id": "KJA-A0135",
+      "trust": 74,
+      "band": "Moderate",
+      "investment": 5.7,
+      "investmentBand": "Moderate",
+      "digest": "55ec0b9e4ea1c62cdb1aa24023a652127e05a66fe04436b0b52be375b0882ac0"
+    },
+    {
+      "id": "KJA-A0132",
+      "trust": 70,
+      "band": "Moderate",
+      "investment": 6.8,
+      "investmentBand": "Solid",
+      "digest": "7bee5ac66f337000a59957679d0ab37fbc5bcb5375566f69ff76aef6de0841b1"
+    },
+    {
+      "id": "KJA-A0144",
+      "trust": 71,
+      "band": "Moderate",
+      "investment": 7.3,
+      "investmentBand": "Solid",
+      "digest": "3bc772b87255d392fe3f6159e3061f365eec4756c019caf1ad9d562f151fee88"
+    },
+    {
+      "id": "KJA-A0142",
+      "trust": 72,
+      "band": "Moderate",
+      "investment": 7.2,
+      "investmentBand": "Solid",
+      "digest": "e4d7c88b71cb812098ce38f14c7c2eee0007694bc0afba11de2e2df71f5a42c3"
+    },
+    {
+      "id": "KJA-A0137",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 7,
+      "investmentBand": "Solid",
+      "digest": "6da5848162b4b938782ac808b2c33cbb4f33a51b90234aacc90db537b193568a"
+    },
+    {
+      "id": "KJA-001",
+      "trust": 95,
+      "band": "Exceptional",
+      "investment": 8.9,
+      "investmentBand": "Exceptional",
+      "digest": "0aecac956cbd5426ac24743651c8ebdaaa9123c1c530411ae36610a32be12117"
+    },
+    {
+      "id": "KJA-002",
+      "trust": 91,
+      "band": "Exceptional",
+      "investment": 7.1,
+      "investmentBand": "Solid",
+      "digest": "1cb479cb7cadd5b1a4405d7116d82e21596b3c128b1b63978a9b0ec34a059be0"
+    },
+    {
+      "id": "KJA-003",
+      "trust": 95,
+      "band": "Exceptional",
+      "investment": 8.7,
+      "investmentBand": "Exceptional",
+      "digest": "ebf03a1958c9bb2c290057909aa5ccfe2900161a69e8403bc98e6c6897ba2bdd"
+    },
+    {
+      "id": "KJA-004",
+      "trust": 93,
+      "band": "Exceptional",
+      "investment": 8.1,
+      "investmentBand": "Strong",
+      "digest": "bc9a78928ece5449aa6a7005de37aad576fc62ccf916b746062253171397d668"
+    },
+    {
+      "id": "KJA-005",
+      "trust": 88,
+      "band": "Strong",
+      "investment": 8.2,
+      "investmentBand": "Strong",
+      "digest": "cbde745c45d7ce0e7cf5c5f284c17bb9e59d877bafa79cc823f4d542933514fe"
+    },
+    {
+      "id": "KJA-006",
+      "trust": 87,
+      "band": "Strong",
+      "investment": 7.1,
+      "investmentBand": "Solid",
+      "digest": "e32207cffec97ee8cf0594fd0d7c6b40cdeabfb7bdd4f4b856de23361ee17c78"
+    },
+    {
+      "id": "KJA-007",
+      "trust": 95,
+      "band": "Exceptional",
+      "investment": 8.1,
+      "investmentBand": "Strong",
+      "digest": "50e665c77bbbb029e81d5db1b9c2c910d1fd7f391416b9c3c967c9d4a75161bd"
+    },
+    {
+      "id": "KJA-008",
+      "trust": 87,
+      "band": "Strong",
+      "investment": 7.1,
+      "investmentBand": "Solid",
+      "digest": "417a26b6a408598832de8335d1020ace32d8a7035af542c396cdbb36362220ff"
+    },
+    {
+      "id": "KJA-009",
+      "trust": 91,
+      "band": "Exceptional",
+      "investment": 8.2,
+      "investmentBand": "Strong",
+      "digest": "42a85fc28b1c66e1c368c9dbded45505f451beed228ec9d2b383b04d729ae60b"
+    },
+    {
+      "id": "KJA-010",
+      "trust": 90,
+      "band": "Exceptional",
+      "investment": 7,
+      "investmentBand": "Solid",
+      "digest": "59b69ddedb276cf95243e767bf7c431840b6ee12b9ae753614a85d21d9ced985"
+    },
+    {
+      "id": "KJA-011",
+      "trust": 87,
+      "band": "Strong",
+      "investment": 8.1,
+      "investmentBand": "Strong",
+      "digest": "47473d76d2e299d0a59cc9062f070437b983b77e9a7371e6870ad63c1def6808"
+    },
+    {
+      "id": "KJA-012",
+      "trust": 88,
+      "band": "Strong",
+      "investment": 8.1,
+      "investmentBand": "Strong",
+      "digest": "325a9c71eed9869edb658ae6c66d7ef78d76acd52b0703c6e8e50af64ffd9755"
+    },
+    {
+      "id": "KJA-013",
+      "trust": 87,
+      "band": "Strong",
+      "investment": 6.8,
+      "investmentBand": "Solid",
+      "digest": "e38eb29b4297d48894ebdc0c1e2b3dec4a63b87dbd8627d450533d721c9a7a92"
+    },
+    {
+      "id": "KJA-014",
+      "trust": 88,
+      "band": "Strong",
+      "investment": 8.4,
+      "investmentBand": "Strong",
+      "digest": "3a73111ddc961cdf268711e86f2f6178a7b05066534f4ae6c580d429e40cc4a9"
+    },
+    {
+      "id": "KJA-015",
+      "trust": 87,
+      "band": "Strong",
+      "investment": 7.1,
+      "investmentBand": "Solid",
+      "digest": "fa680df44c67125cc5ba743d375b19e3500f40ae3133c930569b180df565abdf"
+    },
+    {
+      "id": "KJA-016",
+      "trust": 88,
+      "band": "Strong",
+      "investment": 7.8,
+      "investmentBand": "Strong",
+      "digest": "704c1bd71283af3efdb592f084a3852381a8ab5782c3e6deb92299e784c522b6"
+    },
+    {
+      "id": "KJA-017",
+      "trust": 89,
+      "band": "Strong",
+      "investment": 7.5,
+      "investmentBand": "Strong",
+      "digest": "8c6fa9b5e9ec9efd866240b2fc9f1bbd491021283bc8121abd03d034be461b57"
+    },
+    {
+      "id": "KJA-018",
+      "trust": 84,
+      "band": "Strong",
+      "investment": 7.6,
+      "investmentBand": "Strong",
+      "digest": "528a6a1c0d09c326560ed57f814f2dc4bcda8807b750df897f83ecd22e21234f"
+    },
+    {
+      "id": "KJA-019",
+      "trust": 87,
+      "band": "Strong",
+      "investment": 7.5,
+      "investmentBand": "Strong",
+      "digest": "79290e3e18519229f438412dba75228a702db714bf6e0159242279797a7c17c6"
+    },
+    {
+      "id": "KJA-020",
+      "trust": 46,
+      "band": "Requires Significant Due Diligence",
+      "investment": 6.6,
+      "investmentBand": "Solid",
+      "digest": "2f7cf9a556f69bb33afb1db95f992e98e4fd23acabd066359c5c590130e3abb2"
+    },
+    {
+      "id": "KJA-021",
+      "trust": 82,
+      "band": "Strong",
+      "investment": 7.8,
+      "investmentBand": "Strong",
+      "digest": "484a31eb9606069f1112f8283e00ee597f09a3a3121c0607e2ddcc7f34337035"
+    },
+    {
+      "id": "KJA-022",
+      "trust": 74,
+      "band": "Moderate",
+      "investment": 5.8,
+      "investmentBand": "Moderate",
+      "digest": "970cd1cd50bdf4da6e8e4c081af1a5ef5417bf75442b292c2acaa6d28c5d600b"
+    },
+    {
+      "id": "KJA-023",
+      "trust": 74,
+      "band": "Moderate",
+      "investment": 5.6,
+      "investmentBand": "Moderate",
+      "digest": "3a09d2e5a385edb757147b6cd1059cf8d122ae8d7728e06d9ba34307a687ccc8"
+    },
+    {
+      "id": "KJA-024",
+      "trust": 75,
+      "band": "Moderate",
+      "investment": 5.8,
+      "investmentBand": "Moderate",
+      "digest": "95b02dee9dc76e3650e52681eeb9121fed949f8b0e1ed492fb981f5fd1fc4b68"
+    },
+    {
+      "id": "KJA-025",
+      "trust": 71,
+      "band": "Moderate",
+      "investment": 6,
+      "investmentBand": "Moderate",
+      "digest": "a9985f6d031a5748fe3cc46941ed29d93689f85ded5a7c2ea5b6fc110e62da99"
+    },
+    {
+      "id": "KJA-026",
+      "trust": 74,
+      "band": "Moderate",
+      "investment": 6.3,
+      "investmentBand": "Moderate",
+      "digest": "7baceffc0323b82797be0ecd253c401ea0750ce8e929722d7a0dc394b7ce0bc1"
+    },
+    {
+      "id": "KJA-027",
+      "trust": 73,
+      "band": "Moderate",
+      "investment": 6.2,
+      "investmentBand": "Moderate",
+      "digest": "6c2d2793eab919b6ca9c93bfa0688d7c9ac7defe86a7941089cee26b8ca36518"
+    }
+  ]
+}

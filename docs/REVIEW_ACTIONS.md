@@ -169,3 +169,28 @@ verification green (118 pages, 2 injected preloads, 507 kB ≤ 525 kB budget) ·
 live walkthrough clean (home, NL search, listing detail, Ask Keja escalation,
 account — zero console errors, no 390 px overflow) · all four workflow files
 YAML-validated.
+
+## 2026-09-13 — wave 12: the verifiable trust layer (cycle 5)
+
+Theme: make what the platform *claims about its own scores* verifiable. The
+six-area survey (trust anchor, AI honesty, thin-data confidence, performance
+equity, regulatory sequencing, auth guarantees) found the AI gateway, the
+performance budget ratchet and the 2FA stack already structurally sound —
+those were left alone. Five defects shipped as one coherent change set.
+
+| Finding | Severity | What was done |
+| --- | --- | --- |
+| **The claims register misstated its own engine.** The `trust-score` claim said "five weighted pillars"; the engine ships twelve factors and the Trust Center's methodology tab says twelve. A truth-layer that misdescribes the thing it vouches for is worse than none — and the claim's evidence ("factor definitions are published on the Trust Center") was pointing at a page contradicting it. | P0 (trust) | Claim corrected to twelve factors; evidence now also cites the published anchor manifest; a drift-guard test derives the engine's factor count (`trustScore(PROPERTIES[0]).factors.length`) and fails the suite if the register ever misstates it again. An article excerpt that conflated the 5-signal *verification pipeline* with "every trust score" was reworded too. |
+| **Investment Score claimed FACT for editorial data.** `location` (a hand-set band table the file itself calls "illustrative… upgradeable to data") and `demand` (views blended with the trust-score model) were labelled FACT — while the Trust Score engine labels the same underlying tables ESTIMATE. A fourth mislabel (`rental` claiming FACT for authored rent estimates) surfaced when the new allowlist test ran. | P0 (trust) | All four factors relabelled ESTIMATE with honest notes. A pinned allowlist test now fails if any factor outside verification-derived inputs (`risk`) claims FACT — adding a FACT requires a reason that survives review. |
+| **Scores had no provenance.** Deterministic client-side computation meant all users saw the same number, but nothing could answer "what score was published for KJA-001 on 13 Sep, under which algorithm?" — no version, no per-release record, no tamper-evidence. The Trust Center's "Audit trails" pillar promised immutable logs that a static export cannot have. | P0 (trust) | Score provenance made real within the static architecture: both engines carry explicit versions (`TRUST_ALGORITHM_VERSION`, `INVESTMENT_ALGORITHM_VERSION`); a build step (`scripts/generate-trust-anchor.ts`) computes every catalogue listing's scores and publishes `trust-anchor.json` (schemaVersion, engine versions, generatedAt, input snapshot digest, per-listing outcome + sha256 digest over factors/weights/outcomes); committed to git so repository history becomes the audit trail; folded into the sw-version release hash so each release id attests the anchor it shipped; `verify-artifacts.mjs` gained gate 7 (structure + coverage === prerendered listings); the listing page and Trust Center show engine version + release + manifest link; the generator self-validates before writing. |
+| **One-decimal precision on thin data.** The Investment Score showed `8.2/10` whether an area had 2 comparables or 200 — false precision exactly where users least afford it. (KEJA DATA answers already stated sample sizes — the honest pattern existed, the score surfaces didn't use it.) | P1 (UX/trust) | New data-confidence layer (`dataConfidence`): comparable counts against live inventory; grades thin (<5) / growing (5–14) / robust (≥15); presentation precision follows the grade — thin shows the band only ("Exceptional", no number), growing shows integers, robust earns the decimal. Verified live: Kilimani (4 comparables) now shows the band + an amber "Thin data — 4 comparable listings" chip. |
+| **Regulated capabilities could be flipped live by editing a string.** Nothing structural prevented a `status: 'live'` edit to payments/tokenize/kyc/mpesa-escrow landing before legal review — technical completeness could be mistaken for legal readiness. | P1 (regulatory) | New structural gate (`src/lib/regulatory.ts` + `docs/legal/approvals/`): regulated claim ids may only be `live` when a committed, parseable, unexpired legal-approval artifact exists at `docs/legal/approvals/<id>.md` (capability, named approver, date, scope, expiry). Enforced by tests on every CI path including Auto-Pilot ingests; the directory ships empty by design — empty means locked. |
+
+Evidence: 442 tests / 34 files (32 new) · typecheck + lint clean · artifact
+verification green (118 pages, trust-anchor covering all 87 prerendered
+listings, both engines versioned, entry JS still 507 kB ≤ 525 kB) ·
+in-browser verification against the fresh build: provenance caption renders,
+thin-data chip + band-only headline on Kilimani, manifest link resolves from
+deep pages (a relative-href 404 on prerendered sub-pages was caught and fixed
+with the base-path-aware `asset()` helper), anchor fetch returns 87 listings
+with digests, zero console errors.

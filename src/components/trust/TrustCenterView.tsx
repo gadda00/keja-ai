@@ -28,9 +28,12 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CAPABILITY_CLAIMS, type ClaimStatus } from '@/data/claims';
-import { trustScore, type TrustFactor } from '@/lib/trustScore';
+import { trustScore, TRUST_ALGORITHM_VERSION, type TrustFactor } from '@/lib/trustScore';
+import { INVESTMENT_ALGORITHM_VERSION } from '@/lib/investmentScore';
+import { currentRelease } from '@/lib/telemetry';
 import { useAllProperties } from '@/lib/inventory';
 import { useRouter } from '@/lib/router';
+import { asset } from '@/config';
 import { cn } from '@/lib/utils';
 
 const STATUS_STYLE: Record<ClaimStatus, string> = {
@@ -98,6 +101,22 @@ function MethodologyPanel() {
               <p className="mt-0.5 text-[10px] font-bold uppercase tracking-wide opacity-90">{label}</p>
             </div>
           ))}
+        </div>
+        <div className="mt-5 rounded-xl bg-accent/50 p-3.5 text-[11px] leading-relaxed text-muted-foreground">
+          <p>
+            <strong className="text-foreground">Versioned and anchored.</strong> Both engines carry an
+            explicit version — Trust Score <span className="font-mono">{TRUST_ALGORITHM_VERSION}</span>,
+            Investment Score <span className="font-mono">{INVESTMENT_ALGORITHM_VERSION}</span> — and every
+            release publishes a machine-readable manifest of every listing&rsquo;s scores and digests at{' '}
+            <a className="underline hover:text-foreground" href={asset('trust-anchor.json')} target="_blank" rel="noreferrer">
+              /trust-anchor.json
+            </a>
+            {currentRelease() && (
+              <> (this deployment: release <span className="font-mono">{currentRelease()}</span>)</>
+            )}
+            , so a score you saw on a given date can be traced to the exact algorithm and data that
+            produced it. Scores computed on thin data present as bands, not decimals.
+          </p>
         </div>
       </div>
 
