@@ -74,6 +74,26 @@ jobs:
             else exit $code; fi
           }
 
+      # Wave-16 — pre-push data gate. The 2026-09-18 14:25 ingest culled the
+      # hero-example listing; the verify job caught it AFTER the push had
+      # already deployed (the guarded revert healed production ~2 min later,
+      # but the bad data was live). The data-facing suite now runs BEFORE
+      # git push: a broken ingest fails HERE — nothing is committed, nothing
+      # deploys, no revert needed. The verify job stays as defense-in-depth
+      # (full suite + build).
+      - name: Pre-push data gate (data-integrity + hero promise + generated artifacts)
+        if: steps.pipeline.outputs.changed == 'true'
+        run: |
+          bun install --frozen-lockfile
+          npx vitest run \
+            tests/data-integrity.test.ts \
+            tests/queryParser.test.ts \
+            tests/homeSubset.test.ts \
+            tests/autopilotProtection.test.ts \
+            tests/trustAnchor.test.ts \
+            tests/sectionMeta.test.ts \
+            tests/buildParity.test.ts
+
       - name: Commit new listings
         if: steps.pipeline.outputs.changed == 'true'
         run: |
@@ -82,17 +102,20 @@ jobs:
           # committing — otherwise every ingest breaks `npm run
           # lint:prettier` and the drift compounds.
           npx --yes prettier@3.9.6 --write src/data/auto-listings.json
-          # Wave-15 home-subset: the homepage's featured picks + stats are a
-          # generated artifact pinned byte-exact by tests/homeSubset.test.ts
-          # — regenerate whenever the catalogue changes, or the verify job
-          # below (rightly) fails on the stale subset and reverts the ingest.
+          # Wave-15/16 generated artifacts — regenerate whenever the
+          # catalogue changes, ALL in lockstep (one data change, four files):
+          #   home-subset  — pinned byte-exact by tests/homeSubset.test.ts
+          #   trust-anchor — the published score manifest (audit trail)
+          #   sitemap      — per-listing URLs must match the catalogue
           bun scripts/generate-home-subset.ts
+          bun scripts/generate-trust-anchor.ts
+          bun scripts/generate-sitemap.mjs
           # Vercel Hobby verification: commits must be authored by the team
           # owner (torv54@gmail.com) or the deploy is blocked. The automation
           # is identified by the commit message instead of the identity.
           git config user.name "gadda00"
           git config user.email "torv54@gmail.com"
-          git add src/data/auto-listings.json src/data/home-subset.json
+          git add src/data/auto-listings.json src/data/home-subset.json public/trust-anchor.json public/sitemap.xml
           git commit \
             -m "chore(autopilot): ingest new listings $(date -u +'%Y-%m-%d %H:%M UTC')" \
             -m "Automated by the Auto-Pilot workflow (.github/workflows/auto-listings.yml)."

@@ -146,7 +146,12 @@ describe('parseFreeQuery — real inventory regression', () => {
       ),
     );
     expect(hits.length).toBeGreaterThan(0);
-    expect(hits.some((p) => p.id === 'KJA-A0162')).toBe(true);
+    // Structural promise only (wave-16): the id-level pin (KJA-A0162) broke
+    // every Auto-Pilot ingest whose cap-60 eviction culled that one listing —
+    // the bot inventory churns, the promise must not. The promise is now
+    // enforced on the data side too: publish.mjs's hero-promise protection
+    // restores a qualifying listing if cap eviction would empty the set, and
+    // tests/autopilotProtection.test.ts pins that policy.
   });
 
   it('a nonsense query returns zero hits without crashing', () => {

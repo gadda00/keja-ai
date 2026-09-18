@@ -949,3 +949,33 @@ Discover, investment confidence, alert sweep, zero console errors.
 **Verification:** 546 tests / 42 files (8 new) · typecheck clean · lint
 clean · build + artifact verification PASSED (entry 507 ≤ 525 kB, critical
 977 ≤ 1000 kB, inventory lazy, 87-listing anchor).
+
+---
+
+## IMP-019 — Wave-16: the Auto-Pilot breaks the hero promise; gated before the push (18 Sep 2026)
+
+**The incident.** The 14:25 UTC ingest's cap-60 eviction culled KJA-A0162 —
+the only listing satisfying the homepage's advertised hero example
+("2BR Kilimani under 15M"). The verify job caught it and the guarded revert
+healed production, but only AFTER the GITHUB_TOKEN push had already deployed
+via the Vercel Git integration: ~2 minutes of live site whose hero example
+returned zero results. The designed tripwire worked; the exposure window was
+the flaw.
+
+**Three fixes.** (1) The promise is now enforced at merge time —
+publish.mjs's hero-promise protection restores the newest evicted qualifier
+if cap eviction would empty the set (deterministic, stable size, logged in
+the run record); the queryParser regression relaxed from an id-level pin
+(KJA-A0162) to the structural promise it always meant, since the bot
+inventory churns and the promise must not. (2) The data-facing suite now
+runs in the ingest job BEFORE git push — a broken ingest fails with nothing
+committed, nothing deployed, nothing to revert; the verify job remains
+defense-in-depth. (3) Ingest commits now regenerate every generated artifact
+in lockstep (home-subset + trust-anchor + sitemap, alongside the data), so
+git history is the complete audit trail of what shipped. Pinned by 7 new
+tests (tests/autopilotProtection.test.ts) + the incident replay script
+(scripts/verify-incident-replay.ts) — which replays the exact culling and
+asserts the promise holds.
+
+**Verification:** 553 tests / 43 files · typecheck clean · lint clean ·
+build + artifact verification PASSED · incident replay PASSED.
