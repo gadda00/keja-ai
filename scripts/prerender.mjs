@@ -155,7 +155,7 @@ const escapeHtml = (s) =>
 
 const escapeAttr = escapeHtml;
 
-const clip = (s, n) => {
+const _clip = (s, n) => {
   const clean = s.replace(/\s+/g, ' ').trim();
   return clean.length <= n ? clean : `${clean.slice(0, n - 1).trimEnd()}\u2026`;
 };
@@ -200,7 +200,7 @@ function render(page, SITE_URL) {
   const updated = template
     .replace(/<title[^>]*>.*?<\/title>/i, title)
     .replace(/<meta name="description"[^>]*>/i, (m) => {
-      const match = m.match(/content="([^"]*)"/);
+      const _match = m.match(/content="([^"]*)"/);
       return `<meta name="description" content="${escapeAttr(page.description)}" />`;
     })
     .replace(/<\/head>/i, (m) => `\n    ${head}\n    ${m}`)
