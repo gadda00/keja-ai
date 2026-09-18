@@ -31,10 +31,24 @@ describe('build-command parity (package.json ↔ vercel.json)', () => {
   it('the pipeline includes the preload injection before the prerender clones the template', () => {
     const s = steps(pkg.scripts.build);
     const inject = s.indexOf('node scripts/inject-preloads.mjs');
-    const prerender = s.indexOf('node scripts/prerender.mjs');
+    const prerender = s.indexOf('bun scripts/prerender.ts');
     expect(inject).toBeGreaterThan(-1);
     expect(prerender).toBeGreaterThan(-1);
     expect(inject).toBeLessThan(prerender);
+  });
+
+  it('the TS-importing pipeline steps run under bun (node cannot import the shared TS catalogues)', () => {
+    const s = steps(pkg.scripts.build);
+    // generate-sitemap / prerender / trust-anchor import src/**/*.ts — only
+    // bun executes those. A `node scripts/*.mjs|ts` regression here is what
+    // broke the delivery pipeline on 2026-09-18 (missing-file ENOENT on
+    // Vercel + silently-empty fallbacks).
+    for (const step of s) {
+      expect(step).not.toMatch(/^node scripts\/(prerender|generate-sitemap|generate-trust-anchor)/);
+    }
+    expect(s).toContain('bun scripts/prerender.ts');
+    expect(s).toContain('bun scripts/generate-trust-anchor.ts');
+    expect(s).toContain('bun scripts/generate-sitemap.mjs');
   });
 
   it('the pipeline ends with artifact verification (nothing ships ungated)', () => {
