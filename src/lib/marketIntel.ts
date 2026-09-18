@@ -14,7 +14,7 @@
  * sample sizes honestly and never fabricates precision.
  */
 import type { Property } from '@/data/properties';
-import { areaInsights } from '@/data/properties';
+import { areaInsights } from '@/data/areaInsights';
 import { isRentalPrice } from '@/lib/finance';
 
 export interface MarketAnswer {

@@ -41,7 +41,7 @@ export default function CompareView() {
     { label: 'Rent estimate', render: (p) => (p.rentEstimate ? `${formatKES(p.rentEstimate)}/mo` : '—') },
     { label: 'Gross yield (est.)', render: (p) => (p.rentEstimate && p.price ? `${(((p.rentEstimate * 12) / p.price) * 100).toFixed(1)}%` : '—') },
     { label: 'Trust Score', render: (p) => <span className="font-black text-primary">{trustScore(p).composite}</span> },
-    { label: 'Investment Score', render: (p) => `${investmentScore(p).overall.toFixed(1)}/10` },
+    { label: 'Investment Score', render: (p) => `${investmentScore(p, { inventory: all }).overall.toFixed(1)}/10` },
     { label: 'Title check', render: (p) => (p.verification.titleCheck === 'verified' ? <CheckCircle2 className="h-4 w-4 text-primary" aria-label="Verified" /> : <XCircle className="h-4 w-4 text-gold" aria-label="Pending" />) },
     { label: 'Ardhisasa match', render: (p) => (p.verification.ardhisasaMatch ? <CheckCircle2 className="h-4 w-4 text-primary" aria-label="Matched" /> : <Minus className="h-4 w-4 text-muted-foreground" aria-label="No" />) },
     { label: 'Availability', render: (p) => <span className="capitalize">{p.availability}</span> },
@@ -91,7 +91,7 @@ export default function CompareView() {
                 row.label === 'Price / m²' ? (p: NonNullable<(typeof picked)[number]>) => p.price / p.sizeSqm
                 : row.label === 'Gross yield (est.)' ? (p: NonNullable<(typeof picked)[number]>) => (p.rentEstimate && p.price ? (p.rentEstimate * 12) / p.price : 0)
                 : row.label === 'Trust Score' ? (p: NonNullable<(typeof picked)[number]>) => trustScore(p).composite
-                : row.label === 'Investment Score' ? (p: NonNullable<(typeof picked)[number]>) => investmentScore(p).overall
+                : row.label === 'Investment Score' ? (p: NonNullable<(typeof picked)[number]>) => investmentScore(p, { inventory: all }).overall
                 : null;
               const bestVal = fn ? best(fn, 'max') : null;
               return (

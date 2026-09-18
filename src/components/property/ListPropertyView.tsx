@@ -20,7 +20,7 @@ import { toast } from '@/hooks/use-toast';
 import { useAllProperties } from '@/lib/inventory';
 import { useSubmissions, useUserListings, submissionToListing } from '@/lib/adminStore';
 import { useAuth, initials } from '@/lib/auth';
-import { areaInsights } from '@/data/properties';
+import { areaInsights } from '@/data/areaInsights';
 import { validateListingForm } from '@/lib/boundaries';
 import { formatKES } from '@/lib/format';
 import { navigate } from '@/lib/router';

@@ -5,9 +5,9 @@
  * guarantees — the engine separates verified inputs from estimates and
  * communicates how much data stands behind each score.
  */
-import { areaInsights, PROPERTIES, type Property } from '@/data/properties';
+import type { Property } from '@/data/properties';
+import { areaInsights } from '@/data/areaInsights';
 import { isRentalPrice } from '@/lib/finance';
-import { AUTO_PROPERTIES } from '@/lib/autoListings';
 
 /**
  * Version of this scoring engine. Bump on ANY change to factors, weights or
@@ -120,11 +120,28 @@ const LOCATION_SCORE: Record<string, number> = {
 
 export function investmentScore(
   p: Property,
-  opts?: {
-    /** inventory the confidence layer counts comparables against (defaults to the platform catalogue) */
-    inventory?: Property[];
+  opts: {
+    /** Inventory the confidence layer counts comparables against.
+     *
+     * REQUIRED since the wave-15 inventory data-split: this module must not
+     * import the 87-listing catalogue (that dragged the whole inventory into
+     * the boot-critical chunk via PropertyCard). Callers pass the inventory
+     * they render within — views have `useAllProperties()`, the build-side
+     * anchor passes the catalogue it is scoring. */
+    inventory: Property[];
   },
 ): InvestmentScore {
+  const core = investmentFactors(p);
+  return { ...core, confidence: dataConfidence(p, opts.inventory) };
+}
+
+/** Pure factor engine — overall / band / the seven factors, NO inventory
+ *  dependency. Safe for the boot-critical card surface (PropertyCard), which
+ *  renders only the chip; confidence comparables need a real inventory and
+ *  are computed by `investmentScore` in the views that have one. */
+export function investmentFactors(
+  p: Property,
+): Pick<InvestmentScore, 'overall' | 'band' | 'factors'> {
   // Rental listings are not sale assets — price/value per-sqm norm comparison
   // is skipped for them (monthly rent vs sale price per sqm is meaningless).
   // 1 — Rental potential. For rental listings (price = monthly rent) the
@@ -256,9 +273,7 @@ export function investmentScore(
             ? 'Moderate'
             : 'Speculative';
 
-  const inventory = opts?.inventory ?? [...AUTO_PROPERTIES, ...PROPERTIES];
-
-  return { overall, band, factors, confidence: dataConfidence(p, inventory) };
+  return { overall, band, factors };
 }
 
 const round1 = (n: number) => Math.round(n * 10) / 10;

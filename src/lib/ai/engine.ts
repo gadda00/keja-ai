@@ -6,7 +6,7 @@
  */
 import type { LanguageCode } from '@/config';
 import type { Property } from '@/data/properties';
-import { areaInsights } from '@/data/properties';
+import { areaInsights } from '@/data/areaInsights';
 import {
   analyzeInvestment,
   calculateMortgage,

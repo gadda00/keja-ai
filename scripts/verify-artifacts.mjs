@@ -170,6 +170,52 @@ else fail("robots.txt missing");
         "split the added weight before shipping (see CURRENT_PICTURE §8 data-split plan)",
     );
   }
+
+  /* 5d — first-paint critical JS (wave-15): entry + the preloaded shell
+     graph. This is the real mobile-first number — before the 2026-09-18
+     inventory data-split it stood at 1,134 kB raw (507 entry + 627 preloaded:
+     the shell statically carried the entire 87-listing catalogue). The split
+     moved the catalogue into a lazy chunk (home renders a generated 8-pick
+     subset); measured 977 kB after. Ratchet at 1000 kB: the NEXT regression —
+     any module re-importing the catalogue from the shell graph, a zod
+     default import in a boot path, or new eager weight — fails the build
+     here, at the exact gate that watches the class of bug. */
+  const CRITICAL_JS_BUDGET_BYTES = 1000 * 1024;
+  let preloadedBytes2 = 0;
+  for (const href of preloads) {
+    const f = join(out, href.replace(/^\//, ""));
+    if (existsSync(f)) preloadedBytes2 += statSync(f).size;
+  }
+  const criticalBytes = entryBytes + preloadedBytes2;
+  if (criticalBytes <= CRITICAL_JS_BUDGET_BYTES) {
+    ok(
+      `first-paint critical JS ${(criticalBytes / 1024).toFixed(0)} kB ` +
+        `(entry ${(entryBytes / 1024).toFixed(0)} + preloaded ${(preloadedBytes2 / 1024).toFixed(0)}) ≤ ` +
+        `${(CRITICAL_JS_BUDGET_BYTES / 1024).toFixed(0)} kB budget`,
+    );
+  } else {
+    fail(
+      `first-paint critical JS ${(criticalBytes / 1024).toFixed(0)} kB exceeds the ` +
+        `${(CRITICAL_JS_BUDGET_BYTES / 1024).toFixed(0)} kB ratchet — something re-fattened the boot graph ` +
+        "(shell importing the inventory? zod on a new boot path? eager heavy imports?). See CURRENT_PICTURE §8.5.",
+    );
+  }
+
+  /* 5e — the inventory stays OFF the boot path (wave-15): the catalogue
+     chunk must not be preloaded. A preload hint re-appearing for the lazy
+     inventory is the exact regression the critical budget watches in
+     aggregate; this named check pinpoints it for whoever trips the budget. */
+  {
+    const html = html0();
+    const ids = [...html.matchAll(/KJA-A0\d{2}/g)].length;
+    if (ids === 0) {
+      ok("no listing ids in the boot HTML (inventory stays lazy)");
+    } else {
+      fail(
+        `${ids} listing-id occurrences in index.html — the inventory leaked back into the boot graph`,
+      );
+    }
+  }
 }
 function html0() {
   return existsSync(indexPath) ? readFileSync(indexPath, "utf8") : "";

@@ -15,7 +15,7 @@
  *    legal, valuation, financial or regulatory advice
  *  - everything runs client-side — documents never leave the device
  */
-import { areaInsights } from '@/data/properties';
+import { areaInsights } from '@/data/areaInsights';
 
 export type DocKind =
   | 'title'

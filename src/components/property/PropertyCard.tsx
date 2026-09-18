@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Bath, BedDouble, Heart, Ruler, Tag } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { investmentScore } from '@/lib/investmentScore';
+import { investmentFactors } from '@/lib/investmentScore';
 import { isRentalPrice } from '@/lib/finance';
 import { formatKES } from '@/lib/format';
 import type { Property } from '@/data/properties';
@@ -35,7 +35,9 @@ export function PropertyCard({
 }) {
   const [imgOk, setImgOk] = useState(true);
   const isRent = p.purpose.includes('rent') || isRentalPrice(p.price);
-  const score = investmentScore(p);
+  // Pure factors only (overall chip) — the confidence layer needs a real
+  // inventory, which the boot-critical card deliberately does not import.
+  const score = investmentFactors(p);
 
   return (
     <motion.article

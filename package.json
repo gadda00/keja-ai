@@ -18,6 +18,7 @@
     "mobile:apk": "npm run build && npx cap sync android && cd android && ./gradlew assembleDebug",
     "sitemap": "bun scripts/generate-sitemap.mjs",
     "prerender": "bun scripts/prerender.ts",
+    "subset": "bun scripts/generate-home-subset.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "verify:artifacts": "node scripts/verify-artifacts.mjs"

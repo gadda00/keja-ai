@@ -2,7 +2,7 @@
  * Search v2: saved searches, alert matching, map coordinates, notifications.
  * All client-side (localStorage) — upgradeable to server push later.
  */
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 
 import type { Property } from '@/data/properties';
 import { matchesFreeQuery, parseFreeQuery } from '@/lib/queryParser';
@@ -223,13 +223,3 @@ export function useNotifications() {
   return { notifs, unread, markAllRead, clearAll, markOneRead, removeOne };
 }
 
-/** One-time alert sweep on mount (after inventory loads). */
-export function useAlertSweep(properties: Property[]) {
-  useEffect(() => {
-    const t = window.setTimeout(() => runAlertSweep(properties), 1500);
-    return () => window.clearTimeout(t);
-    // deliberate: fire once when the inventory size settles — depending on
-    // the array identity would re-run the sweep on every parent render
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [properties.length]);
-}

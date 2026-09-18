@@ -5,7 +5,7 @@ import { srcsetFor, GALLERY_SIZES } from '@/lib/responsive-images';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { NEIGHBORHOOD_GUIDES, getNeighborhoodGuide, guideInventoryCount } from '@/data/neighborhoods';
-import { areaInsights } from '@/data/properties';
+import { areaInsights } from '@/data/areaInsights';
 import { useAllProperties } from '@/lib/inventory';
 import { PropertyCard } from '@/components/property/PropertyCard';
 import { navigate } from '@/lib/router';

@@ -22,7 +22,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAllProperties } from '@/lib/inventory';
 import { navigate } from '@/lib/router';
-import { areaInsights } from '@/data/properties';
+import { areaInsights } from '@/data/areaInsights';
 import { formatKES } from '@/lib/format';
 import { cn } from '@/lib/utils';
 

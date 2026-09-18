@@ -18,7 +18,7 @@
  * store (useStore / 'keja-store-change' event), so no new persistence
  * machinery is introduced.
  */
-import { areaInsights } from '@/data/properties';
+import { areaInsights } from '@/data/areaInsights';
 import { isRentalPrice } from '@/lib/finance';
 import { marketInventory } from '@/lib/inventory';
 import { store, useStore } from '@/lib/store';

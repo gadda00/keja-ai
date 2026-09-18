@@ -8,13 +8,18 @@
  * Properties page's "We'll alert you when matching listings arrive" was a
  * promise the app could not keep. This component runs the sweep once the
  * inventory settles and renders the bell the notifications were built for.
+ *
+ * Wave-15: the sweep no longer statically imports `@/lib/inventory` — that
+ * pulled the full 87-listing catalogue into the boot-critical shell chunk
+ * for a debounced background job. The inventory module is now dynamically
+ * imported AFTER first paint (1.5 s debounce unchanged), so the alert
+ * pipeline still runs on every session while the boot path stays lean.
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bell, CheckCheck, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useAllProperties } from '@/lib/inventory';
-import { useAlertSweep, useNotifications } from '@/lib/searchStore';
+import { runAlertSweep, useNotifications } from '@/lib/searchStore';
 import { navigate } from '@/lib/router';
 import { cn } from '@/lib/utils';
 
@@ -26,11 +31,28 @@ function timeAgo(iso: string): string {
   return `${Math.floor(s / 86400)}d ago`;
 }
 
+/** Deferred alert sweep: load the inventory chunk off the boot path, then
+ *  run the same sweep `useAlertSweep` ran — once, 1.5 s after mount, against
+ *  the CURRENT merged inventory (incl. device-local user listings via
+ *  marketInventory()). Cancelled if the bell unmounts first. */
+function useLazyAlertSweep() {
+  useEffect(() => {
+    let cancelled = false;
+    const t = window.setTimeout(() => {
+      void import('@/lib/inventory').then(({ marketInventory }) => {
+        if (!cancelled) runAlertSweep(marketInventory());
+      });
+    }, 1500);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(t);
+    };
+  }, []);
+}
+
 export function NotificationsBell() {
   const [open, setOpen] = useState(false);
-  const properties = useAllProperties();
-  // one sweep after inventory settles (1.5 s debounce inside the hook)
-  useAlertSweep(properties);
+  useLazyAlertSweep();
   const { notifs, unread, markAllRead, clearAll, markOneRead, removeOne } = useNotifications();
 
   return (

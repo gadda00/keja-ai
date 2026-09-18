@@ -25,7 +25,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { analyzeDeal, DOC_OPTIONS, SAMPLE_DEAL, type DealAnalysis, type DealInput, type DocEntry, type DocKind } from '@/lib/dealAnalyst';
-import { areaInsights } from '@/data/properties';
+import { areaInsights } from '@/data/areaInsights';
 import { formatKES } from '@/lib/format';
 import { cn } from '@/lib/utils';
 

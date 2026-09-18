@@ -22,7 +22,7 @@
  * with human verification paths and professional referrals.
  */
 import type { Property } from '@/data/properties';
-import { areaInsights } from '@/data/properties';
+import { areaInsights } from '@/data/areaInsights';
 
 export type ScoreBasis = 'FACT' | 'ESTIMATE' | 'ASSUMPTION';
 

@@ -52,6 +52,13 @@ jobs:
         with:
           node-version: 22
 
+      # bun runs the home-subset generator (scripts/generate-home-subset.ts
+      # imports the TypeScript data modules — the same runtime contract as
+      # the build pipeline; see tests/buildParity.test.ts).
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.14
+
       - name: Run Auto-Pilot pipeline
         id: pipeline
         env:
@@ -75,12 +82,17 @@ jobs:
           # committing — otherwise every ingest breaks `npm run
           # lint:prettier` and the drift compounds.
           npx --yes prettier@3.9.6 --write src/data/auto-listings.json
+          # Wave-15 home-subset: the homepage's featured picks + stats are a
+          # generated artifact pinned byte-exact by tests/homeSubset.test.ts
+          # — regenerate whenever the catalogue changes, or the verify job
+          # below (rightly) fails on the stale subset and reverts the ingest.
+          bun scripts/generate-home-subset.ts
           # Vercel Hobby verification: commits must be authored by the team
           # owner (torv54@gmail.com) or the deploy is blocked. The automation
           # is identified by the commit message instead of the identity.
           git config user.name "gadda00"
           git config user.email "torv54@gmail.com"
-          git add src/data/auto-listings.json
+          git add src/data/auto-listings.json src/data/home-subset.json
           git commit \
             -m "chore(autopilot): ingest new listings $(date -u +'%Y-%m-%d %H:%M UTC')" \
             -m "Automated by the Auto-Pilot workflow (.github/workflows/auto-listings.yml)."

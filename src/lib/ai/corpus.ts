@@ -14,7 +14,8 @@
  * surface. Anything private (KYC evidence, user drafts, audit metadata)
  * never enters this module at all, so the retrieval layer cannot leak it.
  */
-import { areaInsights, PROPERTIES } from '@/data/properties';
+import { PROPERTIES } from '@/data/properties';
+import { areaInsights } from '@/data/areaInsights';
 
 export type CorpusKind = 'property' | 'area-insight' | 'policy';
 

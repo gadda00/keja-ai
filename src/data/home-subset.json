@@ -1,0 +1,637 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-18T14:23:48.607Z",
+  "featured": [
+    {
+      "id": "KJA-001",
+      "title": "Premium 3BR Apartment with City Views",
+      "type": "apartment",
+      "purpose": [
+        "buy",
+        "invest"
+      ],
+      "area": "Kilimani",
+      "county": "Nairobi",
+      "price": 14500000,
+      "rentEstimate": 110000,
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "sizeSqm": 145,
+      "amenities": [
+        "Balcony",
+        "Gym",
+        "Pool",
+        "24/7 Security",
+        "Lift",
+        "Borehole",
+        "CCTV",
+        "Visitor Parking"
+      ],
+      "images": [
+        "/images/props/apartment_1.webp",
+        "/images/props/interior_0.webp",
+        "/images/props/bedroom_0.webp",
+        "/images/props/interior_1.webp"
+      ],
+      "description": "A beautifully finished 3-bedroom apartment in the heart of Kilimani, one of Nairobi’s most in-demand rental corridors. The unit features an open-plan living area flowing onto a wide balcony with sweeping city views, a fitted kitchen with granite worktops, and master ensuite. The development offers a rooftop pool, modern gym, and full backup water and power. Walking distance to Yaya Centre and Prestige Plaza — a strong, liquid rental market for both young professionals and the expatriate community.",
+      "agency": "Chacadom Premier Properties",
+      "agent": {
+        "name": "Mercy Wanjiru",
+        "phone": "+254 712 000 001"
+      },
+      "trustScore": 96,
+      "verification": {
+        "titleCheck": "verified",
+        "ardhisasaMatch": true,
+        "photosVerified": true,
+        "duplicateCheck": "clean",
+        "listingVelocity": "normal",
+        "lastChecked": "2026-08-20"
+      },
+      "trustSignals": [
+        {
+          "label": "Title search",
+          "status": "pass",
+          "detail": "Title deed verified against Ardhisasa records — free of encumbrances."
+        },
+        {
+          "label": "Photo authenticity",
+          "status": "pass",
+          "detail": "All 4 photos uniquely matched to this listing. No cross-listing reuse detected."
+        },
+        {
+          "label": "Pricing analysis",
+          "status": "pass",
+          "detail": "Asking price is within 3% of the Kilimani 3BR market band (KES 13.8M–15.2M)."
+        },
+        {
+          "label": "Agent history",
+          "status": "pass",
+          "detail": "Chacadom Premier Properties: 6 active listings, 4.9 rating, zero fraud reports."
+        }
+      ],
+      "availability": "available",
+      "grossYieldEstimate": 9.1,
+      "appreciationForecast": 7.5,
+      "listedAt": "2026-07-28",
+      "views": 482,
+      "highlights": [
+        "Rooftop pool & gym",
+        "Walk to Yaya Centre",
+        "Backup water & power",
+        "Strong expat rental demand"
+      ]
+    },
+    {
+      "id": "KJA-010",
+      "title": "5BR Family Villa — Runda",
+      "type": "villa",
+      "purpose": [
+        "buy",
+        "invest"
+      ],
+      "area": "Runda",
+      "county": "Nairobi",
+      "price": 85000000,
+      "rentEstimate": 380000,
+      "bedrooms": 5,
+      "bathrooms": 5,
+      "sizeSqm": 460,
+      "amenities": [
+        "Swimming Pool",
+        "Garden",
+        "DSQ",
+        "Gated Estate",
+        "Electric Fence",
+        "Fireplace",
+        "Solar Heating",
+        "2-Car Garage"
+      ],
+      "images": [
+        "/images/props/villa_1.webp",
+        "/images/props/villa_0.webp",
+        "/images/props/bedroom_1.webp"
+      ],
+      "description": "A statement residence in gated Runda, Nairobi’s premier diplomatic address. Five ensuite bedrooms, formal living and dining rooms, a family room opening to the pool terrace, and a landscaped half-acre plot. Runda’s controlled development rules protect long-term value, and its proximity to the UN complex, Village Market, and international schools sustains deep expatriate demand for premium rentals.",
+      "agency": "Chacadom Premier Properties",
+      "agent": {
+        "name": "James Otieno",
+        "phone": "+254 712 000 002"
+      },
+      "trustScore": 95,
+      "verification": {
+        "titleCheck": "verified",
+        "ardhisasaMatch": true,
+        "photosVerified": true,
+        "duplicateCheck": "clean",
+        "listingVelocity": "normal",
+        "lastChecked": "2026-08-21"
+      },
+      "trustSignals": [
+        {
+          "label": "Title search",
+          "status": "pass",
+          "detail": "Freehold title verified, search certificate current."
+        },
+        {
+          "label": "Photo authenticity",
+          "status": "pass",
+          "detail": "All photos verified unique and on-site."
+        },
+        {
+          "label": "Pricing analysis",
+          "status": "pass",
+          "detail": "In line with premium Runda stock (KES 180k–190k per sqm)."
+        },
+        {
+          "label": "Agent history",
+          "status": "pass",
+          "detail": "Top-rated premium agency."
+        }
+      ],
+      "availability": "reserved",
+      "grossYieldEstimate": 5.4,
+      "appreciationForecast": 7.8,
+      "listedAt": "2026-06-18",
+      "views": 712,
+      "highlights": [
+        "Premier diplomatic address",
+        "Controlled development",
+        "UN & international school proximity",
+        "Currently reserved"
+      ]
+    },
+    {
+      "id": "KJA-002",
+      "title": "Luxury 5BR Villa with Pool & Garden",
+      "type": "villa",
+      "purpose": [
+        "buy",
+        "invest"
+      ],
+      "area": "Karen",
+      "county": "Nairobi",
+      "price": 75000000,
+      "rentEstimate": 350000,
+      "bedrooms": 5,
+      "bathrooms": 4,
+      "sizeSqm": 420,
+      "amenities": [
+        "Swimming Pool",
+        "Manicured Garden",
+        "DSQ",
+        "Solar Water Heating",
+        "Electric Fence",
+        "Alarm System",
+        "Gated Entry",
+        "Pet Friendly"
+      ],
+      "images": [
+        "/images/props/villa_0.webp",
+        "/images/props/villa_1.webp",
+        "/images/props/bedroom_1.webp",
+        "/images/props/villa_2.webp"
+      ],
+      "description": "An exceptional family residence set on half an acre of manicured gardens in Old Karen. This five-bedroom villa balances classic elegance with modern comfort: double-height reception rooms, a chef’s kitchen, ensuite bedrooms, and a sparkling pool framed by mature trees. Karen remains Nairobi’s premier low-density suburb, beloved by diplomatic families and executives. The property includes staff quarters, ample parking, and a private gated entrance.",
+      "agency": "Chacadom Premier Properties",
+      "agent": {
+        "name": "James Otieno",
+        "phone": "+254 712 000 002"
+      },
+      "trustScore": 94,
+      "verification": {
+        "titleCheck": "verified",
+        "ardhisasaMatch": true,
+        "photosVerified": true,
+        "duplicateCheck": "clean",
+        "listingVelocity": "normal",
+        "lastChecked": "2026-08-18"
+      },
+      "trustSignals": [
+        {
+          "label": "Title search",
+          "status": "pass",
+          "detail": "Freehold title confirmed. Search certificate dated within 90 days."
+        },
+        {
+          "label": "Photo authenticity",
+          "status": "pass",
+          "detail": "Photos uniquely verified; no recycled images across agencies."
+        },
+        {
+          "label": "Pricing analysis",
+          "status": "pass",
+          "detail": "Aligned with Karen villa comparables (KES 165k–195k per sqm for premium stock)."
+        },
+        {
+          "label": "Agent history",
+          "status": "pass",
+          "detail": "Verified agency with consistent closing record."
+        }
+      ],
+      "availability": "available",
+      "grossYieldEstimate": 5.6,
+      "appreciationForecast": 8,
+      "listedAt": "2026-08-02",
+      "views": 631,
+      "highlights": [
+        "Half-acre garden",
+        "Private pool",
+        "Old Karen address",
+        "Diplomatic family favourite"
+      ]
+    },
+    {
+      "id": "KJA-004",
+      "title": "4BR Townhouse in Gated Community",
+      "type": "townhouse",
+      "purpose": [
+        "buy",
+        "invest"
+      ],
+      "area": "Lavington",
+      "county": "Nairobi",
+      "price": 32000000,
+      "rentEstimate": 220000,
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "sizeSqm": 260,
+      "amenities": [
+        "Gated Community",
+        "Clubhouse",
+        "Children Play Area",
+        "Gym",
+        "Solar Heating",
+        "Borehole",
+        "Perimeter Wall",
+        "CCTV"
+      ],
+      "images": [
+        "/images/props/townhouse_0.webp",
+        "/images/props/interior_1.webp",
+        "/images/props/bedroom_0.webp"
+      ],
+      "description": "A charming four-bedroom townhouse in one of Lavington’s best-run gated communities of just 12 units. Private garden, attached garage, and a warm family layout with a sunken lounge and stone fireplace. The estate offers a clubhouse, gym, and children’s play area. Lavington continues to attract upper-middle-class families seeking proximity to international schools — a rental segment known for long tenancies and reliable payment.",
+      "agency": "Chacadom Premier Properties",
+      "agent": {
+        "name": "Mercy Wanjiru",
+        "phone": "+254 712 000 001"
+      },
+      "trustScore": 93,
+      "verification": {
+        "titleCheck": "verified",
+        "ardhisasaMatch": true,
+        "photosVerified": true,
+        "duplicateCheck": "clean",
+        "listingVelocity": "normal",
+        "lastChecked": "2026-08-19"
+      },
+      "trustSignals": [
+        {
+          "label": "Title search",
+          "status": "pass",
+          "detail": "Title verified; no caveats or encumbrances on record."
+        },
+        {
+          "label": "Photo authenticity",
+          "status": "pass",
+          "detail": "Unique photos, verified on-site."
+        },
+        {
+          "label": "Pricing analysis",
+          "status": "pass",
+          "detail": "Within Lavington townhouse comparables (KES 118k–128k per sqm)."
+        },
+        {
+          "label": "Agent history",
+          "status": "pass",
+          "detail": "Premium agency, strong record."
+        }
+      ],
+      "availability": "available",
+      "grossYieldEstimate": 8.3,
+      "appreciationForecast": 7.2,
+      "listedAt": "2026-07-20",
+      "views": 354,
+      "highlights": [
+        "Only 12 units in estate",
+        "International school catchment",
+        "Private garden",
+        "Long-tenancy family segment"
+      ]
+    },
+    {
+      "id": "KJA-012",
+      "title": "Furnished 1BR — Kileleshwa (Short-Stay Ready)",
+      "type": "apartment",
+      "purpose": [
+        "rent",
+        "invest"
+      ],
+      "area": "Kileleshwa",
+      "county": "Nairobi",
+      "price": 65000,
+      "rentEstimate": 65000,
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "sizeSqm": 58,
+      "amenities": [
+        "Fully Furnished",
+        "Wi-Fi Ready",
+        "DSTV",
+        "Balcony",
+        "Lift",
+        "Gym",
+        "24/7 Security",
+        "Borehole"
+      ],
+      "images": [
+        "/images/props/interior_0.webp",
+        "/images/props/apartment_0.webp",
+        "/images/props/bedroom_0.webp"
+      ],
+      "description": "A tastefully furnished one-bedroom apartment in Kileleshwa, available to rent at KES 65,000 monthly or as a short-stay unit. Contemporary furniture, fast Wi-Fi, and a well-equipped kitchen make it corporate-tenant and Airbnb ready from day one. Kileleshwa’s leafy streets sit between Westlands and Kilimani — quiet enough for residents, central enough for everything.",
+      "agency": "Nairobi Habitat Realtors",
+      "agent": {
+        "name": "Faith Njeri",
+        "phone": "+254 712 000 003"
+      },
+      "trustScore": 92,
+      "verification": {
+        "titleCheck": "verified",
+        "ardhisasaMatch": true,
+        "photosVerified": true,
+        "duplicateCheck": "clean",
+        "listingVelocity": "normal",
+        "lastChecked": "2026-08-20"
+      },
+      "trustSignals": [
+        {
+          "label": "Landlord verification",
+          "status": "pass",
+          "detail": "Landlord identity and ownership documents verified."
+        },
+        {
+          "label": "Photo authenticity",
+          "status": "pass",
+          "detail": "Interior photos verified against actual unit."
+        },
+        {
+          "label": "Rent analysis",
+          "status": "pass",
+          "detail": "KES 65k matches furnished Kileleshwa 1BR market (KES 60k–70k)."
+        },
+        {
+          "label": "Agent history",
+          "status": "pass",
+          "detail": "Verified agency, no dispute history."
+        }
+      ],
+      "availability": "available",
+      "grossYieldEstimate": 8.6,
+      "appreciationForecast": 6.8,
+      "listedAt": "2026-08-10",
+      "views": 519,
+      "furnished": true,
+      "highlights": [
+        "Rent KES 65,000/month",
+        "Fully furnished",
+        "Airbnb-ready",
+        "Corporate tenant demand"
+      ]
+    },
+    {
+      "id": "KJA-007",
+      "title": "Prime Commercial Office Floor — Westlands",
+      "type": "commercial",
+      "purpose": [
+        "buy",
+        "invest"
+      ],
+      "area": "Westlands",
+      "county": "Nairobi",
+      "price": 65000000,
+      "rentEstimate": 480000,
+      "sizeSqm": 480,
+      "amenities": [
+        "Central AC",
+        "Lift Bank",
+        "Backup Generator",
+        "Fibre Internet",
+        "Secure Parking",
+        "Conference Facility",
+        "24/7 Security"
+      ],
+      "images": [
+        "/images/props/office_0.webp",
+        "/images/props/office_1.webp"
+      ],
+      "description": "A full office floor (480 sqm) in a Grade-A Westlands office tower, currently tenanted by a regional tech firm on a 6-year lease at KES 480,000 per month. Fitted with raised flooring, partitioned offices, a boardroom, and server room. Investing in income-producing commercial space shifts the yield profile: this asset delivers a documented 8.9% gross yield with a corporate covenant tenant in place — ideal for investors prioritising income over appreciation.",
+      "agency": "Chacadom Premier Properties",
+      "agent": {
+        "name": "James Otieno",
+        "phone": "+254 712 000 002"
+      },
+      "trustScore": 92,
+      "verification": {
+        "titleCheck": "verified",
+        "ardhisasaMatch": true,
+        "photosVerified": true,
+        "duplicateCheck": "clean",
+        "listingVelocity": "normal",
+        "lastChecked": "2026-08-16"
+      },
+      "trustSignals": [
+        {
+          "label": "Title search",
+          "status": "pass",
+          "detail": "Commercial title verified; registered lease documented."
+        },
+        {
+          "label": "Photo authenticity",
+          "status": "pass",
+          "detail": "Current office photos verified on-site visit."
+        },
+        {
+          "label": "Pricing analysis",
+          "status": "pass",
+          "detail": "KES 135k per sqm — in line with Grade-A Westlands office stock."
+        },
+        {
+          "label": "Agent history",
+          "status": "pass",
+          "detail": "Premium agency, commercial desk verified."
+        }
+      ],
+      "availability": "available",
+      "grossYieldEstimate": 8.9,
+      "appreciationForecast": 6,
+      "listedAt": "2026-06-25",
+      "views": 276,
+      "highlights": [
+        "Tenanted — income from day one",
+        "Grade-A building",
+        "6-year corporate lease",
+        "8.9% gross yield documented"
+      ]
+    },
+    {
+      "id": "KJA-003",
+      "title": "Modern 2BR Apartment — Westlands",
+      "type": "apartment",
+      "purpose": [
+        "buy",
+        "rent",
+        "invest"
+      ],
+      "area": "Westlands",
+      "county": "Nairobi",
+      "price": 11000000,
+      "rentEstimate": 85000,
+      "bedrooms": 2,
+      "bathrooms": 2,
+      "sizeSqm": 105,
+      "amenities": [
+        "Balcony",
+        "Gym",
+        "Lift",
+        "Borehole",
+        "Backup Generator",
+        "24/7 Security",
+        "Secure Parking"
+      ],
+      "images": [
+        "/images/props/apartment_2.webp",
+        "/images/props/interior_2.webp",
+        "/images/props/apartment_0.webp"
+      ],
+      "description": "Sleek two-bedroom apartment in a contemporary Westlands tower, minutes from Sarit Centre and Westgate. Open-plan living with floor-to-ceiling windows, fitted kitchen, and a covered balcony. The building runs a full-service operation — gym, lift access, borehole water, and standby generator. Westlands is Nairobi’s most liquid rental sub-market: quality 2BR units here rarely stay vacant beyond three weeks.",
+      "agency": "Nairobi Habitat Realtors",
+      "agent": {
+        "name": "Faith Njeri",
+        "phone": "+254 712 000 003"
+      },
+      "trustScore": 91,
+      "verification": {
+        "titleCheck": "verified",
+        "ardhisasaMatch": true,
+        "photosVerified": true,
+        "duplicateCheck": "clean",
+        "listingVelocity": "normal",
+        "lastChecked": "2026-08-15"
+      },
+      "trustSignals": [
+        {
+          "label": "Title search",
+          "status": "pass",
+          "detail": "Sectional title verified; management company in good standing."
+        },
+        {
+          "label": "Photo authenticity",
+          "status": "pass",
+          "detail": "Photos verified unique to this listing."
+        },
+        {
+          "label": "Pricing analysis",
+          "status": "pass",
+          "detail": "Fairly priced against the Westlands 2BR band (KES 10.2M–12M)."
+        },
+        {
+          "label": "Agent history",
+          "status": "pass",
+          "detail": "Nairobi Habitat Realtors: 4 active listings, 4.7 rating."
+        }
+      ],
+      "availability": "available",
+      "grossYieldEstimate": 9.3,
+      "appreciationForecast": 7,
+      "listedAt": "2026-08-05",
+      "views": 397,
+      "highlights": [
+        "Most liquid rental submarket",
+        "Full-service building",
+        "Walk to Sarit & Westgate",
+        "High expat demand"
+      ]
+    },
+    {
+      "id": "KJA-017",
+      "title": "Commercial Building — Nairobi CBD",
+      "type": "commercial",
+      "purpose": [
+        "buy",
+        "invest"
+      ],
+      "area": "CBD",
+      "county": "Nairobi",
+      "price": 85000000,
+      "rentEstimate": 620000,
+      "sizeSqm": 750,
+      "amenities": [
+        "Lift",
+        "Backup Generator",
+        "24/7 Security",
+        "Retail Ground Floor",
+        "Office Floors",
+        "Parking Bays",
+        "CCTV"
+      ],
+      "images": [
+        "/images/props/office_1.webp",
+        "/images/props/office_0.webp"
+      ],
+      "description": "A mixed-use commercial building in the heart of the Nairobi CBD: retail spaces on the ground and first floors, offices above, and income already flowing from 14 tenancies. The building delivers approximately KES 620,000 in monthly rent — a documented 8.7% gross yield with diversified tenant risk across retail, professional services, and a government-adjacent anchor. Full structural survey and tenancy schedules available to qualified buyers.",
+      "agency": "Chacadom Premier Properties",
+      "agent": {
+        "name": "James Otieno",
+        "phone": "+254 712 000 002"
+      },
+      "trustScore": 91,
+      "verification": {
+        "titleCheck": "verified",
+        "ardhisasaMatch": true,
+        "photosVerified": true,
+        "duplicateCheck": "clean",
+        "listingVelocity": "normal",
+        "lastChecked": "2026-08-13"
+      },
+      "trustSignals": [
+        {
+          "label": "Title search",
+          "status": "pass",
+          "detail": "Commercial title verified; rates and rent accounts current."
+        },
+        {
+          "label": "Photo authenticity",
+          "status": "pass",
+          "detail": "Building photos verified on-site."
+        },
+        {
+          "label": "Pricing analysis",
+          "status": "pass",
+          "detail": "KES 113k per sqm for CBD mixed-use — within market band."
+        },
+        {
+          "label": "Agent history",
+          "status": "pass",
+          "detail": "Premium agency, commercial desk verified."
+        }
+      ],
+      "availability": "available",
+      "grossYieldEstimate": 8.7,
+      "appreciationForecast": 5.5,
+      "listedAt": "2026-06-20",
+      "views": 298,
+      "highlights": [
+        "14 tenancies — diversified income",
+        "Documented 8.7% yield",
+        "Retail + office mix",
+        "Full records available"
+      ]
+    }
+  ],
+  "stats": {
+    "totalListings": 87,
+    "verifiedHigh": 65
+  }
+}

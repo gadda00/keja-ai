@@ -89,7 +89,8 @@ export function inputSnapshotDigest(inventory: Property[]): string {
 export function buildTrustAnchor(inventory: Property[], now = new Date().toISOString()): TrustAnchorManifest {
   const listings: TrustAnchorEntry[] = inventory.map((p) => {
     const ts = trustScore(p);
-    const inv = investmentScore(p);
+    // comparables counted against the exact catalogue being scored
+    const inv = investmentScore(p, { inventory });
     return {
       id: p.id,
       trust: ts.composite,
