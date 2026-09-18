@@ -31,7 +31,7 @@ describe('build-command parity (package.json ↔ vercel.json)', () => {
   it('the pipeline includes the preload injection before the prerender clones the template', () => {
     const s = steps(pkg.scripts.build);
     const inject = s.indexOf('node scripts/inject-preloads.mjs');
-    const prerender = s.indexOf('bun scripts/prerender.ts');
+    const prerender = s.indexOf('node scripts/prerender.mjs');
     expect(inject).toBeGreaterThan(-1);
     expect(prerender).toBeGreaterThan(-1);
     expect(inject).toBeLessThan(prerender);

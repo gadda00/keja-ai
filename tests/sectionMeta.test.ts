@@ -112,9 +112,10 @@ describe('RouteMeta consumes both catalogues', () => {
 });
 
 describe('the prerender and sitemap scripts consume the catalogues', () => {
-  it('prerender.ts imports both catalogues (static sections derive from them)', () => {
-    const src = readFileSync(resolve(ROOT, 'scripts/prerender.ts'), 'utf8');
-    expect(src).toContain("from '../src/lib/sectionMeta'");
+  it('prerender.mjs imports both catalogues (static sections derive from them)', () => {
+    const src = readFileSync(resolve(ROOT, 'scripts/prerender.mjs'), 'utf8');
+    expect(src).toContain('sectionMeta');
+    expect(src).toContain('SECTION_META');
     expect(src).toContain('APP_SECTION_META');
     expect(src).not.toMatch(/path: '\/tokenize'/); // no hand-copied sections left
   });

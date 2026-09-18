@@ -67,7 +67,9 @@ export function TwoFactorChallenge({
   }, [beginTwoFactorEnrolment]);
 
   useEffect(() => {
-    if (mode === 'enrol' && !pending && !recoveryCodes) startEnrolment();
+    if (mode === 'enrol' && !pending && !recoveryCodes) {
+      requestAnimationFrame(() => startEnrolment());
+    }
   }, [mode, pending, recoveryCodes, startEnrolment]);
 
   // render the otpauth:// QR (dynamic import keeps `qrcode` out of the
