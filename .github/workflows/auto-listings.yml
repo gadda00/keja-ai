@@ -74,6 +74,34 @@ jobs:
             else exit $code; fi
           }
 
+      # Wave-17 fix — regenerate the artifacts BEFORE the data gate.
+      # The wave-16 ordering ran the gate on fresh data with STALE
+      # artifacts (home-subset/trust-anchor/sitemap were only regenerated
+      # inside the commit step, i.e. AFTER the gate): the byte-exact drift
+      # pin then compared the old committed home-subset against the new
+      # catalogue — a guaranteed failure the moment an ingest crosses a
+      # stats threshold (observed 2026-09-19 00:13 UTC: expected 65 to be
+      # 66). The gate must judge the exact state that will be committed:
+      # pipeline writes data → artifacts regenerate in lockstep → gate
+      # runs → commit + push. Same four files, same order, just sequenced
+      # correctly.
+      - name: Regenerate generated artifacts (lockstep with the data change)
+        if: steps.pipeline.outputs.changed == 'true'
+        run: |
+          # The pipeline runs zero-npm-deps, so it writes raw (multi-line)
+          # JSON. Format with the exact locked Prettier version — otherwise
+          # every ingest breaks `npm run lint:prettier` and the drift
+          # compounds.
+          npx --yes prettier@3.9.6 --write src/data/auto-listings.json
+          # Wave-15/16 generated artifacts — regenerate whenever the
+          # catalogue changes, ALL in lockstep (one data change, four files):
+          #   home-subset  — pinned byte-exact by tests/homeSubset.test.ts
+          #   trust-anchor — the published score manifest (audit trail)
+          #   sitemap      — per-listing URLs must match the catalogue
+          bun scripts/generate-home-subset.ts
+          bun scripts/generate-trust-anchor.ts
+          bun scripts/generate-sitemap.mjs
+
       # Wave-16 — pre-push data gate. The 2026-09-18 14:25 ingest culled the
       # hero-example listing; the verify job caught it AFTER the push had
       # already deployed (the guarded revert healed production ~2 min later,
@@ -97,19 +125,6 @@ jobs:
       - name: Commit new listings
         if: steps.pipeline.outputs.changed == 'true'
         run: |
-          # The pipeline runs zero-npm-deps, so it writes raw (multi-line)
-          # JSON. Format with the exact locked Prettier version before
-          # committing — otherwise every ingest breaks `npm run
-          # lint:prettier` and the drift compounds.
-          npx --yes prettier@3.9.6 --write src/data/auto-listings.json
-          # Wave-15/16 generated artifacts — regenerate whenever the
-          # catalogue changes, ALL in lockstep (one data change, four files):
-          #   home-subset  — pinned byte-exact by tests/homeSubset.test.ts
-          #   trust-anchor — the published score manifest (audit trail)
-          #   sitemap      — per-listing URLs must match the catalogue
-          bun scripts/generate-home-subset.ts
-          bun scripts/generate-trust-anchor.ts
-          bun scripts/generate-sitemap.mjs
           # Vercel Hobby verification: commits must be authored by the team
           # owner (torv54@gmail.com) or the deploy is blocked. The automation
           # is identified by the commit message instead of the identity.
