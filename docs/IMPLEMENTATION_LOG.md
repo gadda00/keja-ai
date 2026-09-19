@@ -979,3 +979,83 @@ asserts the promise holds.
 
 **Verification:** 553 tests / 43 files · typecheck clean · lint clean ·
 build + artifact verification PASSED · incident replay PASSED.
+
+---
+
+## IMP-020 — Wave-17: portal reality — authenticated workspaces, the admin-owned developer directory, and listings that actually complete (19 Sep 2026)
+
+**The user report.** "All portals (e.g. developer) cannot be loggined or
+registered — it just allows direct listing of properties. The listings
+should also work. The developer list should only be available in admin
+side. There are a lot of such usability deficiencies." The report was
+accurate on every count: /develop was a static brochure with three
+hardcoded fictional projects and a single "Post a property" CTA; the
+publish wizard navigated to the submission's `UL-…` id which the
+marketplace merge never resolves (every fresh poster hit "Property not
+found" one screen after "Listing published"); the duplicate-screening
+signature list was never fed; owner listings sat at 0 views forever and
+could not be reserved, marked sold or withdrawn; and the developer
+feasibility engine (devStore: feasibility, cashflow, sensitivity) was
+imported by nothing — dead code behind a marketing page.
+
+**What shipped.**
+
+1. **Developer workspace (`/develop`)** — three honest states: a guest
+   sign-in/registration gate (requireAuth → the Google registration step
+   lands new developers back in the workspace), an explicit one-click
+   account-type switch for signed-in non-developers (no silent dead ends),
+   and the workspace itself: owner-scoped listings with review status and
+   lifecycle controls, feasibility schemes wired to the devStore engine
+   through a live input editor (land, density, build cost, unit mix,
+   finance — metrics, peak funding, payback and the ±10/±20% sensitivity
+   grid recompute per keystroke), plus market intelligence (Development
+   Score, off-plan inventory).
+2. **Admin-owned developer directory** — new
+   `src/lib/developerStore.ts` (org profiles, track record, portfolio,
+   pending → verified / suspended) with every decision through
+   `setDeveloperStatus()` into the audit trail; a new admin-console
+   Developers tab renders it. The public portal no longer lists
+   developers — exactly where the user said it belongs.
+3. **The listing pipeline** — publish now navigates to the listing's
+   `KJA-U…` id (bug fix), records the duplicate-screening signature, and
+   the shared `ListingManageCard` gives every owner surface (account My
+   listings + developer workspace) reserve / mark sold / re-list /
+   withdraw — withdraw resolves the linked submission so the admin queue
+   stays coherent. Listing views now count (one-shot per mount, guarded
+   against the re-render increment loop).
+4. **Pro workspace gating** — same portal pattern: sign-in gate for
+   guests, agent-lane switch prompt for signed-in non-agents, tools stay
+   available either way.
+5. **Chrome + routing coherence** — AuthProvider hoisted to wrap the whole
+   shell so the navbar can show admins a direct console link (shield);
+   /develop + /pro moved to the app-workspace catalogue (noindex,
+   unsitemap'd — login-gated consoles are not organic landing pages);
+   sitemap regenerated; verify-artifacts' independent path lists updated;
+   fresh developers land in /develop after registration
+   (accountTypes destination contract).
+6. **The live smoke walkthrough caught one more crash (fixed the same
+   wave):** user-submitted listings killed their own detail pages —
+   `userListingToProperty` stamped `verification.lastChecked` with the full
+   `listedAt` ISO timestamp while the freshness engine builds
+   `new Date(iso + 'T00:00:00Z')` → Invalid Date → RangeError inside the
+   Property Passport → the error boundary swallowed the whole page. Seeds
+   and Auto-Pilot listings always shipped date-only; only the user-listing
+   path was broken. Fixed at both ends (the merge now truncates to
+   date-only; the freshness helpers normalise defensively) and pinned by a
+   regression test.
+7. **Tests** — tests/portalReality.test.ts (14 tests): directory seeding
+   + status transitions + audit assertions, the id-minting /
+   marketplace-resolution contract, availability lifecycle schema
+   validity, view counting, withdraw semantics, the passport crash
+   regression, devStore area context; sectionMeta + accountTypes tests
+   updated for the new catalogue shape. Live headless walkthrough of every
+   new surface: guest gates, the switch card, the workspace (scheme
+   created, margin recomputed live 15.9% → 6.0% on an input change), the
+   listing lifecycle (mark sold persisted, re-list offered), the detail
+   page rendering post-fix with views counting, the admin Developers tab
+   (verify → store + audit trail), the navbar admin shield — zero console
+   errors.
+
+**Verification:** 567 tests / 44 files (14 new) · typecheck clean · lint
+clean · build + artifact verification PASSED (110-URL sitemap, 15 catalogue
++ 10 app sections prerendered, all gates green).

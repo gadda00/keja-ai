@@ -23,6 +23,7 @@ import { useUserListings } from '@/lib/adminStore';
 import { LANGUAGES, useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/router';
 import { PropertyRow } from '@/components/property/PropertyCard';
+import { ListingEmptyState, ListingManageCard } from '@/components/property/ListingManageCard';
 import {
   ACCOUNT_TYPES,
   accountTypeInfo,
@@ -204,44 +205,33 @@ function RegistrationCard() {
 function MyListings() {
   const { user } = useAuth();
   const [userListings] = useUserListings();
-  const all = useAllProperties();
 
-  const mine = useMemo(() => {
-    const ids = new Set(
-      userListings
-        .filter((l) => !l.ownerEmail || (user && l.ownerEmail === user.email))
-        .map((l) => l.id),
-    );
-    return all.filter((p) => ids.has(p.id));
-  }, [userListings, user, all]);
+  // owner-filtered (wave 17): legacy device-local listings without an owner
+  // stamp stay manageable; account-attributed ones are scoped to the poster.
+  const mine = useMemo(
+    () =>
+      userListings.filter((l) => !l.ownerEmail || (user && l.ownerEmail === user.email)),
+    [userListings, user],
+  );
 
   return (
     <div>
       {mine.length === 0 ? (
-        <div className="rounded-3xl border border-dashed bg-card/60 p-10 text-center">
-          <Building2 className="mx-auto h-8 w-8 text-muted-foreground/40" aria-hidden />
-          <p className="mt-3 text-sm font-bold">No properties posted yet</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Landlords, developers and agents: publish your first property with the guided
-            wizard — pricing feedback and verification screens included.
-          </p>
-          <Button className="mt-4 font-bold" onClick={() => navigate('/sell')}>
-            Post a property
-          </Button>
-        </div>
+        <ListingEmptyState />
       ) : (
         <>
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs font-bold text-muted-foreground">
-              {mine.length} posted · visible in the marketplace on this device
+              {mine.length} posted · {mine.filter((l) => l.availability !== 'sold').length} live in
+              the marketplace on this device
             </p>
             <Button size="sm" className="h-8 text-xs font-bold" onClick={() => navigate('/sell')}>
               Post another
             </Button>
           </div>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            {mine.map((p) => (
-              <PropertyRow key={p.id} property={p} />
+          <div className="mt-3 grid gap-3">
+            {mine.map((l) => (
+              <ListingManageCard key={l.id} listing={l} />
             ))}
           </div>
         </>

@@ -12,6 +12,7 @@ import {
   Menu,
   Moon,
   Search,
+  Shield,
   Sun,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { NotificationsBell } from '@/components/shell/NotificationsBell';
 import { Link, useRouter } from '@/lib/router';
 import { ECOSYSTEM, PORTALS } from '@/lib/ecosystem';
+import { useAuth } from '@/lib/auth';
 import { LANGUAGES, useI18n } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
@@ -155,6 +157,7 @@ function ThemeToggle() {
 export function Navbar() {
   const { section } = useRouter();
   const { t } = useI18n();
+  const { isAdmin } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [ecoOpen, setEcoOpen] = useState(false);
@@ -282,6 +285,23 @@ export function Navbar() {
           >
             <Search className="h-4 w-4" />
           </Link>
+          {/* Admin quick entry (wave 17): admins no longer have to route
+              through the account page — the shield links straight to the
+              gated console. Hidden entirely for everyone else. */}
+          {isAdmin && (
+            <Link
+              to="/admin"
+              ariaLabel="Admin console"
+              className={cn(
+                'flex h-9 w-9 items-center justify-center rounded-lg transition-colors',
+                section === 'admin'
+                  ? 'bg-accent text-primary'
+                  : 'text-gold hover:bg-accent hover:text-foreground',
+              )}
+            >
+              <Shield className="h-4 w-4" />
+            </Link>
+          )}
           <NotificationsBell />
           <LanguageSwitcher />
           <ThemeToggle />

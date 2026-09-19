@@ -115,14 +115,6 @@ export const SECTION_META: SectionMetaEntry[] = [
     noscript: 'Instant property valuations anchored to Kenyan comparables.',
   },
   {
-    path: '/develop',
-    title: 'Developer portal',
-    description: 'Partner with Keja to move inventory with data-backed pricing and reach.',
-    priority: '0.6',
-    changefreq: 'weekly',
-    noscript: 'Partner with Keja to move inventory with data-backed pricing, portals and off-plan reach.',
-  },
-  {
     path: '/diaspora',
     title: 'Diaspora hub',
     description: 'Buy and oversee Kenyan property from abroad — verified evidence and remote processes.',
@@ -234,6 +226,18 @@ export const APP_SECTION_META: AppSectionEntry[] = [
     title: 'Investor dashboard',
     description: 'Your holdings, distributions and portfolio performance.',
     noscript: 'Your holdings, distributions and portfolio performance.',
+  },
+  {
+    path: '/pro',
+    title: 'Pro workspace',
+    description: 'Agent and pro tooling — comparables, listing generation and viewings.',
+    noscript: 'Agent and pro tooling — comparables, listing generation and viewings.',
+  },
+  {
+    path: '/develop',
+    title: 'Developer workspace',
+    description: 'The authenticated developer console — listings, feasibility screening and market intelligence.',
+    noscript: 'Sign in to the Keja developer workspace — your listings, feasibility screening and market intelligence.',
   },
 ];
 

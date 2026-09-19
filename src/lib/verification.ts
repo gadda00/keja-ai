@@ -37,14 +37,23 @@ export interface EvidenceCheck {
 }
 
 const addDays = (iso: string, days: number): string => {
-  const d = new Date(`${iso}T00:00:00Z`);
+  const d = new Date(`${dayOf(iso)}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
 };
 
+/** Normalise a `lastChecked` value to its date part. Wave 17 crash fix:
+ *  user-submitted listings stamped `lastChecked` with a FULL ISO timestamp
+ *  (`new Date(iso + 'T00:00:00Z')` → Invalid Date → RangeError inside the
+ *  Property Passport, killing the whole detail page). Seeds and Auto-Pilot
+ *  listings always shipped date-only — only the user-listing path was
+ *  broken. Truncating here makes the helpers accept either form. */
+const dayOf = (iso: string): string => iso.slice(0, 10);
+
 const daysBetween = (fromIso: string, toIso: string): number =>
   Math.round(
-    (new Date(`${toIso}T00:00:00Z`).getTime() - new Date(`${fromIso}T00:00:00Z`).getTime()) /
+    (new Date(`${dayOf(toIso)}T00:00:00Z`).getTime() -
+      new Date(`${dayOf(fromIso)}T00:00:00Z`).getTime()) /
       86_400_000
   );
 

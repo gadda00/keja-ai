@@ -31,8 +31,8 @@ import { ROUTE_META } from '@/components/shell/KejaApp';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 describe('SECTION_META catalogue (public, crawl-worthy sections)', () => {
-  it('lists every public section the sitemap advertises (16 + home)', () => {
-    expect(SECTION_META.length).toBe(16);
+  it('lists every public section the sitemap advertises (15 + home)', () => {
+    expect(SECTION_META.length).toBe(15);
     const paths = SECTION_META.map((s) => s.path);
     expect(paths).toContain('/properties');
     expect(paths).toContain('/tokenize');
@@ -57,7 +57,7 @@ describe('SECTION_META catalogue (public, crawl-worthy sections)', () => {
     const paths = SECTION_META.map((s) => s.path);
     for (const privateRoute of [
       '/account', '/admin', '/pro', '/manage', '/tenant', '/finance', '/transact',
-      '/data', '/portfolio', '/deal-analyst', '/institutional',
+      '/data', '/portfolio', '/deal-analyst', '/institutional', '/develop',
     ]) {
       expect(paths).not.toContain(privateRoute);
     }
@@ -65,10 +65,20 @@ describe('SECTION_META catalogue (public, crawl-worthy sections)', () => {
 });
 
 describe('APP_SECTION_META (app-workspace shells)', () => {
-  it('lists the 8 workspace sections that keep path URLs without rewrites', () => {
+  it('lists the 10 workspace sections that keep path URLs without rewrites', () => {
     expect(APP_SECTION_META.map((s) => s.path).sort()).toEqual(
-      ['/data', '/deal-analyst', '/finance', '/institutional', '/manage', '/portfolio', '/tenant', '/transact'].sort(),
+      ['/data', '/deal-analyst', '/develop', '/finance', '/institutional', '/manage', '/portfolio', '/pro', '/tenant', '/transact'].sort(),
     );
+  });
+
+  it('gated workspaces (/develop, /pro) are app shells — noindex, unsitemap\'d', () => {
+    // wave 17: the developer portal became an authenticated workspace — it
+    // must not advertise itself to organic entry (the sitemap'd marketing
+    // surface is the ecosystem/homepage, not the login-gated console).
+    const paths = APP_SECTION_META.map((s) => s.path);
+    expect(paths).toContain('/develop');
+    expect(paths).toContain('/pro');
+    expect(APP_SECTION_META_BY_PATH['/develop'].robots).toBe('noindex');
   });
 
   it('is disjoint from the public catalogue (sitemap stays crawl-budget-clean)', () => {

@@ -53,6 +53,9 @@ export interface Property {
   views: number;
   offPlan?: boolean;
   furnished?: boolean;
+  /** True for account-posted listings merged in from the user-listings
+   *  store (src/lib/inventory.ts) — marks owner attribution surfaces. */
+  userSubmitted?: boolean;
   highlights: string[];
 }
 

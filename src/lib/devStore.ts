@@ -32,6 +32,9 @@ export interface DevProject {
   name: string;
   createdAt: string;
   inputs: DevFeasibilityInputs;
+  /** Scheme location — drives the comp-derived land-banking shield and
+   *  area context. Optional so pre-wave-17 records stay readable. */
+  area?: string;
 }
 
 export interface DevFeasibilityInputs {
@@ -320,12 +323,17 @@ export function getDevProjects(): DevProject[] {
 }
 
 /** Pure factory: stamps id + createdAt; the caller appends it to the store. */
-export function newDevProject(name: string, inputs: DevFeasibilityInputs): DevProject {
+export function newDevProject(
+  name: string,
+  inputs: DevFeasibilityInputs,
+  area?: string,
+): DevProject {
   return {
     id: newId('dev'),
     name: name.trim() || 'Untitled scheme',
     createdAt: new Date().toISOString(),
     inputs,
+    area: area || undefined,
   };
 }
 

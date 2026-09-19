@@ -233,10 +233,12 @@ for (const f of [
 
 /* 6b — every public section in the sitemap must have a real prerendered
    page (src/lib/sectionMeta.ts drives both). Previously 16 sitemap'd
-   section URLs served the generic home shell — duplicate content. */
+   section URLs served the generic home shell — duplicate content.
+   Wave 17: /develop moved to the app-workspace list — the developer
+   portal is an authenticated workspace now (noindex shell, unsitemap'd). */
 const SECTION_PATHS = [
   "properties", "tokenize", "ask", "invest", "trust", "insights",
-  "ecosystem", "partners", "sell", "valuation", "develop", "diaspora",
+  "ecosystem", "partners", "sell", "valuation", "diaspora",
   "about", "contact", "compare", "legal",
 ];
 /* 6c — the app-workspace sections are prerendered as noindexed shells:
@@ -246,7 +248,7 @@ const SECTION_PATHS = [
    404ing), so serving real files replaced rewrites entirely. */
 const APP_SECTION_PATHS = [
   "finance", "data", "transact", "manage", "tenant",
-  "institutional", "deal-analyst", "portfolio",
+  "institutional", "deal-analyst", "portfolio", "pro", "develop",
 ];
 let sectionPages = 0;
 for (const s of [...SECTION_PATHS, ...APP_SECTION_PATHS]) {

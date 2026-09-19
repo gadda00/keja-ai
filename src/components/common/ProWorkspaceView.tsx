@@ -1,22 +1,62 @@
 'use client';
-/** Pro workspace — for agents & professionals: comparables (CMA), listing generation, viewings. */
+/** Pro workspace — for agents & professionals: comparables (CMA), listing
+ *  generation, viewings.
+ *
+ *  Wave 17: this is an authenticated workspace now. Guests get the sign-in
+ *  gate (one Google sign-in; new accounts pick the Agent / Pro lane and
+ *  land back here). Signed-in non-agents still get the tools — the CMA desk
+ *  is useful to landlords and investors too — with an explicit prompt to
+ *  switch to the agent lane so lead/pipeline personalisation kicks in. */
 import { useMemo, useState } from 'react';
-import { CalendarClock, FileBarChart, Home, Sparkles } from 'lucide-react';
+import { Briefcase, CalendarClock, FileBarChart, Home, LogIn, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAllProperties } from '@/lib/inventory';
 import { useProStore } from '@/lib/proStore';
+import { useAuth } from '@/lib/auth';
 import { formatKES } from '@/lib/format';
 import { navigate } from '@/lib/router';
 import { newId } from '@/lib/uuid';
+
+/** Guest gate — same shape as the developer workspace gate. */
+function ProGuestGate() {
+  const { requireAuth } = useAuth();
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-12 text-center sm:px-6">
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 mx-auto">
+        <Briefcase className="h-7 w-7 text-primary" aria-hidden />
+      </div>
+      <h1 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl">The professional&rsquo;s desk</h1>
+      <p className="mx-auto mt-3 max-w-xl leading-relaxed text-muted-foreground">
+        Sign in to run comparables that carry the Trust Score, draft verified listings and keep
+        your CMA history — the workspace for agents and property professionals.
+      </p>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <Button className="font-black" onClick={() => requireAuth('the Pro workspace', () => undefined)}>
+          <LogIn className="mr-1.5 h-4 w-4" aria-hidden /> Sign in / create an account
+        </Button>
+        <Button variant="outline" className="font-bold" onClick={() => navigate('/properties')}>
+          Browse the marketplace first
+        </Button>
+      </div>
+      <p className="mt-3 text-xs text-muted-foreground">
+        One Google sign-in. New accounts pick their lane — choose <strong>Agent / Pro</strong> and
+        you land right back here.
+      </p>
+    </div>
+  );
+}
 
 export default function ProWorkspaceView() {
   const all = useAllProperties();
   const [pro, setPro] = useProStore();
   const [area, setArea] = useState('Kilimani');
   const [type, setType] = useState('apartment');
+  const { isLoggedIn, user, updateUser } = useAuth();
 
+  // All hooks run unconditionally (rules-of-hooks) — the guest gate renders
+  // from the same hook set; the signed-in branch simply consumes more of it.
   const areas = useMemo(() => [...new Set(all.map((p) => p.area))].sort(), [all]);
   const comps = useMemo(
     () =>
@@ -27,6 +67,8 @@ export default function ProWorkspaceView() {
   const median = prices.length ? prices.sort((a, b) => a - b)[Math.floor(prices.length / 2)] : 0;
   const low = prices.length ? prices[0] : 0;
   const high = prices.length ? prices[prices.length - 1] : 0;
+
+  if (!isLoggedIn || !user) return <ProGuestGate />;
 
   const runCma = () => {
     setPro((prev) => ({
@@ -58,6 +100,19 @@ export default function ProWorkspaceView() {
           viewings calendar — the workspace for agents and property professionals on the platform.
         </p>
       </div>
+
+      {user.accountType && user.accountType !== 'agent' && (
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold/40 bg-gold-soft p-4">
+          <p className="text-xs leading-relaxed text-gold-foreground">
+            <strong>Signed in as a {user.accountType} account.</strong> The full Pro workspace —
+            leads, pipeline and client management personalisation — expects the agent lane. The
+            comparables desk below works either way.
+          </p>
+          <Button size="sm" className="h-8 shrink-0 text-xs font-black" onClick={() => updateUser({ accountType: 'agent' })}>
+            Switch to agent
+          </Button>
+        </div>
+      )}
 
       <Tabs defaultValue="cma" className="mt-8">
         <TabsList className="w-full justify-start overflow-x-auto">

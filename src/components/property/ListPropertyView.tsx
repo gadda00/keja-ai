@@ -18,7 +18,7 @@ import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { useAllProperties } from '@/lib/inventory';
-import { useSubmissions, useUserListings, submissionToListing } from '@/lib/adminStore';
+import { useSubmissions, useUserListings, submissionToListing, recordListingSignature } from '@/lib/adminStore';
 import { useAuth, initials } from '@/lib/auth';
 import { areaInsights } from '@/data/areaInsights';
 import { validateListingForm } from '@/lib/boundaries';
@@ -135,12 +135,26 @@ export default function ListPropertyView() {
     };
     setSubmissions([submission, ...submissions]);
     // auto-publish for demo velocity (trial platform), flagged for review
-    setUserListings((prev) => [...prev, submissionToListing(submission)]);
+    // (wave 17 bug fix): the USER LISTING carries its own KJA-U… id — build
+    // it first and navigate to THAT id. The old code navigated to the
+    // submission's UL-… id, which the marketplace merge never resolves:
+    // every fresh poster landed on "Property not found" one screen after
+    // "Listing published".
+    const listing = submissionToListing(submission);
+    setUserListings((prev) => [...prev, listing]);
+    // record the duplicate-detection signature at submit time (the anomaly
+    // engine's seen-list was never fed — duplicate screening was inert)
+    recordListingSignature({
+      title: v.title,
+      area: v.area,
+      price: v.price,
+      bedrooms: v.bedrooms,
+    });
     toast({
       title: 'Listing published',
       description: `Posted as ${poster.name} (${poster.email}) — the verification desk screens it next. Find it under My listings in your account.`,
     });
-    navigate(`/properties/${id}`);
+    navigate(`/properties/${listing.id}`);
     void all;
   };
 

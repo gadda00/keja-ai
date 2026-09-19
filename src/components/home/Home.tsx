@@ -174,7 +174,7 @@ const STAKEHOLDERS = [
   { icon: LineChart, title: 'Investors', desc: 'Yield analysis, the investor dashboard and fractional ownership trials.', to: '/portfolio' },
   { icon: HandCoins, title: 'Tenants', desc: 'Rent affordability checks, verified homes and a tenant hub.', to: '/tenant' },
   { icon: Landmark, title: 'Banks & Lenders', desc: 'Qualified financing leads and property intelligence.', to: '/institutional' },
-  { icon: GraduationCap, title: 'Developers', desc: 'Project profiles, the Development Score and buyer matching.', to: '/develop' },
+  { icon: GraduationCap, title: 'Developers', desc: 'The developer workspace — listings, feasibility screening and market intelligence.', to: '/develop' },
   { icon: Plane, title: 'Diaspora', desc: 'Invest in Kenya from anywhere — verification, viewing and management.', to: '/diaspora' },
   { icon: HeartHandshake, title: 'Agents & Professionals', desc: 'A pro workspace with leads, valuation tools and market data.', to: '/pro' },
 ];

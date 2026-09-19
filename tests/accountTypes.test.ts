@@ -37,9 +37,10 @@ describe('ACCOUNT_TYPES catalogue', () => {
     }
   });
 
-  it('sends fresh landlords and developers straight to the posting wizard', () => {
+  it('routes each lane to the workspace built for it (wave 17: developers land in /develop)', () => {
     expect(accountTypeInfo('landlord').to).toBe('/sell');
-    expect(accountTypeInfo('developer').to).toBe('/sell');
+    expect(accountTypeInfo('developer').to).toBe('/develop');
+    expect(accountTypeInfo('agent').to).toBe('/pro');
     expect(accountTypeInfo('renter').to).toBe('/properties');
   });
 });

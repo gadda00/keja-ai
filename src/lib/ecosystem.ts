@@ -124,7 +124,7 @@ export const ECOSYSTEM: EcosystemProduct[] = [
 /** The stakeholder portals (proposal §8 §10 §11 §17). */
 export const PORTALS = [
   { name: 'Diaspora', route: '/diaspora', description: 'Invest in Kenya from anywhere in the world.' },
-  { name: 'Developers', route: '/develop', description: 'Verified project profiles and the Development Score.' },
+  { name: 'Developers', route: '/develop', description: 'The developer workspace — sign in to manage listings and schemes. Directory verification is admin-side.' },
   { name: 'Institutional', route: '/institutional', description: 'Banks, pension funds, REITs, SACCOs and insurers.' },
   { name: 'Partners', route: '/partners', description: 'Partner with Keja — request the partnership deck.' },
 ];

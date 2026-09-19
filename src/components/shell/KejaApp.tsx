@@ -102,11 +102,8 @@ export const ROUTE_META: Record<string, { title: string; description: string; ro
     description: 'Platform administration (restricted).',
     robots: 'noindex',
   },
-  '/pro': {
-    title: 'Pro workspace',
-    description: 'Agent and pro tooling — leads, pipeline and client management.',
-    robots: 'noindex',
-  },
+  // /pro and /develop derive from APP_SECTION_META since wave 17 — the
+  // workspaces are noindexed app shells, no longer hand-duplicated here.
 };
 
 /** Applies ROUTE_META for the current hash path. Detail routes
@@ -286,34 +283,37 @@ export default function KejaApp() {
         <PathToHashBridge />
         <TelemetryBootstrap />
         <RouteMeta />
-        <div className="flex min-h-screen flex-col bg-background">
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-primary-foreground"
-          >
-            Skip to main content
-          </a>
-          <Navbar />
-          <DemoBanner />
-          {/* pb-20 clears the app-style mobile tab bar */}
-          <main id="main-content" className="flex-1 pb-20 pt-16 md:pb-0">
-            <ErrorBoundary>
-              <Suspense fallback={<ViewFallback />}>
-                <AuthProvider>
+        {/* AuthProvider wraps the whole shell (wave 17): the navbar's admin
+            quick entry and account-aware chrome read the auth context — it
+            can no longer live below the Navbar in the tree. */}
+        <AuthProvider>
+          <div className="flex min-h-screen flex-col bg-background">
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-primary-foreground"
+            >
+              Skip to main content
+            </a>
+            <Navbar />
+            <DemoBanner />
+            {/* pb-20 clears the app-style mobile tab bar */}
+            <main id="main-content" className="flex-1 pb-20 pt-16 md:pb-0">
+              <ErrorBoundary>
+                <Suspense fallback={<ViewFallback />}>
                   <TokenizeProvider>
                     <Routes />
                     <AuthModal />
                   </TokenizeProvider>
-                </AuthProvider>
-              </Suspense>
-            </ErrorBoundary>
-          </main>
-          <Footer />
-          <WhatsAppFloat />
-          <MobileTabBar />
-          <InstallPrompt />
-          <ServiceWorkerRegistrar />
-        </div>
+                </Suspense>
+              </ErrorBoundary>
+            </main>
+            <Footer />
+            <WhatsAppFloat />
+            <MobileTabBar />
+            <InstallPrompt />
+            <ServiceWorkerRegistrar />
+          </div>
+        </AuthProvider>
       </HashRouter>
     </MotionConfig>
   );

@@ -1,11 +1,14 @@
 'use client';
-/** Admin console — verification queue, partner applications, listing reports, audit trail, settings. */
+/** Admin console — verification queue, developer directory, partner
+ *  applications, listing reports, audit trail, settings. */
 import { useMemo } from 'react';
-import { CheckCircle2, FileSearch, Gavel, Plug, Settings2, ShieldAlert, Users, XCircle } from 'lucide-react';
+import { Building2, CheckCircle2, FileSearch, Gavel, Plug, Settings2, ShieldAlert, Users, XCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSubmissions, usePartners, useFeeds, useSettings, useAuditLog, useListingReports, setReportStatus, type ListingSubmission, type SubmissionStatus } from '@/lib/adminStore';
+import { directoryStats, setDeveloperStatus, useDevelopers, type DeveloperProfile, type DeveloperStatus } from '@/lib/developerStore';
+import { useAuth } from '@/lib/auth';
 import { formatKES } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
@@ -16,6 +19,100 @@ const SUBMISSION_STATUS: Record<SubmissionStatus, string> = {
   flagged: 'bg-destructive/15 text-destructive',
 };
 
+const DEVELOPER_STATUS: Record<DeveloperStatus, { label: string; className: string }> = {
+  pending: { label: 'Pending review', className: 'border-gold/50 text-gold-foreground' },
+  verified: { label: 'Verified', className: 'border-primary/40 text-primary' },
+  suspended: { label: 'Suspended', className: 'border-destructive/40 text-destructive' },
+};
+
+/** One developer organisation in the admin-managed directory (wave 17). */
+function DeveloperCard({
+  dev,
+  actor,
+}: {
+  dev: DeveloperProfile;
+  actor: { name: string; email: string };
+}) {
+  const status = DEVELOPER_STATUS[dev.status];
+  const decide = (next: DeveloperStatus) => setDeveloperStatus(dev.id, next, actor);
+  return (
+    <div className="rounded-2xl border bg-card p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-bold">{dev.orgName}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {dev.contactName} · {dev.email} · {dev.county} · {dev.yearsActive} yrs ·{' '}
+            {dev.projectsDelivered} schemes delivered
+          </p>
+          <p className="mt-1.5 max-w-xl text-xs leading-relaxed text-muted-foreground">{dev.about}</p>
+        </div>
+        <Badge variant="outline" className={cn('shrink-0 text-[10px] font-bold', status.className)}>
+          {status.label}
+        </Badge>
+      </div>
+      {dev.portfolio.length > 0 && (
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {dev.portfolio.map((proj) => (
+            <div key={proj.id} className="rounded-xl bg-accent/50 p-3">
+              <p className="text-xs font-bold">{proj.name}</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">
+                {proj.area} · {proj.units} units ({proj.unitsSold} sold) · from{' '}
+                {formatKES(proj.fromPrice)} · {proj.completion}
+              </p>
+              <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-background">
+                <div
+                  className="h-full rounded-full bg-primary/70"
+                  style={{ width: `${proj.progressPct}%` }}
+                  role="progressbar"
+                  aria-label={`${proj.name} ${proj.progressPct}% complete`}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {dev.status !== 'verified' && (
+          <Button size="sm" className="h-8 text-xs font-bold" onClick={() => decide('verified')}>
+            <CheckCircle2 className="mr-1 h-3.5 w-3.5" aria-hidden /> Verify
+          </Button>
+        )}
+        {dev.status === 'pending' && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 text-xs font-bold text-destructive"
+            onClick={() => decide('suspended')}
+          >
+            <XCircle className="mr-1 h-3.5 w-3.5" aria-hidden /> Reject
+          </Button>
+        )}
+        {dev.status === 'verified' && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 text-xs font-bold text-destructive"
+            onClick={() => decide('suspended')}
+          >
+            <ShieldAlert className="mr-1 h-3.5 w-3.5" aria-hidden /> Suspend
+          </Button>
+        )}
+        {dev.status === 'suspended' && (
+          <Button size="sm" variant="outline" className="h-8 text-xs font-bold" onClick={() => decide('pending')}>
+            Reopen application
+          </Button>
+        )}
+      </div>
+      {dev.verifiedAt && (
+        <p className="mt-2 text-[10px] text-muted-foreground">
+          Verified {new Date(dev.verifiedAt).toLocaleDateString('en-KE', { month: 'short', year: 'numeric' })} · applied{' '}
+          {new Date(dev.createdAt).toLocaleDateString('en-KE', { month: 'short', year: 'numeric' })}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function AdminView() {
   const [submissions, setSubmissions] = useSubmissions();
   const [partners, setPartners] = usePartners();
@@ -23,6 +120,10 @@ export default function AdminView() {
   const [settings, setSettings] = useSettings();
   const [audit] = useAuditLog();
   const [reports] = useListingReports();
+  const developers = useDevelopers();
+  const { user } = useAuth();
+  const actor = { name: user?.name ?? 'Verification desk', email: user?.email ?? 'admin@keja.app' };
+  const devStats = useMemo(() => directoryStats(developers), [developers]);
 
   const decide = (s: ListingSubmission, decision: 'approved' | 'rejected') => {
     setSubmissions(submissions.map((x) => (x.id === s.id ? { ...x, status: decision } : x)));
@@ -32,11 +133,12 @@ export default function AdminView() {
   const statCards = useMemo(
     () => [
       { label: 'Pending verifications', value: pending.length, icon: FileSearch },
+      { label: 'Developer applications', value: devStats.pending, icon: Building2 },
       { label: 'Partner applications', value: partners.filter((p) => p.status === 'pending').length, icon: Users },
       { label: 'Listing reports', value: reports.filter((r) => r.status === 'open').length, icon: ShieldAlert },
       { label: 'Healthy feeds', value: feeds.filter((f) => f.status === 'healthy').length, icon: Plug },
     ],
-    [pending, partners, reports, feeds],
+    [pending, devStats, partners, reports, feeds],
   );
 
   return (
@@ -51,7 +153,7 @@ export default function AdminView() {
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {statCards.map((m) => (
           <div key={m.label} className="card-lift rounded-2xl border bg-card p-4 sm:p-5">
             <div className="flex items-center justify-between">
@@ -66,12 +168,27 @@ export default function AdminView() {
       <Tabs defaultValue="queue" className="mt-7">
         <TabsList className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="queue" className="gap-1.5 font-bold"><FileSearch className="h-4 w-4" aria-hidden /> Verification queue</TabsTrigger>
+          <TabsTrigger value="developers" className="gap-1.5 font-bold"><Building2 className="h-4 w-4" aria-hidden /> Developers</TabsTrigger>
           <TabsTrigger value="reports" className="gap-1.5 font-bold"><ShieldAlert className="h-4 w-4" aria-hidden /> Listing reports</TabsTrigger>
           <TabsTrigger value="partners" className="gap-1.5 font-bold"><Users className="h-4 w-4" aria-hidden /> Partners</TabsTrigger>
           <TabsTrigger value="feeds" className="gap-1.5 font-bold"><Plug className="h-4 w-4" aria-hidden /> Feeds</TabsTrigger>
           <TabsTrigger value="audit" className="gap-1.5 font-bold"><Gavel className="h-4 w-4" aria-hidden /> Audit trail</TabsTrigger>
           <TabsTrigger value="settings" className="gap-1.5 font-bold"><Settings2 className="h-4 w-4" aria-hidden /> Settings</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="developers" className="mt-6 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-dashed px-4 py-3 text-xs text-muted-foreground">
+            <span>
+              The developer directory — {devStats.verified} verified · {devStats.pending} pending ·
+              {' '}{devStats.portfolioProjects} portfolio projects. Verification covers track record,
+              delivery history and portfolio evidence; the public developer portal shows each
+              developer only their own workspace, this registry stays desk-side.
+            </span>
+          </div>
+          {developers.map((dev) => (
+            <DeveloperCard key={dev.id} dev={dev} actor={actor} />
+          ))}
+        </TabsContent>
 
         <TabsContent value="queue" className="mt-6 space-y-3">
           {submissions.map((s) => (

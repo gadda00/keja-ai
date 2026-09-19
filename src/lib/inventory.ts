@@ -56,7 +56,10 @@ export function userListingToProperty(u: UserListing, approved: boolean): Proper
       photosVerified: u.images.length > 0,
       duplicateCheck: 'clean' as const,
       listingVelocity: 'normal' as const,
-      lastChecked: u.listedAt,
+      // date-only, matching the seed catalogue + Auto-Pilot convention (the
+      // freshness engine expects YYYY-MM-DD; a full timestamp crashed the
+      // Property Passport — wave 17 fix)
+      lastChecked: u.listedAt.slice(0, 10),
     },
     trustSignals: [
       {

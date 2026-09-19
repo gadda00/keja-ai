@@ -6,7 +6,7 @@
  * Investment Score™ factors, evidence panels with freshness, and a mortgage
  * quick-quote powered by Keja Finance.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   AlertTriangle,
@@ -53,7 +53,7 @@ import { areaInsights } from '@/data/areaInsights';
 import type { Property } from '@/data/properties';
 import { navigate } from '@/lib/router';
 import { useFavorites } from '@/lib/store';
-import { reportListing, REPORT_REASONS, type ReportReason } from '@/lib/adminStore';
+import { reportListing, REPORT_REASONS, incrementListingViews, type ReportReason } from '@/lib/adminStore';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -500,6 +500,18 @@ export default function PropertyDetailView({ id }: { id: string }) {
   // Analytics (audit F-11): one result_view per listing open.
   useEffect(() => {
     if (p) track({ event: 'result_view', propertyId: p.id });
+  }, [p]);
+
+  // Wave 17: count real views on account-owned listings (they used to sit
+  // at 0 forever). A per-mount ref guard keeps this a one-shot per id — the
+  // merged inventory re-renders this view when the counter changes, and
+  // without the guard the effect would feed itself into an increment loop.
+  const countedRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (p && p.userSubmitted && !countedRef.current.has(p.id)) {
+      countedRef.current.add(p.id);
+      incrementListingViews(p.id);
+    }
   }, [p]);
 
   const similar = useMemo(

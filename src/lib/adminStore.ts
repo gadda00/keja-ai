@@ -549,6 +549,21 @@ export interface UserListing {
 export const useUserListings = () =>
   useValidatedStore<UserListing[]>('user-listings', userListingsSchema, []);
 
+/**
+ * Count a marketplace view on an account-owned listing (wave 17). Views were
+ * displayed on every owner surface but never incremented — user listings sat
+ * at 0 forever. Pure store mutation + change event; the marketplace merge
+ * and every owner surface re-derive on the next render.
+ */
+export function incrementListingViews(id: string): void {
+  const listings = store.get<UserListing[]>('user-listings', []);
+  if (!listings.some((l) => l.id === id)) return;
+  store.set(
+    'user-listings',
+    listings.map((l) => (l.id === id ? { ...l, views: l.views + 1 } : l)),
+  );
+}
+
 export function submissionToListing(s: ListingSubmission): UserListing {
   return {
     submissionId: s.id,
