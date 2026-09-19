@@ -64,7 +64,7 @@ export interface ListingSubmission {
 }
 
 export type PartnerType =
-  'agency' | 'developer' | 'landlord' | 'portal' | 'data-partner' | 'diaspora-agent';
+  | 'agency' | 'developer' | 'landlord' | 'portal' | 'data-partner' | 'diaspora-agent' | 'institution';
 
 export interface PartnerApplication {
   id: string;

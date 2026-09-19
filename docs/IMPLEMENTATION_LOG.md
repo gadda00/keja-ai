@@ -1059,3 +1059,90 @@ imported by nothing — dead code behind a marketing page.
 **Verification:** 567 tests / 44 files (14 new) · typecheck clean · lint
 clean · build + artifact verification PASSED (110-URL sitemap, 15 catalogue
 + 10 app sections prerendered, all gates green).
+
+## IMP-021 — Wave-18: all eight portals real + the production-killing React #185 loop (19 Sep 2026)
+
+**The user report.** "There other portals ensure all are done
+appropriately: Buyers & Sellers … Landlords … Investors … Tenants … Banks
+& Lenders … Developers … Diaspora … Agents & Professionals — Open
+workspace." The homepage advertises eight stakeholder cards, but wave 17
+had only reached two of them (/develop, /pro): /manage, /portfolio,
+/tenant and /institutional were still open demo ledgers and brochures —
+any visitor could read somebody else's tenant arrears without signing in,
+and the Diaspora store's entire feature set (viewing slots, the PoA
+checklist, the purchase journey) had a store and no UI.
+
+**What shipped.**
+
+1. **The shared `PortalGate`** (src/components/common/PortalGate.tsx) —
+   the wave-17 three-state pattern extracted once: guest sign-in /
+   registration gate (requireAuth → the Google registration step lands
+   new members back in the workspace), a one-click account-type switch
+   for signed-in wrong-lane accounts (register-or-switch, never a dead
+   end), and the workspace itself. `lane: 'any'` admits every signed-in
+   account for cross-cutting portals, with a `RegistrationHint` nudging
+   skipped-registration accounts to pick a lane.
+2. **Four more gated workspaces** — /manage (Landlords, landlord lane;
+   the console also gains the owner's marketplace listings with full
+   lifecycle controls via ListingManageCard — the property desk and the
+   listing pipeline finally meet on one screen), /portfolio (Investors,
+   investor lane; plus a watchlist strip fed by the marketplace heart
+   button — the save → shortlist → Deal Analyst bridge), /tenant
+   (Tenants, renter lane), /institutional (Banks & Lenders, new
+   `institution` lane).
+3. **The institution lane** — a sixth account type ('institution') through
+   the registration wizard, the account boundary schema and the account
+   page. Institutional enquiries are real partner applications now: the
+   form prefills from the signed-in account, files a typed
+   PartnerApplication (type 'institution') into the admin console's
+   Partners tab with audit-trail entry, and the workspace tracks the
+   account's own enquiry status — no more toasts into the void. The
+   workspace also leads with a live market snapshot computed from the
+   real inventory (verified count, median price, average Trust Score,
+   coverage).
+4. **The Diaspora desk** — /diaspora keeps its public marketing layer
+   (hero, services, remittance comparison — genuinely useful, SEO-worthy)
+   but gains the account-gated desk exactly where the store's features
+   waited: virtual viewing slots with exact cross-timezone conversion
+   (book in EAT, see it in your zone with cross-day flags, requested →
+   confirmed → done), the nine-step embassy-to-registry PoA checklist
+   with progress, and the eight-step remote purchase journey
+   (JOURNEY_STEPS: shortlist → viewing → analysis → lawyer/escrow → PoA
+   → financing → transfer → management) with per-step surface links and
+   status cycling. Guests see a sign-in card where the desk sits.
+5. **Buyers & Sellers** — the marketplace keeps public browsing (the
+   correct shape for a marketplace) and gains the missing workspace
+   piece: a first-class Saved-homes filter (toolbar chip + desktop filter
+   + dedicated empty state), so the heart button's save → shortlist →
+   viewing journey doesn't dead-end at the account page.
+6. **The production-killing React #185 loop (pre-existing, found by the
+   wave-18 live smoke test):** /portfolio was dead for EVERY visitor
+   since the recharts 3.10 bump — "Maximum update depth exceeded" in
+   TokenizeProvider. Root cause: the store read its "live trial clock"
+   through useSyncExternalStore with `getSnapshot: () => Date.now()` —
+   an UNCACHED snapshot; React re-renders to reconcile a changed
+   snapshot forever. The clock was also dead API (no component ever
+   consumed trialNowMs) — removed entirely, pinned by a render regression
+   test that provably throws error #185 when the uncached snapshot
+   returns (verified by reintroducing the bug). Secondary hardening: the
+   dashboard's rent-by-holding chart data is memoized now
+   (ChartDataContextProvider dispatches on every `data` identity change
+   — inline `.map()` at the call site is a loop waiting to happen), and
+   the source-contract test forbids inline-derived chart data props
+   across all chart views.
+7. **Tests** — tests/portalGates.test.ts (19 tests): journey steps /
+   progress helpers / status cycle contracts, the institution lane
+   through the account boundary, the institutional enquiry → partner
+   desk persistence, and the gate-wiring source contract for every
+   portal (each gated view mounts PortalGate with the promised lane; the
+   diaspora desk wiring; the chart-data stability and uncached-snapshot
+   bans); tests/tokenizeRender.test.tsx (the #185 regression pin);
+   accountTypes tests extended to six lanes; diasporaHub tests unchanged
+   and green. Live headless walkthrough on the production bundle: every
+   guest gate, the signed-in landlord console (account chip, marketplace
+   listings panel), the signed-in investor dashboard (charts, watchlist,
+   holdings — zero console errors post-fix), the diaspora guest card.
+
+**Verification:** 587 tests / 46 files (20 new) · typecheck clean · lint
+clean · build + artifact verification PASSED (110-URL sitemap, 15 catalogue
++ 10 app sections prerendered, all gates green).

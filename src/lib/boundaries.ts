@@ -149,7 +149,7 @@ export const userAccountSchema = z.object({
   company: z.string().optional(),
   // Registration (group personalisation) — optional for backward
   // compatibility with accounts created before the registration step.
-  accountType: z.enum(['renter', 'landlord', 'developer', 'agent', 'investor']).optional(),
+  accountType: z.enum(['renter', 'landlord', 'developer', 'agent', 'investor', 'institution']).optional(),
   onboardedAt: z.string().optional(),
   createdAt: z.string(),
   lastLoginAt: z.string(),

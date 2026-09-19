@@ -1,11 +1,16 @@
 'use client';
 /**
  * Keja Home — property discovery (proposal §2).
- * Search, facets (area/type/purpose/price/beds/trust), sorting, comparison
- * and saved searches. Every card surfaces the Trust Score.
+ * Search, facets (area/type/purpose/price/beds/trust), sorting, comparison,
+ * saved searches and the saved-homes filter. Every card surfaces the Trust
+ * Score.
+ *
+ * Wave 18: the Buyers & Sellers portal workspace surface — the heart button
+ * (saved homes) now has a first-class filter chip, so the save → shortlist →
+ * viewing journey doesn't dead-end at the account page.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { Bell, Filter, MapPin, Search, SlidersHorizontal, Star, X } from 'lucide-react';
+import { Bell, Filter, Heart, MapPin, Search, SlidersHorizontal, Star, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -45,6 +50,7 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
   const [minTrust, setMinTrust] = useState(0);
   const [beds, setBeds] = useState<string>('any');
   const [sort, setSort] = useState<SortKey>('trust');
+  const [savedOnly, setSavedOnly] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
 
@@ -62,6 +68,7 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
 
   const filtered = useMemo(() => {
     let list = all.filter((p) => {
+      if (savedOnly && !favorites.includes(p.id)) return false;
       if (parsedQ.raw && !matchesFreeQuery(p, parsedQ)) return false;
       if (area !== 'all' && p.area !== area) return false;
       if (type !== 'all' && p.type !== type) return false;
@@ -91,7 +98,7 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
     });
     void monthly;
     return list;
-  }, [all, parsedQ, area, type, purpose, maxPrice, minTrust, beds, sort]);
+  }, [all, parsedQ, area, type, purpose, maxPrice, minTrust, beds, sort, savedOnly, favorites]);
 
   const toggleSave = (p: Property) => {
     const wasSaved = favorites.includes(p.id);
@@ -150,7 +157,8 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
     (purpose !== 'all' ? 1 : 0) +
     (maxPrice < MAX_PRICE ? 1 : 0) +
     (minTrust > 0 ? 1 : 0) +
-    (beds !== 'any' ? 1 : 0);
+    (beds !== 'any' ? 1 : 0) +
+    (savedOnly ? 1 : 0);
 
   const FiltersBody = (
     <div className="space-y-6">
@@ -247,7 +255,7 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
         className="w-full font-bold"
         onClick={() => {
           setArea('all'); setType('all'); setPurpose('all');
-          setMaxPrice(MAX_PRICE); setMinTrust(0); setBeds('any');
+          setMaxPrice(MAX_PRICE); setMinTrust(0); setBeds('any'); setSavedOnly(false);
         }}
       >
         <X className="mr-1.5 h-4 w-4" aria-hidden /> Clear filters
@@ -272,6 +280,16 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
           </p>
         </div>
         <div className="flex max-w-full flex-wrap items-center justify-start gap-2 sm:justify-end">
+          <Button
+            variant={savedOnly ? 'default' : 'outline'}
+            size="sm"
+            className="font-bold"
+            aria-pressed={savedOnly}
+            onClick={() => setSavedOnly((v) => !v)}
+          >
+            <Heart className={cn('mr-1.5 h-4 w-4', savedOnly && 'fill-current')} aria-hidden />
+            Saved{favorites.length > 0 ? ` (${favorites.length})` : ''}
+          </Button>
           <Button
             variant={mapOpen ? 'default' : 'outline'}
             size="sm"
@@ -388,15 +406,24 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
 
       {filtered.length === 0 ? (
         <div className="mt-16 flex flex-col items-center gap-3 py-16 text-center">
-          <span className="text-5xl" aria-hidden>🔍</span>
-          <h2 className="text-lg font-bold">No listings match those filters</h2>
+          <span className="text-5xl" aria-hidden>{savedOnly ? '🤍' : '🔍'}</span>
+          <h2 className="text-lg font-bold">
+            {savedOnly ? 'No saved homes yet' : 'No listings match those filters'}
+          </h2>
           <p className="max-w-sm text-sm text-muted-foreground">
-            Try widening the price band or clearing the area filter — or save this search and
-            we&rsquo;ll alert you when a match arrives.
+            {savedOnly
+              ? 'Tap the heart on any listing — your shortlist lives here, on your account page and in the investor watchlist.'
+              : 'Try widening the price band or clearing the area filter — or save this search and we’ll alert you when a match arrives.'}
           </p>
-          <Button variant="outline" className="font-bold" onClick={() => { setQ(''); setArea('all'); setType('all'); setPurpose('all'); setMaxPrice(MAX_PRICE); setMinTrust(0); setBeds('any'); }}>
-            Clear everything
-          </Button>
+          {savedOnly ? (
+            <Button variant="outline" className="font-bold" onClick={() => setSavedOnly(false)}>
+              Show all listings
+            </Button>
+          ) : (
+            <Button variant="outline" className="font-bold" onClick={() => { setQ(''); setArea('all'); setType('all'); setPurpose('all'); setMaxPrice(MAX_PRICE); setMinTrust(0); setBeds('any'); setSavedOnly(false); }}>
+              Clear everything
+            </Button>
+          )}
         </div>
       ) : (
         <div>

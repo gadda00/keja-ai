@@ -18,13 +18,14 @@ import {
 import { submissionToListing, type ListingSubmission } from '@/lib/adminStore';
 
 describe('ACCOUNT_TYPES catalogue', () => {
-  it('offers the five journeys with unique values', () => {
+  it('offers the six journeys with unique values', () => {
     expect(ACCOUNT_TYPES.map((t) => t.value)).toEqual([
       'renter',
       'landlord',
       'developer',
       'agent',
       'investor',
+      'institution',
     ]);
   });
 
@@ -37,16 +38,18 @@ describe('ACCOUNT_TYPES catalogue', () => {
     }
   });
 
-  it('routes each lane to the workspace built for it (wave 17: developers land in /develop)', () => {
+  it('routes each lane to the workspace built for it (wave 17: developers land in /develop; wave 18: institutions in /institutional)', () => {
     expect(accountTypeInfo('landlord').to).toBe('/sell');
     expect(accountTypeInfo('developer').to).toBe('/develop');
     expect(accountTypeInfo('agent').to).toBe('/pro');
     expect(accountTypeInfo('renter').to).toBe('/properties');
+    expect(accountTypeInfo('investor').to).toBe('/invest');
+    expect(accountTypeInfo('institution').to).toBe('/institutional');
   });
 });
 
 describe('isAccountType guard', () => {
-  it('accepts the five real types and rejects everything else', () => {
+  it('accepts the six real types and rejects everything else', () => {
     for (const v of ACCOUNT_TYPE_VALUES) expect(isAccountType(v)).toBe(true);
     expect(isAccountType('admin')).toBe(false); // role, not account type
     expect(isAccountType('')).toBe(false);
@@ -73,9 +76,10 @@ describe('canPostProperties', () => {
     expect(POSTING_TYPES).toEqual(['landlord', 'developer', 'agent']);
   });
 
-  it('blocks renters, investors and signed-out visitors', () => {
+  it('blocks renters, investors, institutions and signed-out visitors', () => {
     expect(canPostProperties('renter')).toBe(false);
     expect(canPostProperties('investor')).toBe(false);
+    expect(canPostProperties('institution')).toBe(false);
     expect(canPostProperties(undefined)).toBe(false);
     expect(canPostProperties(null)).toBe(false);
   });

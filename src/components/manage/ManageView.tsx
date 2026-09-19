@@ -4,6 +4,13 @@
  * units, tenants & screening, rent collection, leases, maintenance tickets,
  * statements, AI alerts and owner reporting. Seeded demo portfolio, fully
  * editable, persisted on-device.
+ *
+ * Wave 18: the console is a gated workspace now (PortalGate, landlord
+ * lane) — guests get the sign-in/registration gate instead of somebody
+ * else's tenant ledger, and the signed-in landlord also sees their own
+ * marketplace listings (posted via /sell) inside the console with the
+ * full lifecycle controls — the property desk and the listing pipeline
+ * finally meet on one screen.
  */
 import { useMemo, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, } from '@/components/charts/reexports';
@@ -15,6 +22,7 @@ import {
   DoorClosed,
   LayoutDashboard,
   LineChart,
+  Megaphone,
   Plus,
   Receipt,
   RotateCcw,
@@ -43,6 +51,11 @@ import {
   type NewTicket,
   type NewUnit,
 } from '@/lib/landlordStore';
+import { useUserListings } from '@/lib/adminStore';
+import { ListingManageCard } from '@/components/property/ListingManageCard';
+import { PortalGate } from '@/components/common/PortalGate';
+import { useAuth, initials } from '@/lib/auth';
+import { isPictureUrl } from '@/lib/googleAuth';
 import { formatKES } from '@/lib/format';
 import { navigate } from '@/lib/router';
 import { cn } from '@/lib/utils';
@@ -56,7 +69,49 @@ const STATUS_CLASS = {
 const PRIORITY_CLASS = { high: 'bg-destructive text-destructive-foreground', medium: 'bg-gold text-gold-foreground', low: 'bg-muted text-muted-foreground' } as const;
 const TICKET_CLASS = { new: 'border-gold/50 text-gold-foreground', scheduled: 'border-primary/40 text-primary', resolved: 'border-border text-muted-foreground' } as const;
 
-export default function ManageView() {
+/** The owner's marketplace listings (posted via /sell) with lifecycle
+ *  controls — the missing link between the landlord console and the
+ *  listing pipeline (wave 18). */
+function MarketplaceListingsPanel() {
+  const { user } = useAuth();
+  const [userListings] = useUserListings();
+  const mine = useMemo(
+    () => userListings.filter((l) => !l.ownerEmail || (user && l.ownerEmail === user.email)),
+    [userListings, user],
+  );
+
+  return (
+    <div className="rounded-3xl border bg-card p-5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider">
+          <Megaphone className="h-4 w-4 text-gold" aria-hidden /> Your marketplace listings
+        </h3>
+        <Button size="sm" className="h-8 text-xs font-bold" onClick={() => navigate('/sell')}>
+          <Plus className="mr-1 h-3.5 w-3.5" aria-hidden /> Post a property
+        </Button>
+      </div>
+      <p className="mt-1.5 text-xs text-muted-foreground">
+        Listings published under your account — review status, availability and views, controlled
+        from the same desk as the tenancies they become.
+      </p>
+      <div className="mt-4 grid gap-3">
+        {mine.length === 0 ? (
+          <div className="rounded-2xl border border-dashed bg-background/50 p-6 text-center">
+            <p className="text-sm font-bold">Nothing published yet</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              A vacant unit sells or lets faster on the marketplace — the wizard screens pricing
+              against area bands before it goes live.
+            </p>
+          </div>
+        ) : (
+          mine.map((l) => <ListingManageCard key={l.id} listing={l} />)
+        )}
+      </div>
+    </div>
+  );
+}
+
+function LandlordConsole() {
   const { data, addUnit, addTenant, recordPayment, addTicket, updateTicketStatus, resetDemo } = useLandlordStore();
   const [payOpenFor, setPayOpenFor] = useState<string | null>(null);
   const [payAmount, setPayAmount] = useState(0);
@@ -112,19 +167,33 @@ export default function ManageView() {
   })();
 
   const unitsById = useMemo(() => new Map(data.units.map((u) => [u.id, u])), [data.units]);
+  const { user } = useAuth();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <Badge variant="outline" className="border-primary/40 font-bold text-primary">Keja Manage</Badge>
+          <Badge variant="outline" className="border-primary/40 font-bold text-primary">Keja Manage · Landlord console</Badge>
           <h1 className="mt-2.5 text-3xl font-black tracking-tight sm:text-4xl">My properties</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             {data.units.length} properties · {formatKES(expectedMonthly)} monthly rental income ·{' '}
             {occupancy.toFixed(0)}% occupancy · {formatKES(expectedMonthly * 12)} annual revenue
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="hidden items-center gap-3 rounded-2xl border bg-card px-4 py-2.5 sm:flex">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-primary text-[10px] font-black text-primary-foreground">
+              {user && isPictureUrl(user.picture) ? (
+                <img src={user.picture} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" loading="lazy" />
+              ) : (
+                <span aria-hidden>{initials(user?.name ?? '')}</span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-xs font-bold">{user?.company || user?.name}</p>
+              <p className="truncate text-[10px] text-muted-foreground">landlord account</p>
+            </div>
+          </div>
           <Button className="font-bold" onClick={() => navigate('/sell')}>
             <Building2 className="mr-1.5 h-4 w-4" aria-hidden /> Post a property
           </Button>
@@ -176,6 +245,7 @@ export default function ManageView() {
               </ul>
             </div>
           )}
+          <MarketplaceListingsPanel />
           <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
             <div className="rounded-3xl border bg-card p-5">
               <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider">
@@ -579,5 +649,43 @@ export default function ManageView() {
         );
       })()}
     </div>
+  );
+}
+
+/* ------------------------------ the gate ----------------------------------- */
+
+/** The landlord console — one of the eight stakeholder workspaces. Guests
+ *  hit the sign-in gate; signed-in non-landlords get the one-click lane
+ *  switch; landlords get the console (wave 18 portal reality). */
+export default function ManageView() {
+  return (
+    <PortalGate
+      badge="Keja Manage · Landlord console"
+      title="The landlord console"
+      blurb="Sign in to one desk for rent collection, tenant screening and portfolio performance — your properties, your tenants, your statements."
+      lane="landlord"
+      laneLabel="a landlord"
+      laneTitle="Landlord"
+      intent="the landlord console"
+      features={[
+        {
+          icon: Building2,
+          title: 'Properties & tenants',
+          text: 'Units, leases, occupancy and arrears in one console — add what you own, onboard who rents, track every balance.',
+        },
+        {
+          icon: Receipt,
+          title: 'Rent collection',
+          text: 'Record payments by M-Pesa, bank or cash, track balances month by month, and see the collection rate the moment each rent lands.',
+        },
+        {
+          icon: LineChart,
+          title: 'Portfolio performance',
+          text: 'Income history, owner statements and transparent rule-based alerts that flag arrears, voids and maintenance risks early.',
+        },
+      ]}
+    >
+      <LandlordConsole />
+    </PortalGate>
   );
 }

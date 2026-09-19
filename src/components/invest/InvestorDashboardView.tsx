@@ -3,6 +3,11 @@
  * KEJA INVESTOR DASHBOARD (proposal §6) — the whole-portfolio desk:
  * value, holdings, rental income, appreciation, ROI, yields, occupancy,
  * cash flow, financing, and a downloadable investor report.
+ *
+ * Wave 18: the dashboard is a gated workspace (PortalGate, investor lane)
+ * and the signed-in investor starts from their watchlist — the homes saved
+ * while browsing the marketplace, with live yield estimates — so the
+ * collection-to-commitment journey is one screen, not a dead product.
  */
 import { useMemo, useState } from 'react';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, } from '@/components/charts/reexports';
@@ -12,6 +17,8 @@ import {
   Building2,
   Coins,
   Download,
+  Eye,
+  Heart,
   Landmark,
   PieChart as PieIcon,
   Plus,
@@ -33,6 +40,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { usePortfolio, type Holding } from '@/lib/investorStore';
 import { useTokenize } from '@/lib/tokenizeStore';
+import { PortalGate } from '@/components/common/PortalGate';
+import { useAuth, initials } from '@/lib/auth';
+import { isPictureUrl } from '@/lib/googleAuth';
+import { useAllProperties } from '@/lib/inventory';
+import { useFavorites } from '@/lib/store';
 import { formatKES } from '@/lib/format';
 import { navigate } from '@/lib/router';
 import { cn } from '@/lib/utils';
@@ -87,7 +99,93 @@ function projection(hs: Holding[], appreciationPct: number) {
   }));
 }
 
-export default function InvestorDashboardView() {
+/** The investor's watchlist — homes saved while browsing, with the numbers
+ *  an investor actually wants on one line. This is the collection →
+ *  commitment bridge (wave 18): the marketplace heart button feeds this. */
+function WatchlistStrip() {
+  const [favorites] = useFavorites();
+  const all = useAllProperties();
+  const saved = useMemo(
+    () => all.filter((p) => favorites.includes(p.id)).sort((a, b) => b.trustScore - a.trustScore).slice(0, 6),
+    [all, favorites],
+  );
+
+  if (saved.length === 0) {
+    return (
+      <div className="rounded-3xl border border-dashed bg-card/60 p-5 text-center">
+        <Heart className="mx-auto h-6 w-6 text-muted-foreground/40" aria-hidden />
+        <p className="mt-2 text-sm font-bold">Your watchlist is empty</p>
+        <p className="mx-auto mt-1 max-w-md text-xs leading-relaxed text-muted-foreground">
+          Tap the heart on any marketplace listing — it lands here with its yield estimate, ready
+          for the Deal Analyst and the buy decision.
+        </p>
+        <Button variant="outline" size="sm" className="mt-3 font-bold" onClick={() => navigate('/properties')}>
+          Browse the marketplace
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-3xl border bg-card p-5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider">
+          <Heart className="h-4 w-4 text-gold" aria-hidden /> Watchlist — saved homes
+        </h2>
+        <p className="text-[11px] font-bold text-muted-foreground">
+          {favorites.length} saved · {saved.length} shown
+        </p>
+      </div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {saved.map((p) => (
+          <button
+            key={p.id}
+            onClick={() => navigate(`/properties/${p.id}`)}
+            className="rounded-2xl border bg-background/60 p-4 text-left transition-colors hover:border-primary/40"
+          >
+            <p className="line-clamp-1 text-sm font-bold">{p.title}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">{p.area} · {p.type}</p>
+            <div className="mt-2.5 flex items-center justify-between text-xs">
+              <span className="font-black tabular-nums">
+                {p.priceOnApplication ? 'POA' : formatKES(p.price)}
+              </span>
+              <span className="inline-flex items-center gap-1 font-bold text-primary">
+                <Eye className="h-3 w-3" aria-hidden /> {p.trustScore}
+              </span>
+            </div>
+            <p className="mt-1.5 text-[11px] font-bold text-muted-foreground">
+              {p.grossYieldEstimate ? `est. gross yield ${p.grossYieldEstimate.toFixed(1)}%` : 'yield on request'} ·{' '}
+              <span className="text-primary">Deal Analyst →</span>
+            </p>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Signed-in investor chip — the workspace is account-scoped (wave 18). */
+function AccountChip() {
+  const { user } = useAuth();
+  if (!user) return null;
+  return (
+    <div className="hidden items-center gap-3 rounded-2xl border bg-card px-4 py-2.5 sm:flex">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-primary text-[10px] font-black text-primary-foreground">
+        {isPictureUrl(user.picture) ? (
+          <img src={user.picture} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" loading="lazy" />
+        ) : (
+          <span aria-hidden>{initials(user.name)}</span>
+        )}
+      </div>
+      <div className="min-w-0">
+        <p className="truncate text-xs font-bold">{user.company || user.name}</p>
+        <p className="truncate text-[10px] text-muted-foreground">investor account</p>
+      </div>
+    </div>
+  );
+}
+
+function InvestorDashboard() {
   const portfolio = usePortfolio();
   const tokenize = useTokenize();
   const [addOpen, setAddOpen] = useState(false);
@@ -113,6 +211,20 @@ export default function InvestorDashboardView() {
   }, [portfolio.holdings]);
 
   const series = useMemo(() => projection(portfolio.holdings, 7.2), [portfolio.holdings]);
+
+  // Chart data props MUST be referentially stable (recharts 3.10's
+  // ChartDataContextProvider dispatches on every `data` identity change —
+  // an inline `.map()` here looped the store into React error #185, killing
+  // the whole dashboard for every visitor; found by the wave-18 live smoke
+  // test on a route nobody had verified since the recharts bump).
+  const rentByHolding = useMemo(
+    () =>
+      holdingRows.map((h) => ({
+        name: h.label.split('·')[0].trim(),
+        rent: Math.round((h.monthlyRent * h.occupancyPct) / 100),
+      })),
+    [holdingRows],
+  );
 
   // tokenized holdings join (trial wallet positions)
   const tokenPositions = tokenize.investments.map((inv) => {
@@ -183,7 +295,8 @@ export default function InvestorDashboardView() {
             {portfolio.holdings.length} holdings · demo portfolio on the trial platform — every figure editable.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <AccountChip />
           <Button variant="outline" className="font-bold" onClick={downloadReport}>
             <Download className="mr-1.5 h-4 w-4" aria-hidden /> Download investor report
           </Button>
@@ -240,6 +353,11 @@ export default function InvestorDashboardView() {
             <RotateCcw className="h-4 w-4" />
           </Button>
         </div>
+      </div>
+
+      {/* watchlist — saved homes bridge into the deal flow */}
+      <div className="mt-6">
+        <WatchlistStrip />
       </div>
 
       {/* headline metrics */}
@@ -440,7 +558,7 @@ export default function InvestorDashboardView() {
         <h2 className="text-sm font-black uppercase tracking-wider">Monthly rental income by holding</h2>
         <div className="mt-4 h-52">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={holdingRows.map((h) => ({ name: h.label.split('·')[0].trim(), rent: Math.round((h.monthlyRent * h.occupancyPct) / 100) }))}>
+            <BarChart data={rentByHolding}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
               <XAxis dataKey="name" stroke="var(--muted-foreground)" fontSize={11} />
               <YAxis stroke="var(--muted-foreground)" fontSize={11} tickFormatter={(v: number) => `${Math.round(v / 1000)}k`} />
@@ -454,5 +572,43 @@ export default function InvestorDashboardView() {
         </div>
       </div>
     </div>
+  );
+}
+
+/* ------------------------------ the gate ----------------------------------- */
+
+/** The investor dashboard — one of the eight stakeholder workspaces.
+ *  Guests hit the sign-in gate; signed-in non-investors get the one-click
+ *  lane switch; investors get the desk (wave 18 portal reality). */
+export default function InvestorDashboardView() {
+  return (
+    <PortalGate
+      badge="Keja Invest · Investor Dashboard"
+      title="The investor dashboard"
+      blurb="Sign in to the whole-portfolio desk — value, yields, cash flow and financing, plus a watchlist of the homes you saved on the marketplace."
+      lane="investor"
+      laneLabel="an investor"
+      laneTitle="Investor"
+      intent="the investor dashboard"
+      features={[
+        {
+          icon: Wallet,
+          title: 'Portfolio instrumented',
+          text: 'Value, equity, LTV, net and gross yields, occupancy and cash flow — every figure editable, downloadable as a report.',
+        },
+        {
+          icon: Heart,
+          title: 'Watchlist to deal flow',
+          text: 'Homes saved on the marketplace land here with live yield estimates, one tap from the Deal Analyst stress tests.',
+        },
+        {
+          icon: Coins,
+          title: 'Fractional trials',
+          text: 'Tokenized positions join the dashboard next to direct holdings — one view of the whole exposure.',
+        },
+      ]}
+    >
+      <InvestorDashboard />
+    </PortalGate>
   );
 }

@@ -274,6 +274,84 @@ export function poaProgressPct(taskIds: string[]): number {
 }
 
 /* ------------------------------------------------------------------ */
+/* Purchase journey                                                     */
+/* ------------------------------------------------------------------ */
+
+export interface JourneyStep {
+  id: string;
+  label: string;
+  hint: string;
+  /** where the platform helps with this step, if anywhere */
+  to?: string;
+}
+
+/** The eight steps of a remote purchase (proposal §8) — the diaspora desk
+ *  walks buyers through these with the platform surfaces that serve them. */
+export const JOURNEY_STEPS: JourneyStep[] = [
+  {
+    id: 'j-shortlist',
+    label: 'Shortlist verified homes',
+    hint: 'Trust Score ≥ 85 with title screens — save with the heart button and they land in your desk.',
+    to: '/properties',
+  },
+  {
+    id: 'j-viewing',
+    label: 'Virtual viewing',
+    hint: 'Book a Nairobi-time slot below; an independent Keja verifier walks the property live on video.',
+  },
+  {
+    id: 'j-analysis',
+    label: 'Run the numbers',
+    hint: 'Deal Analyst stress-tests yield, cash flow and downside before money moves.',
+    to: '/deal-analyst',
+  },
+  {
+    id: 'j-lawyer',
+    label: 'Lawyer & escrow',
+    hint: 'Vetted Kenyan counsel drafts the agreement; escrow options keep deposit and title in sync.',
+    to: '/transact',
+  },
+  {
+    id: 'j-poachoice',
+    label: 'Power of Attorney (if not traveling)',
+    hint: 'The embassy-to-registry checklist below — start early, notarisation takes weeks.',
+  },
+  {
+    id: 'j-financing',
+    label: 'Financing',
+    hint: 'Diaspora mortgage desks at partner banks — USD or KES, remote onboarding.',
+    to: '/finance',
+  },
+  {
+    id: 'j-transfer',
+    label: 'Offer, deposit & transfer',
+    hint: 'Signed remotely with e-signature where accepted; registration at the lands registry.',
+    to: '/transact',
+  },
+  {
+    id: 'j-manage',
+    label: 'Handover & management',
+    hint: 'Keja Manage collects rent, chases arrears and wires net income to your overseas account.',
+    to: '/manage',
+  },
+];
+
+/** Ordered next step in the journey (first 'next', else first untouched).
+ *  Absent statuses count as untouched — the store seeds an empty map. */
+export function activeJourneyStep(journey: Record<string, JourneyStepStatus>): JourneyStep | undefined {
+  const statusOf = (id: string): JourneyStepStatus => journey[id] ?? 'untouched';
+  const next = JOURNEY_STEPS.find((s) => statusOf(s.id) === 'next');
+  return next ?? JOURNEY_STEPS.find((s) => statusOf(s.id) === 'untouched');
+}
+
+/** Journey completion 0–100 across the defined steps. */
+export function journeyProgressPct(journey: Record<string, JourneyStepStatus>): number {
+  if (JOURNEY_STEPS.length === 0) return 0;
+  const done = JOURNEY_STEPS.filter((s) => journey[s.id] === 'done').length;
+  return Math.round((done / JOURNEY_STEPS.length) * 100);
+}
+
+/* ------------------------------------------------------------------ */
 /* Journey status cycle                                                 */
 /* ------------------------------------------------------------------ */
 

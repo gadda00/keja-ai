@@ -11,7 +11,7 @@
  * is safely importable from tests, SSR and any UI layer.
  */
 
-export type AccountType = 'renter' | 'landlord' | 'developer' | 'agent' | 'investor';
+export type AccountType = 'renter' | 'landlord' | 'developer' | 'agent' | 'investor' | 'institution';
 
 export interface AccountTypeInfo {
   value: AccountType;
@@ -91,6 +91,19 @@ export const ACCOUNT_TYPES: AccountTypeInfo[] = [
       { label: 'Investment tools', to: '/invest' },
       { label: 'Portfolio', to: '/portfolio' },
       { label: 'Deal analyst', to: '/deal-analyst' },
+    ],
+  },
+  {
+    value: 'institution',
+    label: 'Bank / Lender / Institution',
+    blurb: 'Market intelligence, qualified financing leads and portfolio analytics',
+    emoji: '🏛️',
+    to: '/institutional',
+    cta: 'Open the institutional workspace',
+    actions: [
+      { label: 'Institutional workspace', to: '/institutional' },
+      { label: 'Market data', to: '/data' },
+      { label: 'Partner programme', to: '/partners' },
     ],
   },
 ];

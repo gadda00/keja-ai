@@ -1,7 +1,10 @@
 'use client';
-/** Tenant hub — lease, maintenance requests, moving checklist (tenant side of Keja Manage). */
+/** Tenant hub — lease, maintenance requests, moving checklist (tenant side of Keja Manage).
+ *
+ *  Wave 18: gated workspace (PortalGate, renter lane) — the lease ledger
+ *  and maintenance line are account surfaces now, not an open brochure. */
 import { useState } from 'react';
-import { CalendarDays, CheckCircle2, ClipboardCheck, DoorOpen, Home, Plus, Send, Wrench } from 'lucide-react';
+import { CalendarDays, CheckCircle2, ClipboardCheck, DoorOpen, Home, KeyRound, Plus, Send, Wrench } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +13,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTenantStore, MOVING_CHECKLIST, REQUEST_CATEGORIES, PREFERRED_TIMES } from '@/lib/tenantStore';
+import { PortalGate } from '@/components/common/PortalGate';
+import { useAuth } from '@/lib/auth';
 
 const CATEGORY_LABELS: Record<string, string> = {
   plumbing: 'Plumbing',
@@ -28,8 +33,9 @@ const REQ_STATUS = {
   scheduled: 'border-primary text-primary',
 } as const;
 
-export default function TenantHubView() {
+function TenantHub() {
   const { data, addRequest, advanceRequest, toggleChecklistItem, resetDemo } = useTenantStore();
+  const { user } = useAuth();
   const [title, setTitle] = useState('');
   const [detail, setDetail] = useState('');
   const [category, setCategory] = useState<string>(REQUEST_CATEGORIES[0]);
@@ -41,7 +47,9 @@ export default function TenantHubView() {
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
       <div className="max-w-2xl">
         <Badge variant="outline" className="border-primary/40 font-bold text-primary">Keja Manage · Tenant Hub</Badge>
-        <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Your home, self-served</h1>
+        <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+          Your home, self-served{user ? `, ${user.name.split(' ')[0]}` : ''}
+        </h1>
         <p className="mt-3 leading-relaxed text-muted-foreground">
           The tenant side of the platform: your lease on record, maintenance one tap away, and a
           moving checklist that actually helps. (Demo data on the trial platform.)
@@ -209,5 +217,43 @@ export default function TenantHubView() {
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+/* ------------------------------ the gate ----------------------------------- */
+
+/** The tenant hub — one of the eight stakeholder workspaces. Guests get the
+ *  sign-in gate; signed-in non-renters get the one-click lane switch; renters
+ *  get their hub (wave 18 portal reality). */
+export default function TenantHubView() {
+  return (
+    <PortalGate
+      badge="Keja Manage · Tenant Hub"
+      title="The tenant hub"
+      blurb="Sign in to your side of the platform — your lease on record, maintenance one tap away, and a moving checklist that actually helps."
+      lane="renter"
+      laneLabel="a tenant"
+      laneTitle="Find a home"
+      intent="the tenant hub"
+      features={[
+        {
+          icon: DoorOpen,
+          title: 'Your lease, on record',
+          text: 'Rent, deposit, dates and landlord contacts — the paperwork that matters, on your device instead of a shoebox.',
+        },
+        {
+          icon: Wrench,
+          title: 'Maintenance, one tap',
+          text: 'Log issues with category and preferred time; requests move submitted → acknowledged → scheduled with the landlord desk.',
+        },
+        {
+          icon: KeyRound,
+          title: 'Rent within 33%',
+          text: 'Affordability checks before you commit, verified homes only, and a moving-in checklist from KRA to internet.',
+        },
+      ]}
+    >
+      <TenantHub />
+    </PortalGate>
   );
 }

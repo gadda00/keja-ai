@@ -8,8 +8,8 @@
  *     expiry / verified email) before a session is created.
  *  2. Registration — first-time Google sign-ins continue to a one-screen
  *     "what brings you to Keja" step (account group, phone, company) so
- *     every journey — renter, landlord, developer, agent, investor — lands
- *     on the surface built for it.
+ *     every journey — renter, landlord, developer, agent, investor,
+ *     institution — lands on the surface built for it.
  *  3. Two-factor step — when the signed-in account requires it (admins
  *     always; everyone else if enrolled), the modal advances to the
  *     Google Authenticator challenge / enrolment wizard instead of closing.
@@ -147,8 +147,8 @@ function RegistrationStep({ onDone }: { onDone: () => void }) {
   const [phone, setPhone] = useState(user?.phone ?? '');
   const [company, setCompany] = useState(user?.company ?? '');
   const [name, setName] = useState(user?.name ?? '');
-  // company only makes sense for the professional groups
-  const pro = type === 'landlord' || type === 'developer' || type === 'agent';
+  // company only makes sense for the professional / institutional groups
+  const pro = type === 'landlord' || type === 'developer' || type === 'agent' || type === 'institution';
 
   const finishRegistration = () => {
     if (!type) return;
@@ -223,12 +223,13 @@ function RegistrationStep({ onDone }: { onDone: () => void }) {
         {pro && (
           <label className="grid gap-1.5">
             <span className="text-xs font-bold">
-              Company / agency <span className="font-normal text-muted-foreground">(optional)</span>
+              {type === 'institution' ? 'Organisation' : 'Company / agency'}{' '}
+              <span className="font-normal text-muted-foreground">(optional)</span>
             </span>
             <Input
               value={company}
               onChange={(e) => setCompany(e.target.value)}
-              placeholder={type === 'developer' ? 'e.g. Section Homes Ltd' : 'e.g. Keja Properties'}
+              placeholder={type === 'developer' ? 'e.g. Section Homes Ltd' : type === 'institution' ? 'e.g. Amani Bank Ltd' : 'e.g. Keja Properties'}
               className="h-9"
             />
           </label>

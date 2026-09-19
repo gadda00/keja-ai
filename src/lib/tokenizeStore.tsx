@@ -12,7 +12,7 @@
  */
 import type { ReactNode } from 'react';
 import { validateTokenizePersisted } from '@/lib/boundaries';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import type {
   Investment,
@@ -149,15 +149,6 @@ function load(): PersistedState {
 }
 
 /**
- * Stable no-op subscription for the render-time clock snapshot above —
- * module-level so its identity never changes (a new closure each render
- * would tear down and re-run the subscription every pass).
- */
-function neverNotify(_onStoreChange: () => void) {
-  return () => {};
-}
-
-/**
  * Seed + runtime-overridden property view — pure function of persisted
  * state, shared by the provider memo and the mount accrual in `load()`
  * so both see exactly the same LIVE/overridden world (audit SEC-201).
@@ -229,8 +220,6 @@ export interface TokenizeStore {
   trades: Trade[];
   /** Virtual trial clock offset in ms. */
   clockOffsetMs: number;
-  /** Effective "now" on the trial clock (real now + offset). */
-  trialNowMs: number;
   /** Add a labelled chunk of trial credits. */
   topUpTrial: () => void;
   /** Buy on the secondary market against the ask side (walking book). */
@@ -808,17 +797,6 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, statusOverrides: { ...s.statusOverrides, [propertyId]: 'LIVE' } }));
   }, []);
 
-  // live trial clock — an intentional "now" snapshot per render (display-only).
-  // useSyncExternalStore with a never-firing subscribe is the React-blessed
-  // escape hatch for reading an impure value during render without tearing
-  // (audit SEC-201): the value is re-read on every re-render triggered by
-  // real state changes, but never causes a re-render of its own.
-  const trialNowMs = useSyncExternalStore(
-    neverNotify,
-    () => Date.now() + state.clockOffsetMs,
-    () => Date.now(),
-  );
-
   const value = useMemo<TokenizeStore>(
     () => ({
       investor: state.investor,
@@ -850,8 +828,6 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
       walletUsd: state.walletUsd,
       trades: state.trades,
       clockOffsetMs: state.clockOffsetMs,
-      // live trial clock snapshot (read above via useSyncExternalStore)
-      trialNowMs,
       topUpTrial,
       buySecondary,
       sellSecondary,
@@ -887,7 +863,6 @@ export function TokenizeProvider({ children }: { children: ReactNode }) {
       marketPrice,
       resetTrial,
       openTrading,
-      trialNowMs,
     ]
   );
 
