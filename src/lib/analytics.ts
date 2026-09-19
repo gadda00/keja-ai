@@ -36,6 +36,7 @@ export type AnalyticsEvent =
   | { event: 'calculator_complete'; calculator: 'roi' | 'mortgage' | 'affordability' }
   | { event: 'chat_qualified'; intent: string }
   | { event: 'viewing_request'; propertyId: string }
+  | { event: 'share'; propertyId: string; channel: 'whatsapp' | 'native' | 'link' | 'poster' }
   | { event: 'human_handoff'; channel: 'whatsapp' | 'contact'; context?: string }
   | { event: 'role_selected'; role: string }
   | { event: 'issue_reported'; propertyId: string; reason: string }
@@ -50,6 +51,7 @@ export const EVENT_TAXONOMY = [
   'calculator_complete',
   'chat_qualified',
   'viewing_request',
+  'share',
   'human_handoff',
   'role_selected',
   'issue_reported',

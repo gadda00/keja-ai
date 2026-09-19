@@ -52,31 +52,22 @@ import { formatKES, timeAgo, trustTier } from '@/lib/format';
 import { areaInsights } from '@/data/areaInsights';
 import type { Property } from '@/data/properties';
 import { navigate } from '@/lib/router';
-import { useFavorites } from '@/lib/store';
+import { pushViewed, useFavorites, useRecentlyViewed } from '@/lib/store';
 import { reportListing, REPORT_REASONS, incrementListingViews, type ReportReason } from '@/lib/adminStore';
+import { passportId } from '@/lib/passport';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { asset, whatsappLink } from '@/config';
 import { PropertyCard } from './PropertyCard';
+import { PricingIntelligencePanel } from './PricingIntelligencePanel';
+import { ShareListing } from './ShareListing';
 import { TrustDial } from './TrustBadge';
 import { cn } from '@/lib/utils';
 
 /* --------------------------- passport identity ---------------------------- */
 
-const AREA_CODE: Record<string, string> = {
-  Kilimani: 'KLM', Westlands: 'WST', Lavington: 'LVT', Riverside: 'RSV', Karen: 'KRN',
-  'Upper Hill': 'UPH', Kileleshwa: 'KLS', Runda: 'RND', Nyali: 'NYL', Diani: 'DNA',
-  Kasarani: 'KSN', Madaraka: 'MDK', CBD: 'NBO', Eastleigh: 'EST', Nanyuki: 'NYK',
-  Milimani: 'MLM', Ruaka: 'RUK', Syokimau: 'SYK', Kitengela: 'KTG', 'Athi River': 'ATH',
-  Nakuru: 'NKR', Kisumu: 'KSM',
-};
-
-export function passportId(p: Property): string {
-  const code = AREA_CODE[p.area] ?? p.area.slice(0, 3).toUpperCase().replace(/[^A-Z]/g, 'X');
-  const seq = (p.id.match(/(\d+)$/)?.[1] ?? '0').padStart(6, '0');
-  return `KEJA-${code}-${seq}`;
-}
+export { passportId } from '@/lib/passport';
 
 function fraudRisk(p: Property): { label: string; tone: string } {
   const t = trustScore(p).composite;
@@ -86,18 +77,12 @@ function fraudRisk(p: Property): { label: string; tone: string } {
   return { label: 'High', tone: 'text-destructive' };
 }
 
-/** Market range estimate ±8% around asking — clearly labelled as an estimate. */
-function marketRange(p: Property): [number, number] {
-  return [Math.round(p.price * 0.92), Math.round(p.price * 1.08)];
-}
-
 /* ------------------------------ the passport ------------------------------ */
 
 function PropertyPassport({ p }: { p: Property }) {
   const ts = trustScore(p);
   const tier = trustTier(ts.composite);
   const insight = areaInsights[p.area];
-  const range = marketRange(p);
   const risk = fraudRisk(p);
   const freshness = listingFreshness(p);
 
@@ -125,8 +110,7 @@ function PropertyPassport({ p }: { p: Property }) {
       p.verification.titleCheck === 'verified' ? 'Compliant (screened)' : 'To be confirmed',
       p.verification.titleCheck === 'verified' ? 'ok' : 'warn',
     ],
-    ['Valuation', p.priceOnApplication ? 'On application' : `Estimated ${formatKES(p.price)}`, 'info'],
-    ['Estimated market range', p.priceOnApplication ? 'On application' : `${formatKES(range[0])} – ${formatKES(range[1])}`, 'info'],
+    ['Valuation', p.priceOnApplication ? 'On application' : `Asking ${formatKES(p.price)} · screen in Pricing Intelligence`, 'info'],
     ['Agent', `${p.agency} — verified`, 'ok'],
     ['Fraud risk', risk.label, risk.tone.includes('primary') ? 'ok' : 'warn'],
     ['Last verification', `${p.verification.lastChecked} · ${timeAgo(p.verification.lastChecked)}`, 'info'],
@@ -487,6 +471,7 @@ export default function PropertyDetailView({ id }: { id: string }) {
   const all = useAllProperties();
   const p = useMemo(() => all.find((x) => x.id === id), [all, id]);
   const [favorites, setFavorites] = useFavorites();
+  const [, setViewed] = useRecentlyViewed();
   const saved = p ? favorites.includes(p.id) : false;
 
   // Entity SEO (2026-09-12): re-apply the prerendered meta after hydration so
@@ -506,19 +491,33 @@ export default function PropertyDetailView({ id }: { id: string }) {
   // at 0 forever). A per-mount ref guard keeps this a one-shot per id — the
   // merged inventory re-renders this view when the counter changes, and
   // without the guard the effect would feed itself into an increment loop.
+  // Wave 20: every opened listing also enters the recently-viewed strip on
+  // /properties and the account overview (the store key finally has a
+  // writer). Same one-shot guard discipline.
   const countedRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (p && p.userSubmitted && !countedRef.current.has(p.id)) {
       countedRef.current.add(p.id);
       incrementListingViews(p.id);
     }
-  }, [p]);
+    if (p && !countedRef.current.has(`viewed:${p.id}`)) {
+      countedRef.current.add(`viewed:${p.id}`);
+      setViewed((prev) => pushViewed(prev, p.id));
+    }
+  }, [p, setViewed]);
 
   const similar = useMemo(
     () =>
       p
         ? all
-            .filter((x) => x.id !== p.id && (x.area === p.area || x.type === p.type))
+            // sold stock never belongs in "similar listings" — a buyer who
+            // just lost a listing should not be re-offered sold comparables
+            .filter(
+              (x) =>
+                x.id !== p.id &&
+                x.availability !== 'sold' &&
+                (x.area === p.area || x.type === p.type),
+            )
             .sort((a, b) => b.trustScore - a.trustScore)
             .slice(0, 4)
         : [],
@@ -585,6 +584,7 @@ export default function PropertyDetailView({ id }: { id: string }) {
             <Heart className={cn('h-4 w-4', saved && 'fill-gold text-gold')} aria-hidden />
             {saved ? 'Saved' : 'Save'}
           </Button>
+          <ShareListing p={p} />
           <Button size="sm" className="font-bold" onClick={() => navigate(`/finance?price=${p.price}`)}>
             <Landmark className="mr-1.5 h-4 w-4" aria-hidden /> Financing
           </Button>
@@ -657,6 +657,7 @@ export default function PropertyDetailView({ id }: { id: string }) {
 
         {/* Sidebar */}
         <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+          <PricingIntelligencePanel p={p} />
           <div className="rounded-2xl border bg-card p-5">
             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-muted-foreground">
               Listed by

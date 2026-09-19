@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { useAllProperties } from '@/lib/inventory';
 import { areaInsights } from '@/data/areaInsights';
 import { formatKES } from '@/lib/format';
-import { navigate } from '@/lib/router';
+import { navigate, useRouter } from '@/lib/router';
 import { cn } from '@/lib/utils';
 
 const CONDITIONS = [
@@ -19,16 +19,32 @@ const CONDITIONS = [
   { key: 'tired', label: 'Tired — needs work', adj: 0.82 },
 ] as const;
 
+const DESK_TYPES = ['apartment', 'villa', 'townhouse', 'land'] as const;
+
+type DeskType = (typeof DESK_TYPES)[number];
+
 export default function ValuationDeskView() {
   const all = useAllProperties();
-  const [area, setArea] = useState('Kilimani');
-  const [type, setType] = useState<'apartment' | 'villa' | 'townhouse' | 'land'>('apartment');
-  const [size, setSize] = useState(120);
-  const [acres, setAcres] = useState(1);
+  // Deep-link prefill (wave 20): the Pricing Intelligence panel on a listing
+  // detail page hands its area/type/size to the desk so the buyer continues
+  // the same investigation instead of retyping the inputs.
+  const { route } = useRouter();
+  const areas = [...new Set(all.map((p) => p.area))].sort();
+  const qa = typeof route.query.area === 'string' ? route.query.area : '';
+  const qt = route.query.type as DeskType | undefined;
+  const qs = Number(route.query.size);
+  const qac = Number(route.query.acres);
+  const [area, setArea] = useState(areas.includes(qa) ? qa : 'Kilimani');
+  const [type, setType] = useState<DeskType>(
+    qt && DESK_TYPES.includes(qt) ? qt : 'apartment',
+  );
+  const [size, setSize] = useState(Number.isFinite(qs) && qs >= 10 ? Math.round(qs) : 120);
+  const [acres, setAcres] = useState(
+    Number.isFinite(qac) && qac > 0 ? Math.round(qac * 100) / 100 : 1,
+  );
   const [condition, setCondition] = useState<(typeof CONDITIONS)[number]['key']>('good');
   const [result, setResult] = useState<{ low: number; median: number; high: number; comps: number } | null>(null);
 
-  const areas = [...new Set(all.map((p) => p.area))].sort();
   const insight = areaInsights[area];
   const condAdj = CONDITIONS.find((c) => c.key === condition)!.adj;
 
@@ -82,7 +98,7 @@ export default function ValuationDeskView() {
             <div className="grid gap-1.5">
               <Label htmlFor="vd-type">Type</Label>
               <select id="vd-type" className="h-9 rounded-lg border bg-background px-3 text-sm" value={type} onChange={(e) => setType(e.target.value as typeof type)}>
-                {['apartment', 'villa', 'townhouse', 'land'].map((t) => (
+                {DESK_TYPES.map((t) => (
                   <option key={t} value={t} className="capitalize">{t}</option>
                 ))}
               </select>

@@ -1216,3 +1216,104 @@ profile + lane chip + quick actions + viewing strip, admin territory
 chrome with no public navbar, hash discipline, valid handoff booting
 the console, tampered handoff falling to the sign-in wall — zero
 console errors throughout.
+
+## IMP-023 — Wave-20: the thoughtful depth — share, honest price screening, and the engines that never had UIs (19 Sep 2026)
+
+**The brief:** "implement really thoughtful things that will be amazing for
+the project — look for them very deeply." The deep audit that followed did
+not look for missing pages; it looked for *promises with dead or fake
+backing* — engines written in earlier waves that no component ever
+imported, and arithmetic that looks like intelligence but isn't.
+
+**What the audit found.**
+
+1. A Kenyan marketplace with **no way to forward a listing** — the detail
+   page could enquire at the Keja desk, but the family group, the diaspora
+   aunt financing the purchase, and the lawyer had nothing to receive. In
+   the market where WhatsApp *is* the sharing channel, the share button
+   did not exist.
+2. The passport's only "market range" was **±8% around the asking price**
+   — arithmetic that brackets whatever the seller asks, so it could never
+   warn "this is 30% over the market". The Buyers & Sellers portal card
+   promises "fair-price screening"; the screening was fake.
+3. `KEYS.viewed: 'recently-viewed'` has existed in the store since wave 1
+   **with no reader and no writer** — recently-viewed was planned, never
+   built.
+4. `tenantStore.competitiveness()` (rent-share verdicts: strong ≤25%,
+   moderate ≤35%, stretch beyond) was **dead code since wave 1** — and the
+   tenant hub's "Affordability check" card pointed at `/finance`, the
+   *mortgage affordability* calculator: the buyer's tool, not the renter's.
+5. The Buyers & Sellers portal promises a "guided purchase path". Ask
+   Keja can *describe* the nine-step buying flow in chat; the buyer had
+   nowhere to walk it.
+6. The `qrcode` dependency was used only by 2FA. The free-query parser
+   (wave 3.9) parsed "2BR Kilimani under 15M" invisibly — the searcher
+   never saw what the AI understood.
+
+**What shipped.**
+
+1. **The share kit** (src/lib/share.ts + ShareListing.tsx) — WhatsApp
+   share-picker link (wa.me/?text= — the contact chooser, not the desk
+   chat), the OS share sheet where it exists, copy-link, and the **QR
+   poster**: a print-ready 720×960 flyer (canvas → PNG) carrying the
+   passport id, price, key facts, trust score and a QR that opens the
+   live listing — the agent's window-card at a viewing, the owner's
+   noticeboard pin. `qrcode` stays behind its dynamic import (the same
+   async chunk 2FA already loads — nothing new in the boot). Share
+   events enter the governed taxonomy as `listing.shared.v1`
+   (propertyId + channel: whatsapp/native/link/poster).
+2. **Pricing Intelligence** (src/lib/pricingIntel.ts +
+   PricingIntelligencePanel.tsx) — every priced sale listing is screened
+   against live comparables (same area + type, sale-priced, not sold,
+   minus the subject): the honest band (median ±10/13/18% scaled by comp
+   count, the same thresholds as the Valuation Desk), where the asking
+   sits (below / within / above, with the percentage), the price-per-sqm
+   read vs the area median, and the comp count + confidence in plain
+   sight. Rentals, POA and comp-less listings render *nothing* — the
+   honest null. The fake ±8% passport row is gone; the Valuation Desk
+   gained deep-link prefill (area/type/size/acres) so the panel hands
+   its inputs to the desk for the full estimate. Similar listings no
+   longer offer sold stock.
+3. **Recently viewed** — the dead key finally has both a writer (every
+   listing open, one-shot-guarded like the view counter) and readers: a
+   horizontal strip on discovery and a block on the account overview.
+   zod schema at the read seam (`viewedEntriesSchema`), push semantics
+   (front-insert, dedupe, cap 12) pinned by tests.
+4. **The tenant rent check** (TenantHubView's new Affordability tab) —
+   `competitiveness()` wired at last: income → verdict with the ratio
+   bar, the 25/30/35% comfort bands, the Kenyan moving-in cash stack
+   (2-month deposit + first month), and a budget-matched rentals CTA
+   that rides the free-query parser discovery already speaks
+   (`/properties?q=rent under 150k`). The wrong-tool link to the
+   mortgage calculator is gone.
+5. **My journey** (src/lib/journeyStore.ts + BuyingJourney.tsx) — the
+   nine-step guided purchase path as an account tab: each step links to
+   the exact surface that does the job (discovery, finance, Ask Keja,
+   Deal Analyst, saved homes, viewings, Transact, Trust Center), the
+   next step is always highlighted, progress persists per device.
+6. **"Keja AI understood" intent chips** — the parser's structured
+   reading of the live query renders back as chips under the discovery
+   search box (beds, area, budget, purpose, type, keywords). The brand
+   promise is intelligence; now it is visible.
+7. **The passport id moved to a lib** (src/lib/passport.ts) — pure
+   modules (share kit, poster, tests) compose it without importing a
+   view component.
+
+**Budget discipline:** every new line lands in lazy route chunks —
+first-paint critical JS 994 kB ≤ 1,000 kB (+1 kB over wave-19; the QR
+library rides the existing async chunk). Entry JS 507 kB unchanged.
+
+**Verification:** 654 tests / 49 files (31 new in
+tests/thoughtfulDepth.test.ts: share-link forms, poster spec, QR render,
+comps exclusion/self-exclusion/sold, band classification above/within/
+below, psqm math, valuation-desk threshold parity, pushViewed semantics,
+schema salvage, journey catalogue/progress/persistence, and seven wiring
+source contracts) · typecheck clean · lint clean (0 warnings) · build +
+artifact verification PASSED (110-URL sitemap, 87-listing anchor, entry
+507/525, critical 994/1,000, inventory lazy). Live headless smoke on the
+production bundle (scripts/smoke-wave20.mjs, **35/35**): share dialog
+(picker link, live QR, poster path), pricing panel on a priced sale +
+honest absence on a rental, intent chips echoing the parsed structure,
+recently-viewed write + strip, tenant affordability verdict/bands/moving
+cash/budget CTA, journey tab with persisted toggles and progress,
+valuation desk prefill — zero console errors on every surface.

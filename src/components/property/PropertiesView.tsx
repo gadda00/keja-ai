@@ -10,7 +10,7 @@
  * viewing journey doesn't dead-end at the account page.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { Bell, Filter, Heart, MapPin, Search, SlidersHorizontal, Star, X } from 'lucide-react';
+import { Bell, BedDouble, Building2, Clock, Coins, Filter, Heart, MapPin, Search, SlidersHorizontal, Sparkles, Star, Tag, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -23,11 +23,11 @@ import { matchesFreeQuery, parseFreeQuery } from '@/lib/queryParser';
 import { isRentalPrice } from '@/lib/finance';
 import { track } from '@/lib/analytics';
 import type { Property } from '@/data/properties';
-import { PropertyCard } from '@/components/property/PropertyCard';
+import { PropertyCard, PropertyRow } from '@/components/property/PropertyCard';
 import { CompareBar, useCompare } from '@/components/property/CompareBar';
 import MapPanel from '@/components/property/MapPanel';
 import { navigate, useRouter } from '@/lib/router';
-import { useFavorites } from '@/lib/store';
+import { useFavorites, useRecentlyViewed } from '@/lib/store';
 import { useSavedSearches, VERIFIED_TRUST_FLOOR } from '@/lib/searchStore';
 import { formatKES } from '@/lib/format';
 import { cn } from '@/lib/utils';
@@ -55,6 +55,7 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
   const [mapOpen, setMapOpen] = useState(false);
 
   const [favorites, setFavorites] = useFavorites();
+  const [viewed] = useRecentlyViewed();
   const { ids: compareIds, toggle } = useCompare();
   const { save: addSavedSearch } = useSavedSearches();
 
@@ -65,6 +66,32 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
   // intent out of the box — instead of the old literal-substring match that
   // returned 0 results for the product's own advertised example.
   const parsedQ = useMemo(() => parseFreeQuery(q, areas), [q, areas]);
+
+  // Wave 20: parse-as-you-type intent chips — the parsed structure is shown
+  // back to the searcher as “Keja AI understood” chips instead of staying
+  // invisible. The brand promise is intelligence; this makes it visible.
+  const intentChips = useMemo(() => {
+    const chips: Array<{ icon: typeof BedDouble; label: string }> = [];
+    if (parsedQ.minBeds) chips.push({ icon: BedDouble, label: `${parsedQ.minBeds}+ beds` });
+    if (parsedQ.area) chips.push({ icon: MapPin, label: parsedQ.area });
+    if (parsedQ.maxPriceKes) chips.push({ icon: Coins, label: `≤ ${formatKES(parsedQ.maxPriceKes)}` });
+    if (parsedQ.purpose) chips.push({ icon: Tag, label: parsedQ.purpose });
+    if (parsedQ.type) chips.push({ icon: Building2, label: parsedQ.type });
+    if (parsedQ.tokens.length) chips.push({ icon: Search, label: parsedQ.tokens.join(' ') });
+    return chips;
+  }, [parsedQ]);
+
+  // Wave 20: the recently-viewed strip — listings opened on the detail page
+  // (tracked there via pushViewed) resurface here for the come-back-later
+  // browse every marketplace needs. Excludes the current saved-filter view.
+  const recentRows = useMemo(
+    () =>
+      viewed
+        .map((v) => all.find((p) => p.id === v.id))
+        .filter((p): p is Property => Boolean(p))
+        .slice(0, 8),
+    [viewed, all],
+  );
 
   const filtered = useMemo(() => {
     let list = all.filter((p) => {
@@ -348,6 +375,21 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
         </Sheet>
       </div>
 
+      {/* Wave 20: parse-as-you-type intent feedback — the parsed structure
+          shown back as chips so the searcher sees what the AI understood. */}
+      {intentChips.length > 0 && (
+        <div className="mt-3 flex flex-wrap items-center gap-1.5" data-testid="intent-chips">
+          <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+            <Sparkles className="h-3 w-3 text-gold" aria-hidden /> Keja AI understood
+          </span>
+          {intentChips.map((c) => (
+            <Badge key={c.label} variant="outline" className="gap-1 border-primary/30 text-[10px] font-bold capitalize text-primary">
+              <c.icon className="h-3 w-3" aria-hidden /> {c.label}
+            </Badge>
+          ))}
+        </div>
+      )}
+
       {/* Desktop filters row */}
       <div className="mt-4 hidden gap-3 rounded-2xl border bg-card p-4 lg:grid lg:grid-cols-[1fr_1fr_1fr_1.4fr]">
         <Select value={area} onValueChange={setArea}>
@@ -403,6 +445,26 @@ function PropertiesInner({ initialQ }: { initialQ: string }) {
           </div>
         </div>
       </div>
+
+      {/* Wave 20: recently viewed — the come-back-later strip. The detail
+          page writes the entries; this is the first reader the key ever had. */}
+      {!savedOnly && recentRows.length > 0 && (
+        <section className="mt-6" aria-label="Recently viewed listings" data-testid="recently-viewed">
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-muted-foreground" aria-hidden />
+            <h2 className="text-sm font-black uppercase tracking-wider text-muted-foreground">
+              Recently viewed
+            </h2>
+          </div>
+          <div className="mt-3 flex gap-3 overflow-x-auto pb-2 slim-scroll">
+            {recentRows.map((p) => (
+              <div key={p.id} className="w-64 shrink-0">
+                <PropertyRow property={p} onSave={toggleSave} />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {filtered.length === 0 ? (
         <div className="mt-16 flex flex-col items-center gap-3 py-16 text-center">

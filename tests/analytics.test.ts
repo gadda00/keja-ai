@@ -16,7 +16,7 @@ const KEY = 'keja.events.v2';
 
 describe('taxonomy', () => {
   it('maps every legacy name to a governed versioned event', () => {
-    expect(EVENT_TAXONOMY).toHaveLength(11);
+    expect(EVENT_TAXONOMY).toHaveLength(12);
     for (const legacy of EVENT_TAXONOMY) {
       expect(legacy).toBeTruthy();
     }
@@ -84,11 +84,12 @@ describe('track (governed facade)', () => {
     track({ event: 'calculator_complete', calculator: 'roi' });
     track({ event: 'chat_qualified', intent: 'buy' });
     track({ event: 'viewing_request', propertyId: 'KJA-001' });
+    track({ event: 'share', propertyId: 'KJA-001', channel: 'whatsapp' });
     track({ event: 'human_handoff', channel: 'whatsapp' });
     track({ event: 'role_selected', role: 'invest' });
     track({ event: 'issue_reported', propertyId: 'KJA-001', reason: 'stale' });
     track({ event: 'evidence_reviewed', propertyId: 'KJA-001' });
-    expect(recentEvents()).toHaveLength(11);
+    expect(recentEvents()).toHaveLength(12);
   });
 
   it('refuses events outside the taxonomy', () => {

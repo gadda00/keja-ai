@@ -5,7 +5,7 @@
  */
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 
-import { chatHistorySchema, idListSchema } from '@/lib/boundaries';
+import { chatHistorySchema, idListSchema, viewedEntriesSchema } from '@/lib/boundaries';
 
 const PREFIX = 'keja:';
 
@@ -109,6 +109,7 @@ export const KEYS = {
   searches: 'saved-searches',
   compare: 'compare-list',
   notifications: 'notifications',
+  journey: 'buying-journey',
 };
 
 /* ------------------------- validated reads (wave 10) ------------------------ */
@@ -230,6 +231,27 @@ export const useFavorites = () => useValidatedStore<string[]>(KEYS.favorites, id
 export const useCompareList = () => useValidatedStore<string[]>('compare', idListSchema, []);
 export const useChatHistory = () =>
   useValidatedStore<ChatMessage[]>(KEYS.chat, chatHistorySchema, []);
+
+/* ------------------- recently viewed (wave 20) ------------------------------ */
+/** A recently-viewed entry: listing id + when it was opened. The key existed
+ *  since the first store build but had no reader and no writer — the strip
+ *  on /properties and the account overview finally consume it. */
+export interface ViewedEntry {
+  id: string;
+  at: string;
+}
+
+export const RECENTLY_VIEWED_CAP = 12;
+
+export const useRecentlyViewed = () =>
+  useValidatedStore<ViewedEntry[]>(KEYS.viewed, viewedEntriesSchema, []);
+
+/** Push to the front of the recently-viewed list (dedupe, cap at 12). Pure
+ *  helper so the detail view's effect and the tests share one definition. */
+export function pushViewed(entries: ViewedEntry[], id: string, now = new Date()): ViewedEntry[] {
+  const next: ViewedEntry[] = [{ id, at: now.toISOString() }, ...entries.filter((e) => e.id !== id)];
+  return next.slice(0, RECENTLY_VIEWED_CAP);
+}
 
 export const seedLeads: Lead[] = [
   {

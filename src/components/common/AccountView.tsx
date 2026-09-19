@@ -7,7 +7,7 @@
 import { useMemo, useState } from 'react';
 import {
   ArrowRight, BadgeCheck, Bell, Building2, Globe, Heart, KeyRound, LogIn,
-  LogOut, Search, Settings, ShieldCheck, Sparkles, User,
+  LogOut, Milestone, Search, Settings, ShieldCheck, Sparkles, User,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TwoFactorChallenge } from '@/components/common/TwoFactorChallenge';
 import { useAuth, initials } from '@/lib/auth';
 import { isPictureUrl } from '@/lib/googleAuth';
-import { useFavorites } from '@/lib/store';
+import { useFavorites, useRecentlyViewed } from '@/lib/store';
 import { useSavedSearches } from '@/lib/searchStore';
 import { useAllProperties } from '@/lib/inventory';
 import { useUserListings } from '@/lib/adminStore';
@@ -24,6 +24,7 @@ import { LANGUAGES, useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/router';
 import { PropertyRow } from '@/components/property/PropertyCard';
 import { ListingEmptyState, ListingManageCard } from '@/components/property/ListingManageCard';
+import { BuyingJourney } from '@/components/common/BuyingJourney';
 import {
   ACCOUNT_TYPES,
   accountTypeInfo,
@@ -327,6 +328,12 @@ function ProfileEditor() {
 
 function OverviewTab() {
   const { user, isAdmin } = useAuth();
+  const all = useAllProperties();
+  const [viewed] = useRecentlyViewed();
+  const recent = viewed
+    .map((v) => all.find((p) => p.id === v.id))
+    .filter((p): p is NonNullable<typeof p> => Boolean(p))
+    .slice(0, 4);
   if (!user) return null;
   const info = user.accountType ? accountTypeInfo(user.accountType) : null;
   const actions = info?.actions ?? [
@@ -376,6 +383,24 @@ function OverviewTab() {
       </div>
 
       <ProfileEditor />
+
+      {/* recently viewed (wave 20) — the account overview mirrors the
+          discovery strip so a returning member picks up where they left off */}
+      {recent.length > 0 && (
+        <div className="rounded-3xl border bg-card p-5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-black uppercase tracking-wider">Recently viewed</h2>
+            <Button variant="ghost" size="sm" className="h-7 text-xs font-bold text-primary" onClick={() => navigate('/properties')}>
+              Back to discovery <ArrowRight className="ml-1 h-3 w-3" aria-hidden />
+            </Button>
+          </div>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {recent.map((p) => (
+              <PropertyRow key={p.id} property={p} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* session summary */}
       <div className="rounded-3xl border bg-card p-5">
@@ -452,6 +477,7 @@ export default function AccountView() {
         <TabsList className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="overview" className="gap-1.5 font-bold"><User className="h-4 w-4" aria-hidden /> Overview</TabsTrigger>
           <TabsTrigger value="favorites" className="gap-1.5 font-bold"><Heart className="h-4 w-4" aria-hidden /> Saved homes ({saved.length})</TabsTrigger>
+          <TabsTrigger value="journey" className="gap-1.5 font-bold"><Milestone className="h-4 w-4" aria-hidden /> My journey</TabsTrigger>
           <TabsTrigger value="searches" className="gap-1.5 font-bold"><Bell className="h-4 w-4" aria-hidden /> Saved searches ({searches.length})</TabsTrigger>
           <TabsTrigger value="listings" className="gap-1.5 font-bold"><Building2 className="h-4 w-4" aria-hidden /> My listings</TabsTrigger>
           <TabsTrigger value="settings" className="gap-1.5 font-bold"><Settings className="h-4 w-4" aria-hidden /> Preferences &amp; security</TabsTrigger>
@@ -476,6 +502,10 @@ export default function AccountView() {
               ))}
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="journey" className="mt-6">
+          <BuyingJourney />
         </TabsContent>
 
         <TabsContent value="searches" className="mt-6">

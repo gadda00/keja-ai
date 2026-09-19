@@ -343,6 +343,16 @@ export const notificationsSchema = z.array(
   }),
 );
 
+/** Recently-viewed listings (wave 20 — mirrors ViewedEntry in store.ts).
+ *  The 'recently-viewed' key has existed since the first store build; this
+ *  schema is the read seam now that /properties finally consumes it. */
+export const viewedEntriesSchema = z.array(
+  z.object({
+    id: z.string(),
+    at: z.string(),
+  }),
+);
+
 /**
  * Account-posted listings (mirrors UserListing in src/lib/adminStore.ts) —
  * the key the marketplace merge (useAllProperties) reads, so a corrupted

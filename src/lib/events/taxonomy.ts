@@ -91,6 +91,14 @@ export const TAXONOMY = {
     privacy: 'pseudonymous',
     schema: z.strictObject({ propertyId: idSchema }),
   },
+  'listing.shared.v1': {
+    description: 'A listing was shared out (WhatsApp / OS sheet / link copy / QR poster download).',
+    privacy: 'pseudonymous',
+    schema: z.strictObject({
+      propertyId: idSchema,
+      channel: z.enum(['whatsapp', 'native', 'link', 'poster']),
+    }),
+  },
 
   /* ---- tools & conversion ---- */
   'tool.calculator_completed.v1': {
@@ -169,6 +177,7 @@ export const LEGACY_NAMES: Record<string, EventName> = {
   issue_reported: 'listing.issue_reported.v1',
   evidence_reviewed: 'listing.evidence_reviewed.v1',
   viewing_request: 'listing.viewing_requested.v1',
+  share: 'listing.shared.v1',
   calculator_complete: 'tool.calculator_completed.v1',
   human_handoff: 'support.human_requested.v1',
   role_selected: 'visitor.role_selected.v1',
