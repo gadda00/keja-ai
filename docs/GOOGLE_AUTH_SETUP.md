@@ -40,6 +40,10 @@ build time.
    - Application type: **Web application**
    - **Authorised JavaScript origins** — add every origin you serve:
      - `https://keja.app`
+     - `https://admin.keja.app` (the admin territory, wave 19 — see
+       `docs/ADMIN_SUBDOMAIN.md`; sessions signed in on the apex hand
+       over automatically, but direct sign-in on the territory needs
+       this origin registered)
      - `https://www.keja.app` (if the www mirror is reachable — the app
        redirects www → apex automatically, but register it anyway so the
        button never dead-ends during that first load)

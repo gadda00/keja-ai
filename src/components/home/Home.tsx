@@ -14,24 +14,18 @@ import { motion } from 'framer-motion';
 import {
   ArrowRight,
   BadgeCheck,
-  Building2,
   Coins,
-  GraduationCap,
-  HandCoins,
-  HeartHandshake,
-  Landmark,
-  LineChart,
   Plane,
   Search,
   ShieldCheck,
   Sparkles,
-  Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Link, navigate } from '@/lib/router';
 import { ECOSYSTEM } from '@/lib/ecosystem';
+import { PORTAL_DIRECTORY } from '@/lib/portalDirectory';
 import { useI18n } from '@/lib/i18n';
 import { HOME_FEATURED, HOME_STATS } from '@/lib/homeSubset';
 import { useUserListings } from '@/lib/adminStore';
@@ -168,16 +162,16 @@ function LifecycleStrip() {
 
 /* ----------------------------- Stakeholders ------------------------------- */
 
-const STAKEHOLDERS = [
-  { icon: Users, title: 'Buyers & Sellers', desc: 'Verified listings, fair-price screening and a guided purchase path.', to: '/properties' },
-  { icon: Building2, title: 'Landlords', desc: 'Rent collection, tenant screening and portfolio performance in one desk.', to: '/manage' },
-  { icon: LineChart, title: 'Investors', desc: 'Yield analysis, the investor dashboard and fractional ownership trials.', to: '/portfolio' },
-  { icon: HandCoins, title: 'Tenants', desc: 'Rent affordability checks, verified homes and a tenant hub.', to: '/tenant' },
-  { icon: Landmark, title: 'Banks & Lenders', desc: 'Qualified financing leads and property intelligence.', to: '/institutional' },
-  { icon: GraduationCap, title: 'Developers', desc: 'The developer workspace — listings, feasibility screening and market intelligence.', to: '/develop' },
-  { icon: Plane, title: 'Diaspora', desc: 'Invest in Kenya from anywhere — verification, viewing and management.', to: '/diaspora' },
-  { icon: HeartHandshake, title: 'Agents & Professionals', desc: 'A pro workspace with leads, valuation tools and market data.', to: '/pro' },
-];
+/* The eight stakeholder cards derive from the portal directory (wave 19):
+ * one source of truth shared with the navbar account menu, so the homepage
+ * grid, the account menu's guest portal list and the PortalGate lanes can
+ * never drift apart. */
+const STAKEHOLDERS = PORTAL_DIRECTORY.map((p) => ({
+  icon: p.icon,
+  title: p.name,
+  desc: p.description,
+  to: p.route,
+}));
 
 function StakeholderGrid() {
   return (

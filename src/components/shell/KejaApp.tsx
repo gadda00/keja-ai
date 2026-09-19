@@ -5,7 +5,7 @@
  */
 import { Suspense, lazy, useEffect } from 'react';
 import { MotionConfig } from 'framer-motion';
-import { HashRouter, useRouter } from '@/lib/router';
+import { HashRouter, navigate, useRouter } from '@/lib/router';
 import { Navbar } from '@/components/shell/Navbar';
 import { Footer } from '@/components/shell/Footer';
 import { MobileTabBar } from '@/components/shell/MobileTabBar';
@@ -14,8 +14,19 @@ import { WhatsAppFloat } from '@/components/shell/WhatsAppFloat';
 import { InstallPrompt } from '@/components/shell/InstallPrompt';
 import { ErrorBoundary } from '@/components/shell/ErrorBoundary';
 import { TokenizeProvider } from '@/lib/tokenizeStore';
-import { AuthProvider } from '@/lib/auth';
+import { AuthProvider, useAuth } from '@/lib/auth';
 import { AdminGate } from '@/components/admin/AdminGate';
+import { AdminShell } from '@/components/admin/AdminShell';
+import {
+  adminConsoleOrigin,
+  decodeSessionHandoff,
+  encodeSessionHandoff,
+  handoffGrantsAdmin,
+  isAdminHost,
+  isMainProductionHost,
+} from '@/lib/adminHost';
+import { userAccountSchema, sessionSchema } from '@/lib/boundaries';
+import { store } from '@/lib/store';
 import { AuthModal } from '@/components/shell/AuthModal';
 import { usePageMeta } from '@/lib/seo';
 import { APP_SECTION_META_BY_PATH, SECTION_META_BY_PATH } from '@/lib/sectionMeta';
@@ -109,17 +120,31 @@ export const ROUTE_META: Record<string, { title: string; description: string; ro
 /** Applies ROUTE_META for the current hash path. Detail routes
  *  (properties/:id, insights/:slug, areas/:slug) set richer entity-specific
  *  meta + JSON-LD in their own views — those views mount AFTER this effect
- *  (React runs child effects first), so their tags win. */
-function RouteMeta() {
+ *  (React runs child effects first), so their tags win. On the admin host
+ *  every route is the console and stays noindexed regardless of hash. */
+function RouteMeta({ forceNoindex = false }: { forceNoindex?: boolean }) {
   const { route } = useRouter();
-  const m = ROUTE_META[route.path] ?? { title: 'Keja AI', description: undefined };
+  const m = forceNoindex
+    ? { title: 'Admin console', description: 'Platform administration (restricted).', robots: 'noindex' }
+    : ROUTE_META[route.path] ?? { title: 'Keja AI', description: undefined };
   usePageMeta({ title: m.title, description: m.description, robots: m.robots }, route.path);
   return null;
 }
 
-function Routes() {
+function Routes({ adminOnly = false }: { adminOnly?: boolean }) {
   const { route } = useRouter();
   const [head, id] = route.segments;
+
+  // Admin territory (admin.keja.app): every route is the console. A stray
+  // hash boots into the gated console — the public marketplace never
+  // renders on the admin host. AdminRouteForce snaps the hash to #/admin.
+  if (adminOnly && head !== 'admin') {
+    return (
+      <AdminGate>
+        <Admin />
+      </AdminGate>
+    );
+  }
 
   switch (head) {
     case undefined:
@@ -230,13 +255,19 @@ function ServiceWorkerRegistrar() {
  *  The build emits static HTML at /properties/KJA-001/ (etc.) for crawlers
  *  and social unfurls; when a human lands on one, the same index.html shell
  *  is served — setting location.hash (no reload, no navigation) boots the
- *  SPA straight into that route while the address bar keeps the clean path. */
+ *  SPA straight into that route while the address bar keeps the clean path.
+ *  On the admin host every path boots into #/admin — the console is the
+ *  whole site there (wave 19). */
 function PathToHashBridge() {
   useEffect(() => {
+    if (isAdminHost(window.location.hostname)) {
+      if (!window.location.hash.startsWith('#/')) window.location.hash = '#/admin';
+      return; // admin territory: no public path mapping
+    }
     const path = window.location.pathname.replace(/\/+$/, '');
     const hash = window.location.hash;
     if (hash.startsWith('#/') || path === '' || path === '/') return;
-    const known = /^\/(properties|insights|areas|tokenize|trust|about|contact|legal|ask|invest|data|finance|transact|manage|tenant|diaspora|develop|institutional|partners|ecosystem|compare|sell|deal-analyst|portfolio|valuation)(\/.+)?$/;
+    const known = /^\/(properties|insights|areas|tokenize|trust|about|contact|legal|ask|invest|data|finance|transact|manage|tenant|diaspora|develop|institutional|partners|ecosystem|compare|sell|deal-analyst|portfolio|valuation|pro)(\/.+)?$/;
     if (known.test(path)) {
       window.location.hash = `#${path}`;
     }
@@ -249,7 +280,10 @@ function PathToHashBridge() {
  *  canonical origin (keja.app). The OAuth client is registered for the
  *  apex — on a www mirror Google refuses to return a credential (the
  *  stuck-popup failure mode), so we bounce to the canonical origin once,
- *  preserving the current path + hash. Dev hosts are exempt. */
+ *  preserving the current path + hash. Dev hosts are exempt — and so is
+ *  the admin territory (admin.keja.app is an intentional origin, not a
+ *  mirror to squash: without the exemption this redirect would bounce
+ *  every admin-host visit straight back to keja.app). */
 function CanonicalOriginRedirect() {
   useEffect(() => {
     try {
@@ -257,6 +291,7 @@ function CanonicalOriginRedirect() {
       const here = window.location;
       if (here.protocol !== 'https:') return; // local dev / file preview
       if (here.hostname === canonical.hostname) return;
+      if (isAdminHost(here.hostname)) return; // admin.keja.app lives here
       if (!here.hostname.endsWith('.keja.app')) return; // only our own mirrors
       const target = `${canonical.origin}${here.pathname}${here.search}${here.hash}`;
       window.location.replace(target);
@@ -264,6 +299,91 @@ function CanonicalOriginRedirect() {
       /* malformed env — never trap the user */
     }
   }, []);
+  return null;
+}
+
+/* ------------------------------------------------------------------ */
+/* Admin territory (wave 19): admin.keja.app                            */
+/* ------------------------------------------------------------------ */
+
+/** Consume the one-time session handoff on the admin host. localStorage
+ *  is per-origin, so a session signed in on keja.app is invisible here —
+ *  the envelope (?handoff=…) carries the 2FA-verified admin account
+ *  across, is validated against the account + session schemas, installed
+ *  into the admin origin's storage and stripped from the address bar.
+ *  Tampered / expired envelopes are dropped: the sign-in wall shows. */
+function AdminSessionHandoff() {
+  useEffect(() => {
+    try {
+      if (!isAdminHost(window.location.hostname)) return;
+      const payload = new URLSearchParams(window.location.search).get('handoff');
+      if (!payload) return;
+      const handoff = decodeSessionHandoff(payload);
+      let installed = false;
+      if (handoff) {
+        const user = userAccountSchema.safeParse(handoff.u);
+        const session = sessionSchema.safeParse(handoff.s);
+        if (
+          user.success &&
+          session.success &&
+          handoffGrantsAdmin(handoff, {
+            userValid: true,
+            sessionValid: true,
+            user: user.data as { id: string; role: string },
+            session: session.data as unknown as {
+              userId: string;
+              expiresAt: string;
+              mfaVerified: boolean;
+            },
+          })
+        ) {
+          store.set('users', [user.data]);
+          // same key AuthProvider reads (SESSION_KEY is module-private in
+          // auth.tsx — kept in sync by the auth boundary tests)
+          localStorage.setItem('keja:session', JSON.stringify(session.data));
+          installed = true;
+        }
+      }
+      // the envelope leaves the address bar either way (history, not reload)
+      window.history.replaceState({}, '', `${window.location.pathname}#/admin`);
+      // the auth provider read storage before this effect ran — one clean
+      // reload boots the console with the installed session
+      if (installed) window.location.reload();
+    } catch {
+      /* never trap an admin on a broken handoff URL */
+    }
+  }, []);
+  return null;
+}
+
+/** Snap the hash to #/admin whenever a stray route surfaces on the admin
+ *  host (old bookmarks, edited URLs). Routes already renders the console
+ *  for every hash — this keeps the address bar honest. */
+function AdminRouteForce() {
+  const { route } = useRouter();
+  useEffect(() => {
+    if (route.path !== '/admin') navigate('/admin');
+  }, [route.path]);
+  return null;
+}
+
+/** On the main production site, #/admin is the admin territory's door:
+ *  hand the session to admin.keja.app (admins, 2FA-verified sessions) and
+ *  let the sign-in wall handle everyone else. Dev hosts and preview
+ *  deployments keep the local console — no DNS dependency in test flows. */
+function MainHostAdminRedirect() {
+  const { route } = useRouter();
+  const { user, session, isAdmin } = useAuth();
+  useEffect(() => {
+    if (route.path !== '/admin') return;
+    if (!isMainProductionHost(window.location.hostname)) return;
+    const handoff =
+      isAdmin && user && session ? encodeSessionHandoff(user, session) : null;
+    const target = handoff
+      ? `${adminConsoleOrigin()}/?handoff=${encodeURIComponent(handoff)}#/admin`
+      : `${adminConsoleOrigin()}/#/admin`;
+    window.location.replace(target);
+  }, [route.path, user, session, isAdmin]);
   return null;
 }
 
@@ -276,43 +396,64 @@ function TelemetryBootstrap() {
 }
 
 export default function KejaApp() {
+  // The host never changes during a session — decided once at boot. The
+  // root page mounts this shell with ssr:false, so the window access is
+  // browser-only by construction.
+  const adminHost = typeof window !== 'undefined' && isAdminHost(window.location.hostname);
   return (
     <MotionConfig reducedMotion="user">
       <HashRouter>
         <CanonicalOriginRedirect />
         <PathToHashBridge />
+        <AdminSessionHandoff />
         <TelemetryBootstrap />
-        <RouteMeta />
+        <RouteMeta forceNoindex={adminHost} />
         {/* AuthProvider wraps the whole shell (wave 17): the navbar's admin
             quick entry and account-aware chrome read the auth context — it
             can no longer live below the Navbar in the tree. */}
         <AuthProvider>
-          <div className="flex min-h-screen flex-col bg-background">
-            <a
-              href="#main-content"
-              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-primary-foreground"
-            >
-              Skip to main content
-            </a>
-            <Navbar />
-            <DemoBanner />
-            {/* pb-20 clears the app-style mobile tab bar */}
-            <main id="main-content" className="flex-1 pb-20 pt-16 md:pb-0">
+          {adminHost ? (
+            /* ---------------- the admin territory (admin.keja.app) ---------------- */
+            <AdminShell>
               <ErrorBoundary>
                 <Suspense fallback={<ViewFallback />}>
-                  <TokenizeProvider>
-                    <Routes />
-                    <AuthModal />
-                  </TokenizeProvider>
+                  <AdminRouteForce />
+                  <Routes adminOnly />
+                  <AuthModal />
                 </Suspense>
               </ErrorBoundary>
-            </main>
-            <Footer />
-            <WhatsAppFloat />
-            <MobileTabBar />
-            <InstallPrompt />
-            <ServiceWorkerRegistrar />
-          </div>
+              <ServiceWorkerRegistrar />
+            </AdminShell>
+          ) : (
+            /* --------------------------- the public site --------------------------- */
+            <div className="flex min-h-screen flex-col bg-background">
+              <MainHostAdminRedirect />
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-primary-foreground"
+              >
+                Skip to main content
+              </a>
+              <Navbar />
+              <DemoBanner />
+              {/* pb-20 clears the app-style mobile tab bar */}
+              <main id="main-content" className="flex-1 pb-20 pt-16 md:pb-0">
+                <ErrorBoundary>
+                  <Suspense fallback={<ViewFallback />}>
+                    <TokenizeProvider>
+                      <Routes />
+                      <AuthModal />
+                    </TokenizeProvider>
+                  </Suspense>
+                </ErrorBoundary>
+              </main>
+              <Footer />
+              <WhatsAppFloat />
+              <MobileTabBar />
+              <InstallPrompt />
+              <ServiceWorkerRegistrar />
+            </div>
+          )}
         </AuthProvider>
       </HashRouter>
     </MotionConfig>

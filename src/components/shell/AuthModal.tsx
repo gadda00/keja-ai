@@ -36,7 +36,8 @@ import { useFocusTrap } from '@/lib/useFocusTrap';
 import { loadGoogleIdentity } from '@/lib/googleAuth';
 import { navigate, useRouter } from '@/lib/router';
 import { useToast } from '@/hooks/use-toast';
-import { GOOGLE_CLIENT_ID, SITE_URL } from '@/config';
+import { GOOGLE_CLIENT_ID, SITE_URL, ADMIN_HOST } from '@/config';
+import { isAdminHost } from '@/lib/adminHost';
 import {
   ACCOUNT_TYPES,
   accountTypeInfo,
@@ -49,10 +50,11 @@ import { cn } from '@/lib/utils';
 /* Canonical-origin hint                                                */
 /* ------------------------------------------------------------------ */
 
-/** The OAuth client is registered for the canonical origin (keja.app). A
- *  mirrored host (e.g. www.keja.app or a preview URL) will render the
- *  button but Google refuses to return a credential — surface a hint.
- *  The origin cannot change during a page session, so this is a constant,
+/** The OAuth client is registered for the canonical origin (keja.app) —
+ *  and, once configured per docs/ADMIN_SUBDOMAIN.md, the admin territory
+ *  (admin.keja.app). Any other mirrored host will render the button but
+ *  Google refuses to return a credential — those surface the hint. The
+ *  origin cannot change during a page session, so this is a constant,
  *  not state. */
 function useOriginMismatch(): boolean {
   return useMemo(() => {
@@ -60,7 +62,9 @@ function useOriginMismatch(): boolean {
     try {
       const canonical = new URL(SITE_URL);
       const localDev = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname);
-      return !localDev && window.location.origin !== canonical.origin;
+      if (localDev) return false;
+      if (isAdminHost(window.location.hostname)) return false; // admin territory is intentional
+      return window.location.origin !== canonical.origin;
     } catch {
       return false;
     }
@@ -446,6 +450,19 @@ export function AuthModal() {
                 You are on <span className="font-mono font-semibold">{typeof window !== 'undefined' ? window.location.origin : ''}</span>.
                 Google Sign-In is registered for <span className="font-mono font-semibold">{SITE_URL}</span> —{' '}
                 <a className="font-bold underline" href={SITE_URL}>open the canonical site</a> to sign in.
+              </div>
+            )}
+
+            {/* Admin territory note: first-time setup needs the OAuth client to
+                list this origin (docs/ADMIN_SUBDOMAIN.md); until then, admins
+                can also cross from keja.app where their session lives. */}
+            {typeof window !== 'undefined' && isAdminHost(window.location.hostname) && (
+              <div className="mt-4 rounded-xl border border-gold/50 bg-gold-soft p-3 text-[11px] leading-relaxed text-gold-foreground" role="note">
+                You are signing in on <span className="font-mono font-semibold">{ADMIN_HOST}</span>. Make sure{' '}
+                <span className="font-mono">https://{ADMIN_HOST}</span> is listed in the Google OAuth client's
+                authorised JavaScript origins (docs/ADMIN_SUBDOMAIN.md) — or enter the console from{' '}
+                <a className="font-bold underline" href={SITE_URL}>keja.app</a>, where your session hands over
+                automatically.
               </div>
             )}
 

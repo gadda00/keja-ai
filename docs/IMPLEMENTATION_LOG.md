@@ -1146,3 +1146,73 @@ checklist, the purchase journey) had a store and no UI.
 **Verification:** 587 tests / 46 files (20 new) · typecheck clean · lint
 clean · build + artifact verification PASSED (110-URL sitemap, 15 catalogue
 + 10 app sections prerendered, all gates green).
+
+## IMP-022 — Wave-19: the portal-aware account menu and the admin's own territory (19 Sep 2026)
+
+**The user report.** "Homepage, right top corner, on account it should
+show which account one is logging in to… if not logged in/registered it
+should show [that]; if logged in, show profile and then below its portal
+elements… also move admin to its own side at admin.keja.app… make any
+other improvements you find." Two asks: the navbar's account entry was a
+dead "Account" label button that said nothing about identity or
+destination, and the admin console shared the public shell at
+keja.app/#/admin.
+
+**What shipped.**
+
+1. **The portal directory** (src/lib/portalDirectory.ts) — the eight
+   stakeholder portals in homepage order (Buyers & Sellers, Landlords,
+   Investors, Tenants, Banks & Lenders, Developers, Diaspora, Agents &
+   Professionals), each with its route, workspace name, account lane and
+   description. One source of truth: the homepage stakeholder grid now
+   derives from it (the hand-copied list is gone), the account menu
+   renders from it, and tests pin the parity.
+2. **The portal-aware AccountMenu** (src/components/shell/AccountMenu.tsx)
+   — the navbar's top-right entry now answers "which account am I
+   logging into" for both states. Guests get a "Sign in / Register"
+   popover with the lane explainer and all eight portal cards (icon,
+   name, workspace) so the destination is visible before committing.
+   Signed-in users get their profile (avatar, name, email), the
+   lane/portal chip (e.g. "🏡 Landlords · Landlord console"), 2FA and
+   admin badges, a finish-setup prompt for unregistered accounts, the
+   portal quick actions from accountTypes right below the profile, "My
+   account", and sign-out in place. A "Viewing" strip names whichever
+   portal the current route belongs to and confirms the lane match (or
+   offers the one-click switch — the PortalGate contract, surfaced in
+   the navbar).
+3. **The admin territory** (admin.keja.app) — host detection
+   (src/lib/adminHost.ts, env-overridable), the AdminShell chrome
+   (territory label, administrator chip, back-to-site, sign-out), route
+   discipline (every route on the host is the gated console; stray
+   hashes snap to #/admin; noindex enforced), and the cross-origin
+   session handoff: a one-time 90-second envelope that carries only
+   2FA-verified admin sessions, is validated against the account +
+   session schemas on arrival, installed, and stripped from the address
+   bar. keja.app/#/admin hands off to the territory on production hosts
+   (path /admin redirects at the edge too); localhost and previews keep
+   the local console. The canonical-origin mirror-squash now exempts
+   the admin host — without that exemption every admin-host visit would
+   have bounced straight back to keja.app.
+4. **The ~24 kB Buffer polyfill** (caught by the first-paint budget):
+   the handoff codec's first draft used `Buffer.from` as a Node-test
+   fallback; webpack shipped a ~24 kB buffer polyfill into the shared
+   boot chunk for a branch that can never run in a browser. Rewritten
+   with pure btoa/atob + TextEncoder/TextDecoder (global in Node 16+).
+   Critical JS: 1,016 kB (broken) → 993 kB ≤ 1,000 kB budget, +15 kB
+   over the wave-18 baseline for the whole feature.
+5. **Docs** — docs/ADMIN_SUBDOMAIN.md (the three-step production
+   runbook: Vercel domain, DNS, Google OAuth origin, smoke checklist),
+   GOOGLE_AUTH_SETUP.md lists the admin origin.
+
+**Verification:** 623 tests / 48 files (36 new: tests/adminHost.test.ts
+— host detection, handoff codec round-trip/expiry/tamper/ownership/2FA
+rules, shell-wiring source contracts; tests/accountMenu.test.ts —
+directory integrity, route→portal context, navbar/homepage/account-menu
+wiring contracts) · typecheck clean · lint clean · build + artifact
+verification PASSED (first-paint critical JS 993/1,000 kB). Live
+headless smoke on the production bundle (scripts/smoke-wave19.mjs,
+25/25): guest popover with all eight portals, signed-in landlord
+profile + lane chip + quick actions + viewing strip, admin territory
+chrome with no public navbar, hash discipline, valid handoff booting
+the console, tampered handoff falling to the sign-in wall — zero
+console errors throughout.

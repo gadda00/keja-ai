@@ -20,6 +20,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/s
 import { Separator } from '@/components/ui/separator';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { NotificationsBell } from '@/components/shell/NotificationsBell';
+import { AccountMenu } from '@/components/shell/AccountMenu';
 import { Link, useRouter } from '@/lib/router';
 import { ECOSYSTEM, PORTALS } from '@/lib/ecosystem';
 import { useAuth } from '@/lib/auth';
@@ -287,7 +288,10 @@ export function Navbar() {
           </Link>
           {/* Admin quick entry (wave 17): admins no longer have to route
               through the account page — the shield links straight to the
-              gated console. Hidden entirely for everyone else. */}
+              gated console. Hidden entirely for everyone else. On the
+              production site the console lives at admin.keja.app: the
+              #/admin route hands the session across (wave 19) while dev
+              and preview hosts keep the local console. */}
           {isAdmin && (
             <Link
               to="/admin"
@@ -305,15 +309,11 @@ export function Navbar() {
           <NotificationsBell />
           <LanguageSwitcher />
           <ThemeToggle />
-          <Button
-            size="sm"
-            className="ml-1 hidden font-bold sm:inline-flex"
-            onClick={() => {
-              window.location.hash = '#/account';
-            }}
-          >
-            {t('nav.account')}
-          </Button>
+          {/* Portal-aware account entry (wave 19): guests see sign-in /
+              register + the eight portals; signed-in users see their profile
+              and their portal's quick elements — replacing the old dead
+              "Account" label button. */}
+          <AccountMenu />
         </div>
       </nav>
     </header>

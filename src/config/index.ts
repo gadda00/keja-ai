@@ -81,3 +81,14 @@ export const SITE_URL = (
 /** Absolute URL for a route path (handles both '' and '/x' inputs). */
 export const siteUrl = (path = '') =>
   `${SITE_URL}${BASE_PATH}/${path.replace(/^\//, '')}`;
+
+/**
+ * The admin console's own subdomain (wave 19): admin.keja.app serves the
+ * same static build, but the shell drops the public chrome and forces the
+ * #/admin route there (src/lib/adminHost.ts). Overridable with
+ * NEXT_PUBLIC_ADMIN_HOST for preview deployments.
+ */
+export const ADMIN_HOST = (process.env.NEXT_PUBLIC_ADMIN_HOST ?? 'admin.keja.app').toLowerCase();
+
+/** Origin of the admin territory. */
+export const adminSiteUrl = () => `https://${ADMIN_HOST}`;
