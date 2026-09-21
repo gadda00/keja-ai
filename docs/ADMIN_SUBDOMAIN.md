@@ -14,6 +14,40 @@ remain.**
 
 ---
 
+## Wave 21 — the door now probes before it swings (resilience)
+
+**What was wrong:** until Step 1 below is done, `admin.keja.app` does not
+resolve (NXDOMAIN) — but the main site blindly redirected every `#/admin`
+visit (and the `/admin` path via a Vercel edge redirect) straight onto the
+missing subdomain. Admins landed on the browser's DNS error page instead
+of the console.
+
+**What changed (shipped):**
+
+- `keja.app/#/admin` now **probes the territory first** — a `no-cors`
+  fetch to `https://admin.keja.app/favicon.ico` with a 1.75 s ceiling,
+  cached per browser tab for 10 minutes (`src/lib/adminHost.ts`,
+  `probeAdminReachability`). NXDOMAIN rejects in milliseconds.
+- **Territory reachable →** nothing changes: the 90-second session
+  envelope crosses as designed (a brief "Connecting to the admin
+  console…" splash covers the handoff).
+- **Territory unreachable →** the console **runs inline on the main
+  site** — the same gated console (`AdminGate`: Google sign-in, admin
+  role, TOTP 2FA) that dev and preview deployments have always used —
+  plus a dismissible amber note explaining the subdomain isn't attached
+  yet. The CSP (`vercel.json`) now allows the probe
+  (`connect-src … https://admin.keja.app`).
+- The `/admin` **path-level edge redirect** no longer points at the
+  subdomain (it can't probe): it lands on the SPA shell (`/#/admin`),
+  where the same probe decides. Wiring the subdomain later changes
+  nothing in the code — the handoff takes over the moment DNS answers.
+
+**Net effect:** the console is usable on keja.app *today*, and upgrades
+itself to the dedicated subdomain the moment Step 1 + Step 2 are
+completed — no deploy, no code change.
+
+---
+
 ## What already works (no action needed)
 
 - **Host detection** — `src/lib/adminHost.ts` recognises `admin.keja.app`

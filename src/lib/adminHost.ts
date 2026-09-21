@@ -139,3 +139,110 @@ export function handoffGrantsAdmin(
   const now = checks.now ?? Date.now();
   return new Date(session.expiresAt).getTime() > now; // session still live
 }
+
+/* ------------------------------------------------------------------ */
+/* Territory reachability probe (wave 21)                              */
+/* ------------------------------------------------------------------ */
+
+/** Per-tab cache key for the probe result (sessionStorage: the answer
+ *  should live exactly as long as the tab that asked). */
+const PROBE_CACHE_KEY = 'keja:admin-territory:probe';
+
+/** How long a cached probe result stays authoritative. The main site
+ *  re-checks the territory at most every 10 minutes per tab — enough to
+ *  survive an admin clicking around, short enough that attaching the
+ *  subdomain takes effect on the next visit. */
+export const PROBE_CACHE_TTL_MS = 10 * 60_000;
+
+/** The probe must answer fast: NXDOMAIN rejects in milliseconds, but a
+ *  slow mobile network needs a ceiling. 1.75 s keeps the handoff splash
+ *  under two seconds even on EDGE. */
+export const PROBE_TIMEOUT_MS = 1_750;
+
+/** Cached probe shape — { ok: boolean, t: epoch ms }. */
+interface ProbeCache {
+  ok: boolean;
+  t: number;
+}
+
+/** Injectable collaborators so the probe runs in Node tests. */
+export interface ProbeDeps {
+  fetchImpl?: typeof fetch;
+  storage?: { getItem(key: string): string | null; setItem(key: string, value: string): void } | null;
+  now?: () => number;
+  timeoutMs?: number;
+}
+
+/** sessionStorage without the footguns: absent (SSR/Node) and locked
+ *  (privacy modes) both degrade to "no cache" instead of throwing. */
+function safeSessionStorage(): { getItem(key: string): string | null; setItem(key: string, value: string): void } | null {
+  try {
+    return typeof sessionStorage === 'undefined' ? null : sessionStorage;
+  } catch {
+    return null;
+  }
+}
+
+/** Parse + age-check a cached probe. Tampered entries read as "no cache"
+ *  (the probe runs again); stale entries expire per PROBE_CACHE_TTL_MS. */
+function readProbeCache(raw: string | null, now: number): ProbeCache | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as Partial<ProbeCache>;
+    if (typeof parsed.ok !== 'boolean' || typeof parsed.t !== 'number') return null;
+    if (now - parsed.t > PROBE_CACHE_TTL_MS) return null;
+    return parsed as ProbeCache;
+  } catch {
+    return null; // storage is untrusted input
+  }
+}
+
+/** Is the admin territory (https://admin.keja.app) actually attached and
+ *  serving? The subdomain only exists once its DNS record + Vercel
+ *  domain are wired (docs/ADMIN_SUBDOMAIN.md) — until then a blind
+ *  handoff strands every admin on the browser's DNS error page. The
+ *  probe asks the territory's own origin with a no-cors fetch:
+ *  NXDOMAIN rejects almost instantly; a live deployment answers with an
+ *  opaque response (any HTTP status counts — the question is "does the
+ *  origin resolve and answer", not "is the favicon pretty"). Results
+ *  are cached per-tab for PROBE_CACHE_TTL_MS, failures included, so an
+ *  unreachable territory costs one fast request per tab per 10 minutes.
+ *  Pure at the edges — every collaborator is injectable for tests. */
+export async function probeAdminReachability(
+  origin: string,
+  deps: ProbeDeps = {},
+): Promise<boolean> {
+  const {
+    fetchImpl = fetch,
+    storage = safeSessionStorage(),
+    now = Date.now,
+    timeoutMs = PROBE_TIMEOUT_MS,
+  } = deps;
+
+  const cached = readProbeCache(storage?.getItem(PROBE_CACHE_KEY) ?? null, now());
+  if (cached) return cached.ok;
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  let ok = false;
+  try {
+    // cache:'no-store' — "is the territory reachable NOW", not "did some
+    // deployment answer recently". signal covers the slow-network case.
+    await fetchImpl(`${origin}/favicon.ico`, {
+      mode: 'no-cors',
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+    ok = true;
+  } catch {
+    ok = false; // DNS missing, offline, blocked or timed out — never cross
+  } finally {
+    clearTimeout(timer);
+  }
+  try {
+    storage?.setItem(PROBE_CACHE_KEY, JSON.stringify({ ok, t: now() } satisfies ProbeCache));
+  } catch {
+    /* storage full or disabled — the probe still answered this call */
+  }
+  return ok;
+}

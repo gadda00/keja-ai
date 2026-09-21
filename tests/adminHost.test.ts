@@ -24,11 +24,13 @@ import { describe, expect, it } from 'vitest';
 
 import {
   ADMIN_HOST,
+  PROBE_CACHE_TTL_MS,
   decodeSessionHandoff,
   encodeSessionHandoff,
   handoffGrantsAdmin,
   isAdminHost,
   isMainProductionHost,
+  probeAdminReachability,
 } from '@/lib/adminHost';
 import { sessionSchema, userAccountSchema } from '@/lib/boundaries';
 
@@ -164,7 +166,124 @@ describe('session handoff codec (wave 19)', () => {
 });
 
 /* ------------------------------------------------------------------ */
-/* 3. Shell wiring (source contracts)                                   */
+/* 3. Territory reachability probe (wave 21)                           */
+/* ------------------------------------------------------------------ */
+
+/** Minimal storage double: answers what the probe wrote, nothing more. */
+function memoryStorage(initial: Record<string, string> = {}) {
+  const data = new Map(Object.entries(initial));
+  return {
+    getItem: (key: string) => (data.has(key) ? (data.get(key) as string) : null),
+    setItem: (key: string, value: string) => {
+      data.set(key, value);
+    },
+    dump: () => Object.fromEntries(data.entries()),
+  };
+}
+
+describe('territory reachability probe (wave 21)', () => {
+  it('reports true when the territory origin answers (any status, opaque)', async () => {
+    const fetchImpl = (async () => new Response(null, { status: 404 })) as typeof fetch;
+    const storage = memoryStorage();
+    await expect(
+      probeAdminReachability('https://admin.keja.app', { fetchImpl, storage }),
+    ).resolves.toBe(true);
+    // a live 404 still means "the origin resolves and answers" — the probe
+    // asks for reachability, not content
+  });
+
+  it('reports false when DNS is missing (fetch rejects, e.g. NXDOMAIN)', async () => {
+    const fetchImpl = (async () => {
+      throw new TypeError('Failed to fetch');
+    }) as typeof fetch;
+    const storage = memoryStorage();
+    await expect(
+      probeAdminReachability('https://admin.keja.app', { fetchImpl, storage }),
+    ).resolves.toBe(false);
+    expect(JSON.parse(storage.dump()['keja:admin-territory:probe']).ok).toBe(false);
+  });
+
+  it('reports false when the territory is slow (timeout aborts the fetch)', async () => {
+    // never settles on its own — only the AbortController timeout decides
+    const fetchImpl = ((_url: unknown, init?: RequestInit) =>
+      new Promise((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () =>
+          reject(new DOMException('Aborted', 'AbortError')),
+        );
+      })) as unknown as typeof fetch;
+    await expect(
+      probeAdminReachability('https://admin.keja.app', {
+        fetchImpl,
+        storage: memoryStorage(),
+        timeoutMs: 25,
+      }),
+    ).resolves.toBe(false);
+  });
+
+  it('caches the answer per tab (no second fetch within the TTL)', async () => {
+    let calls = 0;
+    const fetchImpl = (async () => {
+      calls += 1;
+      throw new TypeError('Failed to fetch');
+    }) as typeof fetch;
+    const storage = memoryStorage();
+    const deps = { fetchImpl, storage };
+    await expect(probeAdminReachability('https://admin.keja.app', deps)).resolves.toBe(false);
+    await expect(probeAdminReachability('https://admin.keja.app', deps)).resolves.toBe(false);
+    expect(calls).toBe(1); // the cached failure answered the second call
+  });
+
+  it('expired cache entries re-probe (fresh results after the TTL)', async () => {
+    let calls = 0;
+    const fetchImpl = (async () => {
+      calls += 1;
+      return new Response(null, { status: 200 });
+    }) as typeof fetch;
+    const storage = memoryStorage({
+      'keja:admin-territory:probe': JSON.stringify({ ok: false, t: Date.now() - PROBE_CACHE_TTL_MS - 1_000 }),
+    });
+    await expect(
+      probeAdminReachability('https://admin.keja.app', { fetchImpl, storage }),
+    ).resolves.toBe(true); // stale failure ignored, live answer wins
+    expect(calls).toBe(1);
+  });
+
+  it('tampered / malformed cache entries are ignored, never trusted', async () => {
+    const storage = memoryStorage({ 'keja:admin-territory:probe': '{"ok":true' });
+    const fetchImpl = (async () => {
+      throw new TypeError('Failed to fetch');
+    }) as typeof fetch;
+    await expect(
+      probeAdminReachability('https://admin.keja.app', { fetchImpl, storage }),
+    ).resolves.toBe(false); // broken cache ≠ live territory
+  });
+
+  it('probes the territory\u2019s own origin with no-cors + no-store', async () => {
+    const seen: { current?: { url: string; init: RequestInit } } = {};
+    const fetchImpl = (async (url: unknown, init?: RequestInit) => {
+      seen.current = { url: String(url), init: init ?? ({} as RequestInit) };
+      return new Response(null, { status: 200 });
+    }) as typeof fetch;
+    await probeAdminReachability('https://admin.keja.app', {
+      fetchImpl,
+      storage: memoryStorage(),
+    });
+    expect(seen.current?.url).toBe('https://admin.keja.app/favicon.ico');
+    expect(seen.current?.init.mode).toBe('no-cors');
+    expect(seen.current?.init.cache).toBe('no-store');
+    expect(seen.current?.init.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it('survives storage-less environments (Node/SSR answers without cache)', async () => {
+    const fetchImpl = (async () => new Response(null, { status: 200 })) as typeof fetch;
+    await expect(
+      probeAdminReachability('https://admin.keja.app', { fetchImpl, storage: null }),
+    ).resolves.toBe(true);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* 4. Shell wiring (source contracts)                                   */
 /* ------------------------------------------------------------------ */
 
 describe('admin territory shell wiring (source contracts)', () => {
@@ -220,10 +339,27 @@ describe('admin territory shell wiring (source contracts)', () => {
     expect(modal).toContain('isAdminHost(window.location.hostname)) return false');
   });
 
-  it('the /admin path on the main site redirects at the edge (vercel.json)', () => {
+  it('the /admin path lands on the SPA shell — never a dead cross-origin hop', () => {
     const vercel = read('vercel.json');
-    expect(vercel).toContain('"source": "/admin"');
-    expect(vercel).toContain('https://admin.keja.app/');
+    const redirects = vercel.slice(vercel.indexOf('"redirects"'));
+    expect(redirects).toContain('"source": "/admin"');
+    expect(redirects).toContain('"destination": "/#/admin"');
+    // the wave-20 destination pushed admins onto an unattached subdomain
+    // (browser DNS error). The edge redirect now boots the SPA, where the
+    // probe decides subdomain vs local console.
+    expect(redirects).not.toContain('"destination": "https://admin.keja.app/"');
+  });
+
+  it('the CSP allows the main site to probe the admin territory (connect-src)', () => {
+    const vercel = read('vercel.json');
+    const csp = vercel.slice(vercel.indexOf('Content-Security-Policy'));
+    expect(csp).toMatch(/connect-src[^;"]*https:\/\/admin\.keja\.app/);
+  });
+
+  it('#/admin probes the territory before handing off — unreachable means local console', () => {
+    expect(kejaApp).toContain('probeAdminReachability(adminConsoleOrigin())');
+    expect(kejaApp).toContain('setFallback(true)');
+    expect(kejaApp).toContain('<AdminTerritoryPending');
   });
 
   it('config exposes the admin host (single source, env-overridable)', () => {

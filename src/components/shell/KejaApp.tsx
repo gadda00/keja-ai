@@ -3,7 +3,8 @@
  * KejaApp — the SPA root mounted on Next.js `/`.
  * Hash-routed views, app shell, and the platform's global surfaces.
  */
-import { Suspense, lazy, useEffect } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
+import { Loader2, X } from 'lucide-react';
 import { MotionConfig } from 'framer-motion';
 import { HashRouter, navigate, useRouter } from '@/lib/router';
 import { Navbar } from '@/components/shell/Navbar';
@@ -24,6 +25,7 @@ import {
   handoffGrantsAdmin,
   isAdminHost,
   isMainProductionHost,
+  probeAdminReachability,
 } from '@/lib/adminHost';
 import { userAccountSchema, sessionSchema } from '@/lib/boundaries';
 import { store } from '@/lib/store';
@@ -267,7 +269,7 @@ function PathToHashBridge() {
     const path = window.location.pathname.replace(/\/+$/, '');
     const hash = window.location.hash;
     if (hash.startsWith('#/') || path === '' || path === '/') return;
-    const known = /^\/(properties|insights|areas|tokenize|trust|about|contact|legal|ask|invest|data|finance|transact|manage|tenant|diaspora|develop|institutional|partners|ecosystem|compare|sell|deal-analyst|portfolio|valuation|pro)(\/.+)?$/;
+    const known = /^\/(admin|properties|insights|areas|tokenize|trust|about|contact|legal|ask|invest|data|finance|transact|manage|tenant|diaspora|develop|institutional|partners|ecosystem|compare|sell|deal-analyst|portfolio|valuation|pro)(\/.+)?$/;
     if (known.test(path)) {
       window.location.hash = `#${path}`;
     }
@@ -367,23 +369,105 @@ function AdminRouteForce() {
   return null;
 }
 
-/** On the main production site, #/admin is the admin territory's door:
- *  hand the session to admin.keja.app (admins, 2FA-verified sessions) and
- *  let the sign-in wall handle everyone else. Dev hosts and preview
- *  deployments keep the local console — no DNS dependency in test flows. */
+/** Splash while the main site checks whether the admin territory is
+ *  actually serving. Covers the flash of the gated console beneath it
+ *  so an admin crossing to the subdomain never sees the main site's
+ *  chrome flicker mid-handoff. */
+function AdminTerritorySplash() {
+  return (
+    <div
+      className="fixed inset-0 z-[90] flex flex-col items-center justify-center gap-3 bg-background/95 backdrop-blur-sm"
+      role="status"
+      aria-live="polite"
+    >
+      <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden />
+      <p className="text-sm font-semibold">Connecting to the admin console…</p>
+      <p className="text-xs text-muted-foreground">Handing you to the admin territory</p>
+    </div>
+  );
+}
+
+/** The territory is unreachable (DNS not attached yet): the console runs
+ *  right here on the main site — the same inline console dev and preview
+ *  deployments have always used — with a dismissible amber note. The note
+ *  disappears on its own the day the subdomain goes live, because a live
+ *  territory means the handoff redirects before this ever mounts. */
+function AdminTerritoryPending() {
+  const [dismissed, setDismissed] = useState(false);
+  if (dismissed) return null;
+  return (
+    <div
+      className="fixed bottom-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 pr-10 text-xs shadow-lg backdrop-blur supports-[backdrop-filter]:bg-amber-500/10 dark:text-amber-400"
+      role="note"
+    >
+      <p className="font-semibold text-amber-700 dark:text-amber-300">
+        Admin console running on the main site
+      </p>
+      <p className="mt-1 leading-relaxed text-amber-700/90 dark:text-amber-400/90">
+        The dedicated admin.keja.app address isn&rsquo;t attached yet — DNS + Vercel domain
+        wiring is a two-step, ten-minute task (docs/ADMIN_SUBDOMAIN.md). Everything works
+        here in the meantime; the console moves over automatically once the subdomain is
+        live.
+      </p>
+      <button
+        type="button"
+        onClick={() => setDismissed(true)}
+        className="absolute right-2 top-2 rounded-md p-1 text-amber-700/70 transition-colors hover:bg-amber-500/20 hover:text-amber-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 dark:text-amber-400/70 dark:hover:text-amber-400"
+        aria-label="Dismiss the admin subdomain note"
+      >
+        <X className="h-3.5 w-3.5" aria-hidden />
+      </button>
+    </div>
+  );
+}
+
+/** On the main production site, #/admin is the admin territory's door —
+ *  and the door probes before it swings (wave 21). A blind handoff to
+ *  admin.keja.app strands every admin on the browser's DNS error page
+ *  until the subdomain's DNS + Vercel domain are attached, so first we
+ *  check the territory is actually serving (no-cors fetch, ~2 s ceiling,
+ *  cached per tab for 10 minutes). Live territory → the 2FA-verified
+ *  session crosses in the 90-second envelope as before (the splash
+ *  covers the handoff). Unreachable → the console runs inline on the
+ *  main site (AdminGate still walls it) with the amber note above. Dev
+ *  hosts and preview deployments never probe — they keep the local
+ *  console, so test flows have no DNS dependency. */
 function MainHostAdminRedirect() {
   const { route } = useRouter();
   const { user, session, isAdmin } = useAuth();
+  /** Territory unreachable → the console stays on this host. Set only
+   *  from the probe's async callback (state transitions during render
+   *  are derived: crossing = admin-route && main-host && !fallback). */
+  const [fallback, setFallback] = useState(false);
+
+  // the shell mounts ssr:false — window is browser-only by construction
+  const onAdminRoute = route.path === '/admin';
+  const mainHost = isMainProductionHost(window.location.hostname);
+  const crossing = onAdminRoute && mainHost && !fallback;
+
   useEffect(() => {
-    if (route.path !== '/admin') return;
-    if (!isMainProductionHost(window.location.hostname)) return;
-    const handoff =
-      isAdmin && user && session ? encodeSessionHandoff(user, session) : null;
-    const target = handoff
-      ? `${adminConsoleOrigin()}/?handoff=${encodeURIComponent(handoff)}#/admin`
-      : `${adminConsoleOrigin()}/#/admin`;
-    window.location.replace(target);
-  }, [route.path, user, session, isAdmin]);
+    if (!onAdminRoute || !mainHost) return; // dev/preview: local console
+    let cancelled = false;
+    probeAdminReachability(adminConsoleOrigin()).then((reachable) => {
+      if (cancelled) return;
+      if (!reachable) {
+        setFallback(true);
+        return;
+      }
+      const handoff =
+        isAdmin && user && session ? encodeSessionHandoff(user, session) : null;
+      const target = handoff
+        ? `${adminConsoleOrigin()}/?handoff=${encodeURIComponent(handoff)}#/admin`
+        : `${adminConsoleOrigin()}/#/admin`;
+      window.location.replace(target);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [onAdminRoute, mainHost, user, session, isAdmin]);
+
+  if (crossing) return <AdminTerritorySplash />;
+  if (onAdminRoute && mainHost && fallback) return <AdminTerritoryPending />;
   return null;
 }
 
