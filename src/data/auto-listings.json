@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-21T00:10:54.652Z",
+  "generatedAt": "2026-09-22T00:45:10.063Z",
   "runs": [
+    {
+      "id": "run-2026-09-22-10037",
+      "startedAt": "2026-09-22T00:45:10.063Z",
+      "ingested": 4,
+      "published": 4,
+      "queued": 0,
+      "rejected": 0,
+      "deduped": 0,
+      "heroPromiseRestored": null,
+      "sources": {
+        "scanner": 4,
+        "feeds": 0
+      },
+      "feedStatus": []
+    },
     {
       "id": "run-2026-09-21-54628",
       "startedAt": "2026-09-21T00:10:54.652Z",
@@ -1083,42 +1098,293 @@
           "state": "ok"
         }
       ]
-    },
-    {
-      "id": "run-2026-09-02-45520",
-      "startedAt": "2026-09-02T00:04:05.544Z",
-      "ingested": 4,
-      "published": 4,
-      "queued": 0,
-      "rejected": 0,
-      "deduped": 9,
-      "sources": {
-        "scanner": 4,
-        "feeds": 0
-      },
-      "feedStatus": [
-        {
-          "feed": "diaspora-property.xml",
-          "format": "XML",
-          "items": 3,
-          "state": "ok"
-        },
-        {
-          "feed": "horizon-realtors.csv",
-          "format": "CSV",
-          "items": 3,
-          "state": "ok"
-        },
-        {
-          "feed": "skyline-agents.json",
-          "format": "JSON",
-          "items": 3,
-          "state": "ok"
-        }
-      ]
     }
   ],
   "listings": [
+    {
+      "id": "KJA-A0236",
+      "title": "Classic 4-Bedroom Family Villa in Nanyuki",
+      "type": "villa",
+      "purpose": ["buy", "invest"],
+      "area": "Nanyuki",
+      "county": "Laikipia",
+      "price": 7050000,
+      "rentEstimate": 38000,
+      "grossYieldEstimate": 6.5,
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "sizeSqm": 179,
+      "amenities": [
+        "EV charger ready",
+        "Staff quarters",
+        "Solar backup",
+        "Half-acre garden"
+      ],
+      "images": ["/images/props/villa_1.webp", "/images/props/villa_0.webp"],
+      "description": "An honest, well-maintained villa in Nanyuki — 179 sqm of sensible layout for owners and investors alike. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 39k/sqm the pricing sits above the Nanyuki band, and the area yield band of 6.4% supports a solid income case.",
+      "agency": "Skyline Agents Kenya",
+      "agent": {
+        "name": "Peter Kariuki",
+        "phone": "+254 720 811 340"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-22T06:20:00.000Z",
+      "appreciationForecast": 5.5,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 39k/sqm — above the Nanyuki band",
+        "Close to Ol Pejeta conservancy",
+        "Est. gross yield ~6.5% p.a. (area band 6.4%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-22T06:20:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "above",
+        "areaYieldBand": 6.4,
+        "areaPpsmBand": [20000, 45000],
+        "areaAcreBand": [0.8, 4],
+        "qualityScore": 93,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 39k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "54-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0235",
+      "title": "Refined 5-Bedroom Family Villa in Nyali",
+      "type": "villa",
+      "purpose": ["buy", "invest"],
+      "area": "Nyali",
+      "county": "Mombasa",
+      "price": 21700000,
+      "rentEstimate": 123000,
+      "grossYieldEstimate": 6.8,
+      "bedrooms": 5,
+      "bathrooms": 3,
+      "sizeSqm": 271,
+      "amenities": [
+        "Borehole + storage tanks",
+        "Gated community",
+        "Guest wing",
+        "Swimming pool"
+      ],
+      "images": ["/images/props/villa_1.webp", "/images/props/interior_0.webp"],
+      "description": "Rarely available: a villa in Nyali combining space (271 sqm), light and a convenient address. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 80k/sqm the pricing sits within the Nyali band, and the area yield band of 6.8% supports a solid income case.",
+      "agency": "Horizon Realtors",
+      "agent": {
+        "name": "Faith Njeri",
+        "phone": "+254 733 255 902"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-22T06:18:00.000Z",
+      "appreciationForecast": 5.9,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 80k/sqm — within the Nyali band",
+        "Close to Mombasa Marine Park",
+        "Est. gross yield ~6.8% p.a. (area band 6.8%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-22T06:18:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 6.8,
+        "areaPpsmBand": [60000, 100000],
+        "areaAcreBand": [8, 25],
+        "qualityScore": 93,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 80k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "52-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0238",
+      "title": "Modern Building Plot in Riverside",
+      "type": "land",
+      "purpose": ["buy", "invest"],
+      "area": "Riverside",
+      "county": "Nairobi",
+      "price": 537250000,
+      "sizeSqm": 14297,
+      "amenities": [
+        "Ready title deed",
+        "Near tarmac road",
+        "Beaconed boundaries",
+        "Clean freehold title"
+      ],
+      "images": ["/images/props/land_1.webp"],
+      "description": "Set in the heart of Riverside, this land parcel delivers 14297 sqm of comfortable living with genuine character. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Riverside at this price point rarely lingers.",
+      "agency": "Prestige Homes KE",
+      "agent": {
+        "name": "Brian Mutua",
+        "phone": "+254 738 220 776"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-22T03:53:00.000Z",
+      "appreciationForecast": 5.5,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 38k/sqm — below the Riverside band",
+        "Close to Chiromo Lane",
+        "Popular with expatriate family tenants",
+        "3.53 acres with beaconed boundaries"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-22T03:53:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 7.2,
+        "areaPpsmBand": [95000, 140000],
+        "areaAcreBand": [85, 170],
+        "qualityScore": 86,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 152.1M/acre within the area band (85–170M)"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "43-word description · 1 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0237",
+      "title": "Refined 5-Bedroom Townhouse in Nyali",
+      "type": "townhouse",
+      "purpose": ["buy"],
+      "area": "Nyali",
+      "county": "Mombasa",
+      "price": 17650000,
+      "rentEstimate": 100000,
+      "grossYieldEstimate": 6.8,
+      "bedrooms": 5,
+      "bathrooms": 2,
+      "sizeSqm": 251,
+      "amenities": [
+        "Double garage",
+        "Solar water heating",
+        "Perimeter wall",
+        "Gated compound"
+      ],
+      "images": [
+        "/images/props/apartment_2.webp",
+        "/images/props/interior_2.webp"
+      ],
+      "description": "Rarely available: a townhouse in Nyali combining space (251 sqm), light and a convenient address. The property sits on a mature, well-kept compound with room for family life and entertaining. The Nyali market band and 6.8% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Esther Kimani",
+        "phone": "+254 705 118 663"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-22T01:44:00.000Z",
+      "appreciationForecast": 7.3,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 70k/sqm — below the Nyali band",
+        "Close to Nyali Centre",
+        "Est. gross yield ~6.8% p.a. (area band 6.8%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-22T01:44:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 6.8,
+        "areaPpsmBand": [60000, 100000],
+        "areaAcreBand": [8, 25],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 70k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "46-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
     {
       "id": "KJA-A0234",
       "title": "Sunny Acreage in Athi River",
@@ -5135,296 +5401,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "KJA-A0170",
-      "title": "Well-kept 1-Bedroom Apartment in Madaraka",
-      "type": "apartment",
-      "purpose": ["rent"],
-      "area": "Madaraka",
-      "county": "Nairobi",
-      "price": 35000,
-      "bedrooms": 1,
-      "bathrooms": 2,
-      "sizeSqm": 60,
-      "amenities": [
-        "CCTV surveillance",
-        "Balcony",
-        "Fibre internet ready",
-        "Rooftop terrace",
-        "Backup generator"
-      ],
-      "images": [
-        "/images/props/interior_0.webp",
-        "/images/props/apartment_2.webp",
-        "/images/props/apartment_0.webp"
-      ],
-      "description": "This 60 sqm apartment in Madaraka has been finished to a practical standard and priced with discipline. Interiors are clean and neutral, ready for immediate occupation or a light personal refresh. Viewings are recommended — honest stock in Madaraka at this price point rarely lingers.",
-      "agency": "Prestige Homes KE",
-      "agent": {
-        "name": "Alice Mumbi",
-        "phone": "+254 726 900 451"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-07T08:55:00.000Z",
-      "appreciationForecast": 7.3,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "Madaraka location with steady tenant demand",
-        "Close to Madaraka shops",
-        "Popular with young professional tenants"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-07T08:55:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "n/a",
-        "areaYieldBand": 8.8,
-        "areaPpsmBand": [70000, 100000],
-        "areaAcreBand": [8, 20],
-        "qualityScore": 92,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "Price sits inside the area market band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "45-word description · 3 photos · 5 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0174",
-      "title": "Spacious 1-Bedroom City Apartment in Runda",
-      "type": "apartment",
-      "purpose": ["rent"],
-      "area": "Runda",
-      "county": "Nairobi",
-      "price": 25000,
-      "bedrooms": 1,
-      "bathrooms": 2,
-      "sizeSqm": 64,
-      "amenities": [
-        "Balcony",
-        "Lift access",
-        "24/7 security",
-        "Gym",
-        "Borehole water"
-      ],
-      "images": [
-        "/images/props/interior_1.webp",
-        "/images/props/apartment_0.webp",
-        "/images/props/interior_0.webp"
-      ],
-      "description": "Set in the heart of Runda, this apartment delivers 64 sqm of comfortable living with genuine character. Interiors are clean and neutral, ready for immediate occupation or a light personal refresh. A practical choice for anyone seeking a genuine Runda address without overpaying.",
-      "agency": "Horizon Realtors",
-      "agent": {
-        "name": "Dennis Otieno",
-        "phone": "+254 701 644 087"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-07T08:12:00.000Z",
-      "appreciationForecast": 5.9,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "Runda location with steady tenant demand",
-        "Close to Gigiri UN complex",
-        "Popular with young professional tenants"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-07T08:12:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "n/a",
-        "areaYieldBand": 6,
-        "areaPpsmBand": [60000, 95000],
-        "areaAcreBand": [15, 40],
-        "qualityScore": 92,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "Price sits inside the area market band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "43-word description · 3 photos · 5 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0171",
-      "title": "Contemporary 6-Bedroom Villa in Runda",
-      "type": "villa",
-      "purpose": ["buy"],
-      "area": "Runda",
-      "county": "Nairobi",
-      "price": 31100000,
-      "rentEstimate": 156000,
-      "grossYieldEstimate": 6,
-      "bedrooms": 6,
-      "bathrooms": 3,
-      "sizeSqm": 350,
-      "amenities": [
-        "Swimming pool",
-        "Gated community",
-        "EV charger ready",
-        "Borehole + storage tanks"
-      ],
-      "images": [
-        "/images/props/townhouse_1.webp",
-        "/images/props/interior_0.webp"
-      ],
-      "description": "Set in the heart of Runda, this villa delivers 350 sqm of comfortable living with genuine character. The property sits on a mature, well-kept compound with room for family life and entertaining. Benchmarked against comparable stock in Runda, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Coastal Living Estates",
-      "agent": {
-        "name": "Ali Hassan",
-        "phone": "+254 722 684 195"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-07T07:56:00.000Z",
-      "appreciationForecast": 5.5,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 89k/sqm — above the Runda band",
-        "Close to Village Market",
-        "Est. gross yield ~6% p.a. (area band 6%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-07T07:56:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "above",
-        "areaYieldBand": 6,
-        "areaPpsmBand": [60000, 95000],
-        "areaAcreBand": [15, 40],
-        "qualityScore": 90,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 89k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "48-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0172",
-      "title": "Classic Land Parcel in Diani",
-      "type": "land",
-      "purpose": ["buy"],
-      "area": "Diani",
-      "county": "Kwale",
-      "price": 45550000,
-      "sizeSqm": 31055,
-      "amenities": [
-        "Water on site",
-        "Electricity on site",
-        "Beaconed boundaries",
-        "Ready title deed"
-      ],
-      "images": ["/images/props/land_0.webp"],
-      "description": "An honest, well-maintained land parcel in Diani — 31055 sqm of sensible layout for owners and investors alike. Documentation is available for inspection; the holding is clean and transfer-ready. Viewings are recommended — honest stock in Diani at this price point rarely lingers.",
-      "agency": "Prestige Homes KE",
-      "agent": {
-        "name": "Alice Mumbi",
-        "phone": "+254 726 900 451"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-07T07:36:00.000Z",
-      "appreciationForecast": 8.1,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 1k/sqm — below the Diani band",
-        "Close to Diani Beach",
-        "Popular with corporate tenant tenants",
-        "7.67 acres with beaconed boundaries"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-07T07:36:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 7,
-        "areaPpsmBand": [45000, 85000],
-        "areaAcreBand": [3, 12],
-        "qualityScore": 86,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 5.9M/acre within the area band (3–12M)"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "43-word description · 1 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
     }
   ],
   "pending": [],
@@ -5624,7 +5600,11 @@
     "land|Runda|0br|64",
     "land|Kilimani|0br|160",
     "apartment|Kileleshwa|1br|7",
-    "land|Athi River|0br|5"
+    "land|Athi River|0br|5",
+    "villa|Nyali|5br|22",
+    "villa|Nanyuki|4br|7",
+    "townhouse|Nyali|5br|18",
+    "land|Riverside|0br|537"
   ],
   "rejected": []
 }
