@@ -1,6 +1,6 @@
 # Keja AI Marketing Playbook
 
-> PDF edition: `docs/pdf/keja-marketing-playbook.pdf`. Companion to `STRATEGY.md` and `KENYA_PARTNER_PROPOSALS.md`.
+> Companion to `STRATEGY.md` and `KENYA_PARTNER_PROPOSALS.md`.
 
 ## 1. Market Snapshot
 

@@ -6,7 +6,7 @@
 > kept as the forensic record of the Netlify era. The Netlify `keja-ai` site has been
 > deleted as part of the migration.
 
-> PDF edition: `docs/pdf/keja-domain-conflict-fix.pdf`. Companion: `docs/pdf/keja-domain-setup-guide.pdf` (Vercel edition). State re-verified 10 September 2026 with API-level forensics — see the diagnosis below.
+> State re-verified 10 September 2026 with API-level forensics — see the diagnosis below.
 
 ## 1. What the Error Actually Means — and the Confirmed Diagnosis
 

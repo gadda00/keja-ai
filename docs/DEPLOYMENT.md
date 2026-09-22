@@ -2,7 +2,6 @@
 
 > Canonical deployment: **https://keja.app** · platform: **Vercel** (project `keja-ai`,
 > team `victors-projects-37d86841`) · migrated from Netlify on 10 September 2026.
-> PDF companion: `docs/pdf/keja-domain-setup-guide.pdf` (Vercel edition).
 
 ## 1. Architecture at a glance
 

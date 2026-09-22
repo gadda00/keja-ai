@@ -1,6 +1,6 @@
 # Keja AI Strategy
 
-> PDF edition: `docs/pdf/keja-strategy.pdf`. Kenya-first, Africa-next. State: September 2026.
+> Kenya-first, Africa-next. State: September 2026.
 
 ## 1. Executive Summary
 

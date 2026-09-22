@@ -1,6 +1,6 @@
 # Kenya Partner Proposals — Twenty Targets
 
-> PDF edition: `docs/pdf/keja-kenya-partner-proposals.md` source of truth: `docs/pdf/keja-kenya-partner-proposals.pdf`. Each profile: who they are / why Keja fits / the proposal / the ask.
+> Each profile: who they are / why Keja fits / the proposal / the ask.
 
 ## 1. Partnership Philosophy and Tier Model
 

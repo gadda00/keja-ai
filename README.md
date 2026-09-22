@@ -134,21 +134,22 @@ npm run mobile:ios     # Xcode
 
 ## Documentation suite
 
-Engineering, business and operations documents — PDF editions in `docs/pdf/`, markdown companions alongside:
+Engineering, business and operations documents — markdown in `docs/`, printable sources in
+`scripts/keja-docs/` (PDF editions were delivered and removed from the repo):
 
-| Document | Markdown | PDF |
-| --- | --- | --- |
-| **Current picture (post-Phase-2)** | `docs/CURRENT_PICTURE.md` | — |
-| **Site guide (access, accounts, admin, PWA, ops)** | — | `docs/pdf/keja-site-guide.pdf` |
-| Google Sign-In activation runbook | `docs/GOOGLE_AUTH_SETUP.md` | — |
-| Phase-2 technical audit (~100 pp) | source: `scripts/phase2_audit/` | `scripts/phase2_audit/final.pdf` |
-| The Repository Picture (engineering dossier, pre-audit) | `docs/REPO_PICTURE.md` | `docs/pdf/keja-repo-picture.pdf` |
-| Marketing playbook | `docs/MARKETING_PLAYBOOK.md` | `docs/pdf/keja-marketing-playbook.pdf` |
-| Strategy | `docs/STRATEGY.md` | `docs/pdf/keja-strategy.pdf` |
-| Kenya partner proposals (20 targets) | `docs/KENYA_PARTNER_PROPOSALS.md` | `docs/pdf/keja-kenya-partner-proposals.pdf` |
-| keja.app domain setup guide (Vercel) | `docs/DEPLOYMENT.md` | `docs/pdf/keja-domain-setup-guide.pdf` |
-| keja.app Netlify domain-conflict fix (historical) | `docs/DOMAIN_CONFLICT_FIX.md` | `docs/pdf/keja-domain-conflict-fix.pdf` |
-| PWA asset regeneration | `node scripts/generate-pwa-assets.mjs` | — |
+| Document | Where |
+| --- | --- |
+| **Current picture (post-Phase-2)** | `docs/CURRENT_PICTURE.md` |
+| Site guide (access, accounts, admin, PWA, ops) | `scripts/keja-docs/doc6_site_guide.html` |
+| Google Sign-In activation runbook | `docs/GOOGLE_AUTH_SETUP.md` |
+| Phase-2 technical audit (~100 pp) | source: `scripts/phase2_audit/` |
+| The Repository Picture (engineering dossier, pre-audit) | `docs/REPO_PICTURE.md` |
+| Marketing playbook | `docs/MARKETING_PLAYBOOK.md` |
+| Strategy | `docs/STRATEGY.md` |
+| Kenya partner proposals (20 targets) | `docs/KENYA_PARTNER_PROPOSALS.md` |
+| keja.app domain setup guide (Vercel) | `docs/DEPLOYMENT.md` |
+| keja.app Netlify domain-conflict fix (historical) | `docs/DOMAIN_CONFLICT_FIX.md` |
+| PWA asset regeneration | `node scripts/generate-pwa-assets.mjs` |
 
 ## The honesty standard
 

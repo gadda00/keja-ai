@@ -1,6 +1,6 @@
 # The Repository Picture — Keja AI Engineering Dossier
 
-> Complete engineering documentation of `gadda00/keja-ai`. PDF edition: `docs/pdf/keja-repo-picture.pdf`. State verified 10 September 2026 (main @ `ab30a10`).
+> Complete engineering documentation of `gadda00/keja-ai`. State verified 10 September 2026 (main @ `ab30a10`).
 
 ## 1. Executive Overview
 
