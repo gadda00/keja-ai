@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-23T00:23:05.579Z",
+  "generatedAt": "2026-09-24T00:26:01.646Z",
   "runs": [
+    {
+      "id": "run-2026-09-24-61464",
+      "startedAt": "2026-09-24T00:26:01.646Z",
+      "ingested": 3,
+      "published": 3,
+      "queued": 0,
+      "rejected": 0,
+      "deduped": 1,
+      "heroPromiseRestored": null,
+      "sources": {
+        "scanner": 3,
+        "feeds": 0
+      },
+      "feedStatus": []
+    },
     {
       "id": "run-2026-09-23-85556",
       "startedAt": "2026-09-23T00:23:05.579Z",
@@ -1047,42 +1062,232 @@
           "state": "ok"
         }
       ]
-    },
-    {
-      "id": "run-2026-09-02-59121",
-      "startedAt": "2026-09-02T14:24:19.620Z",
-      "ingested": 4,
-      "published": 4,
-      "queued": 0,
-      "rejected": 0,
-      "deduped": 9,
-      "sources": {
-        "scanner": 4,
-        "feeds": 0
-      },
-      "feedStatus": [
-        {
-          "feed": "diaspora-property.xml",
-          "format": "XML",
-          "items": 3,
-          "state": "ok"
-        },
-        {
-          "feed": "horizon-realtors.csv",
-          "format": "CSV",
-          "items": 3,
-          "state": "ok"
-        },
-        {
-          "feed": "skyline-agents.json",
-          "format": "JSON",
-          "items": 3,
-          "state": "ok"
-        }
-      ]
     }
   ],
   "listings": [
+    {
+      "id": "KJA-A0246",
+      "title": "Elegant 4-Bedroom Cluster Home in Lavington",
+      "type": "townhouse",
+      "purpose": ["buy"],
+      "area": "Lavington",
+      "county": "Nairobi",
+      "price": 21000000,
+      "rentEstimate": 130000,
+      "grossYieldEstimate": 7.4,
+      "bedrooms": 4,
+      "bathrooms": 2,
+      "sizeSqm": 212,
+      "amenities": [
+        "Solar water heating",
+        "Perimeter wall",
+        "Clubhouse access",
+        "Staff quarters"
+      ],
+      "images": [
+        "/images/props/interior_2.webp",
+        "/images/props/townhouse_1.webp"
+      ],
+      "description": "A well-presented townhouse in Lavington, Nairobi, offering 212 sqm of bright, efficiently planned space. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 99k/sqm the pricing sits within the Lavington band, and the area yield band of 7.4% supports a solid income case.",
+      "agency": "Skyline Agents Kenya",
+      "agent": {
+        "name": "Mercy Wanjiru",
+        "phone": "+254 712 400 118"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-24T09:45:00.000Z",
+      "appreciationForecast": 8.3,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 99k/sqm — within the Lavington band",
+        "Close to Lavington Mall",
+        "Est. gross yield ~7.4% p.a. (area band 7.4%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-24T09:45:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 7.4,
+        "areaPpsmBand": [90000, 135000],
+        "areaAcreBand": [80, 160],
+        "qualityScore": 93,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 99k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "51-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0245",
+      "title": "Elegant 1-Bedroom Apartment in Madaraka",
+      "type": "apartment",
+      "purpose": ["rent"],
+      "area": "Madaraka",
+      "county": "Nairobi",
+      "price": 25000,
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "sizeSqm": 41,
+      "amenities": [
+        "24/7 security",
+        "Fibre internet ready",
+        "Balcony",
+        "Lift access",
+        "Gym"
+      ],
+      "images": [
+        "/images/props/apartment_0.webp",
+        "/images/props/interior_0.webp",
+        "/images/props/apartment_1.webp"
+      ],
+      "description": "This 41 sqm apartment in Madaraka has been finished to a practical standard and priced with discipline. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. A practical choice for anyone seeking a genuine Madaraka address without overpaying.",
+      "agency": "Horizon Realtors",
+      "agent": {
+        "name": "Dennis Otieno",
+        "phone": "+254 701 644 087"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-24T04:55:00.000Z",
+      "appreciationForecast": 5,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "Madaraka location with steady tenant demand",
+        "Close to Nairobi Expressway ramp",
+        "Popular with young professional tenants"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-24T04:55:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "n/a",
+        "areaYieldBand": 8.8,
+        "areaPpsmBand": [70000, 100000],
+        "areaAcreBand": [8, 20],
+        "qualityScore": 92,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "Price sits inside the area market band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "46-word description · 3 photos · 5 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0243",
+      "title": "Contemporary 1-Bedroom City Apartment in Kitengela",
+      "type": "apartment",
+      "purpose": ["buy", "invest"],
+      "area": "Kitengela",
+      "county": "Kajiado",
+      "price": 2750000,
+      "rentEstimate": 17000,
+      "grossYieldEstimate": 7.4,
+      "bedrooms": 1,
+      "bathrooms": 2,
+      "sizeSqm": 64,
+      "amenities": [
+        "CCTV surveillance",
+        "24/7 security",
+        "Fibre internet ready",
+        "Borehole water"
+      ],
+      "images": [
+        "/images/props/apartment_0.webp",
+        "/images/props/interior_1.webp",
+        "/images/props/interior_0.webp"
+      ],
+      "description": "Rarely available: a apartment in Kitengela combining space (64 sqm), light and a convenient address. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. At KES 43k/sqm the pricing sits within the Kitengela band, and the area yield band of 7.6% supports a solid income case.",
+      "agency": "Horizon Realtors",
+      "agent": {
+        "name": "Faith Njeri",
+        "phone": "+254 733 255 902"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-24T03:43:00.000Z",
+      "appreciationForecast": 7.2,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 43k/sqm — within the Kitengela band",
+        "Close to Kitengela town",
+        "Est. gross yield ~7.4% p.a. (area band 7.6%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-24T03:43:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "within",
+        "areaYieldBand": 7.6,
+        "areaPpsmBand": [30000, 55000],
+        "areaAcreBand": [2.5, 8],
+        "qualityScore": 95,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 43k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "54-word description · 3 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
     {
       "id": "KJA-A0240",
       "title": "Elegant 4-Bedroom Residence in Athi River",
@@ -5176,226 +5381,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "KJA-A0180",
-      "title": "Elegant 4-Bedroom Residence in Athi River",
-      "type": "apartment",
-      "purpose": ["buy"],
-      "area": "Athi River",
-      "county": "Machakos",
-      "price": 4700000,
-      "rentEstimate": 28000,
-      "grossYieldEstimate": 7.1,
-      "bedrooms": 4,
-      "bathrooms": 2,
-      "sizeSqm": 150,
-      "amenities": [
-        "Backup generator",
-        "Rooftop terrace",
-        "Secure parking",
-        "Borehole water",
-        "Balcony"
-      ],
-      "images": [
-        "/images/props/interior_1.webp",
-        "/images/props/apartment_0.webp",
-        "/images/props/apartment_2.webp"
-      ],
-      "description": "Rarely available: a apartment in Athi River combining space (150 sqm), light and a convenient address. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Athi River, this listing offers defensible entry pricing for an income-focused buyer.",
-      "agency": "Coastal Living Estates",
-      "agent": {
-        "name": "Halima Yusuf",
-        "phone": "+254 718 337 540"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-08T06:20:00.000Z",
-      "appreciationForecast": 7.8,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 31k/sqm — within the Athi River band",
-        "Close to Mombasa Road corridor",
-        "Est. gross yield ~7.1% p.a. (area band 7.2%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-08T06:20:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 7.2,
-        "areaPpsmBand": [25000, 45000],
-        "areaAcreBand": [2, 6],
-        "qualityScore": 95,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 31k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "50-word description · 3 photos · 5 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0175",
-      "title": "Modern Acreage in Nakuru",
-      "type": "land",
-      "purpose": ["buy", "invest"],
-      "area": "Nakuru",
-      "county": "Nakuru",
-      "price": 9100000,
-      "sizeSqm": 15857,
-      "amenities": [
-        "Graded access road",
-        "Water on site",
-        "Beaconed boundaries",
-        "Electricity on site"
-      ],
-      "images": ["/images/props/land_0.webp"],
-      "description": "An honest, well-maintained land parcel in Nakuru — 15857 sqm of sensible layout for owners and investors alike. Documentation is available for inspection; the holding is clean and transfer-ready. A practical choice for anyone seeking a genuine Nakuru address without overpaying.",
-      "agency": "Horizon Realtors",
-      "agent": {
-        "name": "Dennis Otieno",
-        "phone": "+254 701 644 087"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-08T04:42:00.000Z",
-      "appreciationForecast": 6.9,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 574/sqm — below the Nakuru band",
-        "Close to Kabarak Road",
-        "Popular with expatriate family tenants",
-        "3.92 acres with beaconed boundaries"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-08T04:42:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "below",
-        "areaYieldBand": 7.8,
-        "areaPpsmBand": [30000, 55000],
-        "areaAcreBand": [1.5, 6],
-        "qualityScore": 86,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 2.3M/acre within the area band (1.5–6M)"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "warn",
-            "detail": "41-word description · 1 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0177",
-      "title": "Charming 4-Bedroom Residence in Runda",
-      "type": "apartment",
-      "purpose": ["buy"],
-      "area": "Runda",
-      "county": "Nairobi",
-      "price": 13250000,
-      "rentEstimate": 66000,
-      "grossYieldEstimate": 6,
-      "bedrooms": 4,
-      "bathrooms": 2,
-      "sizeSqm": 171,
-      "amenities": [
-        "Backup generator",
-        "CCTV surveillance",
-        "Gym",
-        "Rooftop terrace",
-        "Fibre internet ready"
-      ],
-      "images": [
-        "/images/props/bedroom_0.webp",
-        "/images/props/interior_0.webp",
-        "/images/props/apartment_1.webp"
-      ],
-      "description": "Set in the heart of Runda, this apartment delivers 171 sqm of comfortable living with genuine character. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. The Runda market band and 6% yield environment make this a disciplined income or appreciation play.",
-      "agency": "Diaspora Property Group",
-      "agent": {
-        "name": "Esther Kimani",
-        "phone": "+254 705 118 663"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-08T04:32:00.000Z",
-      "appreciationForecast": 7.3,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 77k/sqm — within the Runda band",
-        "Close to Runda Mhasibu shops",
-        "Est. gross yield ~6% p.a. (area band 6%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-08T04:32:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 6,
-        "areaPpsmBand": [60000, 95000],
-        "areaAcreBand": [15, 40],
-        "qualityScore": 95,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 77k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "50-word description · 3 photos · 5 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
     }
   ],
   "pending": [],
@@ -5603,7 +5588,10 @@
     "bungalow|Riverside|4br|19",
     "apartment|Athi River|4br|6",
     "apartment|Diani|2br|4",
-    "land|Kasarani|0br|49"
+    "land|Kasarani|0br|49",
+    "apartment|Kitengela|1br|3",
+    "apartment|Madaraka|1br|5",
+    "townhouse|Lavington|4br|21"
   ],
   "rejected": []
 }

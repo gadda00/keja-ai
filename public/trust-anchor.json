@@ -2,10 +2,34 @@
   "schemaVersion": 1,
   "algorithmVersion": "2026-09-13.1",
   "investmentAlgorithmVersion": "2026-09-13.1",
-  "generatedAt": "2026-09-23T00:23:07.552Z",
+  "generatedAt": "2026-09-24T00:26:04.550Z",
   "inventoryCount": 87,
-  "inputSnapshot": "6a0717fb882fd6173b9fddc0946911c57e83a12f62c5c76c206ea84a1e959202",
+  "inputSnapshot": "a9afdf21d170d2d6301ab3357d5474786759cea3596d87cae9358c3375986850",
   "listings": [
+    {
+      "id": "KJA-A0246",
+      "trust": 73,
+      "band": "Moderate",
+      "investment": 7.7,
+      "investmentBand": "Strong",
+      "digest": "4fa08a67eb70fe80178cc69ec9857472b78df905d248692a755e96c6899c55d9"
+    },
+    {
+      "id": "KJA-A0245",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.7,
+      "investmentBand": "Solid",
+      "digest": "c2e6dc0974d3cfa7906f114eab7f58e3d380f7aa1d0e0c00cb9cf344ac005189"
+    },
+    {
+      "id": "KJA-A0243",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.5,
+      "investmentBand": "Solid",
+      "digest": "68b946fe034e75e674f677341a75516fa741b6f9e2b2038d68a93cf0f18b5561"
+    },
     {
       "id": "KJA-A0240",
       "trust": 69,
@@ -461,30 +485,6 @@
       "investment": 7.2,
       "investmentBand": "Solid",
       "digest": "57e752955c5cf0929d4935cf0d6f0e9cb474d6f842856a636d89deb25a679cfc"
-    },
-    {
-      "id": "KJA-A0180",
-      "trust": 69,
-      "band": "High Risk",
-      "investment": 6.5,
-      "investmentBand": "Solid",
-      "digest": "f92f459c52d34c37c2e00c3b871c414d05cd3374bfe593a767322fc485f32d18"
-    },
-    {
-      "id": "KJA-A0175",
-      "trust": 67,
-      "band": "High Risk",
-      "investment": 5.5,
-      "investmentBand": "Moderate",
-      "digest": "0c75b3c1071ad43602e0fc36ef1133c30938ac2562a8302dfd90d34f51dd21f0"
-    },
-    {
-      "id": "KJA-A0177",
-      "trust": 71,
-      "band": "Moderate",
-      "investment": 6.9,
-      "investmentBand": "Solid",
-      "digest": "0657574bccbbcce7f9211d6242f7976d5fa2a6c7c618c14ccf4b786b062c4b51"
     },
     {
       "id": "KJA-001",
