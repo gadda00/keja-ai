@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-24T00:26:04.480Z",
+  "generatedAt": "2026-09-25T00:30:06.225Z",
   "featured": [
     {
       "id": "KJA-001",
@@ -632,6 +632,6 @@
   ],
   "stats": {
     "totalListings": 87,
-    "verifiedHigh": 66
+    "verifiedHigh": 67
   }
 }
