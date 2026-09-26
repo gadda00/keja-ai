@@ -2,10 +2,42 @@
   "schemaVersion": 1,
   "algorithmVersion": "2026-09-13.1",
   "investmentAlgorithmVersion": "2026-09-13.1",
-  "generatedAt": "2026-09-25T00:30:06.310Z",
+  "generatedAt": "2026-09-26T00:33:57.939Z",
   "inventoryCount": 87,
-  "inputSnapshot": "7a6c3868a2f33aae2de2863c06f519f77bcc4b7b4c10f0267016abb7d76a9a29",
+  "inputSnapshot": "bb7b51707612f54d5420574fed6b2294b40e29e110fc46ad1c7396adfc1ea02a",
   "listings": [
+    {
+      "id": "KJA-A0252",
+      "trust": 74,
+      "band": "Moderate",
+      "investment": 7,
+      "investmentBand": "Solid",
+      "digest": "8ae66ab3cbe086b5a016c9e25c474414c88ac5902a98d07d5b46e73b0ceedafa"
+    },
+    {
+      "id": "KJA-A0253",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.5,
+      "investmentBand": "Solid",
+      "digest": "ce83471757083ddac2f6084f93550143cc2fdfc0d0f668ea386db3f8194ac8ca"
+    },
+    {
+      "id": "KJA-A0254",
+      "trust": 70,
+      "band": "Moderate",
+      "investment": 6.7,
+      "investmentBand": "Solid",
+      "digest": "a8d5bf52d63ba189a87a66d7ae9f5e4e43682d0ccdb70e029c8b38d805f0b687"
+    },
+    {
+      "id": "KJA-A0251",
+      "trust": 69,
+      "band": "High Risk",
+      "investment": 6.1,
+      "investmentBand": "Moderate",
+      "digest": "f00a72af397e22c0e40615558a4824c98848f92b4fc47811af8d181ecb7ee11a"
+    },
     {
       "id": "KJA-A0248",
       "trust": 69,
@@ -453,38 +485,6 @@
       "investment": 6.2,
       "investmentBand": "Moderate",
       "digest": "831d3baaf1b5e923eb6b29ac3bb3981aaaec1f5730c6bb62ef1e219a011b63b7"
-    },
-    {
-      "id": "KJA-A0190",
-      "trust": 69,
-      "band": "High Risk",
-      "investment": 6.2,
-      "investmentBand": "Moderate",
-      "digest": "56955e79be7e21a4c15679bef0b79faf11e8a30cffbb9a187deec0ec4c7093a0"
-    },
-    {
-      "id": "KJA-A0189",
-      "trust": 69,
-      "band": "High Risk",
-      "investment": 6.3,
-      "investmentBand": "Moderate",
-      "digest": "6056967cdf5905c21c8589b745f7afb44b70481553adec4a24fcb0e4be792d28"
-    },
-    {
-      "id": "KJA-A0187",
-      "trust": 69,
-      "band": "High Risk",
-      "investment": 6.5,
-      "investmentBand": "Solid",
-      "digest": "9d7b679b9a5e868c97032fdd60da1dd17e28beace83ff27f8623b969de4d8d14"
-    },
-    {
-      "id": "KJA-A0184",
-      "trust": 69,
-      "band": "High Risk",
-      "investment": 6.1,
-      "investmentBand": "Moderate",
-      "digest": "8d34cd19a3537b4560666b0ee8ed40b02210f7148620d89808581e1778e46f4f"
     },
     {
       "id": "KJA-001",

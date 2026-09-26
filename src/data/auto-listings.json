@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-25T00:30:04.525Z",
+  "generatedAt": "2026-09-26T00:33:55.311Z",
   "runs": [
+    {
+      "id": "run-2026-09-26-35195",
+      "startedAt": "2026-09-26T00:33:55.311Z",
+      "ingested": 4,
+      "published": 4,
+      "queued": 0,
+      "rejected": 0,
+      "deduped": 0,
+      "heroPromiseRestored": null,
+      "sources": {
+        "scanner": 4,
+        "feeds": 0
+      },
+      "feedStatus": []
+    },
     {
       "id": "run-2026-09-25-04503",
       "startedAt": "2026-09-25T00:30:04.525Z",
@@ -1011,42 +1026,307 @@
           "state": "ok"
         }
       ]
-    },
-    {
-      "id": "run-2026-09-03-89765",
-      "startedAt": "2026-09-03T00:08:09.792Z",
-      "ingested": 3,
-      "published": 3,
-      "queued": 0,
-      "rejected": 0,
-      "deduped": 10,
-      "sources": {
-        "scanner": 3,
-        "feeds": 0
-      },
-      "feedStatus": [
-        {
-          "feed": "diaspora-property.xml",
-          "format": "XML",
-          "items": 3,
-          "state": "ok"
-        },
-        {
-          "feed": "horizon-realtors.csv",
-          "format": "CSV",
-          "items": 3,
-          "state": "ok"
-        },
-        {
-          "feed": "skyline-agents.json",
-          "format": "JSON",
-          "items": 3,
-          "state": "ok"
-        }
-      ]
     }
   ],
   "listings": [
+    {
+      "id": "KJA-A0252",
+      "title": "Refined 4-Bedroom Townhouse in Westlands",
+      "type": "townhouse",
+      "purpose": ["buy", "invest"],
+      "area": "Westlands",
+      "county": "Nairobi",
+      "price": 23900000,
+      "rentEstimate": 151000,
+      "grossYieldEstimate": 7.6,
+      "bedrooms": 4,
+      "bathrooms": 2,
+      "sizeSqm": 218,
+      "amenities": [
+        "Private garden",
+        "Double garage",
+        "Gated compound",
+        "Perimeter wall"
+      ],
+      "images": [
+        "/images/props/townhouse_1.webp",
+        "/images/props/interior_2.webp"
+      ],
+      "description": "A well-presented townhouse in Westlands, Nairobi, offering 218 sqm of bright, efficiently planned space. The property sits on a mature, well-kept compound with room for family life and entertaining. The Westlands market band and 7.6% yield environment make this a disciplined income or appreciation play.",
+      "agency": "Diaspora Property Group",
+      "agent": {
+        "name": "Esther Kimani",
+        "phone": "+254 705 118 663"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-26T06:13:00.000Z",
+      "appreciationForecast": 4.7,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 110k/sqm — below the Westlands band",
+        "Close to Sarit Centre",
+        "Est. gross yield ~7.6% p.a. (area band 7.6%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-26T06:13:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 7.6,
+        "areaPpsmBand": [100000, 150000],
+        "areaAcreBand": [90, 180],
+        "qualityScore": 90,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 110k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "warn",
+            "detail": "45-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0253",
+      "title": "Spacious 4-Bedroom Apartment in Diani",
+      "type": "apartment",
+      "purpose": ["buy", "invest"],
+      "area": "Diani",
+      "county": "Kwale",
+      "price": 8000000,
+      "rentEstimate": 47000,
+      "grossYieldEstimate": 7.1,
+      "bedrooms": 4,
+      "bathrooms": 2,
+      "sizeSqm": 171,
+      "amenities": [
+        "Backup generator",
+        "CCTV surveillance",
+        "Rooftop terrace",
+        "Secure parking",
+        "Balcony"
+      ],
+      "images": [
+        "/images/props/bedroom_0.webp",
+        "/images/props/interior_0.webp",
+        "/images/props/apartment_0.webp"
+      ],
+      "description": "An honest, well-maintained apartment in Diani — 171 sqm of sensible layout for owners and investors alike. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. Benchmarked against comparable stock in Diani, this listing offers defensible entry pricing for an income-focused buyer.",
+      "agency": "Nairobi Prime Properties",
+      "agent": {
+        "name": "Samuel Kiptoo",
+        "phone": "+254 710 259 664"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-26T05:45:00.000Z",
+      "appreciationForecast": 6.1,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 47k/sqm — below the Diani band",
+        "Close to Baharini shopping plaza",
+        "Est. gross yield ~7.1% p.a. (area band 7%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-26T05:45:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 7,
+        "areaPpsmBand": [45000, 85000],
+        "areaAcreBand": [3, 12],
+        "qualityScore": 95,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 47k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "50-word description · 3 photos · 5 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0254",
+      "title": "Bright 2-Bedroom City Apartment in Karen",
+      "type": "apartment",
+      "purpose": ["rent"],
+      "area": "Karen",
+      "county": "Nairobi",
+      "price": 35000,
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "sizeSqm": 107,
+      "amenities": [
+        "Gym",
+        "Lift access",
+        "Rooftop terrace",
+        "Secure parking",
+        "Backup generator"
+      ],
+      "images": [
+        "/images/props/bedroom_0.webp",
+        "/images/props/apartment_1.webp",
+        "/images/props/interior_0.webp"
+      ],
+      "description": "Set in the heart of Karen, this apartment delivers 107 sqm of comfortable living with genuine character. Interiors are clean and neutral, ready for immediate occupation or a light personal refresh. A practical choice for anyone seeking a genuine Karen address without overpaying.",
+      "agency": "Horizon Realtors",
+      "agent": {
+        "name": "Faith Njeri",
+        "phone": "+254 733 255 902"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-26T05:12:00.000Z",
+      "appreciationForecast": 8.3,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "Karen location with steady tenant demand",
+        "Close to Karen Country Club",
+        "Popular with diaspora investor tenants"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-26T05:12:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "n/a",
+        "areaYieldBand": 5.8,
+        "areaPpsmBand": [55000, 90000],
+        "areaAcreBand": [18, 45],
+        "qualityScore": 92,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "Price sits inside the area market band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "43-word description · 3 photos · 5 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
+    {
+      "id": "KJA-A0251",
+      "title": "Bright 4-Bedroom Townhouse in Syokimau",
+      "type": "townhouse",
+      "purpose": ["buy", "invest"],
+      "area": "Syokimau",
+      "county": "Machakos",
+      "price": 6300000,
+      "rentEstimate": 41000,
+      "grossYieldEstimate": 7.8,
+      "bedrooms": 4,
+      "bathrooms": 2,
+      "sizeSqm": 169,
+      "amenities": [
+        "Perimeter wall",
+        "Borehole water",
+        "Private garden",
+        "Solar water heating"
+      ],
+      "images": [
+        "/images/props/interior_2.webp",
+        "/images/props/townhouse_0.webp"
+      ],
+      "description": "Rarely available: a townhouse in Syokimau combining space (169 sqm), light and a convenient address. The property sits on a mature, well-kept compound with room for family life and entertaining. At KES 37k/sqm the pricing sits below the Syokimau band, and the area yield band of 7.8% supports a solid income case.",
+      "agency": "Horizon Realtors",
+      "agent": {
+        "name": "Dennis Otieno",
+        "phone": "+254 701 644 087"
+      },
+      "availability": "available",
+      "listedAt": "2026-09-26T02:21:00.000Z",
+      "appreciationForecast": 4.6,
+      "offPlan": false,
+      "furnished": false,
+      "highlights": [
+        "KES 37k/sqm — below the Syokimau band",
+        "Close to Mlolongo interchange",
+        "Est. gross yield ~7.8% p.a. (area band 7.8%)"
+      ],
+      "views": 0,
+      "auto": {
+        "source": "market-scanner",
+        "firstSeenAt": "2026-09-26T02:21:00.000Z",
+        "enrichedBy": "keja-autopilot/enrich@1",
+        "priceGrade": "below",
+        "areaYieldBand": 7.8,
+        "areaPpsmBand": [35000, 60000],
+        "areaAcreBand": [3, 9],
+        "qualityScore": 93,
+        "route": "publish",
+        "checks": [
+          {
+            "label": "Completeness screen",
+            "status": "pass",
+            "detail": "All buyer-critical fields present"
+          },
+          {
+            "label": "Price-band screen",
+            "status": "pass",
+            "detail": "KES 37k/sqm sits within the area band"
+          },
+          {
+            "label": "Content quality screen",
+            "status": "pass",
+            "detail": "52-word description · 2 photos · 4 amenities"
+          },
+          {
+            "label": "Source screening",
+            "status": "warn",
+            "detail": "Organic market scanner sighting — human spot-check recommended"
+          }
+        ]
+      }
+    },
     {
       "id": "KJA-A0248",
       "title": "Charming 1-Bedroom Residence in Ruaka",
@@ -5079,304 +5359,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "KJA-A0190",
-      "title": "Sunny 3-Bedroom City Apartment in Kitengela",
-      "type": "apartment",
-      "purpose": ["buy"],
-      "area": "Kitengela",
-      "county": "Kajiado",
-      "price": 8500000,
-      "rentEstimate": 54000,
-      "grossYieldEstimate": 7.6,
-      "bedrooms": 3,
-      "bathrooms": 1,
-      "sizeSqm": 157,
-      "amenities": [
-        "Borehole water",
-        "Rooftop terrace",
-        "CCTV surveillance",
-        "Balcony"
-      ],
-      "images": [
-        "/images/props/interior_0.webp",
-        "/images/props/bedroom_0.webp",
-        "/images/props/interior_1.webp"
-      ],
-      "description": "Rarely available: a apartment in Kitengela combining space (157 sqm), light and a convenient address. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. At KES 54k/sqm the pricing sits above the Kitengela band, and the area yield band of 7.6% supports a solid income case.",
-      "agency": "Skyline Agents Kenya",
-      "agent": {
-        "name": "Mercy Wanjiru",
-        "phone": "+254 712 400 118"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-09T05:49:00.000Z",
-      "appreciationForecast": 5,
-      "offPlan": true,
-      "furnished": false,
-      "highlights": [
-        "KES 54k/sqm — above the Kitengela band",
-        "Close to Kitengela town",
-        "Est. gross yield ~7.6% p.a. (area band 7.6%)",
-        "Off-plan with staged payment plan"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-09T05:49:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "above",
-        "areaYieldBand": 7.6,
-        "areaPpsmBand": [30000, 55000],
-        "areaAcreBand": [2.5, 8],
-        "qualityScore": 95,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 54k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "54-word description · 3 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0189",
-      "title": "Charming 4-Bedroom City Apartment in Milimani",
-      "type": "apartment",
-      "purpose": ["buy", "invest"],
-      "area": "Milimani",
-      "county": "Kisumu",
-      "price": 9500000,
-      "rentEstimate": 59000,
-      "grossYieldEstimate": 7.5,
-      "bedrooms": 4,
-      "bathrooms": 1,
-      "sizeSqm": 180,
-      "amenities": [
-        "Lift access",
-        "Borehole water",
-        "Gym",
-        "CCTV surveillance"
-      ],
-      "images": [
-        "/images/props/bedroom_0.webp",
-        "/images/props/interior_1.webp",
-        "/images/props/apartment_1.webp"
-      ],
-      "description": "An honest, well-maintained apartment in Milimani — 180 sqm of sensible layout for owners and investors alike. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. At KES 53k/sqm the pricing sits within the Milimani band, and the area yield band of 7.4% supports a solid income case.",
-      "agency": "Skyline Agents Kenya",
-      "agent": {
-        "name": "Peter Kariuki",
-        "phone": "+254 720 811 340"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-09T04:33:00.000Z",
-      "appreciationForecast": 5.6,
-      "offPlan": true,
-      "furnished": true,
-      "highlights": [
-        "KES 53k/sqm — within the Milimani band",
-        "Close to Milimani estates",
-        "Est. gross yield ~7.5% p.a. (area band 7.4%)",
-        "Off-plan with staged payment plan"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-09T04:33:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 7.4,
-        "areaPpsmBand": [40000, 70000],
-        "areaAcreBand": [4, 12],
-        "qualityScore": 95,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 53k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "56-word description · 3 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0187",
-      "title": "Sunny 4-Bedroom Apartment in Athi River",
-      "type": "apartment",
-      "purpose": ["buy", "invest"],
-      "area": "Athi River",
-      "county": "Machakos",
-      "price": 6600000,
-      "rentEstimate": 40000,
-      "grossYieldEstimate": 7.3,
-      "bedrooms": 4,
-      "bathrooms": 1,
-      "sizeSqm": 166,
-      "amenities": [
-        "Lift access",
-        "Rooftop terrace",
-        "Backup generator",
-        "Secure parking"
-      ],
-      "images": [
-        "/images/props/interior_1.webp",
-        "/images/props/apartment_2.webp",
-        "/images/props/interior_0.webp"
-      ],
-      "description": "Rarely available: a apartment in Athi River combining space (166 sqm), light and a convenient address. The layout flows from a welcoming entrance into an open living area, with bedrooms positioned for privacy. At KES 40k/sqm the pricing sits above the Athi River band, and the area yield band of 7.2% supports a solid income case.",
-      "agency": "Skyline Agents Kenya",
-      "agent": {
-        "name": "Mercy Wanjiru",
-        "phone": "+254 712 400 118"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-09T02:43:00.000Z",
-      "appreciationForecast": 7.8,
-      "offPlan": true,
-      "furnished": false,
-      "highlights": [
-        "KES 40k/sqm — above the Athi River band",
-        "Close to Mombasa Road corridor",
-        "Est. gross yield ~7.3% p.a. (area band 7.2%)",
-        "Off-plan with staged payment plan"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-09T02:43:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "above",
-        "areaYieldBand": 7.2,
-        "areaPpsmBand": [25000, 45000],
-        "areaAcreBand": [2, 6],
-        "qualityScore": 95,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 40k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "56-word description · 3 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
-    },
-    {
-      "id": "KJA-A0184",
-      "title": "Well-kept Office Suite in Nakuru",
-      "type": "commercial",
-      "purpose": ["buy", "invest"],
-      "area": "Nakuru",
-      "county": "Nakuru",
-      "price": 5800000,
-      "rentEstimate": 38000,
-      "grossYieldEstimate": 7.9,
-      "bathrooms": 1,
-      "sizeSqm": 135,
-      "amenities": [
-        "Ample parking bays",
-        "Central A/C",
-        "Conference facilities",
-        "Loading bay"
-      ],
-      "images": ["/images/props/office_0.webp", "/images/props/office_1.webp"],
-      "description": "An honest, well-maintained commercial unit in Nakuru — 135 sqm of sensible layout for owners and investors alike. Infrastructure — power backup, connectivity and parking — supports immediate occupation. At KES 43k/sqm the pricing sits within the Nakuru band, and the area yield band of 7.8% supports a solid income case.",
-      "agency": "Skyline Agents Kenya",
-      "agent": {
-        "name": "Mercy Wanjiru",
-        "phone": "+254 712 400 118"
-      },
-      "availability": "available",
-      "listedAt": "2026-09-08T08:52:00.000Z",
-      "appreciationForecast": 5.3,
-      "offPlan": false,
-      "furnished": false,
-      "highlights": [
-        "KES 43k/sqm — within the Nakuru band",
-        "Close to Nakuru town CBD",
-        "Est. gross yield ~7.9% p.a. (area band 7.8%)"
-      ],
-      "views": 0,
-      "auto": {
-        "source": "market-scanner",
-        "firstSeenAt": "2026-09-08T08:52:00.000Z",
-        "enrichedBy": "keja-autopilot/enrich@1",
-        "priceGrade": "within",
-        "areaYieldBand": 7.8,
-        "areaPpsmBand": [30000, 55000],
-        "areaAcreBand": [1.5, 6],
-        "qualityScore": 93,
-        "route": "publish",
-        "checks": [
-          {
-            "label": "Completeness screen",
-            "status": "pass",
-            "detail": "All buyer-critical fields present"
-          },
-          {
-            "label": "Price-band screen",
-            "status": "pass",
-            "detail": "KES 43k/sqm sits within the area band"
-          },
-          {
-            "label": "Content quality screen",
-            "status": "pass",
-            "detail": "51-word description · 2 photos · 4 amenities"
-          },
-          {
-            "label": "Source screening",
-            "status": "warn",
-            "detail": "Organic market scanner sighting — human spot-check recommended"
-          }
-        ]
-      }
     }
   ],
   "pending": [],
@@ -5591,7 +5573,11 @@
     "apartment|Ruaka|3br|8",
     "apartment|Ruaka|1br|3",
     "land|Diani|0br|10",
-    "townhouse|Diani|4br|16"
+    "townhouse|Diani|4br|16",
+    "townhouse|Syokimau|4br|6",
+    "townhouse|Westlands|4br|24",
+    "apartment|Diani|4br|8",
+    "apartment|Karen|2br|7"
   ],
   "rejected": []
 }
